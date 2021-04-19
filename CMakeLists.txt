@@ -4,10 +4,13 @@ project(hopsy)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
+set(HOPS_EXAMPLES OFF)
+set(HOPS_TESTS OFF)
+
 add_subdirectory(extern/hops)
 add_subdirectory(extern/pybind11)
 
-pybind11_add_module(hopsy src/main.cpp)
+pybind11_add_module(hopsy src/hopsy.cpp)
 target_link_libraries(hopsy PRIVATE hops)
 
 # EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
