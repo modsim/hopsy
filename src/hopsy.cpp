@@ -98,14 +98,21 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(hopsy, m) {
     py::class_<hopsy::DegenerateMultivariateGaussianModel>(m, "DegenerateMultivariateGaussianModel")
-        .def(py::init<Eigen::VectorXd, Eigen::MatrixXd>())
-        .def(py::init<Eigen::VectorXd, Eigen::MatrixXd, std::vector<long>>());
+        .def(py::init<Eigen::VectorXd, Eigen::MatrixXd>(),
+                py::arg("mean") = Eigen::VectorXd(Eigen::VectorXd::Zero(2)), 
+                py::arg("covariance") = Eigen::MatrixXd(Eigen::MatrixXd::Identity(2, 2)))
+        .def(py::init<Eigen::VectorXd, Eigen::MatrixXd, std::vector<long>>(),
+                py::arg("mean") = Eigen::VectorXd(Eigen::VectorXd::Zero(2)), 
+                py::arg("covariance") = Eigen::MatrixXd(Eigen::MatrixXd::Identity(2, 2)),
+                py::arg("inactives") = std::vector<long>());
 
     py::class_<hopsy::MultimodalMultivariateGaussianModel>(m, "MultimodalMultivariateGaussianModel")
         .def(py::init<std::vector<hopsy::DegenerateMultivariateGaussianModel>>());
 
     py::class_<hopsy::MultivariateGaussianModel>(m, "MultivariateGaussianModel")
-        .def(py::init<Eigen::VectorXd, Eigen::MatrixXd>());
+        .def(py::init<Eigen::VectorXd, Eigen::MatrixXd>(),
+                py::arg("mean") = Eigen::VectorXd(Eigen::VectorXd::Zero(2)), 
+                py::arg("covariance") = Eigen::MatrixXd(Eigen::MatrixXd::Identity(2, 2)));
 
     py::class_<hopsy::RosenbrockModel>(m, "RosenbrockModel")
         .def(py::init<double, Eigen::VectorXd>());
