@@ -1,9 +1,15 @@
 cmake_minimum_required(VERSION 3.4...3.18)
-project(cmake_example)
+project(hopsy)
 
-add_subdirectory(pybind11)
-pybind11_add_module(cmake_example src/main.cpp)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+
+add_subdirectory(extern/hops)
+add_subdirectory(extern/pybind11)
+
+pybind11_add_module(hopsy src/main.cpp)
+target_link_libraries(hopsy PRIVATE hops)
 
 # EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
 # define (VERSION_INFO) here.
-target_compile_definitions(cmake_example PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
+target_compile_definitions(hopsy PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})

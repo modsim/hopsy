@@ -1,6 +1,15 @@
-# -*- coding: utf-8 -*-
-import cmake_example as m
+import hopsy
+import numpy as np
 
-assert m.__version__ == "0.0.1"
-assert m.add(1, 2) == 3
-assert m.subtract(1, 2) == -1
+A = np.array([[1, 0], [0, 1], [-1, 0], [-1, 0]])
+b = np.array([[1], [1], [0], [0]]);
+
+mu = np.zeros((2,1))
+cov = np.identity(2)
+
+model = hopsy.MultivariateGaussianModel(mu, cov)
+problem = hopsy.Problem(A, b, model)
+run = hopsy.Run(problem, "HitAndRun", 100, 1)
+
+run.sample()
+

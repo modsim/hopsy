@@ -1,4 +1,7 @@
-[submodule "pybind11"]
-	path = pybind11
+[submodule "extern/pybind11"]
+	path = extern/pybind11
 	url = https://github.com/pybind/pybind11.git
-	branch = master
+	branch = stable
+[submodule "extern/hops"]
+	path = extern/hops
+	url = git@jugit.fz-juelich.de:fluxomics/hops.git
