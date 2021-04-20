@@ -6,3 +6,5 @@ _generate/
 *.py[cod]
 *.egg-info
 *env*
+.*.sw*
+ssh
