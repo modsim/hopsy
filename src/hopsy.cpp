@@ -1,5 +1,3 @@
-#include <hops/Utility/Exceptions.hpp>
-#include <hops/Utility/StatisticsData.hpp>
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -166,6 +164,8 @@ PYBIND11_MODULE(hopsy, m) {
         .def("get_number_of_samples", &hopsy::DegenerateMultivariateGaussianRun::getNumberOfSamples)
         .def("set_thinning", &hopsy::DegenerateMultivariateGaussianRun::setThinning)
         .def("get_thinning", &hopsy::DegenerateMultivariateGaussianRun::getThinning)
+        .def("enable_rounding", &hopsy::DegenerateMultivariateGaussianRun::enableRounding)
+        .def("disable_rounding", &hopsy::DegenerateMultivariateGaussianRun::disableRounding)
         .def("set_stepsize", &hopsy::DegenerateMultivariateGaussianRun::setStepSize)
         .def("get_stepsize", &hopsy::DegenerateMultivariateGaussianRun::getStepSize)
         .def("set_fisher_weight", &hopsy::DegenerateMultivariateGaussianRun::setFisherWeight)
@@ -198,6 +198,8 @@ PYBIND11_MODULE(hopsy, m) {
         .def("set_thinning", &hopsy::MultimodalMultivariateGaussianRun::setThinning)
         .def("get_thinning", &hopsy::MultimodalMultivariateGaussianRun::getThinning)
         .def("set_stepsize", &hopsy::MultimodalMultivariateGaussianRun::setStepSize)
+        .def("enable_rounding", &hopsy::MultimodalMultivariateGaussianRun::enableRounding)
+        .def("disable_rounding", &hopsy::MultimodalMultivariateGaussianRun::disableRounding)
         .def("get_stepsize", &hopsy::MultimodalMultivariateGaussianRun::getStepSize)
         .def("set_fisher_weight", &hopsy::MultimodalMultivariateGaussianRun::setFisherWeight)
         .def("get_fisher_weight", &hopsy::MultimodalMultivariateGaussianRun::getFisherWeight)
@@ -228,6 +230,8 @@ PYBIND11_MODULE(hopsy, m) {
         .def("get_number_of_samples", &hopsy::MultivariateGaussianRun::getNumberOfSamples)
         .def("set_thinning", &hopsy::MultivariateGaussianRun::setThinning)
         .def("get_thinning", &hopsy::MultivariateGaussianRun::getThinning)
+        .def("enable_rounding", &hopsy::MultivariateGaussianRun::enableRounding)
+        .def("disable_rounding", &hopsy::MultivariateGaussianRun::disableRounding)
         .def("set_stepsize", &hopsy::MultivariateGaussianRun::setStepSize)
         .def("get_stepsize", &hopsy::MultivariateGaussianRun::getStepSize)
         .def("set_fisher_weight", &hopsy::MultivariateGaussianRun::setFisherWeight)
@@ -259,6 +263,8 @@ PYBIND11_MODULE(hopsy, m) {
         .def("get_number_of_samples", &hopsy::RosenbrockRun::getNumberOfSamples)
         .def("set_thinning", &hopsy::RosenbrockRun::setThinning)
         .def("get_thinning", &hopsy::RosenbrockRun::getThinning)
+        .def("enable_rounding", &hopsy::RosenbrockRun::enableRounding)
+        .def("disable_rounding", &hopsy::RosenbrockRun::disableRounding)
         .def("set_stepsize", &hopsy::RosenbrockRun::setStepSize)
         .def("get_stepsize", &hopsy::RosenbrockRun::getStepSize)
         .def("set_fisher_weight", &hopsy::RosenbrockRun::setFisherWeight)
@@ -290,6 +296,8 @@ PYBIND11_MODULE(hopsy, m) {
         .def("get_number_of_samples", &hopsy::UniformRun::getNumberOfSamples)
         .def("set_thinning", &hopsy::UniformRun::setThinning)
         .def("get_thinning", &hopsy::UniformRun::getThinning)
+        .def("enable_rounding", &hopsy::UniformRun::enableRounding)
+        .def("disable_rounding", &hopsy::UniformRun::disableRounding)
         .def("set_stepsize", &hopsy::UniformRun::setStepSize)
         .def("get_stepsize", &hopsy::UniformRun::getStepSize)
         .def("set_fisher_weight", &hopsy::UniformRun::setFisherWeight)
