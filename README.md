@@ -19,8 +19,9 @@ Just clone this repository and pip install. Note the `--recursive` option which 
 needed for the pybind11 submodule:
 
 ```bash
-git clone --recursive https://jugit.fz-juelich.de/fluxomics/hopsy.git
-pip install ./hopsy
+git clone --recursive [url-to-this-repo]
+cd hopsy
+sudo python3 -m pip install -e .
 ```
 
 With the `setup.py` file included in this example, the `pip install` command will
