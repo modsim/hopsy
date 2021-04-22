@@ -22,7 +22,7 @@ add_subdirectory(extern/pybind11)
 #set_target_properties(hops PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
 pybind11_add_module(hopsy src/hopsy.cpp)
-target_compile_options(hopsy PUBLIC "-DHOPS_HEADER_ONLY")
+#target_compile_options(hopsy PUBLIC "-DHOPS_HEADER_ONLY")
 #target_include_directories(hopsy PUBLIC "${EIGEN3_INCLUDE_DIR}")
 target_include_directories(hopsy PUBLIC "extern/hops/include/hops")
 target_link_libraries(hopsy PUBLIC hops)
