@@ -11,5 +11,8 @@ model = hopsy.MultivariateGaussianModel(mu, cov)
 problem = hopsy.Problem(A, b, model)
 run = hopsy.Run(problem)
 
+run.set_starting_points([np.array([[0.5], [0.5]])])
+#run.enable_rounding()
+
 run.sample()
 
