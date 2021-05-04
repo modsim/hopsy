@@ -9,12 +9,41 @@
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
+namespace py = pybind11;
 
 namespace hopsy {
+    class PyModel {
+	public:
+        using MatrixType = Eigen::MatrixXd;
+        using VectorType = Eigen::VectorXd;
+
+		PyModel(py::object pyObj) : pyObj(std::move(pyObj)) {};
+
+		double calculateNegativeLogLikelihood(const Eigen::VectorXd& x) const {
+			return pyObj.attr("calculate_negative_log_likelihood")(x).cast<double>();
+		}
+
+        Eigen::MatrixXd calculateExpectedFisherInformation(const Eigen::VectorXd& x) const {
+			return pyObj.attr("calculate_expected_fisher_information")(x).cast<Eigen::MatrixXd>();
+		}
+
+        Eigen::VectorXd calculateLogLikelihoodGradient(const Eigen::VectorXd& x) const {
+			return pyObj.attr("calculate_log_likelihood_gradient")(x).cast<Eigen::VectorXd>();
+		}
+
+	private:
+		py::object pyObj;
+	};
+
+    class PyProposal {
+
+    };
+
     typedef hops::DegenerateMultivariateGaussianModel<Eigen::MatrixXd, Eigen::VectorXd> DegenerateMultivariateGaussianModel;
     typedef hops::DynMultimodalModel<DegenerateMultivariateGaussianModel> MultimodalMultivariateGaussianModel;
     typedef hops::MultivariateGaussianModel<Eigen::MatrixXd, Eigen::VectorXd> MultivariateGaussianModel;
     typedef hops::RosenbrockModel<Eigen::MatrixXd, Eigen::VectorXd> RosenbrockModel;
+    typedef hops::UniformDummyModel<Eigen::MatrixXd, Eigen::VectorXd> UniformModel;
     typedef hops::UniformDummyModel<Eigen::MatrixXd, Eigen::VectorXd> UniformModel;
 
     typedef hops::Problem<DegenerateMultivariateGaussianModel> DegenerateMultivariateGaussianProblem;
@@ -22,19 +51,25 @@ namespace hopsy {
     typedef hops::Problem<MultivariateGaussianModel> MultivariateGaussianProblem;
     typedef hops::Problem<RosenbrockModel> RosenbrockProblem;
     typedef hops::Problem<UniformModel> UniformProblem;
+    typedef hops::Problem<PyModel> PyProblem;
 
 	typedef hops::Run<DegenerateMultivariateGaussianModel> DegenerateMultivariateGaussianRun;
     typedef hops::Run<MultimodalMultivariateGaussianModel> MultimodalMultivariateGaussianRun;
     typedef hops::Run<MultivariateGaussianModel> MultivariateGaussianRun;
     typedef hops::Run<RosenbrockModel> RosenbrockRun;
     typedef hops::Run<UniformModel> UniformRun;
+    typedef hops::Run<PyModel> PyRun;
 
-	hops::Problem<UniformModel> Problem_(const Eigen::MatrixXd& A, const Eigen::VectorXd& b) {
+	hops::Problem<UniformModel> createUniformProblem(const Eigen::MatrixXd& A, const Eigen::VectorXd& b) {
 		return hops::Problem<UniformModel>(A, b);
 	}
 
+	hops::Problem<PyModel> createPyProblem(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, py::object& pyObj) {
+		return hops::Problem<PyModel>(A, b, PyModel(pyObj));
+	}
+
 	template<typename T>
-	hops::Problem<T> Problem(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const T& t) {
+	hops::Problem<T> createProblem(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const T& t) {
 		if constexpr(std::is_same<T, DegenerateMultivariateGaussianModel>::value) {
 			return hops::Problem<DegenerateMultivariateGaussianModel>(A, b, t);
 		}
@@ -49,6 +84,9 @@ namespace hopsy {
 		}
 		if constexpr(std::is_same<T, UniformModel>::value) {
 			return hops::Problem<UniformModel>(A, b, t);
+		}
+		if constexpr(std::is_same<T, PyModel>::value) {
+			return hops::Problem<PyModel>(A, b, t);
 		}
 	}
 
@@ -89,12 +127,17 @@ namespace hopsy {
 		if constexpr(std::is_same<T, UniformModel>::value) {
 			return hops::Run<UniformModel>(t, chainType, numberOfSamples, numberOfChains);
 		}
+		if constexpr(std::is_same<T, PyModel>::value) {
+			return hops::Run<PyModel>(t, chainType, numberOfSamples, numberOfChains);
+		}
 	}
 }
 
-namespace py = pybind11;
-
 PYBIND11_MODULE(hopsy, m) {
+    //  
+    // Model constructors
+    // ==================
+    //
     py::class_<hopsy::DegenerateMultivariateGaussianModel>(m, "DegenerateMultivariateGaussianModel")
         .def(py::init<Eigen::VectorXd, Eigen::MatrixXd>(),
                 py::arg("mean") = Eigen::VectorXd(Eigen::VectorXd::Zero(2)), 
@@ -112,6 +155,9 @@ PYBIND11_MODULE(hopsy, m) {
                 py::arg("mean") = Eigen::VectorXd(Eigen::VectorXd::Zero(2)), 
                 py::arg("covariance") = Eigen::MatrixXd(Eigen::MatrixXd::Identity(2, 2)));
 
+    py::class_<hopsy::PyModel>(m, "PyModel")
+        .def(py::init<py::object>());
+
     py::class_<hopsy::RosenbrockModel>(m, "RosenbrockModel")
         .def(py::init<double, Eigen::VectorXd>());
 
@@ -119,6 +165,10 @@ PYBIND11_MODULE(hopsy, m) {
         .def(py::init<>());
 
 
+    //  
+    // Problem constructors
+    // ====================
+    //
     py::class_<hopsy::DegenerateMultivariateGaussianProblem>(m, "DegenerateMultivariateGaussianProblem")
         .def(py::init<Eigen::MatrixXd, Eigen::VectorXd, hopsy::DegenerateMultivariateGaussianModel>());
 
@@ -135,13 +185,26 @@ PYBIND11_MODULE(hopsy, m) {
         .def(py::init<Eigen::MatrixXd, Eigen::VectorXd>())
         .def(py::init<Eigen::MatrixXd, Eigen::VectorXd, hopsy::UniformModel>());
 
+    py::class_<hopsy::PyProblem>(m, "PyProblem")
+        .def(py::init<Eigen::MatrixXd, Eigen::VectorXd, hopsy::PyModel>());
 
-	m.def("Problem", &hopsy::Problem<hopsy::DegenerateMultivariateGaussianModel>);
-	m.def("Problem", &hopsy::Problem<hopsy::MultimodalMultivariateGaussianModel>);
-	m.def("Problem", &hopsy::Problem<hopsy::MultivariateGaussianModel>);
-	m.def("Problem", &hopsy::Problem<hopsy::RosenbrockModel>);
-	m.def("Problem", &hopsy::Problem<hopsy::UniformModel>);
-	m.def("Problem", &hopsy::Problem_);
+
+    //  
+    // Problem factory method
+    // ======================
+    //
+    // Instead of having to construct the correct problem from a given model, this method 
+    // simulates a general problem constructor which then statically checks the passed model
+    // type and returns the correctly instantiated problem type
+    //
+	m.def("Problem", &hopsy::createProblem<hopsy::DegenerateMultivariateGaussianModel>);
+	m.def("Problem", &hopsy::createProblem<hopsy::MultimodalMultivariateGaussianModel>);
+	m.def("Problem", &hopsy::createProblem<hopsy::MultivariateGaussianModel>);
+	m.def("Problem", &hopsy::createProblem<hopsy::PyModel>);
+	m.def("Problem", &hopsy::createProblem<hopsy::RosenbrockModel>);
+	m.def("Problem", &hopsy::createProblem<hopsy::UniformModel>);
+	m.def("Problem", &hopsy::createUniformProblem);
+	m.def("Problem", &hopsy::createPyProblem);
 
 
     py::class_<hopsy::DegenerateMultivariateGaussianRun>(m, "DegenerateMultivariateGaussianRun")
@@ -309,12 +372,47 @@ PYBIND11_MODULE(hopsy, m) {
         .def("get_diagnostics_threshold", &hopsy::UniformRun::getDiagnosticsThreshold)
         .def("get_max_repetitions", &hopsy::UniformRun::getMaxRepetitions);
 
+    py::class_<hopsy::PyRun>(m, "PyRun")
+        .def(py::init<hopsy::PyProblem>())
+        .def(py::init<hopsy::PyRun&>())
+        .def("get_data", &hopsy::PyRun::getData)
+        .def("init", &hopsy::PyRun::init)
+        .def("sample", py::overload_cast<>(&hopsy::PyRun::sample))
+        .def("sample", py::overload_cast<unsigned long, unsigned long>(
+                    &hopsy::PyRun::sample), py::arg("number_of_samples"), py::arg("thinning") = 1)
+        .def("set_problem", &hopsy::PyRun::setProblem)
+        .def("get_problem", &hopsy::PyRun::getProblem)
+        .def("set_starting_points", &hopsy::PyRun::setStartingPoints)
+        .def("get_starting_points", &hopsy::PyRun::getStartingPoints)
+        .def("set_markov_chain_type", &hopsy::PyRun::setMarkovChainType)
+        .def("get_markovv_chain_type", &hopsy::PyRun::getMarkovChainType)
+        .def("set_number_of_chains", &hopsy::PyRun::setNumberOfChains)
+        .def("get_number_of_chains", &hopsy::PyRun::getNumberOfChains)
+        .def("set_number_of_samples", &hopsy::PyRun::setNumberOfSamples)
+        .def("get_number_of_samples", &hopsy::PyRun::getNumberOfSamples)
+        .def("set_thinning", &hopsy::PyRun::setThinning)
+        .def("get_thinning", &hopsy::PyRun::getThinning)
+        .def("enable_rounding", &hopsy::PyRun::enableRounding)
+        .def("disable_rounding", &hopsy::PyRun::disableRounding)
+        .def("set_stepsize", &hopsy::PyRun::setStepSize)
+        .def("get_stepsize", &hopsy::PyRun::getStepSize)
+        .def("set_fisher_weight", &hopsy::PyRun::setFisherWeight)
+        .def("get_fisher_weight", &hopsy::PyRun::getFisherWeight)
+        .def("set_random_seed", &hopsy::PyRun::setRandomSeed)
+        .def("get_random_seed", &hopsy::PyRun::getRandomSeed)
+        .def("unset_sampling_until_convergence", &hopsy::PyRun::unsetSamplingUntilConvergence)
+        .def("set_sampling_until_convergence", &hopsy::PyRun::setSamplingUntilConvergence)
+        .def("get_diagnostics_threshold", &hopsy::PyRun::getDiagnosticsThreshold)
+        .def("get_max_repetitions", &hopsy::PyRun::getMaxRepetitions);
+
 
 	m.def("Run", &hopsy::Run<hopsy::DegenerateMultivariateGaussianModel>, 
             py::arg("problem"), py::arg("chainType") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
 	m.def("Run", &hopsy::Run<hopsy::MultimodalMultivariateGaussianModel>,
             py::arg("problem"), py::arg("chainType") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
 	m.def("Run", &hopsy::Run<hopsy::MultivariateGaussianModel>,
+            py::arg("problem"), py::arg("chainType") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+	m.def("Run", &hopsy::Run<hopsy::PyModel>,
             py::arg("problem"), py::arg("chainType") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
 	m.def("Run", &hopsy::Run<hopsy::RosenbrockModel>,
             py::arg("problem"), py::arg("chainType") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
