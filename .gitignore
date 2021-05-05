@@ -8,3 +8,5 @@ _generate/
 *env*
 .*.sw*
 ssh
+.clangd
+compile_commands.json

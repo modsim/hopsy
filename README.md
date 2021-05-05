@@ -3,7 +3,7 @@
 A python interface for HOPS - the **H**ighly **O**ptimized toolbox for **P**olytope **S**ampling.
 Built using `pybind11`
 
-<img src="hops.png" alt="HOPS Logo" width="500"/>
+<img src="hops.png" alt="HOPS Logo" width="300"/>
 
 
 ## Prerequisites
@@ -34,7 +34,7 @@ Alternatively, the project can be built using basic CMake commands:
 ```bash
 git clone --recursive [url-to-this-repo]
 cd hopsy
-mkdir build/
+mkdir build/ && cd build/
 make 
 make test # optional
 ```
