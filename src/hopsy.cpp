@@ -82,7 +82,7 @@ void addRunClassToModule(py::module& m, const char* name, const char* doc) {
 
 PYBIND11_MODULE(hopsy, m) {
     m.doc() = R"pbdoc(
-        hopsy -         
+        hopsy
    		-----------------------
 		A python interface for HOPS - the Highly Optimized toolbox for Polytope Sampling.
 		Built using pybind11.
@@ -91,12 +91,35 @@ PYBIND11_MODULE(hopsy, m) {
 
         .. autosummary::
             :toctree: _generate
-		    DegenerateMultivariateGaussianModel
-			MultimodalMultivariateGaussianModel
-			MultivariateGaussianModel
-			PyModel
+
+            DegenerateMultivariateGaussianModel
+            MultimodalMultivariateGaussianModel
+            MultivariateGaussianModel
+            PyModel
             RosenbrockModel
             UniformModel
+            
+            Problem
+            DegenerateMultivariateGaussianProblem
+            MultimodalMultivariateGaussianProblem
+            MultivariateGaussianProblem
+            PyProblem
+            RosenbrockProblem
+            UniformProblem
+            
+            PyProposal
+            
+            Run
+            DegenerateMultivariateGaussianRun
+            MultimodalMultivariateGaussianRun
+            MultivariateGaussianRun
+            PyRun
+            RosenbrockRun
+            UniformRun
+            
+            Data
+            ChainData
+            compute_
     )pbdoc";
 
     // Model classes
