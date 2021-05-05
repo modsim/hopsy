@@ -3,7 +3,7 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
-class Gaussian:
+class GaussianModel:
     def __init__(self, mu, cov):
         self.mu = mu
         self.cov = cov
@@ -23,7 +23,7 @@ b = np.array([[1], [1], [0], [0]]);
 mu = np.zeros((2,1))
 cov = 0.1*np.identity(2)
 
-model = Gaussian(mu, cov)
+model = GaussianModel(mu, cov)
 problem = hopsy.Problem(A, b, model)
 run = hopsy.Run(problem)
 
@@ -31,8 +31,7 @@ run.set_starting_points([np.array([[0.1], [0.1]])])
 
 run.sample(10000)
 
-states = np.array(run.get_data().get_chain(0).get_states())
-print(states)
+states = np.array(run.get_data().get_states()[0])
 
 fig = plt.figure(figsize=(35,35))
 fig.patch.set_alpha(1)
