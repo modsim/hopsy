@@ -12,7 +12,6 @@ problem = hopsy.Problem(A, b, model)
 run = hopsy.Run(problem)
 
 run.init()
-print(run.get_starting_points())
 
 run.sample()
 

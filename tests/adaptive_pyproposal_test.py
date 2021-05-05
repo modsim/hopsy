@@ -1,6 +1,6 @@
 import hopsy
 import numpy as np
-
+import sys
 import matplotlib.pyplot as plt
 
 class AdaptiveGaussianProposal:
@@ -91,12 +91,13 @@ print("Stepsize |               " + str(run2.get_stepsize()) + " |              
 print("Acc Rate |             " + str(gaussian_acc_rate)[:5] + " |             " + str(adaptive_acc_rate)[:5]) 
 print("ESJD     |             " + str(gaussian_esjd)[:5]     + " |             " + str(adaptive_esjd)[:5])
 
-states = np.array(run.get_data().get_states()[0])
-states2 = np.array(run2.get_data().get_states()[0])
+if len(sys.argv) == 1 or sys.argv[1] != "test":
+    states = np.array(run.get_data().get_states()[0])
+    states2 = np.array(run2.get_data().get_states()[0])
 
-fig = plt.figure(figsize=(35,35))
-fig.patch.set_alpha(1)
-ax = fig.gca()
-ax.scatter(states[:,0], states[:,1])
-ax.scatter(states2[:,0], states2[:,1])
-plt.show()
+    fig = plt.figure(figsize=(35,35))
+    fig.patch.set_alpha(1)
+    ax = fig.gca()
+    ax.scatter(states[:,0], states[:,1])
+    ax.scatter(states2[:,0], states2[:,1])
+    plt.show()

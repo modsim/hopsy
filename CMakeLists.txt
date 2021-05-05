@@ -16,6 +16,10 @@ set(HOPS_TESTS OFF)
 
 #find_package(Eigen3 REQUIRED)
 
+enable_testing()
+add_subdirectory(tests)
+
+set(EVENT__DISABLE_TESTS ON)
 add_subdirectory(extern/hops)
 add_subdirectory(extern/pybind11)
 
@@ -30,3 +34,7 @@ target_link_libraries(hopsy PUBLIC hops)
 # EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
 # define (VERSION_INFO) here.
 target_compile_definitions(hopsy PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
+
+add_custom_command(TARGET hopsy POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:hopsy> tests/${targetfile}
+        )
