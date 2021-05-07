@@ -16,15 +16,9 @@ RUN apt-get install -y python3-pip
 
 WORKDIR /root
 
-#ADD . /root/hopsy
-
-RUN mkdir /root/.ssh/
-ADD ssh/known_hosts /root/.ssh/known_hosts
-ADD ssh/id_rsa /root/.ssh/id_rsa
+ADD . /root/hopsy
 
 RUN pip3 install numpy
-RUN git clone --recursive git@jugit.fz-juelich.de:fluxomics/hopsy.git
-
 RUN pip3 install ./hopsy
 #RUN python3 hopsy/tests/test.py
 

@@ -2,7 +2,6 @@ import hopsy
 import numpy as np
 
 import sys
-import matplotlib.pyplot as plt
 
  
 class GaussianProposal:
@@ -133,6 +132,7 @@ print("Acc Rate |             " + str(gaussian_acc_rate)[:5] + " |             "
 print("ESJD     |             " + str(gaussian_esjd)[:5]     + " |             " + str(adaptive_esjd)[:5])
 
 if len(sys.argv) == 1 or sys.argv[1] != "test":
+    import matplotlib.pyplot as plt
     gaussian_states = np.array(gaussian_run.get_data().get_states()[0])
     adaptive_states = np.array(adaptive_run.get_data().get_states()[0])
 
