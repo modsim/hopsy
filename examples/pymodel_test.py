@@ -1,7 +1,6 @@
 import hopsy
 import numpy as np
 import sys
-import matplotlib.pyplot as plt
 
 class GaussianModel:
     def __init__(self, mu, cov):
@@ -35,6 +34,7 @@ run.set_starting_points([np.array([[0.1], [0.1]])])
 run.sample(10000)
 
 if len(sys.argv) == 1 or sys.argv[1] != "test":
+    import matplotlib.pyplot as plt
     states = np.array(run.get_data().get_states()[0])
 
     fig = plt.figure(figsize=(35,35))
