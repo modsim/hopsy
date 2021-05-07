@@ -55,7 +55,7 @@ namespace hopsy {
         }
 
         double calculateLogAcceptanceProbability() {
-            return pyObj.attr("get_log_acceptance_probability")().cast<double>();
+            return pyObj.attr("calculate_log_acceptance_probability")().cast<double>();
         }
 
         Eigen::VectorXd getState() const {

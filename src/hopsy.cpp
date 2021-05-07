@@ -81,47 +81,6 @@ void addRunClassToModule(py::module& m, const char* name, const char* doc) {
 }
 
 PYBIND11_MODULE(hopsy, m) {
-    m.doc() = R"pbdoc(
-        hopsy
-   		-----------------------
-		A python interface for HOPS - the Highly Optimized toolbox for Polytope Sampling.
-		Built using pybind11.
-
-        .. currentmodule:: hopsy
-
-        .. autosummary::
-            :toctree: _generate
-
-            DegenerateMultivariateGaussianModel
-            MultimodalMultivariateGaussianModel
-            MultivariateGaussianModel
-            PyModel
-            RosenbrockModel
-            UniformModel
-            
-            Problem
-            DegenerateMultivariateGaussianProblem
-            MultimodalMultivariateGaussianProblem
-            MultivariateGaussianProblem
-            PyProblem
-            RosenbrockProblem
-            UniformProblem
-            
-            PyProposal
-            
-            Run
-            DegenerateMultivariateGaussianRun
-            MultimodalMultivariateGaussianRun
-            MultivariateGaussianRun
-            PyRun
-            RosenbrockRun
-            UniformRun
-            
-            Data
-            ChainData
-            compute_
-    )pbdoc";
-
     // Model classes
     // =============
     //
@@ -140,7 +99,8 @@ PYBIND11_MODULE(hopsy, m) {
     py::class_<hopsy::MultimodalMultivariateGaussianModel>(m, "MultimodalMultivariateGaussianModel",
 				R"pbdoc()pbdoc")
         .def(py::init<std::vector<hopsy::DegenerateMultivariateGaussianModel>>(),
-                R"pbdoc()pbdoc");
+                R"pbdoc()pbdoc",
+                py::arg("components"));
 
     py::class_<hopsy::MultivariateGaussianModel>(m, "MultivariateGaussianModel",
 				R"pbdoc()pbdoc")
@@ -152,17 +112,26 @@ PYBIND11_MODULE(hopsy, m) {
     py::class_<hopsy::PyModel>(m, "PyModel",
 				R"pbdoc()pbdoc")
         .def(py::init<py::object>(),
-                R"pbdoc()pbdoc");
+                R"pbdoc()pbdoc",
+                py::arg("model"));
 
     py::class_<hopsy::RosenbrockModel>(m, "RosenbrockModel",
 				R"pbdoc()pbdoc")
-        .def(py::init<double, Eigen::VectorXd>(),
-                R"pbdoc()pbdoc");
+        .def(py::init<double, Eigen::VectorXd>());
 
     py::class_<hopsy::UniformModel>(m, "UniformModel",
-				R"pbdoc()pbdoc")
-        .def(py::init<>(),
-                R"pbdoc()pbdoc");
+				R"pbdoc(
+The ``hopsy.UniformModel`` defines the uniform target distribution on the polytope
+
+.. math::
+   \pi(x) := \frac{1}{Z} \mathbf{1}_{\mathcal{P}}(x)
+
+where
+
+.. math::
+   Z = \int_{\mathcal{P}} \mathbf{1}_{\mathcal{P}}(x) \mathrm{d}x
+                )pbdoc")
+        .def(py::init<>());
 
 
     //  
@@ -172,35 +141,54 @@ PYBIND11_MODULE(hopsy, m) {
     py::class_<hopsy::DegenerateMultivariateGaussianProblem>(m, "DegenerateMultivariateGaussianProblem",
 				R"pbdoc()pbdoc")
         .def(py::init<Eigen::MatrixXd, Eigen::VectorXd, hopsy::DegenerateMultivariateGaussianModel>(),
-                R"pbdoc()pbdoc");
+                R"pbdoc()pbdoc",
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"));
 
     py::class_<hopsy::MultimodalMultivariateGaussianProblem>(m, "MultimodalMultivariateGaussianProblem",
 				R"pbdoc()pbdoc")
         .def(py::init<Eigen::MatrixXd, Eigen::VectorXd, hopsy::MultimodalMultivariateGaussianModel>(),
-                R"pbdoc()pbdoc");
+                R"pbdoc()pbdoc",
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"));
 
     py::class_<hopsy::MultivariateGaussianProblem>(m, "MultivariateGaussianProblem",
 				R"pbdoc()pbdoc")
         .def(py::init<Eigen::MatrixXd, Eigen::VectorXd, hopsy::MultivariateGaussianModel>(),
-                R"pbdoc()pbdoc");
+                R"pbdoc()pbdoc",
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"));
 
     py::class_<hopsy::RosenbrockProblem>(m, "RosenbrockProblem",
 				R"pbdoc()pbdoc")
         .def(py::init<Eigen::MatrixXd, Eigen::VectorXd, hopsy::RosenbrockModel>(),
-                R"pbdoc()pbdoc");
+                R"pbdoc()pbdoc",
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"));
 
     py::class_<hopsy::UniformProblem>(m, "UniformProblem",
 				R"pbdoc()pbdoc")
         .def(py::init<Eigen::MatrixXd, Eigen::VectorXd>(),
                 R"pbdoc()pbdoc",
-				R"pbdoc()pbdoc")
+                py::arg("A"),
+                py::arg("b"))
         .def(py::init<Eigen::MatrixXd, Eigen::VectorXd, hopsy::UniformModel>(),
-                R"pbdoc()pbdoc");
+                R"pbdoc()pbdoc",
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"));
 
     py::class_<hopsy::PyProblem>(m, "PyProblem",
 				R"pbdoc()pbdoc")
         .def(py::init<Eigen::MatrixXd, Eigen::VectorXd, hopsy::PyModel>(),
-                R"pbdoc()pbdoc");
+                R"pbdoc()pbdoc",
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"));
 
 
     //  
@@ -212,21 +200,44 @@ PYBIND11_MODULE(hopsy, m) {
     // type and returns the correctly instantiated problem object
     //
 	m.def("Problem", &hopsy::createProblem<hopsy::DegenerateMultivariateGaussianModel>,
-                R"pbdoc()pbdoc");
+                R"pbdoc()pbdoc",
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"));
 	m.def("Problem", &hopsy::createProblem<hopsy::MultimodalMultivariateGaussianModel>,
-                R"pbdoc()pbdoc");
+                R"pbdoc()pbdoc",
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"));
 	m.def("Problem", &hopsy::createProblem<hopsy::MultivariateGaussianModel>,
-                R"pbdoc()pbdoc");
+                R"pbdoc()pbdoc",
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"));
 	m.def("Problem", &hopsy::createProblem<hopsy::PyModel>,
-                R"pbdoc()pbdoc");
+                R"pbdoc()pbdoc",
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"));
 	m.def("Problem", &hopsy::createProblem<hopsy::RosenbrockModel>,
-                R"pbdoc()pbdoc");
+                R"pbdoc()pbdoc",
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"));
 	m.def("Problem", &hopsy::createProblem<hopsy::UniformModel>,
-                R"pbdoc()pbdoc");
+                R"pbdoc()pbdoc",
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"));
 	m.def("Problem", &hopsy::createUniformProblem,
-                R"pbdoc()pbdoc");
+                R"pbdoc()pbdoc",
+                py::arg("A"),
+                py::arg("b"));
 	m.def("Problem", &hopsy::createPyProblem,
-                R"pbdoc()pbdoc");
+                R"pbdoc()pbdoc",
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"));
 
 
     //  
@@ -236,7 +247,8 @@ PYBIND11_MODULE(hopsy, m) {
     py::class_<hopsy::PyProposal>(m, "PyProposal",
 				R"pbdoc()pbdoc")
         .def(py::init<py::object>(),
-				R"pbdoc()pbdoc");
+				R"pbdoc()pbdoc",
+                py::arg("proposal"));
 
     //  
     // Run classes
@@ -279,60 +291,50 @@ PYBIND11_MODULE(hopsy, m) {
     //
 	m.def("Run", &hopsy::createRun<hopsy::DegenerateMultivariateGaussianModel>, 
             	R"pbdoc()pbdoc",
-            py::arg("problem"), py::arg("chainType") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
-	m.def("Run", &hopsy::createRun<hopsy::MultimodalMultivariateGaussianModel>,
-            	R"pbdoc()pbdoc",
-            py::arg("problem"), py::arg("chainType") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
-	m.def("Run", &hopsy::createRun<hopsy::MultivariateGaussianModel>,
-            	R"pbdoc()pbdoc",
-            py::arg("problem"), py::arg("chainType") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
-	m.def("Run", &hopsy::createRun<hopsy::PyModel>,
-            	R"pbdoc()pbdoc",
-            py::arg("problem"), py::arg("chainType") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
-	m.def("Run", &hopsy::createRun<hopsy::RosenbrockModel>,
-            	R"pbdoc()pbdoc",
-            py::arg("problem"), py::arg("chainType") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
-	m.def("Run", &hopsy::createRun<hopsy::UniformModel>,
-            	R"pbdoc()pbdoc",
-            py::arg("problem"), py::arg("chainType") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	py::arg("problem"), py::arg("proposal_name") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+	m.def("Run", &hopsy::createRun<hopsy::MultimodalMultivariateGaussianModel>);
+	m.def("Run", &hopsy::createRun<hopsy::MultivariateGaussianModel>);
+	m.def("Run", &hopsy::createRun<hopsy::PyModel>);
+	m.def("Run", &hopsy::createRun<hopsy::RosenbrockModel>);
+	m.def("Run", &hopsy::createRun<hopsy::UniformModel>);
 
 	m.def("Run", &hopsy::createRunFromPyProposal<hopsy::DegenerateMultivariateGaussianModel>, 
             	R"pbdoc()pbdoc",
-            py::arg("problem"), py::arg("proposal_algorithm"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	py::arg("problem"), py::arg("proposal"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
 	m.def("Run", &hopsy::createRunFromPyProposal<hopsy::MultimodalMultivariateGaussianModel>,
             	R"pbdoc()pbdoc",
-            py::arg("problem"), py::arg("proposal_algorithm"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	py::arg("problem"), py::arg("proposal"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
 	m.def("Run", &hopsy::createRunFromPyProposal<hopsy::MultivariateGaussianModel>,
             	R"pbdoc()pbdoc",
-            py::arg("problem"), py::arg("proposal_algorithm"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	py::arg("problem"), py::arg("proposal"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
 	m.def("Run", &hopsy::createRunFromPyProposal<hopsy::PyModel>,
             	R"pbdoc()pbdoc",
-            py::arg("problem"), py::arg("proposal_algorithm"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	py::arg("problem"), py::arg("proposal"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
 	m.def("Run", &hopsy::createRunFromPyProposal<hopsy::RosenbrockModel>,
             	R"pbdoc()pbdoc",
-            py::arg("problem"), py::arg("proposal_algorithm"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	py::arg("problem"), py::arg("proposal"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
 	m.def("Run", &hopsy::createRunFromPyProposal<hopsy::UniformModel>,
             	R"pbdoc()pbdoc",
-            py::arg("problem"), py::arg("proposal_algorithm"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	py::arg("problem"), py::arg("proposal"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
 
 	m.def("Run", &hopsy::createRunFromPyObject<hopsy::DegenerateMultivariateGaussianModel>, 
             	R"pbdoc()pbdoc",
-            py::arg("problem"), py::arg("proposal_algorithm"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	py::arg("problem"), py::arg("proposal"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
 	m.def("Run", &hopsy::createRunFromPyObject<hopsy::MultimodalMultivariateGaussianModel>,
             	R"pbdoc()pbdoc",
-            py::arg("problem"), py::arg("proposal_algorithm"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	py::arg("problem"), py::arg("proposal"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
 	m.def("Run", &hopsy::createRunFromPyObject<hopsy::MultivariateGaussianModel>,
             	R"pbdoc()pbdoc",
-            py::arg("problem"), py::arg("proposal_algorithm"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	py::arg("problem"), py::arg("proposal"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
 	m.def("Run", &hopsy::createRunFromPyObject<hopsy::PyModel>,
             	R"pbdoc()pbdoc",
-            py::arg("problem"), py::arg("proposal_algorithm"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	py::arg("problem"), py::arg("proposal"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
 	m.def("Run", &hopsy::createRunFromPyObject<hopsy::RosenbrockModel>,
             	R"pbdoc()pbdoc",
-            py::arg("problem"), py::arg("proposal_algorithm"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	py::arg("problem"), py::arg("proposal"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
 	m.def("Run", &hopsy::createRunFromPyObject<hopsy::UniformModel>,
             	R"pbdoc()pbdoc",
-            py::arg("problem"), py::arg("proposal_algorithm"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	py::arg("problem"), py::arg("proposal"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
 
 
     //  
@@ -357,24 +359,77 @@ PYBIND11_MODULE(hopsy, m) {
     using computeStatisticsSignature = Eigen::VectorXd(hops::Data&);
     m.def("compute_acceptance_rate", py::overload_cast<hops::Data&>(
                 (computeStatisticsSignature*)&hops::computeAcceptanceRate),
-				R"pbdoc()pbdoc");
+				R"pbdoc(
+                Compute the average acceptance rate of the chains in ``data``. 
+                Acceptance rates are returned in an ``m`` x ``1`` column vector, 
+                where ``m`` is the number of chains stored in ``data``.
+
+                The acceptance rate is
+                actually also logged after every chain iteration and stored in the ChainData,
+                but this initializes the acceptance_rate field inside the Data object and thus
+                allows to discard the samples.
+
+                Parameters
+                ----------
+                )pbdoc", 
+                py::arg("data"));
     m.def("compute_effective_sample_size", py::overload_cast<hops::Data&>(
                 (computeStatisticsSignature*)&hops::computeEffectiveSampleSize),
-				R"pbdoc()pbdoc");
+				R"pbdoc(
+                Compute the effective sample size of the chains in ``data``. 
+                The effective sample size is computed for every dimension individually and is then
+                returned in an ``m`` x ``1`` column vector, 
+                where ``m`` is the dimension of the states.
+
+                Parameters
+                ----------
+                )pbdoc", 
+                py::arg("data"));
     m.def("compute_expected_squared_jump_distance", py::overload_cast<hops::Data&>(
                 (computeStatisticsSignature*)&hops::computeExpectedSquaredJumpDistance),
-				R"pbdoc()pbdoc");
+				R"pbdoc(
+                Compute the expected squared jump distance of the chains in ``data``. 
+                The expected squared jump distance is computed for every chain individually and is then
+                returned in an ``m`` x ``1`` column vector, 
+                where ``m`` is the number of chains stored in ``data``.
+
+                Parameters
+                ----------
+                )pbdoc", 
+                py::arg("data"));
     m.def("compute_potential_scale_reduction_factor", py::overload_cast<hops::Data&>(
                 (computeStatisticsSignature*)&hops::computePotentialScaleReductionFactor),
-				R"pbdoc()pbdoc");
+				R"pbdoc(
+                Compute the potential scale reduction factor (also known as R-hat) 
+                of the chains in ``data``. 
+                The potential scale reduction factor is computed for every dimension individually and is then
+                returned in an ``m`` x ``1`` column vector, 
+                where ``m`` is the dimension of the states.
+
+                Parameters
+                ----------
+                )pbdoc", 
+                py::arg("data"));
     m.def("compute_total_time_taken", py::overload_cast<hops::Data&>(
                 (computeStatisticsSignature*)&hops::computeTotalTimeTaken),
-				R"pbdoc()pbdoc");
+				R"pbdoc(
+                Compute the total time taken of the chains in ``data``. 
+                Times are returned in an ``m`` x ``1`` column vector, 
+                where ``m`` is the number of chains stored in ``data``.
+
+                Timestamps are actually also logged after every chain iteration and stored in the ChainData,
+                so this function just takes the difference of the last and first timestamp.
+                It also initializes the total_time_taken field inside the Data object and thus
+                allows to discard the samples.
+
+                Parameters
+                ----------
+                )pbdoc", 
+                py::arg("data"));
 
     py::class_<hops::ChainData>(m, "ChainData",
                 R"pbdoc()pbdoc")
-        .def(py::init<>(),
-				R"pbdoc()pbdoc")
+        .def(py::init<>())
 		.def("get_acceptance_rates", &hops::ChainData::getAcceptanceRates,
 				R"pbdoc()pbdoc")
 		.def("get_negative_log_likelihood", &hops::ChainData::getNegativeLogLikelihood,
