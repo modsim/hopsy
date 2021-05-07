@@ -1,7 +1,50 @@
 import hopsy
 import numpy as np
+
 import sys
 import matplotlib.pyplot as plt
+
+ 
+class GaussianProposal:
+    def __init__(self, A: np.ndarray, b: np.ndarray, x: np.ndarray, cov: np.ndarray):
+        self.A = A
+        self.b = b
+        self.x = x
+        self.cov = cov
+        self.r = 1
+        self.proposal = x
+
+    def propose(self):
+        mean = np.zeros((len(cov),))
+        y = np.random.multivariate_normal(mean, cov).reshape(-1, 1)
+        self.proposal = self.x + self.r * y 
+
+    def accept_proposal(self):
+        self.x = self.proposal
+
+    def calculate_log_acceptance_probability(self) -> float:
+        if ((self.A @ self.proposal - self.b) >= 0).any():
+            return -np.inf
+        return 0
+
+    def get_state(self) -> np.ndarray:
+        return self.x
+
+    def set_state(self, new_state: np.ndarray):
+        self.x = new_state.reshape(-1,1)
+
+    def get_proposal(self) -> np.ndarray:
+        return self.proposal
+
+    def get_stepsize(self) -> float:
+        return self.r
+
+    def set_stepsize(self, new_stepsize: float):
+        self.r = new_stepsize
+
+    def get_name(self) -> str:
+        return "PyGaussianProposal"
+
 
 class AdaptiveGaussianProposal:
     def __init__(self, A: np.ndarray, b: np.ndarray, x: np.ndarray, eps = 0.001):
@@ -28,7 +71,7 @@ class AdaptiveGaussianProposal:
     def accept_proposal(self):
         self.x = self.proposal
 
-    def get_log_acceptance_probability(self) -> float:
+    def calculate_log_acceptance_probability(self) -> float:
         if ((self.A @ self.proposal - self.b) >= 0).any():
             return -np.inf
         return 0
@@ -51,7 +94,6 @@ class AdaptiveGaussianProposal:
     def get_name(self) -> str:
         return "AdaptiveGaussianPyProposal"
 
-
 A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
 b = np.array([[1], [1], [0], [0]]);
 
@@ -60,34 +102,33 @@ x0 = np.array([[0.1], [0.1]])
 mu = np.zeros((2,1))
 cov = 0.1*np.identity(2)
 
-proposal = AdaptiveGaussianProposal(A, b, x0)
+gaussian_proposal = GaussianProposal(A, b, x0, 0.5*np.identity(2))
+adaptive_proposal = GaussianProposal(A, b, x0)
 
 model = hopsy.MultivariateGaussianModel(mu, cov)
 problem = hopsy.Problem(A, b, model)
 
-run = hopsy.Run(problem, proposal)
+run_gaussian = hopsy.Run(problem, proposal)
+run_adaptive = hopsy.Run(problem, proposal)
 
-## alternatively use (which internally happens anyways)
-# run = hopsy.Run(problem, hopsy.PyProposal(proposal))
+run_gaussian.sample()
+run_adaptive.sample()
 
-run2 = hopsy.Run(problem, "Gaussian")
+run_gaussian.set_starting_points([x0])
+run_adaptive.set_starting_points([x0])
 
-run.set_starting_points([x0])
-run2.set_starting_points([x0])
+gaussian_stepsize = run_gaussian.get_stepsize()
+adaptive_stepsize = run_adaptive.get_stepsize()
 
-run.sample(10000)
-run2.sample(10000)
+gaussian_acc_rate = hopsy.compute_acceptance_rate(run_gaussian.get_data())
+adaptive_acc_rate = hopsy.compute_acceptance_rate(run_adaptive.get_data())
 
-adaptive_acc_rate = hopsy.compute_acceptance_rate(run.get_data())[0]
-adaptive_esjd = hopsy.compute_expected_squared_jump_distance(run.get_data())[0]
+gaussian_esjd = hopsy.compute_expected_squared_jump_distance(run_gaussian.get_data())
+adaptive_esjd = hopsy.compute_expected_squared_jump_distance(run_adaptive.get_data())
 
-gaussian_acc_rate = hopsy.compute_acceptance_rate(run2.get_data())[0]
-gaussian_esjd = hopsy.compute_expected_squared_jump_distance(run2.get_data())[0]
-
-
-print("         | Gaussian proposal | Adaptive proposal")
-print("---------+-------------------+------------------")
-print("Stepsize |               " + str(run2.get_stepsize()) + " |               " + str(run.get_stepsize()))
+print("         | Gaussian proposal"                         + " | Adaptive proposal")
+print("---------+------------------"                         + "-+------------------")
+print("Stepsize |               " + str(gaussian_stepsize)   + " |               " + str(adaptive_stepsize))
 print("Acc Rate |             " + str(gaussian_acc_rate)[:5] + " |             " + str(adaptive_acc_rate)[:5]) 
 print("ESJD     |             " + str(gaussian_esjd)[:5]     + " |             " + str(adaptive_esjd)[:5])
 
