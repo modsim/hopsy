@@ -38,7 +38,7 @@ if (HOPSY_TESTS)
     enable_testing()
     add_subdirectory(examples)
     add_custom_command(TARGET hopsy POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:hopsy> tests/${targetfile}
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:hopsy> examples/${targetfile}
     )
 endif()
 
