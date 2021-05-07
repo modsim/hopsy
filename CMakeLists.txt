@@ -17,7 +17,7 @@ set(HOPS_TESTS OFF)
 #find_package(Eigen3 REQUIRED)
 
 enable_testing()
-add_subdirectory(tests)
+add_subdirectory(examples)
 
 set(EVENT__DISABLE_TESTS ON)
 add_subdirectory(extern/hops)
