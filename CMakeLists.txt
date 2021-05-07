@@ -16,8 +16,12 @@ set(HOPS_TESTS OFF)
 
 #find_package(Eigen3 REQUIRED)
 
-enable_testing()
-add_subdirectory(examples)
+option(HOPSY_TESTS "Enable hopsy tests" OFF)
+
+if (HOPSY_TESTS)
+    enable_testing()
+    add_subdirectory(examples)
+endif()
 
 set(EVENT__DISABLE_TESTS ON)
 add_subdirectory(extern/hops)

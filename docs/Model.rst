@@ -85,19 +85,16 @@ We present a quick example code for a Python-implemented Gaussian target functio
    run.sample()
 
 
-Available hopsy models in detail
---------------------------------
+Reference
+---------
 
 .. currentmodule:: hopsy
 
-.. autosummary::
-   :toctree: _generate
-
-   DegenerateMultivariateGaussianModel
-   MultimodalMultivariateGaussianModel
-   MultivariateGaussianModel
-   PyModel
-   RosenbrockModel
-   UniformModel
+.. autoclass:: DegenerateMultivariateGaussianModel
+.. autoclass:: MultimodalMultivariateGaussianModel
+.. autoclass:: MultivariateGaussianModel
+.. autoclass:: PyModel
+.. autoclass:: RosenbrockModel
+.. autoclass:: UniformModel
 
 
