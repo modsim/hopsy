@@ -117,7 +117,10 @@ PYBIND11_MODULE(hopsy, m) {
 
     py::class_<hopsy::RosenbrockModel>(m, "RosenbrockModel",
 				R"pbdoc()pbdoc")
-        .def(py::init<double, Eigen::VectorXd>());
+        .def(py::init<double, Eigen::VectorXd>(),
+                R"pbdoc()pbdoc",
+                py::arg("scale"),
+                py::arg("shift"));
 
     py::class_<hopsy::UniformModel>(m, "UniformModel",
 				R"pbdoc(
@@ -292,11 +295,21 @@ where
 	m.def("Run", &hopsy::createRun<hopsy::DegenerateMultivariateGaussianModel>, 
             	R"pbdoc()pbdoc",
             	py::arg("problem"), py::arg("proposal_name") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
-	m.def("Run", &hopsy::createRun<hopsy::MultimodalMultivariateGaussianModel>);
-	m.def("Run", &hopsy::createRun<hopsy::MultivariateGaussianModel>);
-	m.def("Run", &hopsy::createRun<hopsy::PyModel>);
-	m.def("Run", &hopsy::createRun<hopsy::RosenbrockModel>);
-	m.def("Run", &hopsy::createRun<hopsy::UniformModel>);
+	m.def("Run", &hopsy::createRun<hopsy::MultimodalMultivariateGaussianModel> 
+                R"pbdoc()pbdoc",
+                py::arg("problem"), py::arg("proposal_name") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+	m.def("Run", &hopsy::createRun<hopsy::MultivariateGaussianModel> 
+                R"pbdoc()pbdoc",
+                py::arg("problem"), py::arg("proposal_name") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+	m.def("Run", &hopsy::createRun<hopsy::PyModel> 
+                R"pbdoc()pbdoc",
+                py::arg("problem"), py::arg("proposal_name") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+	m.def("Run", &hopsy::createRun<hopsy::RosenbrockModel> 
+                R"pbdoc()pbdoc",
+                py::arg("problem"), py::arg("proposal_name") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+	m.def("Run", &hopsy::createRun<hopsy::UniformModel> 
+                R"pbdoc()pbdoc",
+                py::arg("problem"), py::arg("proposal_name") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
 
 	m.def("Run", &hopsy::createRunFromPyProposal<hopsy::DegenerateMultivariateGaussianModel>, 
             	R"pbdoc()pbdoc",
