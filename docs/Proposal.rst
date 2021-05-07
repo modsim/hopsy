@@ -1,11 +1,14 @@
 Proposals
-============================
+=========
 
 hopsy is not particulary designed for development of polytope samplers, but instead aims at making the proposals available in hops
 easily usable to solve the practitioner's problems at hand.
 Also, the proposal - together with the Metropolis filter and the models likelihood function - form the core of any Markov chain Monte Carlo algorithm.
 Thus, we believe that for sake of performance, proposals should be optimized and implemented in C++ and hops itself.
 For more informations on the proposal distributions implemented in hops, please refer to xyz.
+
+Custom Python proposals
+-----------------------
 
 Nevertheless, sometimes it might be desirable to do some rapid prototyping to test promising ideas.
 For this case, it is possible to implement Python proposals and to instruct hopsy (and ultimately hops) to use those.
@@ -37,8 +40,8 @@ The functions are
 
 * (optional) ``get_name() -> str`` gets the algorithms name, if it is available.
 
-A quick example
----------------
+Example code
+------------
 
 The following example implements the constraint Gaussian random walk and a constraint adaptive Metropolis 
 algorithm, following the original idea of Haario et al., 2001.
@@ -58,8 +61,8 @@ algorithm, following the original idea of Haario et al., 2001.
          self.proposal = x
  
      def propose(self):
-         mean = np.zeros((len(cov),))
-         y = np.random.multivariate_normal(mean, cov).reshape(-1, 1)
+         mean = np.zeros((len(self.cov),))
+         y = np.random.multivariate_normal(mean, self.cov).reshape(-1, 1)
          self.proposal = self.x + self.r * y 
  
      def accept_proposal(self):
@@ -135,8 +138,8 @@ algorithm, following the original idea of Haario et al., 2001.
          self.r = new_stepsize
  
      def get_name(self) -> str:
-         return "PyAdaptiveGaussianProposal"
-
+         return "AdaptiveGaussianPyProposal"
+ 
  A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
  b = np.array([[1], [1], [0], [0]]);
  
@@ -145,35 +148,45 @@ algorithm, following the original idea of Haario et al., 2001.
  mu = np.zeros((2,1))
  cov = 0.1*np.identity(2)
  
- gaussian_proposal = GaussianProposal(A, b, x0, 0.5*np.identity(2))
- adaptive_proposal = GaussianProposal(A, b, x0)
+ gaussian_proposal = GaussianProposal(A, b, x0, np.identity(2))
+ adaptive_proposal = AdaptiveGaussianProposal(A, b, x0)
  
  model = hopsy.MultivariateGaussianModel(mu, cov)
  problem = hopsy.Problem(A, b, model)
  
- run_gaussian = hopsy.Run(problem, proposal)
- run_adaptive = hopsy.Run(problem, proposal)
+ gaussian_run = hopsy.Run(problem, gaussian_proposal)
+ adaptive_run = hopsy.Run(problem, adaptive_proposal)
  
- run_gaussian.sample()
- run_adaptive.sample()
-
- run_gaussian.set_starting_points([x0])
- run_adaptive.set_starting_points([x0])
-
- gaussian_stepsize = run_gaussian.get_stepsize()
- adaptive_stepsize = run_adaptive.get_stepsize()
-
- gaussian_acc_rate = hopsy.compute_acceptance_rate(run_gaussian.get_data())
- adaptive_acc_rate = hopsy.compute_acceptance_rate(run_adaptive.get_data())
-
- gaussian_esjd = hopsy.compute_expected_squared_jump_distance(run_gaussian.get_data())
- adaptive_esjd = hopsy.compute_expected_squared_jump_distance(run_adaptive.get_data())
-
+ gaussian_run.set_starting_points([x0])
+ adaptive_run.set_starting_points([x0])
+ 
+ gaussian_run.sample(10000)
+ adaptive_run.sample(10000)
+ 
+ gaussian_stepsize = gaussian_run.get_stepsize()
+ adaptive_stepsize = adaptive_run.get_stepsize()
+ 
+ gaussian_acc_rate = hopsy.compute_acceptance_rate(gaussian_run.get_data())[0]
+ adaptive_acc_rate = hopsy.compute_acceptance_rate(adaptive_run.get_data())[0]
+ 
+ gaussian_esjd = hopsy.compute_expected_squared_jump_distance(gaussian_run.get_data())[0]
+ adaptive_esjd = hopsy.compute_expected_squared_jump_distance(adaptive_run.get_data())[0]
+ 
  print("         | Gaussian proposal"                         + " | Adaptive proposal")
  print("---------+------------------"                         + "-+------------------")
  print("Stepsize |               " + str(gaussian_stepsize)   + " |               " + str(adaptive_stepsize))
  print("Acc Rate |             " + str(gaussian_acc_rate)[:5] + " |             " + str(adaptive_acc_rate)[:5]) 
  print("ESJD     |             " + str(gaussian_esjd)[:5]     + " |             " + str(adaptive_esjd)[:5])
+
+(Approximate) output:
+
+.. code-block:: console
+
+          | Gaussian proposal | Adaptive proposal
+ ---------+-------------------+------------------
+ Stepsize |               1.0 |               1.0
+ Acc Rate |             0.046 |             0.293
+ ESJD     |             0.006 |             0.018
 
 
 Reference
@@ -186,7 +199,30 @@ Reference
    Wraps any Python object as a valid C++-proposal, making it usable in hops.
    This works by simply delegating calls to its methods to the wrapped Python object.
 
-.. method:: PyProposal(proposal: object)
+   .. method:: PyProposal(proposal: object)
+   
+      Constructs the ``hopsy.PyProposal`` by wrapping the passed Python object.
+      For the proposal to work correctly together with hops, it should provide the methods
 
-   Constructs the ``hopsy.PyProposal`` by wrapping the passed Python object.
+      * ``propose() -> None``
+
+      * ``accept_proposal() -> None``
+
+      * ``calculate_log_acceptance_probability() -> float``
+
+      * ``get_state() -> numpy.ndarray[shape[d,1]]``
+
+      * ``set_state(new_state: numpy.ndarray[shape[d,1]]) -> None``
+
+      * ``get_proposal() -> numpy.ndarray[shape[d,1]]``
+
+      * ``get_stepsize() -> float``
+
+      * ``set_stepsize(new_stepsize: float)``
+
+      * ``get_name() -> str``
+
+      :param object proposal: The Python-implemented proposal distribution, which should implement the above mentioned methods.
+      :return: the hopsy.PyProposal object wrapping ``object``
+      :rtype: hopsy.PyProposal
 

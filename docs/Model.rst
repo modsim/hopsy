@@ -36,6 +36,11 @@ Depending on the algorithm you aim to use, it might also be necessary to further
 * ``calculate_log_likelihood_gradient``
 
 For more details on signature and return type, please refer to ``hopsy.PyModel``. 
+
+
+Example code
+------------
+
 We present a quick example code for a Python-implemented Gaussian target function:
 
 ::

@@ -14,7 +14,7 @@ Contents
 --------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    Model <Model.rst>
    Problem <Problem.rst>
@@ -60,8 +60,10 @@ These are the "classes", which we deemed most useful and important for any pract
    Throughout this documentation, we will however use ``hopsy.Model``, ``hopsy.Problem`` and ``hopsy.Run`` also as a placeholder for any of the actually
    available models, problems and runs.
 
-A quick example
----------------
+Example code
+------------
+
+A short example on how to sample a Gaussian target distribution restricted to :math:`\mathcal{P} = [0,1]^2`.
 
 ::
 

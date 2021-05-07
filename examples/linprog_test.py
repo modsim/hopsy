@@ -11,6 +11,8 @@ model = hopsy.MultivariateGaussianModel(mu, cov)
 problem = hopsy.Problem(A, b, model)
 run = hopsy.Run(problem)
 
+# this computes the chebyshev center as no other starting point has been
+# previously set
 run.init()
 
 run.sample()

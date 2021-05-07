@@ -1,13 +1,14 @@
 Data
 ============================
 
+
+Reference
+---------
+
 .. currentmodule:: hopsy
 
-.. autosummary::
-   :toctree: _generate
-
-   Data
-   ChainData
+.. autoclass:: Data
+.. autoclass:: ChainData
 
 .. autofunction:: compute_acceptance_rate
 .. autofunction:: compute_effective_sample_size

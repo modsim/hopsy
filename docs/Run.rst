@@ -18,15 +18,17 @@ Run
    the calls to its function to the respective Python methods. For more details on how to use this, refer to ``hopsy.PyProposal``.
 
 
+Reference
+---------
+
 .. currentmodule:: hopsy
 
 .. function:: Run(problem: hopsy.Problem, proposal_string: str = "HitAndRun", number_of_samples: int = 1000, number_of_chains: int = 1)
 
-    Creates a run object of appropriate type using the passed ``problem``. The actual return type depends on the type of ``problem``.
+   Creates a run object of appropriate type using the passed ``problem``. The actual return type depends on the type of ``problem``.
    
-    * ``problem`` which we aim to sample.
-
-    * ``proposal_string`` may be any string identifier of propsals included in HOPS. Valid identifiers are:
+   :param hopsy.Problem problem: the problem which we aim to sample.
+   :param str proposal_string: may be any string identifier of propsals included in hops. Valid identifiers are:
 
       * ``"BallWalk"``
       * ``"CoordinateHitAndRun"``
@@ -36,9 +38,8 @@ Run
       * ``"Gaussian"``
       * ``"HitAndRun"``
 
-   * ``number_of_samples`` sets the number of samples which will be drawn when calling ``run.sample()``. 
-   
-   * ``number_of_chains`` sets the number of chains which will be run. 
+   :param int number_of_samples: sets the number of samples which will be drawn when calling ``run.sample()``. 
+   :param int number_of_chains: sets the number of chains which will be run. 
    
    Note that the total number of samples generated will be ``number_of_samples * number_of_chains``.
 
@@ -47,14 +48,13 @@ Run
 
    Creates a run object of appropriate type using the passed ``problem``. 
    
-   ``proposal`` may be any Python object. Internally, ``proposal``
-   will be wrapped inside ``hopsy.PyProposal``, which works as an interface between HOPS and any Python-implemented proposal class. Any calls
-   from within HOPS to the proposal will be delegated by calling the appropriate Python function. 
-   
-   ``number_of_samples`` sets the number of samples which will be drawn when calling ``run.sample()``. 
-   
-   ``number_of_chains`` sets the number
-   of chains which will be run. 
+   :param hopsy.Problem problem: the problem which we aim to sample.
+   :param object proposal: may be any Python object. Internally, ``proposal``
+      will be wrapped inside ``hopsy.PyProposal``, which works as an interface between HOPS and any Python-implemented proposal class. Any calls
+      from within HOPS to the proposal will be delegated by calling the appropriate Python function. 
+
+   :param int number_of_samples: sets the number of samples which will be drawn when calling ``run.sample()``. 
+   :param int number_of_chains: sets the number of chains which will be run. 
    
    Note that the total number of samples generated will be ``number_of_samples * number_of_chains``.
 
@@ -73,6 +73,39 @@ Run
    
    Note that the total number of samples generated will be ``number_of_samples * number_of_chains``.
 
+The following class reference refers to a non-existent class ``hopsy.AnyRun``. 
+It applies to any of the available run classes, which are listed at the end of this page.
+
+.. class:: AnyRun
+
+   .. method:: Run()
+   .. method:: get_data() -> hopsy.Data
+   .. method:: init() -> None
+   .. method:: sample() -> None
+   .. method:: sample(number_of_samples: int, thinning: int = 1) -> None
+   .. method:: get_problem
+   .. method:: set_starting_points(starting_points: list[numpy.ndarray[numpy.float64[m, 1]]]) -> None
+   .. method:: get_starting_points() -> list[numpy.ndarray[numpy.float64[m, 1]]] 
+   .. method:: set_markov_chain_type
+   .. method:: get_markovv_chain_type
+   .. method:: set_number_of_chains(number_of_chains: int) -> None
+   .. method:: get_number_of_chains
+   .. method:: set_number_of_samples
+   .. method:: get_number_of_samples
+   .. method:: set_thinning
+   .. method:: get_thinning
+   .. method:: enable_rounding
+   .. method:: disable_rounding
+   .. method:: set_stepsize
+   .. method:: get_stepsize
+   .. method:: set_fisher_weight
+   .. method:: get_fisher_weight
+   .. method:: set_random_seed
+   .. method:: get_random_seed
+   .. method:: unset_sampling_until_convergence
+   .. method:: set_sampling_until_convergence
+   .. method:: get_diagnostics_threshold
+   .. method:: get_max_repetitions
 
 .. autosummary::
    :toctree: _generate

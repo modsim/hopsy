@@ -18,11 +18,6 @@ set(HOPS_TESTS OFF)
 
 option(HOPSY_TESTS "Enable hopsy tests" OFF)
 
-if (HOPSY_TESTS)
-    enable_testing()
-    add_subdirectory(examples)
-endif()
-
 set(EVENT__DISABLE_TESTS ON)
 add_subdirectory(extern/hops)
 add_subdirectory(extern/pybind11)
@@ -39,6 +34,11 @@ target_link_libraries(hopsy PUBLIC hops)
 # define (VERSION_INFO) here.
 target_compile_definitions(hopsy PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
 
-add_custom_command(TARGET hopsy POST_BUILD
+if (HOPSY_TESTS)
+    enable_testing()
+    add_subdirectory(examples)
+    add_custom_command(TARGET hopsy POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:hopsy> tests/${targetfile}
-        )
+    )
+endif()
+

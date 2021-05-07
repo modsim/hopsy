@@ -5,9 +5,10 @@ The ``hopsy.Problem`` classes contain the full description of the problem, we ai
 A problem consists mainly of the domain, that is the inequality :math:`Ax \leq b`, and the target distribution, the ``hopsy.Model`` object.
 
 
-.. currentmodule:: hopsy
+Reference
+---------
 
-.. class:: Problem
+.. currentmodule:: hopsy
 
 .. function:: Problem(A: numpy.ndarray[numpy.float64[m, n]], b: numpy.ndarray[numpy.float64[m, 1]], model: hopsy.Model)
 
@@ -32,13 +33,9 @@ A problem consists mainly of the domain, that is the inequality :math:`Ax \leq b
      will be wrapped inside ``hopsy.PyModel``, which works as an interface between HOPS and any Python-implemented model class. Any calls
      from within HOPS to the model will be delegated by calling the appropriate Python function. 
 
-
-.. autosummary::
-   :toctree: _generate
-
-   DegenerateMultivariateGaussianProblem
-   MultimodalMultivariateGaussianProblem
-   MultivariateGaussianProblem
-   PyProblem
-   RosenbrockProblem
-   UniformProblem
+.. autoclass:: DegenerateMultivariateGaussianProblem
+.. autoclass:: MultimodalMultivariateGaussianProblem
+.. autoclass:: MultivariateGaussianProblem
+.. autoclass:: PyProblem
+.. autoclass:: RosenbrockProblem
+.. autoclass:: UniformProblem
