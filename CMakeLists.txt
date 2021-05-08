@@ -10,17 +10,20 @@ if (CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Wall")
 endif ()
 
+option(HOPSY_TESTS "Enable hopsy tests" OFF)
+
 set(HOPS_EXAMPLES OFF)
 set(HOPS_TESTS OFF)
 set(HOPS_HEADER_ONLY ON)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHOPS_HEADER_ONLY")
 
-find_package(Eigen3 REQUIRED)
+set(EIGEN3_INCLUDE_DIR "extern/eigen3")
+set(HOPS_INCLUDE_DIR "extern/hops/include/hops")
 
-option(HOPSY_TESTS "Enable hopsy tests" OFF)
+include_directories(${EIGEN3_INCLUDE_DIR})
+include_directories(${HOPS_INCLUDE_DIR})
 
 set(EVENT__DISABLE_TESTS ON)
-add_subdirectory(extern/hops)
 add_subdirectory(extern/pybind11)
 
 pybind11_add_module(hopsy src/hopsy.cpp)
@@ -33,8 +36,7 @@ endif (UNIX)
 
 target_compile_options(hopsy PUBLIC "-DHOPS_HEADER_ONLY")
 
-include_directories("extern/hops/include/hops")
-target_include_directories(hopsy PUBLIC "extern/hops/include/hops")
+target_include_directories(hopsy PUBLIC ${HOPS_INCLUDE_DIR})
 target_include_directories(hopsy PUBLIC ${EIGEN3_INCLUDE_DIR})
 
 set(GUROBI_ENABLE ON)
