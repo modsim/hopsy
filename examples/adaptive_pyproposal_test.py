@@ -125,13 +125,13 @@ adaptive_acc_rate = hopsy.compute_acceptance_rate(adaptive_run.get_data())[0]
 gaussian_esjd = hopsy.compute_expected_squared_jump_distance(gaussian_run.get_data())[0]
 adaptive_esjd = hopsy.compute_expected_squared_jump_distance(adaptive_run.get_data())[0]
 
-print("         | Gaussian proposal"                         + " | Adaptive proposal")
-print("---------+------------------"                         + "-+------------------")
-print("Stepsize |               " + str(gaussian_stepsize)   + " |               " + str(adaptive_stepsize))
-print("Acc Rate |             " + str(gaussian_acc_rate)[:5] + " |             " + str(adaptive_acc_rate)[:5]) 
-print("ESJD     |             " + str(gaussian_esjd)[:5]     + " |             " + str(adaptive_esjd)[:5])
-
 if len(sys.argv) == 1 or sys.argv[1] != "test":
+    print("         | Gaussian proposal"                         + " | Adaptive proposal")
+    print("---------+------------------"                         + "-+------------------")
+    print("Stepsize |               " + str(gaussian_stepsize)   + " |               " + str(adaptive_stepsize))
+    print("Acc Rate |             " + str(gaussian_acc_rate)[:5] + " |             " + str(adaptive_acc_rate)[:5]) 
+    print("ESJD     |             " + str(gaussian_esjd)[:5]     + " |             " + str(adaptive_esjd)[:5])
+
     import matplotlib.pyplot as plt
     gaussian_states = np.array(gaussian_run.get_data().get_states()[0])
     adaptive_states = np.array(adaptive_run.get_data().get_states()[0])

@@ -21,7 +21,7 @@ class GaussianProposal:
     def accept_proposal(self):
         self.x = self.proposal
 
-    def get_log_acceptance_probability(self) -> float:
+    def calculate_log_acceptance_probability(self) -> float:
         if ((self.A @ self.proposal - self.b) >= 0).any():
             return -np.inf
         return 0
@@ -75,7 +75,7 @@ for i in range(10):
     end = time.time()
     times.append(end - start)
 
-print(times[-1], np.mean(times))
+python_proposal = (times[-1], np.mean(times))
 times = []
 
 for i in range(10):
@@ -84,9 +84,12 @@ for i in range(10):
     end = time.time()
     times.append(end - start)
 
-print(times[-1], np.mean(times))
+cpp_proposal = (times[-1], np.mean(times))
 
 if len(sys.argv) == 1 or sys.argv[1] != "test":
+    print(python_proposal[0], python_proposal[1])
+    print(cpp_proposal[0], cpp_proposal[1])
+
     import matplotlib.pyplot as plt
     states = np.array(run.get_data().get_states()[0])
 
