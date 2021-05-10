@@ -89,23 +89,23 @@ It applies to any of the available run classes, which are listed at the end of t
    .. method:: set_markov_chain_type
    .. method:: get_markovv_chain_type
    .. method:: set_number_of_chains(number_of_chains: int) -> None
-   .. method:: get_number_of_chains
-   .. method:: set_number_of_samples
-   .. method:: get_number_of_samples
-   .. method:: set_thinning
-   .. method:: get_thinning
-   .. method:: enable_rounding
-   .. method:: disable_rounding
-   .. method:: set_stepsize
-   .. method:: get_stepsize
-   .. method:: set_fisher_weight
-   .. method:: get_fisher_weight
-   .. method:: set_random_seed
-   .. method:: get_random_seed
-   .. method:: unset_sampling_until_convergence
-   .. method:: set_sampling_until_convergence
-   .. method:: get_diagnostics_threshold
-   .. method:: get_max_repetitions
+   .. method:: get_number_of_chains() -> int
+   .. method:: set_number_of_samples(number_of_samples: int) -> None
+   .. method:: get_number_of_samples() -> int
+   .. method:: set_thinning(thinning: int) -> None
+   .. method:: get_thinning() -> int
+   .. method:: enable_rounding() -> None
+   .. method:: disable_rounding() -> None
+   .. method:: set_stepsize(stepsize: float) -> None
+   .. method:: get_stepsize() -> float
+   .. method:: set_fisher_weight(fisher_weight: float) -> None
+   .. method:: get_fisher_weight() -> float
+   .. method:: set_random_seed(seed: float) -> None
+   .. method:: get_random_seed() -> float
+   .. method:: set_sampling_until_convergence(sample_until_convergence: bool, diagnostics_threshold: float, max_repetitions: int) -> None
+   .. method:: unset_sampling_until_convergence() -> None
+   .. method:: get_diagnostics_threshold() -> float
+   .. method:: get_max_repetitions() -> int
 
 .. autosummary::
    :toctree: _generate
