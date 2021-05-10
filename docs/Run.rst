@@ -73,8 +73,8 @@ Reference
    
    Note that the total number of samples generated will be ``number_of_samples * number_of_chains``.
 
-The following class reference refers to a non-existent class ``hopsy.AnyRun``. 
-It applies to any of the available run classes, which are listed at the end of this page.
+.. note:: The following class reference refers to a non-existent class ``hopsy.AnyRun``. 
+          It applies to any of the available run classes, which are listed at the end of this page.
 
 .. class:: AnyRun
 
@@ -94,8 +94,6 @@ It applies to any of the available run classes, which are listed at the end of t
    .. method:: get_number_of_samples() -> int
    .. method:: set_thinning(thinning: int) -> None
    .. method:: get_thinning() -> int
-   .. method:: enable_rounding() -> None
-   .. method:: disable_rounding() -> None
    .. method:: set_stepsize(stepsize: float) -> None
    .. method:: get_stepsize() -> float
    .. method:: set_fisher_weight(fisher_weight: float) -> None
@@ -107,14 +105,11 @@ It applies to any of the available run classes, which are listed at the end of t
    .. method:: get_diagnostics_threshold() -> float
    .. method:: get_max_repetitions() -> int
 
-.. autosummary::
-   :toctree: _generate
-
-   DegenerateMultivariateGaussianRun
-   MultimodalMultivariateGaussianRun
-   MultivariateGaussianRun
-   PyRun
-   RosenbrockRun
-   UniformRun
+.. autoclass:: DegenerateMultivariateGaussianRun
+.. autoclass:: MultimodalMultivariateGaussianRun
+.. autoclass:: MultivariateGaussianRun
+.. autoclass:: PyRun
+.. autoclass:: RosenbrockRun
+.. autoclass:: UniformRun
 
 

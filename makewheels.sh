@@ -7,7 +7,7 @@ do
     docker exec hopsy_manylinux_build_env /bin/bash -c  \
         "/opt/python/"$py"/bin/pip wheel /io -w /io/dist/"
     docker exec hopsy_manylinux_build_env /bin/bash -c  \
-        "auditwheel repair /io/dist/*"$py"*.whl -w /io/dist"
+        "auditwheel repair /io/dist/*"$py"-linux*.whl -w /io/dist"
 done
 
 docker stop hopsy_manylinux_build_env

@@ -17,8 +17,12 @@ Built using `pybind11`
 
 ## Installation
 
-Just clone this repository and pip install. Note the `--recursive` option which is
-needed for the pybind11 submodule:
+Install using `pip` with
+```bash
+pip install hopsy
+```
+or clone this repository and pip install. Note the `--recursive` option which is
+needed for hops, eigen and pybind11 submodules:
 
 ```bash
 git clone --recursive [url-to-this-repo]
@@ -26,17 +30,12 @@ cd hopsy
 sudo python3 -m pip install -e .
 ```
 
-With the `setup.py` file included in this example, the `pip install` command will
-invoke CMake and build the pybind11 module as specified in `CMakeLists.txt`.
-
 Alternatively, the project can be built using basic CMake commands:
-
 ```bash
 git clone --recursive [url-to-this-repo]
 cd hopsy
 mkdir build/ && cd build/
 make 
-make test # optional
 ```
 
 In this case, the compiled shared library will be located in `build/` and can be used within the directory. 
