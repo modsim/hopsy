@@ -19,7 +19,6 @@ void addRunClassToModule(py::module& m, const char* name, const char* doc) {
     py::class_<Run>(m, name, doc)
         .def(py::init<Problem>())
         .def_property_readonly("data", &Run::getData)
-        .def("get_data", &Run::getData)
         .def("init", &Run::init)
         .def("sample", py::overload_cast<>(&Run::sample))
         .def("sample", py::overload_cast<unsigned long, unsigned long>(&Run::sample), 
@@ -127,22 +126,28 @@ where
     // ===============
     //
     addProblemClassToModule<hopsy::DegenerateMultivariateGaussianModel, hopsy::DegenerateMultivariateGaussianProblem>(
-            m, "DegenerateMultivariateGaussianProblem", R"pbdoc()pbdoc");
+                m, "DegenerateMultivariateGaussianProblem", 
+                R"pbdoc()pbdoc");
 
     addProblemClassToModule<hopsy::MultimodalMultivariateGaussianModel, hopsy::MultimodalMultivariateGaussianProblem>(
-            m, "MultimodalMultivariateGaussianProblem", R"pbdoc()pbdoc");
+                m, "MultimodalMultivariateGaussianProblem", 
+                R"pbdoc()pbdoc");
 
     addProblemClassToModule<hopsy::MultivariateGaussianModel, hopsy::MultivariateGaussianProblem>(
-            m, "MultivariateGaussianProblem", R"pbdoc()pbdoc");
+                m, "MultivariateGaussianProblem", 
+                R"pbdoc()pbdoc");
 
     addProblemClassToModule<hopsy::PyModel, hopsy::PyProblem>(
-            m, "PyProblem", R"pbdoc()pbdoc");
+                m, "PyProblem", 
+                R"pbdoc()pbdoc");
 
     addProblemClassToModule<hopsy::RosenbrockModel, hopsy::RosenbrockProblem>(
-            m, "RosenbrockProblem", R"pbdoc()pbdoc");
+                m, "RosenbrockProblem", 
+                R"pbdoc()pbdoc");
 
-    py::class_<hopsy::UniformProblem>(m, "UniformProblem",
-				R"pbdoc()pbdoc")
+    py::class_<hopsy::UniformProblem>(
+                m, "UniformProblem",
+                R"pbdoc()pbdoc")
         .def(py::init<Eigen::MatrixXd, Eigen::VectorXd>(),
                 R"pbdoc()pbdoc",
                 py::arg("A"),
@@ -222,30 +227,42 @@ where
     // Run classes
     // ===========
     //
-    addRunClassToModule<hopsy::DegenerateMultivariateGaussianProblem, hopsy::DegenerateMultivariateGaussianRun>(m, "DegenerateMultivariateGaussianRun",
+    addRunClassToModule<hopsy::DegenerateMultivariateGaussianProblem, hopsy::DegenerateMultivariateGaussianRun>(
+                m, "DegenerateMultivariateGaussianRun",
                 R"pbdoc()pbdoc");
-    addRunClassToModule<hopsy::MultimodalMultivariateGaussianProblem, hopsy::MultimodalMultivariateGaussianRun>(m, "MultimodalMultivariateGaussianRun",
+    addRunClassToModule<hopsy::MultimodalMultivariateGaussianProblem, hopsy::MultimodalMultivariateGaussianRun>(
+                m, "MultimodalMultivariateGaussianRun",
                 R"pbdoc()pbdoc");
-    addRunClassToModule<hopsy::MultivariateGaussianProblem, hopsy::MultivariateGaussianRun>(m, "MultivariateGaussianRun",
+    addRunClassToModule<hopsy::MultivariateGaussianProblem, hopsy::MultivariateGaussianRun>(
+                m, "MultivariateGaussianRun",
                 R"pbdoc()pbdoc");
-    addRunClassToModule<hopsy::PyProblem, hopsy::PyRun>(m, "PyRun",
+    addRunClassToModule<hopsy::PyProblem, hopsy::PyRun>(
+                m, "PyRun",
                 R"pbdoc()pbdoc");
-    addRunClassToModule<hopsy::RosenbrockProblem, hopsy::RosenbrockRun>(m, "RosenbrockRun",
+    addRunClassToModule<hopsy::RosenbrockProblem, hopsy::RosenbrockRun>(
+                m, "RosenbrockRun",
                 R"pbdoc()pbdoc");
-    addRunClassToModule<hopsy::UniformProblem, hopsy::UniformRun>(m, "UniformRun",
+    addRunClassToModule<hopsy::UniformProblem, hopsy::UniformRun>(
+                m, "UniformRun",
                 R"pbdoc()pbdoc");
 
-    addRunClassToModule<hopsy::DegenerateMultivariateGaussianProblem, hopsy::DegenerateMultivariateGaussianPyProposalRun>(m, "DegenerateMultivariateGaussianPyProposalRun",
+    addRunClassToModule<hopsy::DegenerateMultivariateGaussianProblem, hopsy::DegenerateMultivariateGaussianPyProposalRun>(
+                m, "DegenerateMultivariateGaussianPyProposalRun",
                 R"pbdoc()pbdoc");
-    addRunClassToModule<hopsy::MultimodalMultivariateGaussianProblem, hopsy::MultimodalMultivariateGaussianPyProposalRun>(m, "MultimodalMultivariateGaussianPyProposalRun",
+    addRunClassToModule<hopsy::MultimodalMultivariateGaussianProblem, hopsy::MultimodalMultivariateGaussianPyProposalRun>(
+                m, "MultimodalMultivariateGaussianPyProposalRun",
                 R"pbdoc()pbdoc");
-    addRunClassToModule<hopsy::MultivariateGaussianProblem, hopsy::MultivariateGaussianPyProposalRun>(m, "MultivariateGaussianPyProposalRun",
+    addRunClassToModule<hopsy::MultivariateGaussianProblem, hopsy::MultivariateGaussianPyProposalRun>(
+                m, "MultivariateGaussianPyProposalRun",
                 R"pbdoc()pbdoc");
-    addRunClassToModule<hopsy::PyProblem, hopsy::PyPyProposalRun>(m, "PyPyProposalRun",
+    addRunClassToModule<hopsy::PyProblem, hopsy::PyPyProposalRun>(
+                m, "PyPyProposalRun",
                 R"pbdoc()pbdoc");
-    addRunClassToModule<hopsy::RosenbrockProblem, hopsy::RosenbrockPyProposalRun>(m, "RosenbrockPyProposalRun",
+    addRunClassToModule<hopsy::RosenbrockProblem, hopsy::RosenbrockPyProposalRun>(
+                m, "RosenbrockPyProposalRun",
                 R"pbdoc()pbdoc");
-    addRunClassToModule<hopsy::UniformProblem, hopsy::UniformPyProposalRun>(m, "UniformPyProposalRun",
+    addRunClassToModule<hopsy::UniformProblem, hopsy::UniformPyProposalRun>(
+                m, "UniformPyProposalRun",
                 R"pbdoc()pbdoc");
 
 
@@ -326,7 +343,17 @@ where
     py::class_<hops::Data>(m, "Data",
                 R"pbdoc()pbdoc")
         .def(py::init<>())
-        .def("get_states", &hops::Data::getStates,
+		.def_property_readonly(
+                "acceptance_rates", &hops::Data::getAcceptanceRates,
+				R"pbdoc()pbdoc")
+		.def_property_readonly(
+                "negative_log_likelihood", &hops::Data::getNegativeLogLikelihood,
+				R"pbdoc()pbdoc")
+		.def_property_readonly(
+                "states", &hops::Data::getStates,
+				R"pbdoc()pbdoc")
+		.def_property_readonly(
+                "timestamps", &hops::Data::getTimestamps,
 				R"pbdoc()pbdoc")
         .def("reset", &hops::Data::reset,
 				R"pbdoc()pbdoc")
@@ -408,19 +435,25 @@ where
     py::class_<hops::ChainData>(m, "ChainData",
                 R"pbdoc()pbdoc")
         .def(py::init<>())
-		.def("get_acceptance_rates", &hops::ChainData::getAcceptanceRates,
+		.def_property_readonly(
+                "acceptance_rates", &hops::ChainData::getAcceptanceRates,
 				R"pbdoc()pbdoc")
-		.def("get_negative_log_likelihood", &hops::ChainData::getNegativeLogLikelihood,
+		.def_property_readonly(
+                "negative_log_likelihood", &hops::ChainData::getNegativeLogLikelihood,
 				R"pbdoc()pbdoc")
-		.def("get_states", &hops::ChainData::getStates,
+		.def_property_readonly(
+                "states", &hops::ChainData::getStates,
 				R"pbdoc()pbdoc")
-		.def("get_timestamps", &hops::ChainData::getTimestamps,
+		.def_property_readonly(
+                "timestamps", &hops::ChainData::getTimestamps,
 				R"pbdoc()pbdoc")
-        .def("reset", &hops::ChainData::reset,
+        .def(
+                "reset", &hops::ChainData::reset,
 				R"pbdoc()pbdoc");
 
     py::class_<hops::EmptyChainDataException>(m, "EmptyChainDataException");
     py::class_<hops::NoProblemProvidedException>(m, "NoProblemProvidedException");
+    py::class_<hops::MissingStartingPointsException>(m, "MissingStartingPointsException");
     py::class_<hops::UninitializedDataFieldException>(m, "UninitializedDataFieldException");
 
 #ifdef VERSION_INFO
