@@ -28,35 +28,10 @@ add_subdirectory(extern/pybind11)
 
 pybind11_add_module(hopsy src/hopsy.cpp)
 
-if (UNIX)
-    message(STATUS "Adjusting CMAKE_PREFIX_PATH on UNIX for CLP and others")
-    list(APPEND CMAKE_PREFIX_PATH /usr/lib/x86_64-linux-gnu)
-endif (UNIX)
-
-
 target_compile_options(hopsy PUBLIC "-DHOPS_HEADER_ONLY")
 
 target_include_directories(hopsy PUBLIC ${HOPS_INCLUDE_DIR})
 target_include_directories(hopsy PUBLIC ${EIGEN3_INCLUDE_DIR})
-
-set(GUROBI_ENABLE ON)
-find_package(GUROBI)
-find_package(CLP)
-
-if (GUROBI_FOUND)
-    target_compile_definitions(hopsy PUBLIC HOPS_GUROBI_FOUND)
-    target_include_directories(hopsy PUBLIC ${GUROBI_INCLUDE_DIR})
-    # IMPORTANT: Gurobi C++ Libraries have to be listed before Gurobi C Libraries to prevent linker error
-    target_link_libraries(hopsy PUBLIC ${GUROBI_CXX_LIBRARY} ${GUROBI_LIBRARY})
-endif ()
-
-find_package(CLP)
-if (CLP_FOUND)
-    target_compile_definitions(hopsy PUBLIC HOPS_CLP_FOUND)
-    target_include_directories(hopsy PUBLIC ${CLP_INCLUDE_DIRS})
-    target_link_libraries(hopsy PUBLIC ${CLP_LIBRARIES})
-endif ()
-
 
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
     target_link_libraries(hopsy PUBLIC stdc++fs)
@@ -64,8 +39,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 endif ()
 
 
-
-# EXAMPLE_VERSION_INFO is defined by setup.pygand passed into the C++ code as a
+# EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
 # define (VERSION_INFO) here.
 target_compile_definitions(hopsy PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
 

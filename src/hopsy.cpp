@@ -18,6 +18,7 @@ template<typename Problem, typename Run>
 void addRunClassToModule(py::module& m, const char* name, const char* doc) {
     py::class_<Run>(m, name, doc)
         .def(py::init<Problem>())
+        .def_property_readonly("data", &Run::getData)
         .def("get_data", &Run::getData)
         .def("init", &Run::init)
         .def("sample", py::overload_cast<>(&Run::sample))
@@ -35,8 +36,6 @@ void addRunClassToModule(py::module& m, const char* name, const char* doc) {
         .def("get_number_of_samples", &Run::getNumberOfSamples)
         .def("set_thinning", &Run::setThinning)
         .def("get_thinning", &Run::getThinning)
-        .def("enable_rounding", &Run::enableRounding)
-        .def("disable_rounding", &Run::disableRounding)
         .def("set_stepsize", &Run::setStepSize)
         .def("get_stepsize", &Run::getStepSize)
         .def("set_fisher_weight", &Run::setFisherWeight)
@@ -48,6 +47,23 @@ void addRunClassToModule(py::module& m, const char* name, const char* doc) {
         .def("get_diagnostics_threshold", &Run::getDiagnosticsThreshold)
         .def("get_max_repetitions", &Run::getMaxRepetitions);
 }
+
+template<typename Model, typename Problem>
+void addProblemClassToModule(py::module& m, const char* name, const char* doc) {
+    py::class_<Problem>(m, name, doc)
+        .def(py::init<Eigen::MatrixXd, Eigen::VectorXd, Model>(),
+                R"pbdoc()pbdoc",
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"))
+        .def_property("A", &Problem::getA, &Problem::setA)
+        .def_property("b", &Problem::getB, &Problem::setB)
+        .def_property("starting_point", &Problem::getStartingPoint, &Problem::setStartingPoint)
+        .def_property("unrounding_transformation", &Problem::getUnroundingTransformation, &Problem::setUnroundingTransformation)
+        .def_property("unrounding_shift", &Problem::getUnroundingShift, &Problem::setUnroundingShift)
+        ;
+}
+
 
 PYBIND11_MODULE(hopsy, m) {
     // Model classes
@@ -110,37 +126,20 @@ where
     // Problem classes
     // ===============
     //
-    py::class_<hopsy::DegenerateMultivariateGaussianProblem>(m, "DegenerateMultivariateGaussianProblem",
-				R"pbdoc()pbdoc")
-        .def(py::init<Eigen::MatrixXd, Eigen::VectorXd, hopsy::DegenerateMultivariateGaussianModel>(),
-                R"pbdoc()pbdoc",
-                py::arg("A"),
-                py::arg("b"),
-                py::arg("model"));
+    addProblemClassToModule<hopsy::DegenerateMultivariateGaussianModel, hopsy::DegenerateMultivariateGaussianProblem>(
+            m, "DegenerateMultivariateGaussianProblem", R"pbdoc()pbdoc");
 
-    py::class_<hopsy::MultimodalMultivariateGaussianProblem>(m, "MultimodalMultivariateGaussianProblem",
-				R"pbdoc()pbdoc")
-        .def(py::init<Eigen::MatrixXd, Eigen::VectorXd, hopsy::MultimodalMultivariateGaussianModel>(),
-                R"pbdoc()pbdoc",
-                py::arg("A"),
-                py::arg("b"),
-                py::arg("model"));
+    addProblemClassToModule<hopsy::MultimodalMultivariateGaussianModel, hopsy::MultimodalMultivariateGaussianProblem>(
+            m, "MultimodalMultivariateGaussianProblem", R"pbdoc()pbdoc");
 
-    py::class_<hopsy::MultivariateGaussianProblem>(m, "MultivariateGaussianProblem",
-				R"pbdoc()pbdoc")
-        .def(py::init<Eigen::MatrixXd, Eigen::VectorXd, hopsy::MultivariateGaussianModel>(),
-                R"pbdoc()pbdoc",
-                py::arg("A"),
-                py::arg("b"),
-                py::arg("model"));
+    addProblemClassToModule<hopsy::MultivariateGaussianModel, hopsy::MultivariateGaussianProblem>(
+            m, "MultivariateGaussianProblem", R"pbdoc()pbdoc");
 
-    py::class_<hopsy::RosenbrockProblem>(m, "RosenbrockProblem",
-				R"pbdoc()pbdoc")
-        .def(py::init<Eigen::MatrixXd, Eigen::VectorXd, hopsy::RosenbrockModel>(),
-                R"pbdoc()pbdoc",
-                py::arg("A"),
-                py::arg("b"),
-                py::arg("model"));
+    addProblemClassToModule<hopsy::PyModel, hopsy::PyProblem>(
+            m, "PyProblem", R"pbdoc()pbdoc");
+
+    addProblemClassToModule<hopsy::RosenbrockModel, hopsy::RosenbrockProblem>(
+            m, "RosenbrockProblem", R"pbdoc()pbdoc");
 
     py::class_<hopsy::UniformProblem>(m, "UniformProblem",
 				R"pbdoc()pbdoc")
@@ -152,15 +151,12 @@ where
                 R"pbdoc()pbdoc",
                 py::arg("A"),
                 py::arg("b"),
-                py::arg("model"));
-
-    py::class_<hopsy::PyProblem>(m, "PyProblem",
-				R"pbdoc()pbdoc")
-        .def(py::init<Eigen::MatrixXd, Eigen::VectorXd, hopsy::PyModel>(),
-                R"pbdoc()pbdoc",
-                py::arg("A"),
-                py::arg("b"),
-                py::arg("model"));
+                py::arg("model"))
+        .def_property("A", &hopsy::UniformProblem::getA, &hopsy::UniformProblem::setA)
+        .def_property("b", &hopsy::UniformProblem::getB, &hopsy::UniformProblem::setB)
+        .def_property("starting_point", &hopsy::UniformProblem::getStartingPoint, &hopsy::UniformProblem::setStartingPoint)
+        .def_property("unrounding_transformation", &hopsy::UniformProblem::getUnroundingTransformation, &hopsy::UniformProblem::setUnroundingTransformation)
+        .def_property("unrounding_shift", &hopsy::UniformProblem::getUnroundingShift, &hopsy::UniformProblem::setUnroundingShift);
 
 
     //  
