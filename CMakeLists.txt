@@ -4,6 +4,7 @@ project(hopsy)
 
 set(EIGEN3_INCLUDE_DIR "../../extern/eigen3")
 
+set(HOPS_HEADER_ONLY ON)
 set(HOPS_EXAMPLES OFF)
 set(HOPS_TESTS OFF)
 set(EVENT__DISABLE_TESTS ON)
@@ -19,7 +20,6 @@ endif ()
 
 option(HOPSY_TESTS "Enable hopsy tests" OFF)
 
-#set(HOPS_HEADER_ONLY ON)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHOPS_HEADER_ONLY")
 
 set(EIGEN3_INCLUDE_DIR "extern/eigen3")
