@@ -1,4 +1,4 @@
-.. image:: hops.png
+.. image:: hopsy.png
    :align: center
    :width: 400
    :alt: Alternative text
