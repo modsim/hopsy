@@ -119,11 +119,11 @@ adaptive_run.sample(10000)
 gaussian_stepsize = gaussian_run.get_stepsize()
 adaptive_stepsize = adaptive_run.get_stepsize()
 
-gaussian_acc_rate = hopsy.compute_acceptance_rate(gaussian_run.get_data())[0]
-adaptive_acc_rate = hopsy.compute_acceptance_rate(adaptive_run.get_data())[0]
+gaussian_acc_rate = hopsy.compute_acceptance_rate(gaussian_run.data)[0]
+adaptive_acc_rate = hopsy.compute_acceptance_rate(adaptive_run.data)[0]
 
-gaussian_esjd = hopsy.compute_expected_squared_jump_distance(gaussian_run.get_data())[0]
-adaptive_esjd = hopsy.compute_expected_squared_jump_distance(adaptive_run.get_data())[0]
+gaussian_esjd = hopsy.compute_expected_squared_jump_distance(gaussian_run.data)[0]
+adaptive_esjd = hopsy.compute_expected_squared_jump_distance(adaptive_run.data)[0]
 
 if len(sys.argv) == 1 or sys.argv[1] != "test":
     print("         | Gaussian proposal"                         + " | Adaptive proposal")
@@ -133,8 +133,8 @@ if len(sys.argv) == 1 or sys.argv[1] != "test":
     print("ESJD     |             " + str(gaussian_esjd)[:5]     + " |             " + str(adaptive_esjd)[:5])
 
     import matplotlib.pyplot as plt
-    gaussian_states = np.array(gaussian_run.get_data().get_states()[0])
-    adaptive_states = np.array(adaptive_run.get_data().get_states()[0])
+    gaussian_states = np.array(gaussian_run.data.states[0])
+    adaptive_states = np.array(adaptive_run.data.states[0])
 
     fig = plt.figure(figsize=(35,35))
     fig.patch.set_alpha(1)
