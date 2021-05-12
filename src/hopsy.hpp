@@ -151,7 +151,8 @@ namespace hopsy {
 	hops::Run<T> createRun(const hops::Problem<T>& t, 
                            std::string chainTypeString = "HitAndRun", 
                            unsigned long numberOfSamples = 1000, 
-                           unsigned long numberOfChains = 1) {
+                           unsigned long numberOfChains = 1,
+                           std::vector<Eigen::VectorXd> startingPoints = std::vector<Eigen::VectorXd>()) {
 		hops::MarkovChainType chainType;
 		if (chainTypeString == "BallWalk") {
 			chainType = hops::MarkovChainType::BallWalk;
@@ -170,22 +171,34 @@ namespace hopsy {
 		}
 
 		if constexpr(std::is_same<T, DegenerateMultivariateGaussianModel>::value) {
-			return hops::Run<DegenerateMultivariateGaussianModel>(t, chainType, numberOfSamples, numberOfChains);
+			auto run = hops::Run<DegenerateMultivariateGaussianModel>(t, chainType, numberOfSamples, numberOfChains);
+            run.setStartingPoints(startingPoints);
+            return run;
 		}
 		if constexpr(std::is_same<T, MultimodalMultivariateGaussianModel>::value) {
-			return hops::Run<MultimodalMultivariateGaussianModel>(t, chainType, numberOfSamples, numberOfChains);
+			auto run = hops::Run<MultimodalMultivariateGaussianModel>(t, chainType, numberOfSamples, numberOfChains);
+            run.setStartingPoints(startingPoints);
+            return run;
 		}
 		if constexpr(std::is_same<T, MultivariateGaussianModel>::value) {
-			return hops::Run<MultivariateGaussianModel>(t, chainType, numberOfSamples, numberOfChains);
+			auto run = hops::Run<MultivariateGaussianModel>(t, chainType, numberOfSamples, numberOfChains);
+            run.setStartingPoints(startingPoints);
+            return run;
 		}
 		if constexpr(std::is_same<T, RosenbrockModel>::value) {
-			return hops::Run<RosenbrockModel>(t, chainType, numberOfSamples, numberOfChains);
+			auto run = hops::Run<RosenbrockModel>(t, chainType, numberOfSamples, numberOfChains);
+            run.setStartingPoints(startingPoints);
+            return run;
 		}
 		if constexpr(std::is_same<T, UniformModel>::value) {
-			return hops::Run<UniformModel>(t, chainType, numberOfSamples, numberOfChains);
+			auto run = hops::Run<UniformModel>(t, chainType, numberOfSamples, numberOfChains);
+            run.setStartingPoints(startingPoints);
+            return run;
 		}
 		if constexpr(std::is_same<T, PyModel>::value) {
-			return hops::Run<PyModel>(t, chainType, numberOfSamples, numberOfChains);
+			auto run = hops::Run<PyModel>(t, chainType, numberOfSamples, numberOfChains);
+            run.setStartingPoints(startingPoints);
+            return run;
 		}
 	}
 

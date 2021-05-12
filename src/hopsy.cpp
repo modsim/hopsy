@@ -18,33 +18,23 @@ template<typename Problem, typename Run>
 void addRunClassToModule(py::module& m, const char* name, const char* doc) {
     py::class_<Run>(m, name, doc)
         .def(py::init<Problem>())
-        .def_property_readonly("data", &Run::getData)
         .def("init", &Run::init)
         .def("sample", py::overload_cast<>(&Run::sample))
         .def("sample", py::overload_cast<unsigned long, unsigned long>(&Run::sample), 
                 py::arg("number_of_samples"), py::arg("thinning") = 1)
-        .def("set_problem", &Run::setProblem)
-        .def("get_problem", &Run::getProblem)
-        .def("set_starting_points", &Run::setStartingPoints)
-        .def("get_starting_points", &Run::getStartingPoints)
-        .def("set_markov_chain_type", &Run::setMarkovChainType)
-        .def("get_markovv_chain_type", &Run::getMarkovChainType)
-        .def("set_number_of_chains", &Run::setNumberOfChains)
-        .def("get_number_of_chains", &Run::getNumberOfChains)
-        .def("set_number_of_samples", &Run::setNumberOfSamples)
-        .def("get_number_of_samples", &Run::getNumberOfSamples)
-        .def("set_thinning", &Run::setThinning)
-        .def("get_thinning", &Run::getThinning)
-        .def("set_stepsize", &Run::setStepSize)
-        .def("get_stepsize", &Run::getStepSize)
-        .def("set_fisher_weight", &Run::setFisherWeight)
-        .def("get_fisher_weight", &Run::getFisherWeight)
-        .def("set_random_seed", &Run::setRandomSeed)
-        .def("get_random_seed", &Run::getRandomSeed)
-        .def("unset_sampling_until_convergence", &Run::unsetSamplingUntilConvergence)
-        .def("set_sampling_until_convergence", &Run::setSamplingUntilConvergence)
-        .def("get_diagnostics_threshold", &Run::getDiagnosticsThreshold)
-        .def("get_max_repetitions", &Run::getMaxRepetitions);
+        .def_property_readonly("data", &Run::getData)
+        .def_property("problem", &Run::getProblem, &Run::setProblem)
+        .def_property("starting_points", &Run::getStartingPoints, &Run::setStartingPoints)
+        .def_property("markovv_chain_type", &Run::getMarkovChainType, &Run::setMarkovChainType)
+        .def_property("number_of_chains", &Run::getNumberOfChains, &Run::setNumberOfChains)
+        .def_property("number_of_samples", &Run::getNumberOfSamples, &Run::setNumberOfSamples)
+        .def_property("thinning", &Run::getThinning, &Run::setThinning)
+        .def_property("stepsize", &Run::getStepSize, &Run::setStepSize)
+        .def_property("fisher_weight", &Run::getFisherWeight, &Run::setFisherWeight)
+        .def_property("random_seed", &Run::getRandomSeed, &Run::setRandomSeed)
+        .def_property("sample_until_convergence", &Run::getSamplingUntilConvergence, &Run::setSamplingUntilConvergence)
+        .def_property("diagnostics_threshold", &Run::getDiagnosticsThreshold, &Run::setDiagnosticsThreshold)
+        .def_property("max_repetitions", &Run::getMaxRepetitions, &Run::setMaxRepetitions);
 }
 
 template<typename Model, typename Problem>
@@ -276,22 +266,46 @@ where
     //
 	m.def("Run", &hopsy::createRun<hopsy::DegenerateMultivariateGaussianModel>, 
             	R"pbdoc()pbdoc",
-            	py::arg("problem"), py::arg("proposal_name") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	py::arg("problem"), 
+                py::arg("proposal_name") = "HitAndRun", 
+                py::arg("number_of_samples") = 1000, 
+                py::arg("number_of_chains") = 1, 
+                py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRun<hopsy::MultimodalMultivariateGaussianModel>,
-                R"pbdoc()pbdoc",
-                py::arg("problem"), py::arg("proposal_name") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	R"pbdoc()pbdoc",
+            	py::arg("problem"), 
+                py::arg("proposal_name") = "HitAndRun", 
+                py::arg("number_of_samples") = 1000, 
+                py::arg("number_of_chains") = 1, 
+                py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRun<hopsy::MultivariateGaussianModel>,
-                R"pbdoc()pbdoc",
-                py::arg("problem"), py::arg("proposal_name") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	R"pbdoc()pbdoc",
+            	py::arg("problem"), 
+                py::arg("proposal_name") = "HitAndRun", 
+                py::arg("number_of_samples") = 1000, 
+                py::arg("number_of_chains") = 1, 
+                py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRun<hopsy::PyModel>,
-                R"pbdoc()pbdoc",
-                py::arg("problem"), py::arg("proposal_name") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	R"pbdoc()pbdoc",
+            	py::arg("problem"), 
+                py::arg("proposal_name") = "HitAndRun", 
+                py::arg("number_of_samples") = 1000, 
+                py::arg("number_of_chains") = 1, 
+                py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRun<hopsy::RosenbrockModel>,
-                R"pbdoc()pbdoc",
-                py::arg("problem"), py::arg("proposal_name") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	R"pbdoc()pbdoc",
+            	py::arg("problem"), 
+                py::arg("proposal_name") = "HitAndRun", 
+                py::arg("number_of_samples") = 1000, 
+                py::arg("number_of_chains") = 1, 
+                py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRun<hopsy::UniformModel>,
-                R"pbdoc()pbdoc",
-                py::arg("problem"), py::arg("proposal_name") = "HitAndRun", py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
+            	R"pbdoc()pbdoc",
+            	py::arg("problem"), 
+                py::arg("proposal_name") = "HitAndRun", 
+                py::arg("number_of_samples") = 1000, 
+                py::arg("number_of_chains") = 1, 
+                py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 
 	m.def("Run", &hopsy::createRunFromPyProposal<hopsy::DegenerateMultivariateGaussianModel>, 
             	R"pbdoc()pbdoc",
