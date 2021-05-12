@@ -108,14 +108,14 @@ def draw_state(x, sigma, ax, color, n_dof = 4):
     assert len(x) % n_dof == 2
     n_particles = int(len(x) / n_dof)
 
-    particle = plt.Circle((0,0), sigma, clip_on=False, fill=False, color='C0')
+    particle = plt.Circle((0,0), sigma, clip_on=False, fill=False, color=color)
     ax.add_patch(particle)
     for i in range(n_particles):
         particle = plt.Circle(x[n_dof*i+2:n_dof*i+2+4], sigma, clip_on=False, fill=False, color=color)
         ax.add_patch(particle)
 
     particle_j_coord = x[2:4] 
-    ax.plot([0, particle_j_coord[0]], [0, particle_j_coord[1]], color='C0')
+    ax.plot([0, particle_j_coord[0]], [0, particle_j_coord[1]], color=color)
     for i in range(n_particles - 1):
         particle_i_coord = x[4*i+2:4*i+4] 
         particle_j_coord = x[4*(i+1)+2:4*(i+1)+4] 
@@ -143,7 +143,7 @@ def compute_sample_average(f, x):
 
 
 def main():
-    n_particles = 25
+    n_particles = 10
     n_dof = 4
 
     r_f = 1
@@ -160,11 +160,11 @@ def main():
 
     #proposal = UnconstrainedProposal(x, 0.0002*np.identity(n_particles * n_dof - 2)) 
     run = hopsy.Run(problem, "Gaussian")
-    run.set_stepsize(0.02)
+    run.stepsize = 0.02
 
-    run.set_starting_points([x])
+    run.starting_points = [x]
     run.init()
-    run.sample(1000, 100)
+    run.sample(1000, 10)
 
     state = run.data.states[-1][-1]
     #print(hopsy.compute_potential_scale_reduction_factor(run.data))

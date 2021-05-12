@@ -12,7 +12,7 @@ if __name__ == "__main__":
     problem = hopsy.Problem(A, b, model)
     run = hopsy.Run(problem)
 
-    run.set_starting_points([np.array([[0.5], [0.5]])])
+    run.starting_points = [np.array([[0.5], [0.5]])]
     #run.enable_rounding()
 
     run.sample()

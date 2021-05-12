@@ -27,15 +27,13 @@ problem = hopsy.Problem(A, b, model)
 ## alternatively use (which internally happens anyways)
 # problem = hopsy.Problem(A, b, hopsy.PyModel(model))
 
-run = hopsy.Run(problem)
-
-run.set_starting_points([np.array([[0.1], [0.1]])])
+run = hopsy.Run(problem, starting_points = [np.array([[0.1], [0.1]])])
 
 run.sample(10000)
 
 if len(sys.argv) == 1 or sys.argv[1] != "test":
     import matplotlib.pyplot as plt
-    states = np.array(run.get_data().get_states()[0])
+    states = np.array(run.data.states[0])
 
     fig = plt.figure(figsize=(35,35))
     fig.patch.set_alpha(1)

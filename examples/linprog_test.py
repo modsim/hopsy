@@ -16,6 +16,5 @@ if __name__ == "__main__":
     # previously set
     run.init()
 
-    result = run.sample()
-    print(result)
+    run.sample()
 

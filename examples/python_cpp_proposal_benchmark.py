@@ -64,8 +64,8 @@ run2 = hopsy.Run(problem, "Gaussian")
 ## alternatively use (which internally happens anyways)
 # run = hopsy.Run(problem, hopsy.PyProposal(proposal))
 
-run.set_starting_points([x0])
-run2.set_starting_points([x0])
+run.starting_points = [x0]
+run2.starting_points = [x0]
 
 times = []
 
@@ -91,7 +91,7 @@ if len(sys.argv) == 1 or sys.argv[1] != "test":
     print(cpp_proposal[0], cpp_proposal[1])
 
     import matplotlib.pyplot as plt
-    states = np.array(run.get_data().get_states()[0])
+    states = np.array(run.data.states[0])
 
     fig = plt.figure(figsize=(35,35))
     fig.patch.set_alpha(1)
