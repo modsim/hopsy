@@ -110,5 +110,8 @@ setup(
     long_description="",
     ext_modules=[CMakeExtension("hopsy")],
     cmdclass={"build_ext": CMakeBuild},
+	install_requires=[
+		'PolyRound',
+	],
     zip_safe=False,
 )
