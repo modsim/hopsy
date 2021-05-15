@@ -4,6 +4,7 @@
 #include <pybind11/stl.h>
 
 #include "hopsy.hpp"
+#include "hopsy_linprog.hpp"
 
 #include <Eigen/Core>
 
@@ -201,6 +202,31 @@ where
                 py::arg("A"),
                 py::arg("b"),
                 py::arg("model"));
+
+
+    //
+    // Problem rounding with PolyRound
+    // ===============================
+    //
+    m.def("round", &hopsy::round<hopsy::DegenerateMultivariateGaussianModel>);
+    m.def("round", &hopsy::round<hopsy::MultimodalMultivariateGaussianModel>);
+    m.def("round", &hopsy::round<hopsy::MultivariateGaussianModel>);
+    m.def("round", &hopsy::round<hopsy::PyModel>);
+    m.def("round", &hopsy::round<hopsy::RosenbrockModel>);
+    m.def("round", &hopsy::round<hopsy::UniformModel>);
+
+
+    //
+    // Chebyshev center with PolyRound
+    // ===============================
+    //
+    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::DegenerateMultivariateGaussianModel>);
+    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::MultimodalMultivariateGaussianModel>);
+    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::MultivariateGaussianModel>);
+    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::PyModel>);
+    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::RosenbrockModel>);
+    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::UniformModel>);
+
 
 
     //  
