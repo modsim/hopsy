@@ -5,15 +5,12 @@ Built using `pybind11`
 
 <img src="hopsy.png" alt="HOPSY Logo" width="300"/>
 
+**hopsy** is the attempt to offer some of the key functionatlity of **hops** through a Python interface.
+hops is a highly template-based C++-library for Markov chain Monte Carlo sampling on convex polytopes
+ 
+P = {x : Ax &#8804; b},
 
-## Prerequisites
-
-**On Unix (Linux, OS X)**
-
-* A compiler with C++11 support
-* CMake >= 3.4 or Pip 10+
-* Ninja or Pip 10+
-
+which often arises in metabolic flux analysis.
 
 ## Installation
 
@@ -39,6 +36,16 @@ make
 ```
 
 In this case, the compiled shared library will be located in `build/` and can be used within the directory. 
+
+### Prerequisites for compiling from source
+
+**On Unix (Linux, OS X)**
+
+* A compiler with C++11 support
+* CMake >= 3.4 or Pip 10+
+* Ninja or Pip 10+
+* Docker (optional, for building wheels)
+
 
 ## License
 

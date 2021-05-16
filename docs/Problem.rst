@@ -49,6 +49,21 @@ Reference
      will be wrapped inside ``hopsy.PyModel``, which works as an interface between HOPS and any Python-implemented model class. Any calls
      from within HOPS to the model will be delegated by calling the appropriate Python function. 
 
+.. note:: The following class reference refers to the non-existent class ``hopsy.Problem``.
+          It applies to any of the available problem classes, which are listed at the end of this page.
+
+.. class:: Problem
+
+   .. attribute:: A: numpy.ndarray[float64[m,n]]
+
+   .. attribute:: b: numpy.ndarray[float64[m,1]]
+
+   .. attribute:: starting_point: numpy.ndarray[float64[n,1]]
+
+   .. attribute:: unrounding_transformation: numpy.ndarray[float64[m,n]]
+
+   .. attribute:: unrounding_shift: numpy.ndarray[float64[m,1]]
+
 .. autoclass:: DegenerateMultivariateGaussianProblem
 .. autoclass:: MultimodalMultivariateGaussianProblem
 .. autoclass:: MultivariateGaussianProblem

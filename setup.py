@@ -99,6 +99,9 @@ class CMakeBuild(build_ext):
         )
 
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
@@ -107,7 +110,7 @@ setup(
     author="Richard D. Paul",
     author_email="r.paul@fz-juelich.de",
     description="A python interface of HOPS, the highly optimized polytope sampling toolbox.",
-    long_description="",
+    long_description=long_description,
     ext_modules=[CMakeExtension("hopsy")],
     cmdclass={"build_ext": CMakeBuild},
 	install_requires=[

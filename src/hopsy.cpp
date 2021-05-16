@@ -208,24 +208,24 @@ where
     // Problem rounding with PolyRound
     // ===============================
     //
-    m.def("round", &hopsy::round<hopsy::DegenerateMultivariateGaussianModel>);
-    m.def("round", &hopsy::round<hopsy::MultimodalMultivariateGaussianModel>);
-    m.def("round", &hopsy::round<hopsy::MultivariateGaussianModel>);
-    m.def("round", &hopsy::round<hopsy::PyModel>);
-    m.def("round", &hopsy::round<hopsy::RosenbrockModel>);
-    m.def("round", &hopsy::round<hopsy::UniformModel>);
+    m.def("round", &hopsy::round<hopsy::DegenerateMultivariateGaussianModel>, py::arg("problem"));
+    m.def("round", &hopsy::round<hopsy::MultimodalMultivariateGaussianModel>, py::arg("problem"));
+    m.def("round", &hopsy::round<hopsy::MultivariateGaussianModel>, py::arg("problem"));
+    m.def("round", &hopsy::round<hopsy::PyModel>, py::arg("problem"));
+    m.def("round", &hopsy::round<hopsy::RosenbrockModel>, py::arg("problem"));
+    m.def("round", &hopsy::round<hopsy::UniformModel>, py::arg("problem"));
 
 
     //
     // Chebyshev center with PolyRound
     // ===============================
     //
-    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::DegenerateMultivariateGaussianModel>);
-    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::MultimodalMultivariateGaussianModel>);
-    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::MultivariateGaussianModel>);
-    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::PyModel>);
-    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::RosenbrockModel>);
-    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::UniformModel>);
+    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::DegenerateMultivariateGaussianModel>, py::arg("problem"));
+    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::MultimodalMultivariateGaussianModel>, py::arg("problem"));
+    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::MultivariateGaussianModel>, py::arg("problem"));
+    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::PyModel>, py::arg("problem"));
+    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::RosenbrockModel>, py::arg("problem"));
+    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::UniformModel>, py::arg("problem"));
 
 
 
