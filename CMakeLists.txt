@@ -5,7 +5,7 @@ project(hopsy)
 set(EIGEN3_INCLUDE_DIR "../../extern/eigen3")
 
 set(HOPS_HEADER_ONLY ON)
-set(HOPS_EXAMPLES OFF)
+set(HOPS_BINARIES OFF)
 set(HOPS_TESTS OFF)
 set(EVENT__DISABLE_TESTS ON)
 add_subdirectory(extern/hops)
