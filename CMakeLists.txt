@@ -2,10 +2,12 @@ cmake_minimum_required(VERSION 3.4...3.18)
 project(hopsy)
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
-set(HOPS_HEADER_ONLY ON)
+set(HOPS_LIBRARY_TYPE HEADER_ONLY CACHE STRING "use header only" FORCE)
 set(HOPS_BINARIES OFF)
 set(HOPS_TESTS OFF)
+set(HOPS_NO_INSTALL ON)
 set(EVENT__DISABLE_TESTS ON)
+set(EIGEN3_INCLUDE_DIR "../../extern/eigen3")
 add_subdirectory(extern/hops)
 
 set(CMAKE_CXX_STANDARD 17)
