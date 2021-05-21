@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.4...3.18)
 project(hopsy)
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
-set(EIGEN3_INCLUDE_DIR "../../extern/eigen3")
-
 set(HOPS_HEADER_ONLY ON)
 set(HOPS_EXAMPLES OFF)
 set(HOPS_TESTS OFF)
@@ -34,7 +32,7 @@ pybind11_add_module(hopsy src/hopsy.cpp)
 
 #target_compile_options(hopsy PUBLIC "-DHOPS_HEADER_ONLY")
 
-target_include_directories(hopsy PUBLIC ${EIGEN3_INCLUDE_DIR})
+target_include_directories(hopsy PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${EIGEN3_INCLUDE_DIR})
 target_include_directories(hopsy PUBLIC ${HOPS_INCLUDE_DIR})
 
 target_link_libraries(hopsy PRIVATE hops)
