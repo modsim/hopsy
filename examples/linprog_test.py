@@ -12,6 +12,10 @@ if __name__ == "__main__":
     problem = hopsy.Problem(A, b, model)
     run = hopsy.Run(problem)
 
+    x0 = hopsy.compute_chebyshev_center(problem)
+
+    run.starting_points = [x0]
+
     # this computes the chebyshev center as no other starting point has been
     # previously set
     run.init()

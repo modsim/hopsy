@@ -160,8 +160,6 @@ namespace hopsy {
 			chainType = hops::MarkovChainType::CoordinateHitAndRun;
 		} else if (chainTypeString == "CSmMALA") {
 			chainType = hops::MarkovChainType::CSmMALA;
-		} else if (chainTypeString == "CSmMALANoGradient") {
-			chainType = hops::MarkovChainType::CSmMALANoGradient;
 		} else if (chainTypeString == "DikinWalk") {
 			chainType = hops::MarkovChainType::DikinWalk;
 		} else if (chainTypeString == "Gaussian") {

@@ -3,7 +3,7 @@ project(hopsy)
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
 set(HOPS_HEADER_ONLY ON)
-set(HOPS_EXAMPLES OFF)
+set(HOPS_BINARIES OFF)
 set(HOPS_TESTS OFF)
 set(EVENT__DISABLE_TESTS ON)
 add_subdirectory(extern/hops)
