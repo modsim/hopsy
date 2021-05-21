@@ -12,7 +12,8 @@ problem = hopsy.Problem(A, b, model)
 run = hopsy.Run(problem)
 
 run.starting_points = [np.array([[0.4], [0.4]])]
-run.enable_rounding()
+
+rounded_problem = hopsy.round(problem)
 
 run.sample()
 
