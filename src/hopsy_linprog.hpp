@@ -17,51 +17,104 @@
 namespace py = pybind11;
 
 namespace hopsy {
-    std::unique_ptr<py::object> polyRoundApi = nullptr;
-    std::unique_ptr<py::object> polyRoundChebyshevFinder = nullptr;
-    std::unique_ptr<py::object> polyRoundPolytope = nullptr;
+    //std::unique_ptr<py::object> polyRoundApi = nullptr;
+    //std::unique_ptr<py::object> polyRoundChebyshevFinder = nullptr;
+    //std::unique_ptr<py::object> polyRoundPolytope = nullptr;
 
+    //template<typename T>
+    //hops::Problem<T> round(const hops::Problem<T>& problem) {
+    //    //py::scoped_interpreter guard{};
+
+    //    if (!polyRoundApi) {
+    //        polyRoundApi = std::make_unique<py::object>(py::module_::import("PolyRound.api").attr("PolyRoundApi"));
+    //    }
+
+    //    if (!polyRoundPolytope) {
+    //        polyRoundPolytope = std::make_unique<py::object>(py::module_::import("PolyRound.mutable_classes.polytope"));
+    //    }
+
+    //    py::object polytope = polyRoundPolytope->attr("Polytope")(problem.getA(), problem.getB());
+
+    //    py::object roundedPolytope = polyRoundApi->attr("simplify_transform_and_round")(polytope);
+
+    //    hops::Problem<T> roundedProblem(roundedPolytope.attr("A.values").cast<Eigen::MatrixXd>(), 
+    //                                    roundedPolytope.attr("b.values").cast<Eigen::VectorXd>(), 
+    //                                    problem.getModel());
+
+    //    roundedProblem.setUnroundingTransformation(roundedPolytope.attr("S.values").cast<Eigen::MatrixXd>());
+    //    roundedProblem.setUnroundingShift(roundedPolytope.attr("h.values").cast<Eigen::VectorXd>());       
+
+    //    return roundedProblem;
+    //}
+
+    //template<typename T>
+    //Eigen::VectorXd computeChebyshevCenter(const hops::Problem<T>& problem) {
+    //    //py::scoped_interpreter guard{};
+
+    //    if (!polyRoundChebyshevFinder) {
+    //        polyRoundChebyshevFinder = std::make_unique<py::object>(py::module_::import("PolyRound.static_classes.lp_utils").attr("ChebyshevFinder"));
+    //    }
+
+    //    if (!polyRoundPolytope) {
+    //        polyRoundPolytope = std::make_unique<py::object>(py::module_::import("PolyRound.mutable_classes.polytope"));
+    //    }
+
+    //    py::object polytope = polyRoundPolytope->attr("Polytope")(problem.getA(), problem.getB());
+
+    //    return polyRoundChebyshevFinder->attr("chebyshev_center")(polytope).attr("__getitem__")(0).cast<Eigen::VectorXd>();
+    //}
+    
     template<typename T>
     hops::Problem<T> round(const hops::Problem<T>& problem) {
-        //py::scoped_interpreter guard{};
+        py::object polyRoundApi = py::module_::import("PolyRound.api").attr("PolyRoundApi");
+        py::object polyRoundPolytope = py::module_::import("PolyRound.mutable_classes.polytope");
 
-        if (!polyRoundApi) {
-            polyRoundApi = std::make_unique<py::object>(py::module_::import("PolyRound.api").attr("PolyRoundApi"));
-        }
+        py::object polytope = polyRoundPolytope.attr("Polytope")(problem.getA(), problem.getB());
 
-        if (!polyRoundPolytope) {
-            polyRoundPolytope = std::make_unique<py::object>(py::module_::import("PolyRound.mutable_classes.polytope"));
-        }
+        py::object simplifiedPolytope = polyRoundApi.attr("simplify_polytope")(polytope);
 
-        py::object polytope = polyRoundPolytope->attr("Polytope")(problem.getA(), problem.getB());
+        py::dict local;
+        local["p"] = simplifiedPolytope;
 
-        py::object roundedPolytope = polyRoundApi->attr("simplify_transform_and_round")(polytope);
+        py::exec(R"(
+            import numpy as np
+            import pandas as pd
+            number_of_reactions = p.A.shape[1]
+            p.transformation = pd.DataFrame(np.identity(number_of_reactions))
+            p.transformation.index = [str(i) for i in range(p.transformation.to_numpy().shape[0])]
+            p.transformation.columns = [str(i) for i in range(p.transformation.to_numpy().shape[1])]
+            p.shift = pd.Series(np.zeros(number_of_reactions))
+        )", local);
 
-        hops::Problem<T> roundedProblem(roundedPolytope.attr("A.values").cast<Eigen::MatrixXd>(), 
-                                        roundedPolytope.attr("b.values").cast<Eigen::VectorXd>(), 
+        py::object roundedPolytope = polyRoundApi.attr("round_polytope")(local["simplified_polytope"]);
+
+        //local["rounded_polytope"] = roundedPolytope;
+
+        //py::exec(R"(
+        //    print("A", rounded_polytope.A)
+        //    print("b", rounded_polytope.b)
+        //    print("S", rounded_polytope.S)
+        //    print("h", rounded_polytope.h)
+        //)", local);
+
+        hops::Problem<T> roundedProblem(roundedPolytope.attr("A").attr("values").cast<Eigen::MatrixXd>(), 
+                                        roundedPolytope.attr("b").attr("values").cast<Eigen::VectorXd>(), 
                                         problem.getModel());
 
-        roundedProblem.setUnroundingTransformation(roundedPolytope.attr("S.values").cast<Eigen::MatrixXd>());
-        roundedProblem.setUnroundingShift(roundedPolytope.attr("h.values").cast<Eigen::VectorXd>());       
+        roundedProblem.setUnroundingTransformation(roundedPolytope.attr("transformation").attr("values").cast<Eigen::MatrixXd>());
+        roundedProblem.setUnroundingShift(roundedPolytope.attr("shift").attr("values").cast<Eigen::VectorXd>());       
 
         return roundedProblem;
     }
 
     template<typename T>
     Eigen::VectorXd computeChebyshevCenter(const hops::Problem<T>& problem) {
-        //py::scoped_interpreter guard{};
+        py::object polyRoundChebyshevFinder = py::module_::import("PolyRound.static_classes.lp_utils").attr("ChebyshevFinder");
+        py::object polyRoundPolytope = py::module_::import("PolyRound.mutable_classes.polytope");
 
-        if (!polyRoundChebyshevFinder) {
-            polyRoundChebyshevFinder = std::make_unique<py::object>(py::module_::import("PolyRound.static_classes.lp_utils").attr("ChebyshevFinder"));
-        }
+        py::object polytope = polyRoundPolytope.attr("Polytope")(problem.getA(), problem.getB());
 
-        if (!polyRoundPolytope) {
-            polyRoundPolytope = std::make_unique<py::object>(py::module_::import("PolyRound.mutable_classes.polytope"));
-        }
-
-        py::object polytope = polyRoundPolytope->attr("Polytope")(problem.getA(), problem.getB());
-
-        return polyRoundChebyshevFinder->attr("chebyshev_center")(polytope).attr("__getitem__")(0).cast<Eigen::VectorXd>();
+        return polyRoundChebyshevFinder.attr("chebyshev_center")(polytope).attr("__getitem__")(0).cast<Eigen::VectorXd>();
     }
 }
 
