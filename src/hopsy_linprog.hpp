@@ -86,7 +86,8 @@ namespace hopsy {
             p.shift = pd.Series(np.zeros(number_of_reactions))
         )", local);
 
-        py::object roundedPolytope = polyRoundApi.attr("round_polytope")(local["simplified_polytope"]);
+        py::object roundedPolytope = polyRoundApi.attr("round_polytope")(simplifiedPolytope);
+        //py::object roundedPolytope = polyRoundApi.attr("round_polytope")(local["p"]);
 
         //local["rounded_polytope"] = roundedPolytope;
 
