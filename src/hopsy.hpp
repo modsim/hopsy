@@ -1,3 +1,6 @@
+#ifndef HOPSY_HPP
+#define HOPSY_HPP
+
 #include <pybind11/detail/common.h>
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
@@ -6,6 +9,7 @@
 #include <Eigen/Core>
 
 #include "../extern/hops/include/hops/hops.hpp"
+#include "hopsy_linprog.hpp"
 
 #include <string>
 
@@ -168,6 +172,14 @@ namespace hopsy {
 			chainType = hops::MarkovChainType::HitAndRun;
 		}
 
+        // initialize missing starting points with chebyshev center
+        if (startingPoints.size() < numberOfChains) {
+            Eigen::VectorXd chebyshevCenter = computeChebyshevCenter(t);
+            for (size_t i = startingPoints.size(); i < numberOfChains; ++i) {
+                startingPoints.push_back(chebyshevCenter);
+            }
+        }
+
 		if constexpr(std::is_same<T, DegenerateMultivariateGaussianModel>::value) {
 			auto run = hops::Run<DegenerateMultivariateGaussianModel>(t, chainType, numberOfSamples, numberOfChains);
             run.setStartingPoints(startingPoints);
@@ -235,3 +247,4 @@ namespace hopsy {
 	}
 }
 
+#endif // HOPSY_HPP

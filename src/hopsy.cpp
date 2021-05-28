@@ -4,7 +4,6 @@
 #include <pybind11/stl.h>
 
 #include "hopsy.hpp"
-#include "hopsy_linprog.hpp"
 
 #include <Eigen/Core>
 
