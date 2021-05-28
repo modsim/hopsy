@@ -1,3 +1,6 @@
+#ifndef HOPSY_LINPROG_HPP
+#define HOPSY_LINPROG_HPP
+
 #include <pybind11/detail/common.h>
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
@@ -119,3 +122,4 @@ namespace hopsy {
     }
 }
 
+#endif // HOPSY_LINPROG
