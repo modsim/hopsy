@@ -111,6 +111,7 @@ setup(
     author_email="r.paul@fz-juelich.de",
     description="A python interface of hops, the highly optimized polytope sampling toolbox.",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     ext_modules=[CMakeExtension("hopsy")],
     cmdclass={"build_ext": CMakeBuild},
 	install_requires=[
