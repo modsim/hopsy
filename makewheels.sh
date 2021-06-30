@@ -11,8 +11,11 @@ do
 #        "/opt/python/"$py"/bin/pip install -r /io/requirements.txt"
     docker exec hopsy_manylinux_build_env /bin/bash -c  \
         "/opt/python/"$py"/bin/pip wheel --no-deps /io -w /io/dist/"
-    docker exec hopsy_manylinux_build_env /bin/bash -c  \
-        "auditwheel repair /io/dist/*"$py"-linux*.whl -w /io/dist"
+    for whl in dist/*$py-linux*.whl;
+    do
+        docker exec hopsy_manylinux_build_env /bin/bash -c  \
+            "auditwheel repair /io/"$whl" -w /io/dist"
+    done
 done
 
 docker stop hopsy_manylinux_build_env

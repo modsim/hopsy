@@ -117,8 +117,9 @@ namespace hopsy {
         py::object polyRoundPolytope = py::module_::import("PolyRound.mutable_classes.polytope");
 
         py::object polytope = polyRoundPolytope.attr("Polytope")(problem.getA(), problem.getB());
+        py::object settings = py::module_::import("PolyRound.settings").attr("PolyRoundSettings")();
 
-        return polyRoundChebyshevFinder.attr("chebyshev_center")(polytope).attr("__getitem__")(0).cast<Eigen::VectorXd>();
+        return polyRoundChebyshevFinder.attr("chebyshev_center")(polytope, settings).attr("__getitem__")(0).cast<Eigen::VectorXd>();
     }
 }
 
