@@ -157,20 +157,20 @@ algorithm, following the original idea of Haario et al., 2001.
  gaussian_run = hopsy.Run(problem, gaussian_proposal)
  adaptive_run = hopsy.Run(problem, adaptive_proposal)
  
- gaussian_run.set_starting_points([x0])
- adaptive_run.set_starting_points([x0])
+ gaussian_run.starting_points = [x0]
+ adaptive_run.starting_points = [x0]
  
  gaussian_run.sample(10000)
  adaptive_run.sample(10000)
  
- gaussian_stepsize = gaussian_run.get_stepsize()
- adaptive_stepsize = adaptive_run.get_stepsize()
+ gaussian_stepsize = gaussian_run.stepsize
+ adaptive_stepsize = adaptive_run.stepsize
  
- gaussian_acc_rate = hopsy.compute_acceptance_rate(gaussian_run.get_data())[0]
- adaptive_acc_rate = hopsy.compute_acceptance_rate(adaptive_run.get_data())[0]
+ gaussian_acc_rate = hopsy.compute_acceptance_rate(gaussian_run.data)[0]
+ adaptive_acc_rate = hopsy.compute_acceptance_rate(adaptive_run.data)[0]
  
- gaussian_esjd = hopsy.compute_expected_squared_jump_distance(gaussian_run.get_data())[0]
- adaptive_esjd = hopsy.compute_expected_squared_jump_distance(adaptive_run.get_data())[0]
+ gaussian_esjd = hopsy.compute_expected_squared_jump_distance(gaussian_run.data)[0]
+ adaptive_esjd = hopsy.compute_expected_squared_jump_distance(adaptive_run.data)[0]
  
  print("         | Gaussian proposal"                         + " | Adaptive proposal")
  print("---------+------------------"                         + "-+------------------")

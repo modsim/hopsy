@@ -45,7 +45,7 @@ Reference
 
    :param numpy.ndarray[shape[m,1]] b: the right-hand side of the polytope inequality :math:`Ax \leq b`
 
-   :param hopsy.Model model: defines the target distribution and may be any Python object. Internally, ``model``
+   :param object model: defines the target distribution and may be any Python object. Internally, ``model``
      will be wrapped inside ``hopsy.PyModel``, which works as an interface between HOPS and any Python-implemented model class. Any calls
      from within HOPS to the model will be delegated by calling the appropriate Python function. 
 

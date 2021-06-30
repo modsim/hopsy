@@ -46,7 +46,7 @@ The key functionality of hops is provided by encapsulating the key components of
   This consists most prominently of the generated states. 
   Further data stored, are e.g. timestamps, negative log-likelihood values and a few statistics.
 
-These are the "classes", which we deemed most useful and important for any practitioner, who wants to sample a linearily constrained problem at hand. A
+These are the "classes", which we deemed most useful and important for any practitioner, who wants to sample a linearily constrained problem at hand. 
 
 .. note:: Note, that we write classes in quotes, as the mentioned ``hopsy.Model``, ``hopsy.Problem`` and ``hopsy.Run`` "classes" are not actually 
    classes.
@@ -96,12 +96,12 @@ A short example on how to sample a Gaussian target distribution restricted to :m
    run.sample()
    
    # from the run, we can now extract the produced data
-   data = run.get_data()
+   data = run.data
    
    # the states is a list of lists of numpy.ndarrays, which can be casted to a numpy.ndarray
    # which then has the shape (m,n,d), where m is the number of chains, n the number of samples
    # and d the dimenion
-   states  = data.get_states()
+   states  = data.states
 
 
 Python-implemented proposals
