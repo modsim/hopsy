@@ -240,9 +240,9 @@ namespace hopsy {
 
 	template<typename T>
 	hops::RunBase<T, PyProposal> createRunFromPyObject(const hops::Problem<T>& t, 
-                                                      py::object pyObj, 
-                                                      unsigned long numberOfSamples = 1000, 
-                                                      unsigned long numberOfChains = 1) {
+                                                       py::object pyObj, 
+                                                       unsigned long numberOfSamples = 1000, 
+                                                       unsigned long numberOfChains = 1) {
         return createRunFromPyProposal(t, PyProposal(pyObj), numberOfSamples, numberOfChains);
 	}
 }
