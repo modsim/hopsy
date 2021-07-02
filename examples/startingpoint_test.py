@@ -14,8 +14,9 @@ if __name__ == "__main__":
 
     try:
         run.init()
-    except:
-        pass
+    except RuntimeError as e:
+        if len(sys.argv) == 1 or sys.argv[1] != "test":
+            print("caught exception:", e)
 
     run.starting_points = [np.array([[0.5], [0.5]])]
     run.sample()
