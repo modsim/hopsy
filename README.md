@@ -32,6 +32,7 @@ Alternatively, the project can be built using basic CMake commands:
 git clone --recursive [url-to-this-repo]
 cd hopsy
 mkdir build/ && cd build/
+cmake ..
 make 
 ```
 
