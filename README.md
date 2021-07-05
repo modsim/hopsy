@@ -84,12 +84,12 @@ run = hopsy.Run(problem)
 run.sample()
 
 # from the run, we can now extract the produced data
-data = run.get_data()
+data = run.data
 
 # the states is a list of lists of numpy.ndarrays, which can be casted to a numpy.ndarray
 # which then has the shape (m,n,d), where m is the number of chains, n the number of samples
 # and d the dimenion
-states  = data.get_states()
+states  = data.states
 ```
 
 [`cibuildwheel`]:          https://cibuildwheel.readthedocs.io
