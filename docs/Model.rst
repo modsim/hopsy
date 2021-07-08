@@ -95,11 +95,88 @@ Reference
 
 .. currentmodule:: hopsy
 
-.. autoclass:: DegenerateMultivariateGaussianModel
-.. autoclass:: MultimodalMultivariateGaussianModel
-.. autoclass:: MultivariateGaussianModel
-.. autoclass:: PyModel
-.. autoclass:: RosenbrockModel
-.. autoclass:: UniformModel
+
+.. class:: DegenerateMultivariateGaussianModel
+
+   .. attribute:: mean: numpy.ndarray[float64[m,1]]
+
+   .. attribute:: covariance: numpy.ndarray[float64[m,m]]
+
+   .. attribute:: inactives: List[int]
+
+   .. method:: calculate_negative_log_likelihood(x: numpy.ndarray[float64[m,1]]) -> float
+
+   .. method:: calculate_log_likelihood_gradient(x: numpy.ndarray[float64[m,1]]) -> numpy.ndarray[float64[m,1]]
+
+   .. method:: calculate_expected_fisher_information(x: numpy.ndarray[float64[m,1]]) -> numpy.ndarray[float64[m,m]] 
+
+
+.. class:: MultimodalMultivariateGaussianModel
+
+   .. attribute:: components: List[hopsy.DegenerateMultivariateGaussianModel]
+
+   .. method:: calculate_negative_log_likelihood(x: numpy.ndarray[float64[m,1]]) -> float
+
+   .. method:: calculate_log_likelihood_gradient(x: numpy.ndarray[float64[m,1]]) -> numpy.ndarray[float64[m,1]]
+
+   .. method:: calculate_expected_fisher_information(x: numpy.ndarray[float64[m,1]]) -> numpy.ndarray[float64[m,m]] 
+
+
+.. class:: MultivariateGaussianModel
+
+   .. attribute:: mean: numpy.ndarray[float64[m,1]]
+
+   .. attribute:: covariance: numpy.ndarray[float64[m,m]]
+
+   .. attribute:: inactives: List[int]
+
+   .. method:: calculate_negative_log_likelihood(x: numpy.ndarray[float64[m,1]]) -> float
+
+   .. method:: calculate_log_likelihood_gradient(x: numpy.ndarray[float64[m,1]]) -> numpy.ndarray[float64[m,1]]
+
+   .. method:: calculate_expected_fisher_information(x: numpy.ndarray[float64[m,1]]) -> numpy.ndarray[float64[m,m]] 
+
+
+.. class:: PyModel
+
+   .. attribute:: model: object
+
+   .. method:: calculate_negative_log_likelihood(x: numpy.ndarray[float64[m,1]]) -> float
+
+   .. method:: calculate_log_likelihood_gradient(x: numpy.ndarray[float64[m,1]]) -> numpy.ndarray[float64[m,1]]
+
+   .. method:: calculate_expected_fisher_information(x: numpy.ndarray[float64[m,1]]) -> numpy.ndarray[float64[m,m]] 
+
+
+.. class:: RosenbrockModel
+
+   .. attribute:: scale: float
+
+   .. attribute:: shift: numpy.ndarray[float64[m,1]]
+
+   .. method:: calculate_negative_log_likelihood(x: numpy.ndarray[float64[m,1]]) -> float
+
+   .. method:: calculate_log_likelihood_gradient(x: numpy.ndarray[float64[m,1]]) -> numpy.ndarray[float64[m,1]]
+
+   .. method:: calculate_expected_fisher_information(x: numpy.ndarray[float64[m,1]]) -> numpy.ndarray[float64[m,m]] 
+
+
+.. class:: UniformModel
+
+    The ``hopsy.UniformModel`` defines the uniform target distribution on the polytope
+
+    .. math::
+        \pi(x) := \frac{1}{Z} \mathbf{1}_{\mathcal{P}}(x)
+
+    where
+
+    .. math::
+        Z = \int_{\mathcal{P}} \mathbf{1}_{\mathcal{P}}(x) \mathrm{d}x
+
+   .. method:: calculate_negative_log_likelihood(x: numpy.ndarray[float64[m,1]]) -> float
+
+   .. method:: calculate_log_likelihood_gradient(x: numpy.ndarray[float64[m,1]]) -> numpy.ndarray[float64[m,1]]
+
+   .. method:: calculate_expected_fisher_information(x: numpy.ndarray[float64[m,1]]) -> numpy.ndarray[float64[m,m]] 
 
 

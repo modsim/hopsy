@@ -25,9 +25,7 @@ Contents
 Introduction
 ------------
 
-
-**hopsy** is the attempt to offer some of the key functionatlity of **hops** through a Python interface.
-hops is a highly template-based C++-library for Markov chain Monte Carlo sampling on convex polytopes
+**hopsy** is the Python interface for **hops**, a highly template-based C++-library for Markov chain Monte Carlo sampling on convex polytopes
 
 .. math:: \mathcal{P} = \{ x : Ax \leq b \}.
 
@@ -59,6 +57,38 @@ These are the "classes", which we deemed most useful and important for any pract
    which aim at simulating the look and feel of a templated constructor with automatic template deduction.
    Throughout this documentation, we will however use ``hopsy.Model``, ``hopsy.Problem`` and ``hopsy.Run`` also as a placeholder for any of the actually
    available models, problems and runs.
+
+Installation
+------------
+
+hopsy can be easily installed from the Python Package Index using ``pip install hopsy``.
+Alternatively, you can download the source code from our GitHub repository with
+
+::
+
+ git clone https://github.com/modsim/hopsy --recursive
+ 
+and compile either a binary wheel using pip
+
+::
+
+ pip wheel --no-deps hopsy/
+
+or use the standard CMake routine
+
+::
+
+ mkdir cmake-build-release && cd cmake-build-release
+ cmake ..
+ make 
+
+Note however that the binary wheel produced from ``pip`` can be actually installed using ``pip``, using
+
+::
+
+ pip install hopsy-x.y.z-tag.whl
+
+where the version ``x.y.z`` and tag ``tag`` will depend on the verison you downloaded and your build environment.
 
 Example code
 ------------
@@ -104,16 +134,21 @@ A short example on how to sample a Gaussian target distribution restricted to :m
    states  = data.states
 
 
-Python-implemented proposals
-----------------------------
+Python-implemented proposals & models
+-------------------------------------
 
-At the heart of the sampling process lies the proposal distribution or proposal algorithm, which distincts convex polytope samplers more than 
-anything else from more general samplers. 
-hops ships with an ever-growing number of such proposal algorithms which can be easily used by calling the appropriate identifier when constructing the
-``hopsy.Run``. 
-Sometimes, for example when developing novel proposal algorithms, it might be interesting, to quickly prototype them. 
-Obviously, C++ is not a favorable choice for rapid prototyping. 
-Thus, we provided an interface for using Python-implemented proposals. 
-This works by wrapping a Python object, which is passed to ``hopsy.Run()`` in a ``hopsy.PyProposal`` class which internally delegates all calls from
-hops to the proposal class to the respective functions of the passed Python-implemented proposal.
-For more details and an example on the requirements on the Python-implemented proposals, please refer to ``hopsy.PyProposal``
+For high flexibility when using hops, we made the proposal algorithm as well as the model defining the likelihood implementable in Python.
+Consider the Metropolis criterion
+
+.. math:: \alpha(\theta, \theta^*) = \min \Big\{ 1, \frac{\pi(\theta^*)q(\theta^*, \theta)}{\pi(\theta)q(\theta, \theta^*)} \Big\},
+
+which computes the acceptance probability of a move :math:`\theta^*` generated with probability :math:`q(\theta, \theta^*)`,
+where :math:`q` is the proposal distribution and :math:`\pi` the target distribution, from which we wish to draw samples.
+
+In hopsy, we assume that :math:`\pi(x) = \exp\big\{-f(x)\big\}`, where :math:`f(x)` is the negative log likelihood, which you have to provide,
+if you want to sample a self-implemented model. To read more about the details on how to sample custom models, please refer to :doc:`this page<Model>`.
+
+Although hopsy ships with numerous proposal algorithms optimized to work well in linearily-constrained spaces and written in C++,
+it is also possible to implement the proposal algorithm in Python. 
+To read more about the details on how to implement custom proposal algorithms with hopsy, please refer to :doc:`this page<Proposal>`.
+
