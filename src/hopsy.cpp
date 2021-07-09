@@ -33,7 +33,8 @@ void addRunClassToModule(py::module& m, const char* name, const char* doc) {
         .def_property("fisher_weight", &Run::getFisherWeight, &Run::setFisherWeight)
         .def_property("random_seed", &Run::getRandomSeed, &Run::setRandomSeed)
         .def_property("sample_until_convergence", &Run::getSamplingUntilConvergence, &Run::setSamplingUntilConvergence)
-        .def_property("diagnostics_threshold", &Run::getDiagnosticsThreshold, &Run::setDiagnosticsThreshold)
+        .def_property("convergence_threshold", &Run::getConvergenceThreshold, &Run::setConvergenceThreshold)
+        .def_property("diagnostics_threshold", &Run::getConvergenceThreshold, &Run::setConvergenceThreshold)
         .def_property("max_repetitions", &Run::getMaxRepetitions, &Run::setMaxRepetitions);
 }
 

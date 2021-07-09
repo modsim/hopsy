@@ -26,16 +26,16 @@ namespace hopsy {
 
 		PyModel(py::object pyObj) : pyObj(std::move(pyObj)) {};
 
-		double calculateNegativeLogLikelihood(const Eigen::VectorXd& x) const {
-			return pyObj.attr("calculate_negative_log_likelihood")(x).cast<double>();
+		double computeNegativeLogLikelihood(const Eigen::VectorXd& x) const {
+			return pyObj.attr("compute_negative_log_likelihood")(x).cast<double>();
 		}
 
-        Eigen::MatrixXd calculateExpectedFisherInformation(const Eigen::VectorXd& x) const {
-			return pyObj.attr("calculate_expected_fisher_information")(x).cast<Eigen::MatrixXd>();
+        Eigen::MatrixXd computeExpectedFisherInformation(const Eigen::VectorXd& x) const {
+			return pyObj.attr("compute_expected_fisher_information")(x).cast<Eigen::MatrixXd>();
 		}
 
-        Eigen::VectorXd calculateLogLikelihoodGradient(const Eigen::VectorXd& x) const {
-			return pyObj.attr("calculate_log_likelihood_gradient")(x).cast<Eigen::VectorXd>();
+        Eigen::VectorXd computeLogLikelihoodGradient(const Eigen::VectorXd& x) const {
+			return pyObj.attr("compute_log_likelihood_gradient")(x).cast<Eigen::VectorXd>();
 		}
 
 	private:
@@ -58,8 +58,8 @@ namespace hopsy {
             pyObj.attr("accept_proposal")();
         }
 
-        double calculateLogAcceptanceProbability() {
-            return pyObj.attr("calculate_log_acceptance_probability")().cast<double>();
+        double computeLogAcceptanceProbability() {
+            return pyObj.attr("compute_log_acceptance_probability")().cast<double>();
         }
 
         Eigen::VectorXd getState() const {
