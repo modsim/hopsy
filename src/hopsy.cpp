@@ -25,7 +25,6 @@ void addRunClassToModule(py::module& m, const char* name, const char* doc) {
         .def_property_readonly("data", &Run::getData)
         .def_property("problem", &Run::getProblem, &Run::setProblem)
         .def_property("starting_points", &Run::getStartingPoints, &Run::setStartingPoints)
-        .def_property("markovv_chain_type", &Run::getMarkovChainType, &Run::setMarkovChainType)
         .def_property("number_of_chains", &Run::getNumberOfChains, &Run::setNumberOfChains)
         .def_property("number_of_samples", &Run::getNumberOfSamples, &Run::setNumberOfSamples)
         .def_property("thinning", &Run::getThinning, &Run::setThinning)
@@ -70,47 +69,55 @@ PYBIND11_MODULE(hopsy, m) {
                 R"pbdoc()pbdoc",
                 py::arg("mean") = Eigen::VectorXd(Eigen::VectorXd::Zero(2)), 
                 py::arg("covariance") = Eigen::MatrixXd(Eigen::MatrixXd::Identity(2, 2)),
-                py::arg("inactives") = std::vector<long>());
+                py::arg("inactives") = std::vector<long>())
+        .def("compute_negative_log_likelihood", &hopsy::DegenerateMultivariateGaussianModel::computeNegativeLogLikelihood, py::arg("x"))
+        .def("compute_log_likelihood_gradient", &hopsy::DegenerateMultivariateGaussianModel::computeLogLikelihoodGradient, py::arg("x"))
+        .def("compute_expected_fisher_information", &hopsy::DegenerateMultivariateGaussianModel::computeExpectedFisherInformation, py::arg("x"));
 
     py::class_<hopsy::MultimodalMultivariateGaussianModel>(m, "MultimodalMultivariateGaussianModel",
 				R"pbdoc()pbdoc")
         .def(py::init<std::vector<hopsy::DegenerateMultivariateGaussianModel>>(),
                 R"pbdoc()pbdoc",
-                py::arg("components"));
+                py::arg("components"))
+        .def("compute_negative_log_likelihood", &hopsy::MultimodalMultivariateGaussianModel::computeNegativeLogLikelihood, py::arg("x"))
+        .def("compute_log_likelihood_gradient", &hopsy::MultimodalMultivariateGaussianModel::computeLogLikelihoodGradient, py::arg("x"))
+        .def("compute_expected_fisher_information", &hopsy::MultimodalMultivariateGaussianModel::computeExpectedFisherInformation, py::arg("x"));
 
     py::class_<hopsy::MultivariateGaussianModel>(m, "MultivariateGaussianModel",
 				R"pbdoc()pbdoc")
         .def(py::init<Eigen::VectorXd, Eigen::MatrixXd>(),
                 R"pbdoc()pbdoc",
                 py::arg("mean") = Eigen::VectorXd(Eigen::VectorXd::Zero(2)), 
-                py::arg("covariance") = Eigen::MatrixXd(Eigen::MatrixXd::Identity(2, 2)));
+                py::arg("covariance") = Eigen::MatrixXd(Eigen::MatrixXd::Identity(2, 2)))
+        .def("compute_negative_log_likelihood", &hopsy::MultivariateGaussianModel::computeNegativeLogLikelihood, py::arg("x"))
+        .def("compute_log_likelihood_gradient", &hopsy::MultivariateGaussianModel::computeLogLikelihoodGradient, py::arg("x"))
+        .def("compute_expected_fisher_information", &hopsy::MultivariateGaussianModel::computeExpectedFisherInformation, py::arg("x"));
 
     py::class_<hopsy::PyModel>(m, "PyModel",
 				R"pbdoc()pbdoc")
         .def(py::init<py::object>(),
                 R"pbdoc()pbdoc",
-                py::arg("model"));
+                py::arg("model"))
+        .def("compute_negative_log_likelihood", &hopsy::PyModel::computeNegativeLogLikelihood, py::arg("x"))
+        .def("compute_log_likelihood_gradient", &hopsy::PyModel::computeLogLikelihoodGradient, py::arg("x"))
+        .def("compute_expected_fisher_information", &hopsy::PyModel::computeExpectedFisherInformation, py::arg("x"));
 
     py::class_<hopsy::RosenbrockModel>(m, "RosenbrockModel",
 				R"pbdoc()pbdoc")
         .def(py::init<double, Eigen::VectorXd>(),
                 R"pbdoc()pbdoc",
                 py::arg("scale"),
-                py::arg("shift"));
+                py::arg("shift"))
+        .def("compute_negative_log_likelihood", &hopsy::RosenbrockModel::computeNegativeLogLikelihood, py::arg("x"))
+        .def("compute_log_likelihood_gradient", &hopsy::RosenbrockModel::computeLogLikelihoodGradient, py::arg("x"))
+        .def("compute_expected_fisher_information", &hopsy::RosenbrockModel::computeExpectedFisherInformation, py::arg("x"));
 
     py::class_<hopsy::UniformModel>(m, "UniformModel",
-				R"pbdoc(
-The ``hopsy.UniformModel`` defines the uniform target distribution on the polytope
-
-.. math::
-   \pi(x) := \frac{1}{Z} \mathbf{1}_{\mathcal{P}}(x)
-
-where
-
-.. math::
-   Z = \int_{\mathcal{P}} \mathbf{1}_{\mathcal{P}}(x) \mathrm{d}x
-                )pbdoc")
-        .def(py::init<>());
+				R"pbdoc()pbdoc")
+        .def(py::init<>())
+        .def("compute_negative_log_likelihood", &hopsy::UniformModel::computeNegativeLogLikelihood, py::arg("x"))
+        .def("compute_log_likelihood_gradient", &hopsy::UniformModel::computeLogLikelihoodGradient, py::arg("x"))
+        .def("compute_expected_fisher_information", &hopsy::UniformModel::computeExpectedFisherInformation, py::arg("x"));
 
 
     //  
@@ -203,6 +210,98 @@ where
                 py::arg("A"),
                 py::arg("b"),
                 py::arg("model"));
+
+
+    //
+    // Box constraints convenience function
+    // ====================================
+    //
+    m.def("add_box_constraints", 
+            py::overload_cast<const Eigen::MatrixXd&, const Eigen::VectorXd&, const Eigen::VectorXd&, const Eigen::VectorXd&>(
+                &hopsy::addBoxConstraintsToMatrixVector), 
+            py::arg("A"),
+            py::arg("b"),
+            py::arg("lower_bounds"),
+            py::arg("upper_bounds"));
+    m.def("add_box_constraints", 
+            py::overload_cast<const Eigen::MatrixXd&, const Eigen::VectorXd&, double, double>(
+                &hopsy::addBoxConstraintsToMatrixVector), 
+            py::arg("A"),
+            py::arg("b"),
+            py::arg("lower_bound"),
+            py::arg("upper_bound"));
+    m.def("add_box_constraints", 
+            py::overload_cast<const hopsy::DegenerateMultivariateGaussianProblem&, const Eigen::VectorXd&, const Eigen::VectorXd&>(
+                &hopsy::addBoxConstraintsToProblem<hopsy::DegenerateMultivariateGaussianProblem>), 
+            py::arg("problem"),
+            py::arg("lower_bound"),
+            py::arg("upper_bound"));
+    m.def("add_box_constraints", 
+            py::overload_cast<const hopsy::DegenerateMultivariateGaussianProblem&, double, double>(
+                &hopsy::addBoxConstraintsToProblem<hopsy::DegenerateMultivariateGaussianProblem>), 
+            py::arg("problem"),
+            py::arg("lower_bound"),
+            py::arg("upper_bound"));
+    m.def("add_box_constraints", 
+            py::overload_cast<const hopsy::MultimodalMultivariateGaussianProblem&, const Eigen::VectorXd&, const Eigen::VectorXd&>(
+                &hopsy::addBoxConstraintsToProblem<hopsy::MultimodalMultivariateGaussianProblem>), 
+            py::arg("problem"),
+            py::arg("lower_bound"),
+            py::arg("upper_bound"));
+    m.def("add_box_constraints", 
+            py::overload_cast<const hopsy::MultimodalMultivariateGaussianProblem&, double, double>(
+                &hopsy::addBoxConstraintsToProblem<hopsy::MultimodalMultivariateGaussianProblem>), 
+            py::arg("problem"),
+            py::arg("lower_bound"),
+            py::arg("upper_bound"));
+    m.def("add_box_constraints", 
+            py::overload_cast<const hopsy::MultivariateGaussianProblem&, const Eigen::VectorXd&, const Eigen::VectorXd&>(
+                &hopsy::addBoxConstraintsToProblem<hopsy::MultivariateGaussianProblem>), 
+            py::arg("problem"),
+            py::arg("lower_bound"),
+            py::arg("upper_bound"));
+    m.def("add_box_constraints", 
+            py::overload_cast<const hopsy::MultivariateGaussianProblem&, double, double>(
+                &hopsy::addBoxConstraintsToProblem<hopsy::MultivariateGaussianProblem>), 
+            py::arg("problem"),
+            py::arg("lower_bound"),
+            py::arg("upper_bound"));
+    m.def("add_box_constraints", 
+            py::overload_cast<const hopsy::PyProblem&, const Eigen::VectorXd&, const Eigen::VectorXd&>(
+                &hopsy::addBoxConstraintsToProblem<hopsy::PyProblem>), 
+            py::arg("problem"),
+            py::arg("lower_bound"),
+            py::arg("upper_bound"));
+    m.def("add_box_constraints", 
+            py::overload_cast<const hopsy::PyProblem&, double, double>(
+                &hopsy::addBoxConstraintsToProblem<hopsy::PyProblem>), 
+            py::arg("problem"),
+            py::arg("lower_bound"),
+            py::arg("upper_bound"));
+    m.def("add_box_constraints", 
+            py::overload_cast<const hopsy::RosenbrockProblem&, const Eigen::VectorXd&, const Eigen::VectorXd&>(
+                &hopsy::addBoxConstraintsToProblem<hopsy::RosenbrockProblem>), 
+            py::arg("problem"),
+            py::arg("lower_bound"),
+            py::arg("upper_bound"));
+    m.def("add_box_constraints", 
+            py::overload_cast<const hopsy::RosenbrockProblem&, double, double>(
+                &hopsy::addBoxConstraintsToProblem<hopsy::RosenbrockProblem>), 
+            py::arg("problem"),
+            py::arg("lower_bound"),
+            py::arg("upper_bound"));
+    m.def("add_box_constraints", 
+            py::overload_cast<const hopsy::UniformProblem&, const Eigen::VectorXd&, const Eigen::VectorXd&>(
+                &hopsy::addBoxConstraintsToProblem<hopsy::UniformProblem>), 
+            py::arg("problem"),
+            py::arg("lower_bound"),
+            py::arg("upper_bound"));
+    m.def("add_box_constraints", 
+            py::overload_cast<const hopsy::UniformProblem&, double, double>(
+                &hopsy::addBoxConstraintsToProblem<hopsy::UniformProblem>), 
+            py::arg("problem"),
+            py::arg("lower_bound"),
+            py::arg("upper_bound"));
 
 
     //

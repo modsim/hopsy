@@ -245,6 +245,38 @@ namespace hopsy {
                                                        unsigned long numberOfChains = 1) {
         return createRunFromPyProposal(t, PyProposal(pyObj), numberOfSamples, numberOfChains);
 	}
+
+    std::pair<Eigen::MatrixXd, Eigen::VectorXd> addBoxConstraintsToMatrixVector(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::VectorXd& lowerBounds, const Eigen::VectorXd& upperBounds) {
+        Eigen::MatrixXd newA(A.rows() + 2*A.cols(), A.cols());
+        Eigen::VectorXd newB(newA.rows());
+
+        newA << A, Eigen::MatrixXd::Identity(A.cols(), A.cols()), -Eigen::MatrixXd::Identity(A.cols(), A.cols());
+        newB << b, upperBounds, -lowerBounds;
+
+        return {newA, newB};
+    }
+
+    std::pair<Eigen::MatrixXd, Eigen::VectorXd> addBoxConstraintsToMatrixVector(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, double lowerBound, double upperBound) {
+        Eigen::VectorXd lowerBounds = lowerBound * Eigen::VectorXd::Ones(A.cols());
+        Eigen::VectorXd upperBounds = upperBound * Eigen::VectorXd::Ones(A.cols());
+        return addBoxConstraintsToMatrixVector(A, b, lowerBounds, upperBounds);
+    }
+
+    template<typename Problem>
+    Problem addBoxConstraintsToProblem(const Problem& problem, const Eigen::VectorXd& lowerBounds, const Eigen::VectorXd& upperBounds) {
+        auto[A, b] = addBoxConstraintsToMatrixVector(problem.getA(), problem.getB(), lowerBounds, upperBounds);
+        Problem newProblem(problem);
+        newProblem.setA(A);
+        newProblem.setB(b);
+        return newProblem;
+    }
+
+    template<typename Problem>
+    Problem addBoxConstraintsToProblem(const Problem& problem, double lowerBound, double upperBound) {
+        Eigen::VectorXd lowerBounds = lowerBound * Eigen::VectorXd::Ones(problem.getA().cols());
+        Eigen::VectorXd upperBounds = upperBound * Eigen::VectorXd::Ones(problem.getA().cols());
+        return addBoxConstraintsToProblem(problem, lowerBounds, upperBounds);
+    }
 }
 
 #endif // HOPSY_HPP
