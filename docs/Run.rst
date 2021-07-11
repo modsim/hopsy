@@ -78,6 +78,8 @@ Reference
 
 .. class:: Run
 
+   **Attributes:**
+
    .. attribute:: data: hopsy.Data
 
         A ``hopsy.Data`` object containing most prominently the states, as well as other data, that the chain produced.
@@ -149,6 +151,8 @@ Reference
 
         The maximal number of repetitions when sampling until convergence. This prevents endless loops when convergence is not reached.
 
+   **Methods:**
+
    .. method:: init() -> None
 
        Initializes the run object. This initializes the ``data`` object, if it was not initialized before and **erases all of its content.**
@@ -171,8 +175,11 @@ Reference
       to determine whether convergence has been reached or not. 
       This may produce up to ``max_repetitions * number_of_samples`` samples.
 
+Possible Run-types
+~~~~~~~~~~~~~~~~~~
+
 .. autoclass:: DegenerateMultivariateGaussianRun
-.. autoclass:: MultimodalMultivariateGaussianRun
+.. autoclass:: MixtureRun
 .. autoclass:: MultivariateGaussianRun
 .. autoclass:: PyRun
 .. autoclass:: RosenbrockRun

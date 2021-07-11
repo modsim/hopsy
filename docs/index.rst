@@ -9,18 +9,39 @@ hopsy - Python bindings for hops
 A Python interface for hops - the **H**\ ighly **O**\ ptimized toolbox for **P**\ olytope **S**\ ampling.
 Built using pybind11.
 
+   
+Installation
+------------
 
-Contents
---------
+hopsy can be easily installed from the Python Package Index using ``pip install hopsy``.
+Alternatively, you can download the source code from our GitHub repository with
 
-.. toctree::
-   :maxdepth: 2
+::
 
-   Model <Model.rst>
-   Problem <Problem.rst>
-   Run <Run.rst>
-   Proposal <Proposal.rst>
-   Data <Data.rst>
+ git clone https://github.com/modsim/hopsy --recursive
+ 
+and compile either a binary wheel using pip
+
+::
+
+ pip wheel --no-deps hopsy/
+
+or use the standard CMake routine
+
+::
+
+ mkdir cmake-build-release && cd cmake-build-release
+ cmake ..
+ make 
+
+Note however that the binary wheel produced from ``pip`` can be actually installed using ``pip``, using
+
+::
+
+ pip install hopsy-x.y.z-tag.whl
+
+where the version ``x.y.z`` and tag ``tag`` will depend on the verison you downloaded and your build environment.
+
 
 Introduction
 ------------
@@ -58,37 +79,6 @@ These are the "classes", which we deemed most useful and important for any pract
    Throughout this documentation, we will however use ``hopsy.Model``, ``hopsy.Problem`` and ``hopsy.Run`` also as a placeholder for any of the actually
    available models, problems and runs.
 
-Installation
-------------
-
-hopsy can be easily installed from the Python Package Index using ``pip install hopsy``.
-Alternatively, you can download the source code from our GitHub repository with
-
-::
-
- git clone https://github.com/modsim/hopsy --recursive
- 
-and compile either a binary wheel using pip
-
-::
-
- pip wheel --no-deps hopsy/
-
-or use the standard CMake routine
-
-::
-
- mkdir cmake-build-release && cd cmake-build-release
- cmake ..
- make 
-
-Note however that the binary wheel produced from ``pip`` can be actually installed using ``pip``, using
-
-::
-
- pip install hopsy-x.y.z-tag.whl
-
-where the version ``x.y.z`` and tag ``tag`` will depend on the verison you downloaded and your build environment.
 
 Example code
 ------------
@@ -151,4 +141,18 @@ if you want to sample a self-implemented model. To read more about the details o
 Although hopsy ships with numerous proposal algorithms optimized to work well in linearily-constrained spaces and written in C++,
 it is also possible to implement the proposal algorithm in Python. 
 To read more about the details on how to implement custom proposal algorithms with hopsy, please refer to :doc:`this page<Proposal>`.
+
+
+Contents
+--------
+
+.. toctree::
+   :maxdepth: 2
+
+   Model <Model.rst>
+   Problem <Problem.rst>
+   Run <Run.rst>
+   Proposal <Proposal.rst>
+   Data <Data.rst>
+
 
