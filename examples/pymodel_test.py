@@ -7,13 +7,13 @@ class GaussianModel:
         self.mu = mu
         self.cov = cov
 
-    def calculate_negative_log_likelihood(self, x):
+    def compute_negative_log_likelihood(self, x):
         return (0.5 * (x.reshape(-1, 1) - self.mu).T @ np.linalg.inv(self.cov) @ (x.reshape(-1, 1) - self.mu))[0,0]
 
-    def calculate_expected_fisher_information(self, x):
+    def compute_expected_fisher_information(self, x):
         return np.linalg.inv(self.cov)
 
-    def calculate_log_likelihood_gradient(self, x):
+    def compute_log_likelihood_gradient(self, x):
         return -np.linalg.inv(self.cov) @ (x - self.mu)
 
 A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])

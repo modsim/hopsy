@@ -19,7 +19,7 @@ class UnconstrainedProposal:
     def accept_proposal(self):
         self.x = self.proposal
 
-    def calculate_log_acceptance_probability(self) -> float:
+    def compute_log_acceptance_probability(self) -> float:
         return 0
 
     def get_state(self) -> np.ndarray:
@@ -52,7 +52,7 @@ class Potentials:
         self.eps = eps
         self.U_LJ_cut = 4 * self.eps * ((self.sigma / self.r_cut)**12 - (self.sigma / self.r_cut)**6)
 
-    def calculate_negative_log_likelihood(self, x):
+    def compute_negative_log_likelihood(self, x):
         return self.beta * (self.fene_potential(x) + self.wca_potential(x) + self.zeeman_potential(x))
        
     def fene_potential(self, x):
@@ -151,7 +151,7 @@ def main():
 
     x = get_initial_state(n_particles, r_f, sigma)
     U = Potentials(1, r_f, sigma, np.array([0, 0]), 1, 1)
-    print(U.calculate_negative_log_likelihood(x))
+    print(U.compute_negative_log_likelihood(x))
 
     A = np.hstack([np.array([[-1]]), np.zeros((1, len(x)-1))])
     b = np.zeros((1,1))

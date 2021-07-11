@@ -21,7 +21,7 @@ class GaussianProposal:
     def accept_proposal(self):
         self.x = self.proposal
 
-    def calculate_log_acceptance_probability(self) -> float:
+    def compute_log_acceptance_probability(self) -> float:
         if ((self.A @ self.proposal - self.b) >= 0).any():
             return -np.inf
         return 0
@@ -70,7 +70,7 @@ class AdaptiveGaussianProposal:
     def accept_proposal(self):
         self.x = self.proposal
 
-    def calculate_log_acceptance_probability(self) -> float:
+    def compute_log_acceptance_probability(self) -> float:
         if ((self.A @ self.proposal - self.b) >= 0).any():
             return -np.inf
         return 0

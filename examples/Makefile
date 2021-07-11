@@ -1,5 +1,6 @@
 test:
 	-python3 adaptive_pyproposal_test.py test
+	-python3 box_constraints_test.py test
 	-python3 linprog_test.py test
 	-python3 pymodel_test.py test
 	-python3 pyproposal_test.py test
