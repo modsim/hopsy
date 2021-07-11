@@ -61,10 +61,6 @@ PYBIND11_MODULE(hopsy, m) {
     //
     py::class_<hopsy::DegenerateMultivariateGaussianModel>(m, "DegenerateMultivariateGaussianModel",
 				R"pbdoc()pbdoc")
-        .def(py::init<Eigen::VectorXd, Eigen::MatrixXd>(),
-                R"pbdoc()pbdoc",
-                py::arg("mean") = Eigen::VectorXd(Eigen::VectorXd::Zero(2)), 
-                py::arg("covariance") = Eigen::MatrixXd(Eigen::MatrixXd::Identity(2, 2)))
         .def(py::init<Eigen::VectorXd, Eigen::MatrixXd, std::vector<long>>(),
                 R"pbdoc()pbdoc",
                 py::arg("mean") = Eigen::VectorXd(Eigen::VectorXd::Zero(2)), 
@@ -74,14 +70,18 @@ PYBIND11_MODULE(hopsy, m) {
         .def("compute_log_likelihood_gradient", &hopsy::DegenerateMultivariateGaussianModel::computeLogLikelihoodGradient, py::arg("x"))
         .def("compute_expected_fisher_information", &hopsy::DegenerateMultivariateGaussianModel::computeExpectedFisherInformation, py::arg("x"));
 
-    py::class_<hopsy::MultimodalMultivariateGaussianModel>(m, "MultimodalMultivariateGaussianModel",
+    py::class_<hopsy::MixtureModel>(m, "MixtureModel",
 				R"pbdoc()pbdoc")
-        .def(py::init<std::vector<hopsy::DegenerateMultivariateGaussianModel>>(),
+        .def(py::init<std::vector<hopsy::PyModel>>(),
                 R"pbdoc()pbdoc",
                 py::arg("components"))
-        .def("compute_negative_log_likelihood", &hopsy::MultimodalMultivariateGaussianModel::computeNegativeLogLikelihood, py::arg("x"))
-        .def("compute_log_likelihood_gradient", &hopsy::MultimodalMultivariateGaussianModel::computeLogLikelihoodGradient, py::arg("x"))
-        .def("compute_expected_fisher_information", &hopsy::MultimodalMultivariateGaussianModel::computeExpectedFisherInformation, py::arg("x"));
+        .def(py::init<std::vector<hopsy::PyModel>, std::vector<double>>(),
+                R"pbdoc()pbdoc",
+                py::arg("components"),
+                py::arg("weights"))
+        .def("compute_negative_log_likelihood", &hopsy::MixtureModel::computeNegativeLogLikelihood, py::arg("x"))
+        .def("compute_log_likelihood_gradient", &hopsy::MixtureModel::computeLogLikelihoodGradient, py::arg("x"))
+        .def("compute_expected_fisher_information", &hopsy::MixtureModel::computeExpectedFisherInformation, py::arg("x"));
 
     py::class_<hopsy::MultivariateGaussianModel>(m, "MultivariateGaussianModel",
 				R"pbdoc()pbdoc")
@@ -128,8 +128,8 @@ PYBIND11_MODULE(hopsy, m) {
                 m, "DegenerateMultivariateGaussianProblem", 
                 R"pbdoc()pbdoc");
 
-    addProblemClassToModule<hopsy::MultimodalMultivariateGaussianModel, hopsy::MultimodalMultivariateGaussianProblem>(
-                m, "MultimodalMultivariateGaussianProblem", 
+    addProblemClassToModule<hopsy::MixtureModel, hopsy::MixtureProblem>(
+                m, "MixtureProblem", 
                 R"pbdoc()pbdoc");
 
     addProblemClassToModule<hopsy::MultivariateGaussianModel, hopsy::MultivariateGaussianProblem>(
@@ -176,7 +176,7 @@ PYBIND11_MODULE(hopsy, m) {
                 py::arg("A"),
                 py::arg("b"),
                 py::arg("model"));
-	m.def("Problem", &hopsy::createProblem<hopsy::MultimodalMultivariateGaussianModel>,
+	m.def("Problem", &hopsy::createProblem<hopsy::MixtureModel>,
                 R"pbdoc()pbdoc",
                 py::arg("A"),
                 py::arg("b"),
@@ -243,14 +243,14 @@ PYBIND11_MODULE(hopsy, m) {
             py::arg("lower_bound"),
             py::arg("upper_bound"));
     m.def("add_box_constraints", 
-            py::overload_cast<const hopsy::MultimodalMultivariateGaussianProblem&, const Eigen::VectorXd&, const Eigen::VectorXd&>(
-                &hopsy::addBoxConstraintsToProblem<hopsy::MultimodalMultivariateGaussianProblem>), 
+            py::overload_cast<const hopsy::MixtureProblem&, const Eigen::VectorXd&, const Eigen::VectorXd&>(
+                &hopsy::addBoxConstraintsToProblem<hopsy::MixtureProblem>), 
             py::arg("problem"),
             py::arg("lower_bound"),
             py::arg("upper_bound"));
     m.def("add_box_constraints", 
-            py::overload_cast<const hopsy::MultimodalMultivariateGaussianProblem&, double, double>(
-                &hopsy::addBoxConstraintsToProblem<hopsy::MultimodalMultivariateGaussianProblem>), 
+            py::overload_cast<const hopsy::MixtureProblem&, double, double>(
+                &hopsy::addBoxConstraintsToProblem<hopsy::MixtureProblem>), 
             py::arg("problem"),
             py::arg("lower_bound"),
             py::arg("upper_bound"));
@@ -309,7 +309,7 @@ PYBIND11_MODULE(hopsy, m) {
     // ===============================
     //
     m.def("round", &hopsy::round<hopsy::DegenerateMultivariateGaussianModel>, py::arg("problem"));
-    m.def("round", &hopsy::round<hopsy::MultimodalMultivariateGaussianModel>, py::arg("problem"));
+    m.def("round", &hopsy::round<hopsy::MixtureModel>, py::arg("problem"));
     m.def("round", &hopsy::round<hopsy::MultivariateGaussianModel>, py::arg("problem"));
     m.def("round", &hopsy::round<hopsy::PyModel>, py::arg("problem"));
     m.def("round", &hopsy::round<hopsy::RosenbrockModel>, py::arg("problem"));
@@ -321,7 +321,7 @@ PYBIND11_MODULE(hopsy, m) {
     // ===============================
     //
     m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::DegenerateMultivariateGaussianModel>, py::arg("problem"));
-    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::MultimodalMultivariateGaussianModel>, py::arg("problem"));
+    m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::MixtureModel>, py::arg("problem"));
     m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::MultivariateGaussianModel>, py::arg("problem"));
     m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::PyModel>, py::arg("problem"));
     m.def("compute_chebyshev_center", &hopsy::computeChebyshevCenter<hopsy::RosenbrockModel>, py::arg("problem"));
@@ -346,8 +346,8 @@ PYBIND11_MODULE(hopsy, m) {
     addRunClassToModule<hopsy::DegenerateMultivariateGaussianProblem, hopsy::DegenerateMultivariateGaussianRun>(
                 m, "DegenerateMultivariateGaussianRun",
                 R"pbdoc()pbdoc");
-    addRunClassToModule<hopsy::MultimodalMultivariateGaussianProblem, hopsy::MultimodalMultivariateGaussianRun>(
-                m, "MultimodalMultivariateGaussianRun",
+    addRunClassToModule<hopsy::MixtureProblem, hopsy::MixtureRun>(
+                m, "MixtureRun",
                 R"pbdoc()pbdoc");
     addRunClassToModule<hopsy::MultivariateGaussianProblem, hopsy::MultivariateGaussianRun>(
                 m, "MultivariateGaussianRun",
@@ -365,8 +365,8 @@ PYBIND11_MODULE(hopsy, m) {
     addRunClassToModule<hopsy::DegenerateMultivariateGaussianProblem, hopsy::DegenerateMultivariateGaussianPyProposalRun>(
                 m, "DegenerateMultivariateGaussianPyProposalRun",
                 R"pbdoc()pbdoc");
-    addRunClassToModule<hopsy::MultimodalMultivariateGaussianProblem, hopsy::MultimodalMultivariateGaussianPyProposalRun>(
-                m, "MultimodalMultivariateGaussianPyProposalRun",
+    addRunClassToModule<hopsy::MixtureProblem, hopsy::MixturePyProposalRun>(
+                m, "MixturePyProposalRun",
                 R"pbdoc()pbdoc");
     addRunClassToModule<hopsy::MultivariateGaussianProblem, hopsy::MultivariateGaussianPyProposalRun>(
                 m, "MultivariateGaussianPyProposalRun",
@@ -397,7 +397,7 @@ PYBIND11_MODULE(hopsy, m) {
                 py::arg("number_of_samples") = 1000, 
                 py::arg("number_of_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
-	m.def("Run", &hopsy::createRun<hopsy::MultimodalMultivariateGaussianModel>,
+	m.def("Run", &hopsy::createRun<hopsy::MixtureModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal_name") = "HitAndRun", 
@@ -436,7 +436,7 @@ PYBIND11_MODULE(hopsy, m) {
 	m.def("Run", &hopsy::createRunFromPyProposal<hopsy::DegenerateMultivariateGaussianModel>, 
             	R"pbdoc()pbdoc",
             	py::arg("problem"), py::arg("proposal"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
-	m.def("Run", &hopsy::createRunFromPyProposal<hopsy::MultimodalMultivariateGaussianModel>,
+	m.def("Run", &hopsy::createRunFromPyProposal<hopsy::MixtureModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), py::arg("proposal"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
 	m.def("Run", &hopsy::createRunFromPyProposal<hopsy::MultivariateGaussianModel>,
@@ -455,7 +455,7 @@ PYBIND11_MODULE(hopsy, m) {
 	m.def("Run", &hopsy::createRunFromPyObject<hopsy::DegenerateMultivariateGaussianModel>, 
             	R"pbdoc()pbdoc",
             	py::arg("problem"), py::arg("proposal"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
-	m.def("Run", &hopsy::createRunFromPyObject<hopsy::MultimodalMultivariateGaussianModel>,
+	m.def("Run", &hopsy::createRunFromPyObject<hopsy::MixtureModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), py::arg("proposal"), py::arg("number_of_samples") = 1000, py::arg("number_of_chains") = 1);
 	m.def("Run", &hopsy::createRunFromPyObject<hopsy::MultivariateGaussianModel>,

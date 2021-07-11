@@ -91,28 +91,27 @@ namespace hopsy {
 
 
     typedef hops::DegenerateMultivariateGaussianModel<Eigen::MatrixXd, Eigen::VectorXd> DegenerateMultivariateGaussianModel;
-    typedef hops::DynMultimodalModel<DegenerateMultivariateGaussianModel> MultimodalMultivariateGaussianModel;
+    typedef hops::DynMultimodalModel<PyModel> MixtureModel;
     typedef hops::MultivariateGaussianModel<Eigen::MatrixXd, Eigen::VectorXd> MultivariateGaussianModel;
     typedef hops::RosenbrockModel<Eigen::MatrixXd, Eigen::VectorXd> RosenbrockModel;
     typedef hops::UniformDummyModel<Eigen::MatrixXd, Eigen::VectorXd> UniformModel;
-    typedef hops::UniformDummyModel<Eigen::MatrixXd, Eigen::VectorXd> UniformModel;
 
     typedef hops::Problem<DegenerateMultivariateGaussianModel> DegenerateMultivariateGaussianProblem;
-    typedef hops::Problem<MultimodalMultivariateGaussianModel> MultimodalMultivariateGaussianProblem;
+    typedef hops::Problem<MixtureModel> MixtureProblem;
     typedef hops::Problem<MultivariateGaussianModel> MultivariateGaussianProblem;
     typedef hops::Problem<RosenbrockModel> RosenbrockProblem;
     typedef hops::Problem<UniformModel> UniformProblem;
     typedef hops::Problem<PyModel> PyProblem;
 
 	typedef hops::Run<DegenerateMultivariateGaussianModel> DegenerateMultivariateGaussianRun;
-    typedef hops::Run<MultimodalMultivariateGaussianModel> MultimodalMultivariateGaussianRun;
+    typedef hops::Run<MixtureModel> MixtureRun;
     typedef hops::Run<MultivariateGaussianModel> MultivariateGaussianRun;
     typedef hops::Run<RosenbrockModel> RosenbrockRun;
     typedef hops::Run<UniformModel> UniformRun;
     typedef hops::Run<PyModel> PyRun;
 
 	typedef hops::RunBase<DegenerateMultivariateGaussianModel, PyProposal> DegenerateMultivariateGaussianPyProposalRun;
-    typedef hops::RunBase<MultimodalMultivariateGaussianModel, PyProposal> MultimodalMultivariateGaussianPyProposalRun;
+    typedef hops::RunBase<MixtureModel, PyProposal> MixturePyProposalRun;
     typedef hops::RunBase<MultivariateGaussianModel, PyProposal> MultivariateGaussianPyProposalRun;
     typedef hops::RunBase<RosenbrockModel, PyProposal> RosenbrockPyProposalRun;
     typedef hops::RunBase<UniformModel, PyProposal> UniformPyProposalRun;
@@ -133,8 +132,8 @@ namespace hopsy {
 		if constexpr(std::is_same<T, DegenerateMultivariateGaussianModel>::value) {
 			return hops::Problem<DegenerateMultivariateGaussianModel>(A, b, t);
 		}
-		if constexpr(std::is_same<T, MultimodalMultivariateGaussianModel>::value) {
-			return hops::Problem<MultimodalMultivariateGaussianModel>(A, b, t);
+		if constexpr(std::is_same<T, MixtureModel>::value) {
+			return hops::Problem<MixtureModel>(A, b, t);
 		}
 		if constexpr(std::is_same<T, MultivariateGaussianModel>::value) {
 			return hops::Problem<MultivariateGaussianModel>(A, b, t);
@@ -185,8 +184,8 @@ namespace hopsy {
             run.setStartingPoints(startingPoints);
             return run;
 		}
-		if constexpr(std::is_same<T, MultimodalMultivariateGaussianModel>::value) {
-			auto run = hops::Run<MultimodalMultivariateGaussianModel>(t, chainType, numberOfSamples, numberOfChains);
+		if constexpr(std::is_same<T, MixtureModel>::value) {
+			auto run = hops::Run<MixtureModel>(t, chainType, numberOfSamples, numberOfChains);
             run.setStartingPoints(startingPoints);
             return run;
 		}
@@ -220,8 +219,8 @@ namespace hopsy {
 		if constexpr(std::is_same<T, DegenerateMultivariateGaussianModel>::value) {
 			return hops::RunBase<DegenerateMultivariateGaussianModel, PyProposal>(t, proposal, numberOfSamples, numberOfChains);
 		}
-		if constexpr(std::is_same<T, MultimodalMultivariateGaussianModel>::value) {
-			return hops::RunBase<MultimodalMultivariateGaussianModel, PyProposal>(t, proposal, numberOfSamples, numberOfChains);
+		if constexpr(std::is_same<T, MixtureModel>::value) {
+			return hops::RunBase<MixtureModel, PyProposal>(t, proposal, numberOfSamples, numberOfChains);
 		}
 		if constexpr(std::is_same<T, MultivariateGaussianModel>::value) {
 			return hops::RunBase<MultivariateGaussianModel, PyProposal>(t, proposal, numberOfSamples, numberOfChains);
