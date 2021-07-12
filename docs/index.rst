@@ -30,7 +30,7 @@ or use the standard CMake routine
 
 ::
 
- mkdir cmake-build-release && cd cmake-build-release
+ mkdir hopsy/cmake-build-release && cd hopsy/cmake-build-release
  cmake ..
  make 
 

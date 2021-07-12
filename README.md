@@ -12,31 +12,45 @@ P = {x : Ax &#8804; b},
 
 which often arises in metabolic flux analysis.
 
+
 ## Installation
 
-Install using `pip` with
-```bash
-pip install hopsy
-```
-or clone this repository and pip install. Note the `--recursive` option which is
-needed for hops, eigen and pybind11 submodules:
+hopsy can be easily installed from the Python Package Index using ``pip install hopsy``.
+Alternatively, you can download the source code from our GitHub repository with
 
 ```bash
-git clone --recursive [url-to-this-repo]
-cd hopsy
-sudo python3 -m pip install -e .
+git clone https://github.com/modsim/hopsy --recursive
 ```
 
-Alternatively, the project can be built using basic CMake commands:
+Note the `--recursive` option which is
+needed for hops, eigen and pybind11 submodules.
+
+Next, compile either a binary wheel using pip
+
 ```bash
-git clone --recursive [url-to-this-repo]
-cd hopsy
-mkdir build/ && cd build/
+pip wheel --no-deps hopsy/
+```
+
+or use the standard CMake routine
+
+```bash
+mkdir hopsy/cmake-build-release && cd hopsy/cmake-build-release
 cmake ..
 make 
 ```
 
-In this case, the compiled shared library will be located in `build/` and can be used within the directory. 
+Note however that the binary wheel produced from ``pip`` can be actually installed using ``pip``, using
+
+```bash
+pip install hopsy-x.y.z-tag.whl
+```
+
+where the version `x.y.z` and tag `tag` will depend on the verison you downloaded and your build environment.
+If you use the CMake routine, the compiled shared library will be located in `build/` and can 
+be used within the directory. 
+
+To compile wheels for distribution via the Python Package Index (pypi.org), use the `makewheels.sh` script.
+
 
 ### Prerequisites for compiling from source
 

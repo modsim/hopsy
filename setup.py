@@ -106,12 +106,21 @@ with open("README.md", "r") as fh:
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="hopsy",
-    version="0.1.1",
+    version="0.1.2",
     author="Richard D. Paul",
     author_email="r.paul@fz-juelich.de",
     description="A python interface for hops, the highly optimized polytope sampling toolbox.",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    url="https://github.com/modsim/hopsy/",
+    project_urls={
+        "Documentation": "https://modsim.github.io/hopsy/",
+        "GitHub": "https://modsim.github.io/hopsy/",
+    },
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "Operating System :: POSIX :: Linux",
+    ],
     ext_modules=[CMakeExtension("hopsy")],
     cmdclass={"build_ext": CMakeBuild},
 	install_requires=[
