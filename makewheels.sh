@@ -22,5 +22,5 @@ docker stop hopsy_manylinux_build_env
 docker rm hopsy_manylinux_build_env
 
 # upload with 
-#      python3 -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+#python3 -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
