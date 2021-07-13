@@ -1,0 +1,866 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Models &mdash; hopsy 0.2.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="_static/hopsy.ico"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Problem" href="Problem.html" />
+    <link rel="prev" title="hopsy - Python bindings for hops" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> hopsy
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#custom-python-models">Custom Python models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-code">Example code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Problem.html">Problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Run.html">Run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Proposal.html">Proposal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Data.html">Data</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">hopsy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Models</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/Model.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="models">
+<h1>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h1>
+<p>hopsy ships with a number of simple models, also known as target functions.
+Together with the polytope</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{P} := \{ x : Ax \leq b \}\]</div>
+<p>the model forms a <code class="docutils literal notranslate"><span class="pre">hopsy.Problem</span></code>.</p>
+<p>The simple models provided are</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">hopsy.DegenerateMultivariateGaussianModel</span></code>: A multivariate Gaussian with invariant dimensions, meaning it ignores some dimensions of the input vector. This is interesting for simulating non-identifiabilities.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hopsy.MultimodalMultivariateGaussianModel</span></code>: A mixture Gaussian model, which is a weighted linear combination of multivariate Gaussians.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hopsy.MultivariateGaussianModel</span></code>: A multivariate Gaussian, consisting of mean vector and covariance matrix.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hopsy.RosenbrockModel</span></code>: Rosenbrock’s banana function, a popular test function for computational optimization.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hopsy.UniformModel</span></code>: The uniform distribution on the Polytope <span class="math notranslate nohighlight">\(\mathcal{P}\)</span></p></li>
+</ul>
+<div class="section" id="custom-python-models">
+<h2>Custom Python models<a class="headerlink" href="#custom-python-models" title="Permalink to this headline">¶</a></h2>
+<p>Often, e.g. in physics or parameter inference, one wants to sample more complex target functions.
+hopsy allows to do so, by providing <code class="docutils literal notranslate"><span class="pre">hopsy.PyModel</span></code> which acts as an interface between an arbitrary Python model and HOPS.
+This works by simply delegating any function calls to <code class="docutils literal notranslate"><span class="pre">hopsy.PyModel</span></code> (from within HOPS) to the respective Python method.
+Obviously, this can only work, as long as the Python model implements the  <code class="docutils literal notranslate"><span class="pre">compute_negative_log_likelihood</span></code> method.
+Depending on the algorithm you aim to use, it might also be necessary to further implement</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">compute_log_likelihood_gradient</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">compute_expected_fisher_information</span></code></p></li>
+</ul>
+<p>For more details on signature and return type, please refer to <code class="docutils literal notranslate"><span class="pre">hopsy.PyModel</span></code>.</p>
+</div>
+<div class="section" id="example-code">
+<h2>Example code<a class="headerlink" href="#example-code" title="Permalink to this headline">¶</a></h2>
+<p>We present a quick example code for a Python-implemented Gaussian target function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hopsy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># define the Gaussian model</span>
+<span class="k">class</span> <span class="nc">GaussianModel</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">cov</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">=</span> <span class="n">mu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cov</span> <span class="o">=</span> <span class="n">cov</span>
+
+    <span class="k">def</span> <span class="nf">compute_negative_log_likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">)</span> <span class="o">@</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">))[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">compute_expected_fisher_information</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compute_log_likelihood_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">)</span> <span class="o">@</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">)</span>
+
+<span class="c1"># the polytope is defined as</span>
+<span class="c1">#          P := {x : Ax &lt;= b}</span>
+<span class="c1"># thus we need to define A and b. these constraints form the simple box [0,1]^2.</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]]);</span>
+
+<span class="c1"># next we define our target distribution as an isotropic Gaussian with mean 0 and</span>
+<span class="c1"># scaled identity covariance.</span>
+<span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">cov</span> <span class="o">=</span> <span class="mf">0.1</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># unlike the example on the title page, we now use our own Python implementation GaussianModel</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">GaussianModel</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">cov</span><span class="p">)</span>
+
+<span class="c1"># the hopsy.Problem() factory can take any Python object and will wrap it in hopsy.PyModel</span>
+<span class="n">problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+
+<span class="c1"># alternatively we could wrap it ourselves, though it makes no difference</span>
+<span class="c1"># problem = hopsy.Problem(A, b, hopsy.PyModel(model))</span>
+
+<span class="c1"># instantiate the run using the problem with the custom Python model...</span>
+<span class="n">run</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">Run</span><span class="p">(</span><span class="n">problem</span><span class="p">)</span>
+
+<span class="c1"># ... and sample</span>
+<span class="n">run</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="hopsy.DegenerateMultivariateGaussianModel">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">DegenerateMultivariateGaussianModel</span></span><a class="headerlink" href="#hopsy.DegenerateMultivariateGaussianModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>A degenerate multivariate Gaussian model is a Gaussian model which is invariant in some dimensions of the
+input vector. As an example, consider the one-dimensional squared exponential as a function of two input
+variables</p>
+<div class="math notranslate nohighlight">
+\[f(x_1, x_2) = \exp\big\{ -x_1^2 \big\}\]</div>
+<p>then this function is invariant under the second dimension. We also say, that the second component of the
+input vector <span class="math notranslate nohighlight">\((x_1, x_2)\)</span> is inactive. The degenerate multivaraite Gaussian is defined
+as a regular Gaussian in <span class="math notranslate nohighlight">\(n-k\)</span> dimensions, where the input vector has <span class="math notranslate nohighlight">\(n\)</span> dimensions but <span class="math notranslate nohighlight">\(k\)</span>
+of its components are inactive.</p>
+<p>Technically, this is realized by removing the rows and columns from the mean vector and covariance matrix, that
+correspond to the inactive dimensions. This then basically constructs a Gaussian in <span class="math notranslate nohighlight">\(n-k\)</span> dimensions. However,
+unlike a standard multivariate Gaussian model, this model will still (and only) accept input vectors of dimension
+<span class="math notranslate nohighlight">\(n-k\)</span>.</p>
+<p><strong>Attributes:</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">mean:</span> <span class="pre">numpy.ndarray[float64[n,1]]</span></span></dt>
+<dd><p>The full mean vector over all - active and inactive - input components.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">covariance:</span> <span class="pre">numpy.ndarray[float64[n,n]]</span></span></dt>
+<dd><p>The full covariance matrix over all - active and inactive - input components.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">inactives:</span> <span class="pre">List[int]</span></span></dt>
+<dd><p>A list of indices of the inactive dimensions. If we are in <span class="math notranslate nohighlight">\(n\)</span>-dimensional space, then its elements
+should be integers between 0 and <span class="math notranslate nohighlight">\(n-1\)</span>.</p>
+</dd></dl>
+
+<p><strong>Methods:</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.DegenerateMultivariateGaussianModel.DegenerateMultivariateGaussianModel">
+<span class="sig-name descname"><span class="pre">DegenerateMultivariateGaussianModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inactives</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.DegenerateMultivariateGaussianModel.DegenerateMultivariateGaussianModel" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mean</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Gaussian mean vector</p></li>
+<li><p><strong>covariance</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>n</em><em>]</em><em>]</em>) – Gaussian covariance matrix</p></li>
+<li><p><strong>inactives</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>]</em>) – List of inactive dimensions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#hopsy.DegenerateMultivariateGaussianModel" title="hopsy.DegenerateMultivariateGaussianModel">hopsy.DegenerateMultivariateGaussianModel</a></p>
+</dd>
+</dl>
+<p>Constructs a <code class="docutils literal notranslate"><span class="pre">DegenerateMultivariateGaussianModel</span></code> with given mean and covariance and <cite>deactivates</cite>
+all dimensions specified in <code class="docutils literal notranslate"><span class="pre">inactives</span></code>. This works by removing the corresponding rows and columns
+from the mean and covariance.</p>
+<p>Passing an empty list as <code class="docutils literal notranslate"><span class="pre">inactives</span></code> will actually define a standard multivariate Gaussian.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.DegenerateMultivariateGaussianModel.compute_negative_log_likelihood">
+<span class="sig-name descname"><span class="pre">compute_negative_log_likelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.DegenerateMultivariateGaussianModel.compute_negative_log_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Input vector</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+<p>Computes the negative logarithm of the probability density function of a multivariate Gaussian model in
+<span class="math notranslate nohighlight">\(m-k\)</span> dimensions at <code class="docutils literal notranslate"><span class="pre">x</span></code>. Note that <cite>x</cite> still has to have dimension <span class="math notranslate nohighlight">\(n\)</span>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.DegenerateMultivariateGaussianModel.compute_log_likelihood_gradient">
+<span class="sig-name descname"><span class="pre">compute_log_likelihood_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.DegenerateMultivariateGaussianModel.compute_log_likelihood_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Input vector</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.ndarray[float64[n,1]]</p>
+</dd>
+</dl>
+<p>Computes the gradient of the logarithm of the probability density function of a multivariate Gaussian
+model in <span class="math notranslate nohighlight">\(n-k\)</span> dimensions at <code class="docutils literal notranslate"><span class="pre">x</span></code>. Note that <cite>x</cite> still has to have dimension <span class="math notranslate nohighlight">\(n\)</span>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.DegenerateMultivariateGaussianModel.compute_expected_fisher_information">
+<span class="sig-name descname"><span class="pre">compute_expected_fisher_information</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.DegenerateMultivariateGaussianModel.compute_expected_fisher_information" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Input vector</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+<p>:rtype:numpy.ndarray[float64[n,n]]</p>
+<p>Computes the expected fisher information of a multivariate Gaussian model
+in <span class="math notranslate nohighlight">\(n-k\)</span> dimensions at <code class="docutils literal notranslate"><span class="pre">x</span></code>. This turns out to be just the reduced covariance matrix.
+Note that <cite>x</cite> still has to have dimension <span class="math notranslate nohighlight">\(n\)</span>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hopsy.MixtureModel">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">MixtureModel</span></span><a class="headerlink" href="#hopsy.MixtureModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <code class="docutils literal notranslate"><span class="pre">MixtureModel</span></code> is a weighted sum of
+<code class="docutils literal notranslate"><span class="pre">PyModel</span></code> components and thus arbitrary components can be used.</p>
+<p><strong>Attributes:</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">components:</span> <span class="pre">List[hopsy.PyModel]</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">weights:</span> <span class="pre">List[float]</span></span></dt>
+<dd></dd></dl>
+
+<p><strong>Methods:</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.MixtureModel.MixtureModel">
+<span class="sig-name descname"><span class="pre">MixtureModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">components</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.MixtureModel.MixtureModel" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>components</strong> (<em>List</em><em>[</em><a class="reference internal" href="#hopsy.PyModel" title="hopsy.PyModel"><em>hopsy.PyModel</em></a><em>]</em>) – Model components</p>
+</dd>
+</dl>
+<p>Construct a <code class="docutils literal notranslate"><span class="pre">MixtureModel</span></code> as (equally weighted) sum over the elements from <code class="docutils literal notranslate"><span class="pre">components</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">MixtureModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">components</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>components</strong> (<em>List</em><em>[</em><a class="reference internal" href="#hopsy.PyModel" title="hopsy.PyModel"><em>hopsy.PyModel</em></a><em>]</em>) – Model components</p></li>
+<li><p><strong>weights</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>]</em>) – Model weights</p></li>
+</ul>
+</dd>
+</dl>
+<p>Construct a <code class="docutils literal notranslate"><span class="pre">MixtureModel</span></code> as weighted sum over the elements from <code class="docutils literal notranslate"><span class="pre">components</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.MixtureModel.compute_negative_log_likelihood">
+<span class="sig-name descname"><span class="pre">compute_negative_log_likelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.MixtureModel.compute_negative_log_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Input vector</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.MixtureModel.compute_log_likelihood_gradient">
+<span class="sig-name descname"><span class="pre">compute_log_likelihood_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.MixtureModel.compute_log_likelihood_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Input vector</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.ndarray[float64[n,1]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.MixtureModel.compute_expected_fisher_information">
+<span class="sig-name descname"><span class="pre">compute_expected_fisher_information</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.MixtureModel.compute_expected_fisher_information" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Input vector</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.ndarray[float64[n,n]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hopsy.MultivariateGaussianModel">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">MultivariateGaussianModel</span></span><a class="headerlink" href="#hopsy.MultivariateGaussianModel" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Attributes:</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">mean:</span> <span class="pre">numpy.ndarray[float64[n,1]]</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">covariance:</span> <span class="pre">numpy.ndarray[float64[n,n]]</span></span></dt>
+<dd></dd></dl>
+
+<p><strong>Methods:</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.MultivariateGaussianModel.MultivariateGaussianModel">
+<span class="sig-name descname"><span class="pre">MultivariateGaussianModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.MultivariateGaussianModel.MultivariateGaussianModel" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mean</strong> – </p></li>
+<li><p><strong>covariance</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#hopsy.MultivariateGaussianModel" title="hopsy.MultivariateGaussianModel">hopsy.MultivariateGaussianModel</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.MultivariateGaussianModel.compute_negative_log_likelihood">
+<span class="sig-name descname"><span class="pre">compute_negative_log_likelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.MultivariateGaussianModel.compute_negative_log_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Input vector</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.MultivariateGaussianModel.compute_log_likelihood_gradient">
+<span class="sig-name descname"><span class="pre">compute_log_likelihood_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.MultivariateGaussianModel.compute_log_likelihood_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Input vector</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.ndarray[float64[n,1]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.MultivariateGaussianModel.compute_expected_fisher_information">
+<span class="sig-name descname"><span class="pre">compute_expected_fisher_information</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.MultivariateGaussianModel.compute_expected_fisher_information" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Input vector</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.ndarray[float64[n,n]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hopsy.PyModel">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">PyModel</span></span><a class="headerlink" href="#hopsy.PyModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <code class="docutils literal notranslate"><span class="pre">PyModel</span></code> class allows you to interface arbitrary models implemented in Python to work correctly with
+hops, given that the <code class="docutils literal notranslate"><span class="pre">model</span></code> object you pass implements the required functions:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">compute_negative_log_likelihood</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">compute_log_likelihood_gradient</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">compute_expected_fisher_information</span></code></p></li>
+</ul>
+<p><strong>Attributes:</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">model:</span> <span class="pre">object</span></span></dt>
+<dd></dd></dl>
+
+<p><strong>Methods:</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.PyModel.PyModel">
+<span class="sig-name descname"><span class="pre">PyModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.PyModel.PyModel" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><em>object</em></a>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#hopsy.PyModel" title="hopsy.PyModel">hopsy.PyModel</a></p>
+</dd>
+</dl>
+<p>Wraps the passed object such that it can be correctly called from hops.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.PyModel.compute_negative_log_likelihood">
+<span class="sig-name descname"><span class="pre">compute_negative_log_likelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.PyModel.compute_negative_log_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Input vector</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+<p>Returns the value of <code class="docutils literal notranslate"><span class="pre">model.compute_negative_log_likelihod(x)</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.PyModel.compute_log_likelihood_gradient">
+<span class="sig-name descname"><span class="pre">compute_log_likelihood_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.PyModel.compute_log_likelihood_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Input vector</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.ndarray[float64[n,1]]</p>
+</dd>
+</dl>
+<p>Returns the value of <code class="docutils literal notranslate"><span class="pre">model.compute_log_likelihood_gradient(x)</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.PyModel.compute_expected_fisher_information">
+<span class="sig-name descname"><span class="pre">compute_expected_fisher_information</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.PyModel.compute_expected_fisher_information" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Input vector</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+<p>:rtype:numpy.ndarray[float64[n,n]]</p>
+<p>Returns the value of <code class="docutils literal notranslate"><span class="pre">model.compute_expected_fisher_information(x)</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hopsy.RosenbrockModel">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">RosenbrockModel</span></span><a class="headerlink" href="#hopsy.RosenbrockModel" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Attributes:</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">scale:</span> <span class="pre">float</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">shift:</span> <span class="pre">numpy.ndarray[float64[k,1]]</span></span></dt>
+<dd></dd></dl>
+
+<p><strong>Methods:</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.RosenbrockModel.RosenbrockModel">
+<span class="sig-name descname"><span class="pre">RosenbrockModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.RosenbrockModel.RosenbrockModel" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – </p></li>
+<li><p><strong>shift</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>k</em><em>,</em><em>1</em><em>]</em><em>]</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.RosenbrockModel.compute_negative_log_likelihood">
+<span class="sig-name descname"><span class="pre">compute_negative_log_likelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.RosenbrockModel.compute_negative_log_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Input vector</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.RosenbrockModel.compute_log_likelihood_gradient">
+<span class="sig-name descname"><span class="pre">compute_log_likelihood_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.RosenbrockModel.compute_log_likelihood_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Input vector</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.ndarray[float64[n,1]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.RosenbrockModel.compute_expected_fisher_information">
+<span class="sig-name descname"><span class="pre">compute_expected_fisher_information</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.RosenbrockModel.compute_expected_fisher_information" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Input vector</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.ndarray[float64[n,n]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hopsy.UniformModel">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">UniformModel</span></span><a class="headerlink" href="#hopsy.UniformModel" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>The <code class="docutils literal notranslate"><span class="pre">hopsy.UniformModel</span></code> defines the uniform target distribution on the polytope</p>
+<div class="math notranslate nohighlight">
+\[\pi(x) := \frac{1}{Z} \mathbf{1}_{\mathcal{P}}(x)\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[Z = \int_{\mathcal{P}} \mathbf{1}_{\mathcal{P}}(x) \mathrm{d}x\]</div>
+<p>Note that the uniform distribution is only well-defined, if the volume of the polytope is finite and
+thus if the polytope is bounded in all dimensions. So for example, <span class="math notranslate nohighlight">\(A = 1\)</span> and <span class="math notranslate nohighlight">\(b = 0\)</span>
+define the the inequality <span class="math notranslate nohighlight">\(Ax = x \leq 0 = b\)</span> which defines the negative real line. This can be
+seen as an unbounded one-dimensional polytope and the uniform distribution is thus not well defined on it.</p>
+<p>To prevent your polytope from being unbounded, you can use <code class="docutils literal notranslate"><span class="pre">hopsy.add_box_constraints</span></code> to add box constraints,
+that guarantee your polytope to be bounded. For more details, please refer <a class="reference internal" href="Problem.html"><span class="doc">here</span></a>.</p>
+</div></blockquote>
+<p><strong>Methods:</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.UniformModel.UniformModel">
+<span class="sig-name descname"><span class="pre">UniformModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.UniformModel.UniformModel" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#hopsy.UniformModel" title="hopsy.UniformModel">hopsy.UniformModel</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.UniformModel.compute_negative_log_likelihood">
+<span class="sig-name descname"><span class="pre">compute_negative_log_likelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.UniformModel.compute_negative_log_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Input vector</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.9)"><strong>RuntimeError</strong></a> – always</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+<p>The negative log-likelihood for the uniform model is the unknown constant <span class="math notranslate nohighlight">\(\frac{1}{Z}\)</span>,
+which depends on the volume of the support of the density. The volume is further only well-defined in
+dependence of the polytope, which is not known to the <code class="docutils literal notranslate"><span class="pre">hopsy.UniformModel</span></code>.
+In the Metropolis-Hastings algorithm, this constant cancels out and is not needed for computing the
+acceptance rate. Thus, this function is only available for technical reasons and <strong>will always throw
+an exception, when being called.</strong></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.UniformModel.compute_log_likelihood_gradient">
+<span class="sig-name descname"><span class="pre">compute_log_likelihood_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.UniformModel.compute_log_likelihood_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Input vector</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.9)"><strong>RuntimeError</strong></a> – always</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.ndarray[float64[n,1]]</p>
+</dd>
+</dl>
+<p>For similar reasons as with the <code class="docutils literal notranslate"><span class="pre">compute_negative_log_likelihod</span></code>, this function <strong>will always throw an
+exception when being called.</strong></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.UniformModel.compute_expected_fisher_information">
+<span class="sig-name descname"><span class="pre">compute_expected_fisher_information</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.UniformModel.compute_expected_fisher_information" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Input vector</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.9)"><strong>RuntimeError</strong></a> – always</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.ndarray[float64[n,n]]</p>
+</dd>
+</dl>
+<p>For similar reasons as with the <code class="docutils literal notranslate"><span class="pre">compute_negative_log_likelihod</span></code>, this function <strong>will always throw an
+exception when being called.</strong></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="Problem.html" class="btn btn-neutral float-right" title="Problem" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="hopsy - Python bindings for hops" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Richard D. Paul.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
