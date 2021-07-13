@@ -112,10 +112,9 @@ setup(
     description="A python interface for hops, the highly optimized polytope sampling toolbox.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/modsim/hopsy/",
     project_urls={
         "Documentation": "https://modsim.github.io/hopsy/",
-        "GitHub": "https://modsim.github.io/hopsy/",
+        "GitHub": "https://github.com/modsim/hopsy/",
     },
     classifiers=[
         "Programming Language :: Python :: 3",
