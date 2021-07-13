@@ -2,9 +2,9 @@
 	path = extern/pybind11
 	url = https://github.com/pybind/pybind11.git
 	branch = stable
-[submodule "extern/hops"]
-	path = extern/hops
-	url = git@jugit.fz-juelich.de:fluxomics/hops.git
 [submodule "extern/eigen3"]
 	path = extern/eigen3
 	url = https://gitlab.com/libeigen/eigen.git
+[submodule "extern/hops"]
+	path = extern/hops
+	url = https://github.com/modsim/hops

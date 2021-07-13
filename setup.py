@@ -106,7 +106,7 @@ with open("README.md", "r") as fh:
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="hopsy",
-    version="0.1.2",
+    version="0.2.0",
     author="Richard D. Paul",
     author_email="r.paul@fz-juelich.de",
     description="A python interface for hops, the highly optimized polytope sampling toolbox.",
