@@ -54,7 +54,7 @@ void addProblemClassToModule(py::module& m, const char* name, const char* doc) {
 }
 
 
-PYBIND11_MODULE(hopsy, m) {
+PYBIND11_MODULE(_hopsy, m) {
     //
     // Model classes
     // =============

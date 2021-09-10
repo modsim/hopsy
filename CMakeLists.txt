@@ -30,30 +30,38 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${HOPS_INCLUDE_DIR})
 
 add_subdirectory(extern/pybind11)
+#add_subdirectory(src/hopsy)
 
-pybind11_add_module(hopsy src/hopsy.cpp)
+#set_target_properties(_hopsy
+#    PROPERTIES
+#    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/src/hopsy"
+#    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/src/hopsy"
+#    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/src/hopsy"
+#)
+
+pybind11_add_module(_hopsy src/hopsy/hopsy.cpp)
 
 #target_compile_options(hopsy PUBLIC "-DHOPS_HEADER_ONLY")
 
-target_include_directories(hopsy PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${EIGEN3_INCLUDE_DIR})
-target_include_directories(hopsy PUBLIC ${HOPS_INCLUDE_DIR})
+target_include_directories(_hopsy PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${EIGEN3_INCLUDE_DIR})
+target_include_directories(_hopsy PUBLIC ${HOPS_INCLUDE_DIR})
 
-target_link_libraries(hopsy PRIVATE hops)
+target_link_libraries(_hopsy PRIVATE hops)
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
-    target_link_libraries(hopsy PRIVATE stdc++fs)
+    target_link_libraries(_hopsy PRIVATE stdc++fs)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 endif ()
 
 
 # EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
 # define (VERSION_INFO) here.
-target_compile_definitions(hopsy PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
+target_compile_definitions(_hopsy PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
 
 if (HOPSY_TESTS)
     enable_testing()
     add_subdirectory(examples)
-    add_custom_command(TARGET hopsy POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:hopsy> examples/${targetfile}
+    add_custom_command(TARGET _hopsy POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:_hopsy> examples/${targetfile}
     )
 endif()
 

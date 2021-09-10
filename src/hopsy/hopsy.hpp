@@ -8,7 +8,7 @@
 
 #include <Eigen/Core>
 
-#include "../extern/hops/include/hops/hops.hpp"
+#include "../../extern/hops/include/hops/hops.hpp"
 #include "hopsy_linprog.hpp"
 
 #include <string>

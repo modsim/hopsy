@@ -3,7 +3,7 @@ import os
 import sys
 import subprocess
 
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 
 # Convert distutils Windows platform specifiers to CMake -A arguments
@@ -27,6 +27,7 @@ class CMakeExtension(Extension):
 class CMakeBuild(build_ext):
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
+        print("extdir", extdir)
 
         # required for auto-detection of auxiliary "native" libs
         if not extdir.endswith(os.path.sep):
@@ -106,7 +107,7 @@ with open("README.md", "r") as fh:
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="hopsy",
-    version="0.1.2",
+    version="0.1.3",
     author="Richard D. Paul",
     author_email="r.paul@fz-juelich.de",
     description="A python interface for hops, the highly optimized polytope sampling toolbox.",
@@ -120,10 +121,13 @@ setup(
         "Programming Language :: Python :: 3",
         "Operating System :: POSIX :: Linux",
     ],
-    ext_modules=[CMakeExtension("hopsy")],
+    ext_modules=[CMakeExtension("hopsy/_hopsy")],
+    #ext_modules=[Extension("hopsy._hopsy", sources=["src/hopsy/hopsy.cpp"])],
     cmdclass={"build_ext": CMakeBuild},
-	install_requires=[
-		'PolyRound',
-	],
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
+    install_requires=[
+        'PolyRound',
+    ],
     zip_safe=False,
 )
