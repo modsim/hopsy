@@ -3,7 +3,7 @@
 A python interface for HOPS - the **H**ighly **O**ptimized toolbox for **P**olytope **S**ampling.
 Built using `pybind11`
 
-<img src="docs-sources/hopsy.png" alt="HOPSY Logo" width="300"/>
+<img src="docs/hopsy.png" alt="HOPSY Logo" width="300"/>
 
 **hopsy** is the attempt to offer some of the key functionatlity of **hops** through a Python interface.
 hops is a highly template-based C++-library for Markov chain Monte Carlo sampling on convex polytopes
