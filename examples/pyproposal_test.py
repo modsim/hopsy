@@ -54,9 +54,10 @@ cov = 0.1*np.identity(2)
 proposal = GaussianProposal(A, b, x0, 0.5*np.identity(2))
 
 model = hopsy.MultivariateGaussianModel(mu, cov)
+model = hopsy.RosenbrockModel(1, [1])
 problem = hopsy.Problem(A, b, model)
 
-run = hopsy.Run(problem, proposal)
+run = hopsy.Run(problem, proposal, starting_points=[x0])
 
 ## alternatively use (which internally happens anyways)
 # run = hopsy.Run(problem, hopsy.PyProposal(proposal))

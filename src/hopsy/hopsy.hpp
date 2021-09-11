@@ -177,61 +177,28 @@ namespace hopsy {
             }
         }
 
-		if constexpr(std::is_same<T, DegenerateMultivariateGaussianModel>::value) {
-			auto run = hops::Run<DegenerateMultivariateGaussianModel>(t, chainType, numberOfSamples, numberOfChains);
-            run.setStartingPoints(startingPoints);
-            return run;
-		}
-		if constexpr(std::is_same<T, MixtureModel>::value) {
-			auto run = hops::Run<MixtureModel>(t, chainType, numberOfSamples, numberOfChains);
-            run.setStartingPoints(startingPoints);
-            return run;
-		}
-		if constexpr(std::is_same<T, MultivariateGaussianModel>::value) {
-			auto run = hops::Run<MultivariateGaussianModel>(t, chainType, numberOfSamples, numberOfChains);
-            run.setStartingPoints(startingPoints);
-            return run;
-		}
-		if constexpr(std::is_same<T, RosenbrockModel>::value) {
-			auto run = hops::Run<RosenbrockModel>(t, chainType, numberOfSamples, numberOfChains);
-            run.setStartingPoints(startingPoints);
-            return run;
-		}
-		if constexpr(std::is_same<T, UniformModel>::value) {
-			auto run = hops::Run<UniformModel>(t, chainType, numberOfSamples, numberOfChains);
-            run.setStartingPoints(startingPoints);
-            return run;
-		}
-		if constexpr(std::is_same<T, PyModel>::value) {
-			auto run = hops::Run<PyModel>(t, chainType, numberOfSamples, numberOfChains);
-            run.setStartingPoints(startingPoints);
-            return run;
-		}
+        auto run = hops::Run<T>(t, chainType, numberOfSamples, numberOfChains);
+        run.setStartingPoints(startingPoints);
+        return run;
 	}
 
 	template<typename T>
 	hops::RunBase<T, PyProposal> createRunFromPyProposal(const hops::Problem<T>& t, 
                                                          PyProposal proposal, 
                                                          unsigned long numberOfSamples = 1000, 
-                                                         unsigned long numberOfChains = 1) {
-		if constexpr(std::is_same<T, DegenerateMultivariateGaussianModel>::value) {
-			return hops::RunBase<DegenerateMultivariateGaussianModel, PyProposal>(t, proposal, numberOfSamples, numberOfChains);
-		}
-		if constexpr(std::is_same<T, MixtureModel>::value) {
-			return hops::RunBase<MixtureModel, PyProposal>(t, proposal, numberOfSamples, numberOfChains);
-		}
-		if constexpr(std::is_same<T, MultivariateGaussianModel>::value) {
-			return hops::RunBase<MultivariateGaussianModel, PyProposal>(t, proposal, numberOfSamples, numberOfChains);
-		}
-		if constexpr(std::is_same<T, RosenbrockModel>::value) {
-			return hops::RunBase<RosenbrockModel, PyProposal>(t, proposal, numberOfSamples, numberOfChains);
-		}
-		if constexpr(std::is_same<T, UniformModel>::value) {
-			return hops::RunBase<UniformModel, PyProposal>(t, proposal, numberOfSamples, numberOfChains);
-		}
-		if constexpr(std::is_same<T, PyModel>::value) {
-			return hops::RunBase<PyModel, PyProposal>(t, proposal, numberOfSamples, numberOfChains);
-		}
+                                                         unsigned long numberOfChains = 1,
+                                                         std::vector<Eigen::VectorXd> startingPoints = std::vector<Eigen::VectorXd>()) {
+        // initialize missing starting points with chebyshev center
+        if (startingPoints.size() < numberOfChains) {
+            Eigen::VectorXd chebyshevCenter = computeChebyshevCenter(t);
+            for (size_t i = startingPoints.size(); i < numberOfChains; ++i) {
+                startingPoints.push_back(chebyshevCenter);
+            }
+        }
+
+        auto run = hops::RunBase<T, PyProposal>(t, proposal, numberOfSamples, numberOfChains);
+        run.setStartingPoints(startingPoints);
+        return run;
 	}
 
 
@@ -239,8 +206,9 @@ namespace hopsy {
 	hops::RunBase<T, PyProposal> createRunFromPyObject(const hops::Problem<T>& t, 
                                                        py::object pyObj, 
                                                        unsigned long numberOfSamples = 1000, 
-                                                       unsigned long numberOfChains = 1) {
-        return createRunFromPyProposal(t, PyProposal(pyObj), numberOfSamples, numberOfChains);
+                                                       unsigned long numberOfChains = 1,
+                                                       std::vector<Eigen::VectorXd> startingPoints = std::vector<Eigen::VectorXd>()) {
+        return createRunFromPyProposal(t, PyProposal(pyObj), numberOfSamples, numberOfChains, startingPoints);
 	}
 
     std::pair<Eigen::MatrixXd, Eigen::VectorXd> addBoxConstraintsToMatrixVector(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::VectorXd& lowerBounds, const Eigen::VectorXd& upperBounds) {

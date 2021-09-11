@@ -1,2 +1,5 @@
+from . _hopsy import *
+
 def load(path):
-    print("hi")
+    data = Data()
+    return data
