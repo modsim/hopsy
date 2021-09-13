@@ -524,28 +524,27 @@ PYBIND11_MODULE(_hopsy, m) {
     // Data classes
     // ============
     //
-    // Instead of having to construct the correct run from a given problem manually, this method 
-    // simulates a general run constructor which then statically checks the passed problem
-    // type and returns the correctly instantiated run object
     //
     py::class_<hops::Data>(m, "Data",
                 R"pbdoc()pbdoc")
         .def(py::init<>())
-		.def_property_readonly(
-                "acceptance_rates", &hops::Data::getAcceptanceRates,
+		.def_property(
+                "acceptance_rates", &hops::Data::getAcceptanceRates, &hops::Data::setAcceptanceRates,
 				R"pbdoc()pbdoc")
-		.def_property_readonly(
-                "negative_log_likelihood", &hops::Data::getNegativeLogLikelihood,
+		.def_property(
+                "negative_log_likelihood", &hops::Data::getNegativeLogLikelihood, &hops::Data::setNegativeLogLikelihood,
 				R"pbdoc()pbdoc")
-		.def_property_readonly(
-                "states", &hops::Data::getStates,
+		.def_property(
+                "states", &hops::Data::getStates, &hops::Data::setStates,
 				R"pbdoc()pbdoc")
-		.def_property_readonly(
-                "timestamps", &hops::Data::getTimestamps,
+		.def_property(
+                "timestamps", &hops::Data::getTimestamps, &hops::Data::setTimestamps,
 				R"pbdoc()pbdoc")
         .def("reset", &hops::Data::reset,
 				R"pbdoc()pbdoc")
         .def("write", &hops::Data::write,
+            	py::arg("path"), 
+                py::arg("discard_raw") = false, 
 				R"pbdoc()pbdoc");
 
     // check: https://stackoverflow.com/questions/49452957/overload-cast-fails-in-a-specific-case
