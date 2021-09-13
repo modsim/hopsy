@@ -7,6 +7,7 @@ from copy import deepcopy
 
 import os
 import sys
+import shutil
 
 data = hp.Data()
 data.states = [[np.array([0, 0])], [np.array([0, 0])]]
@@ -33,11 +34,8 @@ if len(sys.argv) == 1 or sys.argv[1] != "test":
 
 data = util.load("test_output")
 
-print(data.states)
-
 if len(sys.argv) == 1 or sys.argv[1] != "test":
-    print(np.array(data.states).shape)
     fig, axs = util.jointplot(data, density_estimator=util.gaussian_mixture)
     plt.show()
 
-os.rmdir("test_output")
+shutil.rmtree("test_output")

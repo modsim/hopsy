@@ -34,7 +34,6 @@ def load(path = "."):
         items = [item for item in items if os.path.isfile(item)]
 
         for item in items:
-            print(item)
             if "csv" not in item: 
                 continue
 
@@ -117,7 +116,6 @@ def scatterplot(data,
 
     if axs is None:
         rows, cols = dim-1, dim-1
-        print(rows, cols)
         # only populate upper triangular part with subplots
         axs = [[fig.add_subplot(rows, cols, (i*rows)+j+1) for j in range(i, cols)] for i in range(rows)]
     else:
@@ -129,7 +127,6 @@ def scatterplot(data,
     for i in range(rows):
         for c in range(number_of_chains):
             for j in range(1, cols-i):
-                print(i, j, c)
                 axs[i][j].scatter(states[c,:,i], states[c,:,j+i], color=colors[c], alpha = 1./number_of_chains, **kwargs)
 
     return fig, axs
@@ -151,7 +148,6 @@ def densityplot(data,
 
     if axs is None:
         rows, cols = dim-1, dim-1
-        print(rows, cols)
         # only populate upper triangular part with subplots
         axs = [[fig.add_subplot(rows, cols, (i*rows)+j+1) for j in range(i, cols)] for i in range(rows)]
     else:
