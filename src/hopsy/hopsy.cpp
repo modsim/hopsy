@@ -22,12 +22,12 @@ void addRunClassToModule(py::module& m, const char* name, const char* doc) {
         .def("init", &Run::init)
         .def("sample", py::overload_cast<>(&Run::sample))
         .def("sample", py::overload_cast<unsigned long, unsigned long>(&Run::sample), 
-                py::arg("number_of_samples"), py::arg("thinning") = 1)
+                py::arg("n_samples"), py::arg("thinning") = 1)
         .def_property_readonly("data", &Run::getData)
         .def_property("problem", &Run::getProblem, &Run::setProblem)
         .def_property("starting_points", &Run::getStartingPoints, &Run::setStartingPoints)
-        .def_property("number_of_chains", &Run::getNumberOfChains, &Run::setNumberOfChains)
-        .def_property("number_of_samples", &Run::getNumberOfSamples, &Run::setNumberOfSamples)
+        .def_property("n_chains", &Run::getNumberOfChains, &Run::setNumberOfChains)
+        .def_property("n_samples", &Run::getNumberOfSamples, &Run::setNumberOfSamples)
         .def_property("thinning", &Run::getThinning, &Run::setThinning)
         .def_property("stepsize", &Run::getStepSize, &Run::setStepSize)
         .def_property("fisher_weight", &Run::getFisherWeight, &Run::setFisherWeight)
@@ -395,129 +395,129 @@ PYBIND11_MODULE(_hopsy, m) {
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal_name") = "HitAndRun", 
-                py::arg("number_of_samples") = 1000, 
-                py::arg("number_of_chains") = 1, 
+                py::arg("n_samples") = 1000, 
+                py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRun<hopsy::MixtureModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal_name") = "HitAndRun", 
-                py::arg("number_of_samples") = 1000, 
-                py::arg("number_of_chains") = 1, 
+                py::arg("n_samples") = 1000, 
+                py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRun<hopsy::MultivariateGaussianModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal_name") = "HitAndRun", 
-                py::arg("number_of_samples") = 1000, 
-                py::arg("number_of_chains") = 1, 
+                py::arg("n_samples") = 1000, 
+                py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRun<hopsy::PyModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal_name") = "HitAndRun", 
-                py::arg("number_of_samples") = 1000, 
-                py::arg("number_of_chains") = 1, 
+                py::arg("n_samples") = 1000, 
+                py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRun<hopsy::RosenbrockModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal_name") = "HitAndRun", 
-                py::arg("number_of_samples") = 1000, 
-                py::arg("number_of_chains") = 1, 
+                py::arg("n_samples") = 1000, 
+                py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRun<hopsy::UniformModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal_name") = "HitAndRun", 
-                py::arg("number_of_samples") = 1000, 
-                py::arg("number_of_chains") = 1, 
+                py::arg("n_samples") = 1000, 
+                py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 
 	m.def("Run", &hopsy::createRunFromPyProposal<hopsy::DegenerateMultivariateGaussianModel>, 
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal"), 
-                py::arg("number_of_samples") = 1000, 
-                py::arg("number_of_chains") = 1, 
+                py::arg("n_samples") = 1000, 
+                py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRunFromPyProposal<hopsy::MixtureModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal"), 
-                py::arg("number_of_samples") = 1000, 
-                py::arg("number_of_chains") = 1, 
+                py::arg("n_samples") = 1000, 
+                py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRunFromPyProposal<hopsy::MultivariateGaussianModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal"), 
-                py::arg("number_of_samples") = 1000, 
-                py::arg("number_of_chains") = 1, 
+                py::arg("n_samples") = 1000, 
+                py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRunFromPyProposal<hopsy::PyModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal"), 
-                py::arg("number_of_samples") = 1000, 
-                py::arg("number_of_chains") = 1, 
+                py::arg("n_samples") = 1000, 
+                py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRunFromPyProposal<hopsy::RosenbrockModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal"), 
-                py::arg("number_of_samples") = 1000, 
-                py::arg("number_of_chains") = 1, 
+                py::arg("n_samples") = 1000, 
+                py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRunFromPyProposal<hopsy::UniformModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal"), 
-                py::arg("number_of_samples") = 1000, 
-                py::arg("number_of_chains") = 1, 
+                py::arg("n_samples") = 1000, 
+                py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 
 	m.def("Run", &hopsy::createRunFromPyObject<hopsy::DegenerateMultivariateGaussianModel>, 
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal"), 
-                py::arg("number_of_samples") = 1000, 
-                py::arg("number_of_chains") = 1, 
+                py::arg("n_samples") = 1000, 
+                py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRunFromPyObject<hopsy::MixtureModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal"), 
-                py::arg("number_of_samples") = 1000, 
-                py::arg("number_of_chains") = 1, 
+                py::arg("n_samples") = 1000, 
+                py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRunFromPyObject<hopsy::MultivariateGaussianModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal"), 
-                py::arg("number_of_samples") = 1000, 
-                py::arg("number_of_chains") = 1, 
+                py::arg("n_samples") = 1000, 
+                py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRunFromPyObject<hopsy::PyModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal"), 
-                py::arg("number_of_samples") = 1000, 
-                py::arg("number_of_chains") = 1, 
+                py::arg("n_samples") = 1000, 
+                py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRunFromPyObject<hopsy::RosenbrockModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal"), 
-                py::arg("number_of_samples") = 1000, 
-                py::arg("number_of_chains") = 1, 
+                py::arg("n_samples") = 1000, 
+                py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRunFromPyObject<hopsy::UniformModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
                 py::arg("proposal"), 
-                py::arg("number_of_samples") = 1000, 
-                py::arg("number_of_chains") = 1, 
+                py::arg("n_samples") = 1000, 
+                py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 
 
@@ -530,12 +530,12 @@ PYBIND11_MODULE(_hopsy, m) {
                 R"pbdoc()pbdoc")
         .def(py::init<>())
         .def(py::init(&hopsy::constructDataFromSimpleData), py::arg("simple_data"))
-		.def_property_readonly("number_of_chains",
+		.def_property_readonly("n_chains",
                 [] (const hops::Data& self) {
                     return self.chains.size();
                 },
                 R"pbdoc()pbdoc")
-		.def_property_readonly("number_of_samples",
+		.def_property_readonly("n_samples",
                 [] (const hops::Data& self) {
                     return ( self.chains.size() ? self.chains[0].states->size() : 0 );
                 },
@@ -575,7 +575,7 @@ PYBIND11_MODULE(_hopsy, m) {
 				R"pbdoc()pbdoc")
         .def("flatten", &hops::Data::flatten)
         .def("subsample", &hops::Data::subsample, 
-                py::arg("number_of_subsamples"), 
+                py::arg("n_subsamples"), 
                 py::arg("seed"))
         .def("thin", &hops::Data::thin, 
                 py::arg("thinning"))
