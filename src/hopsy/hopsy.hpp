@@ -12,6 +12,7 @@
 #include "hopsy_linprog.hpp"
 
 #include <string>
+#include <tuple>
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
@@ -129,24 +130,7 @@ namespace hopsy {
 
 	template<typename T>
 	hops::Problem<T> createProblem(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const T& t) {
-		if constexpr(std::is_same<T, DegenerateMultivariateGaussianModel>::value) {
-			return hops::Problem<DegenerateMultivariateGaussianModel>(A, b, t);
-		}
-		if constexpr(std::is_same<T, MixtureModel>::value) {
-			return hops::Problem<MixtureModel>(A, b, t);
-		}
-		if constexpr(std::is_same<T, MultivariateGaussianModel>::value) {
-			return hops::Problem<MultivariateGaussianModel>(A, b, t);
-		}
-		if constexpr(std::is_same<T, RosenbrockModel>::value) {
-			return hops::Problem<RosenbrockModel>(A, b, t);
-		}
-		if constexpr(std::is_same<T, UniformModel>::value) {
-			return hops::Problem<UniformModel>(A, b, t);
-		}
-		if constexpr(std::is_same<T, PyModel>::value) {
-			return hops::Problem<PyModel>(A, b, t);
-		}
+		return hops::Problem<T>(A, b, t);
 	}
 
 
@@ -242,6 +226,110 @@ namespace hopsy {
         Eigen::VectorXd upperBounds = upperBound * Eigen::VectorXd::Ones(problem.getA().cols());
         return addBoxConstraintsToProblem(problem, lowerBounds, upperBounds);
     }
-}
+
+
+    /*
+     *
+     *  Data __getitem__
+     *
+     */
+
+    using SimpleData = std::vector<         // chains
+        std::tuple<
+            std::vector<double>,            // acceptance rates
+            std::vector<double>,            // negative log likelihood
+            std::vector<Eigen::VectorXd>,   // states
+            std::vector<long>               // timestamps
+        >>;
+
+    hops::Data getDataItem (const hops::Data& data, const py::slice& slice) {
+        py::ssize_t numberOfChains = static_cast<py::ssize_t>(data.chains.size());
+        py::ssize_t start = 0, stop = 0, step = 0, slicelength = 0;
+        if (!slice.compute(numberOfChains, &start, &stop, &step, &slicelength))
+            throw py::error_already_set();
+        size_t istart = static_cast<size_t>(start);
+        size_t istop  = static_cast<size_t>(stop);
+        size_t istep  = static_cast<size_t>(step);
+
+        hops::Data newData{};
+        for (size_t i = istart; i < istop; i += istep) {
+            newData.chains.push_back(
+                    hops::ChainData(
+                        data.chains[i].getAcceptanceRates(), 
+                        data.chains[i].getNegativeLogLikelihood(), 
+                        data.chains[i].getStates(), 
+                        data.chains[i].getTimestamps()
+                    ));
+        }
+
+        return newData;
+    }
+
+    hops::Data getDataItem (const hops::Data& data, const std::tuple<py::slice, py::slice>& slices) {
+        py::ssize_t numberOfChains = static_cast<py::ssize_t>(data.chains.size());
+
+        py::slice chainSlice = std::get<0>(slices);
+        py::slice stateSlice = std::get<1>(slices);
+
+        py::ssize_t start = 0, stop = 0, step = 0, slicelength = 0;
+        if (!chainSlice.compute(numberOfChains, &start, &stop, &step, &slicelength))
+            throw py::error_already_set();
+        size_t istart = static_cast<size_t>(start);
+        size_t istop  = static_cast<size_t>(stop);
+        size_t istep  = static_cast<size_t>(step);
+
+        py::ssize_t maxNumberOfStates = static_cast<py::ssize_t>(data.chains[0].getStates().size());
+        for (const auto& chain : data.chains) {
+            maxNumberOfStates = std::max(maxNumberOfStates, static_cast<py::ssize_t>(chain.getStates().size()));
+        }
+        start = 0, stop = 0, step = 0, slicelength = 0;
+        if (!stateSlice.compute(maxNumberOfStates, &start, &stop, &step, &slicelength))
+            throw py::error_already_set();
+        size_t jstart = static_cast<size_t>(start);
+        size_t jstop  = static_cast<size_t>(stop);
+        size_t jstep  = static_cast<size_t>(step);
+
+        hops::Data newData{};
+        for (size_t i = istart; i < istop; i += istep) {
+            newData.chains.push_back(hops::ChainData());
+            std::vector<double>& acceptanceRates = *newData.chains.back().acceptanceRates;
+            std::vector<double>& negativeLogLikelihood = *newData.chains.back().negativeLogLikelihood;
+            std::vector<Eigen::VectorXd>& states = *newData.chains.back().states;
+            std::vector<long>& timestamps = *newData.chains.back().timestamps;
+
+            for (size_t j = jstart; j < jstop; j += jstep) {
+                if (j < data.chains[i].getAcceptanceRates().size()) {
+                    acceptanceRates.push_back(data.chains[i].getAcceptanceRates()[j]);
+                }
+                if (j < data.chains[i].getNegativeLogLikelihood().size()) {
+                    negativeLogLikelihood.push_back(data.chains[i].getNegativeLogLikelihood()[j]);
+                }
+                if (j < data.chains[i].getStates().size()) {
+                    states.push_back(data.chains[i].getStates()[j]);
+                }
+                if (j < data.chains[i].getTimestamps().size()) {
+                    timestamps.push_back(data.chains[i].getTimestamps()[j]);
+                }
+            }
+        }
+
+        return newData;
+    }
+
+    hops::Data constructDataFromSimpleData(const SimpleData& simpleData) {
+        hops::Data data;
+        for (const auto& simpleChain : simpleData) {
+            data.chains.push_back(
+                    hops::ChainData(
+                        std::get<0>(simpleChain),
+                        std::get<1>(simpleChain),
+                        std::get<2>(simpleChain),
+                        std::get<3>(simpleChain)
+                    )
+                );
+        }
+        return data;
+    }
+} // namespace hopsy
 
 #endif // HOPSY_HPP
