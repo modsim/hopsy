@@ -1,5 +1,6 @@
 #include <pybind11/detail/common.h>
 #include <pybind11/eigen.h>
+#include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -528,18 +529,60 @@ PYBIND11_MODULE(_hopsy, m) {
     py::class_<hops::Data>(m, "Data",
                 R"pbdoc()pbdoc")
         .def(py::init<>())
+        .def(py::init(&hopsy::constructDataFromSimpleData), py::arg("simple_data"))
+		.def_property_readonly("number_of_chains",
+                [] (const hops::Data& self) {
+                    return self.chains.size();
+                },
+                R"pbdoc()pbdoc")
+		.def_property_readonly("number_of_samples",
+                [] (const hops::Data& self) {
+                    return ( self.chains.size() ? self.chains[0].states->size() : 0 );
+                },
+                R"pbdoc()pbdoc")
+		.def_property_readonly("dims", 
+                [] (const hops::Data& self) {
+                    size_t numberOfSamples = ( self.chains.size() ? self.chains[0].states->size() : 0 );
+                    return static_cast<size_t>( numberOfSamples ? self.chains[0].states->at(0).size() : 0);
+                },
+                R"pbdoc()pbdoc")
+		.def_property_readonly("shape",
+                [] (const hops::Data& self) -> std::tuple<size_t, size_t, size_t> {
+                    size_t numberOfSamples = ( self.chains.size() ? self.chains[0].states->size() : 0 );
+                    size_t dim = static_cast<size_t>( numberOfSamples ? self.chains[0].states->at(0).size() : 0);
+                    return {self.chains.size(), numberOfSamples, dim};
+                },
+                R"pbdoc()pbdoc")
 		.def_property(
-                "acceptance_rates", &hops::Data::getAcceptanceRates, &hops::Data::setAcceptanceRates,
+                "acceptance_rates", 
+                [] (hops::Data& self) -> py::array { return py::cast(self.getAcceptanceRates()); }, 
+                &hops::Data::setAcceptanceRates,
 				R"pbdoc()pbdoc")
 		.def_property(
-                "negative_log_likelihood", &hops::Data::getNegativeLogLikelihood, &hops::Data::setNegativeLogLikelihood,
+                "negative_log_likelihood", 
+                [] (hops::Data& self) -> py::array { return py::cast(self.getNegativeLogLikelihood()); }, 
+                &hops::Data::setNegativeLogLikelihood,
 				R"pbdoc()pbdoc")
 		.def_property(
-                "states", &hops::Data::getStates, &hops::Data::setStates,
+                "states", 
+                [] (hops::Data& self) -> py::array { return py::cast(self.getStates()); }, 
+                &hops::Data::setStates,
 				R"pbdoc()pbdoc")
 		.def_property(
-                "timestamps", &hops::Data::getTimestamps, &hops::Data::setTimestamps,
+                "timestamps", 
+                [] (hops::Data& self) -> py::array { return py::cast(self.getTimestamps()); }, 
+                &hops::Data::setTimestamps,
 				R"pbdoc()pbdoc")
+        .def("flatten", &hops::Data::flatten)
+        .def("subsample", &hops::Data::subsample, 
+                py::arg("number_of_subsamples"), 
+                py::arg("seed"))
+        .def("thin", &hops::Data::thin, 
+                py::arg("thinning"))
+        .def("__getitem__", py::overload_cast<const hops::Data&, const py::slice&>(&hopsy::getDataItem), 
+                py::arg("slice"))
+        .def("__getitem__", py::overload_cast<const hops::Data&, const std::tuple<py::slice, py::slice>&>(&hopsy::getDataItem), 
+                py::arg("slices"))
         .def("reset", &hops::Data::reset,
 				R"pbdoc()pbdoc")
         .def("write", &hops::Data::write,
