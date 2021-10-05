@@ -1,21 +1,18 @@
-try:
-    from . _hopsy import *
-except:
-    from hopsy import *
-
 import os 
+import sys
+
+import hopsy._hopsy
 
 import numpy as np
-
 import matplotlib.pyplot as plt
-from matplotlib import cm
+import matplotlib.cm
 
 from sklearn.neighbors import KernelDensity
 from sklearn.mixture import GaussianMixture
 
 
 def load(path = "."):
-    data = Data()
+    data = hopsy._hopsy.Data()
 
     abs_path = os.path.abspath(path)
 
@@ -93,11 +90,11 @@ def gaussian_mixture(x,
     xy_sample = np.vstack([yy.ravel(), xx.ravel()]).T
     xy_train  = np.vstack([y, x]).T
 
-    kde_skl = GaussianMixture(**kwargs)
-    kde_skl.fit(xy_train)
+    gmm_skl = GaussianMixture(**kwargs)
+    gmm_skl.fit(xy_train)
 
     # score_samples() returns the log-likelihood of the samples
-    z = np.exp(kde_skl.score_samples(xy_sample))
+    z = np.exp(gmm_skl.score_samples(xy_sample))
     return xx, yy, np.reshape(z, xx.shape)
 
 
@@ -142,6 +139,7 @@ def densityplot(data,
                 distinguish_chains = False, 
                 dims = None, 
                 density_estimator = kde,
+                cm = matplotlib.cm.tab10,
                 **kwargs):
     states = np.array(data.states)
     dim = len(states[0,0]) if dims is None else len(dims)
@@ -158,7 +156,7 @@ def densityplot(data,
         rows, cols = len(axs), len(axs[0])
 
     # hack to save an if statement since int(True) == 1 and int(False) == 0
-    colors = [cm.tab10(int((distinguish_chains) * i) % 10) for i in range(number_of_chains)]
+    colors = [cm(int((distinguish_chains) * i) % 10) for i in range(number_of_chains)]
 
     for i in range(rows):
         for c in range(number_of_chains):
@@ -175,9 +173,10 @@ def scatterdensityplot(data,
                        distinguish_chains = False, 
                        dims = None, 
                        density_estimator = kde,
+                       cm = matplotlib.cm.tab10,
                        **kwargs):
-        fig, axs = scatterplot(data, fig, axs, distinguish_chains, dims, **kwargs)
-        fig, axs = densityplot(data, fig, axs, distinguish_chains, dims, density_estimator, **kwargs)
+        fig, axs = scatterplot(data, fig, axs, distinguish_chains, dims, cm, **kwargs)
+        fig, axs = densityplot(data, fig, axs, distinguish_chains, dims, density_estimator, cm, **kwargs)
         return fig, axs
 
 
@@ -186,6 +185,7 @@ def histplot(data,
               axs = None,
               distinguish_chains = True,
               dims = None,
+              cm = matplotlib.cm.tab10,
               **kwargs):
     states = np.array(data.states)
     dim = len(states[0,0]) if dims is None else len(dims)
@@ -197,16 +197,16 @@ def histplot(data,
 
     if axs is None:
         rows, cols = int(np.ceil(np.sqrt(dim))), int(np.ceil(np.sqrt(dim)))
-        axs = [[fig.add_subplot(rows, cols, i*cols + j + 1) for j in range(cols)] for i in range(rows)]
+        axs = [[fig.add_subplot(rows, cols, i*cols + j + 1) for j in range(cols) if (i*cols+j) < dim] for i in range(rows)]
     else:
         rows, cols = len(axs), len(axs[0])
 
     # hack to save an if statement since int(True) == 1 and int(False) == 0
-    colors = [cm.tab10(int((distinguish_chains) * i) % 10) for i in range(number_of_chains)]
+    colors = [cm(int((distinguish_chains) * i) % 10) for i in range(number_of_chains)]
 
     for i in range(rows):
         for j in range(cols):
-            if j < len(axs[i]):
+            if j < len(axs[i]) and i*cols+j < dim:
                 for c in range(number_of_chains):
                     axs[i][j].hist(states[c,:,dims[i*cols+j]], color=colors[c], alpha = 1./number_of_chains)
 
@@ -219,6 +219,7 @@ def jointplot(data,
               dims = None,
               diag_plot=histplot,
               off_diag_plot=scatterplot,
+              cm = matplotlib.cm.tab10,
               **kwargs):
     states = np.array(data.states)
     dim = len(states[0,0]) if dims is None else len(dims)
