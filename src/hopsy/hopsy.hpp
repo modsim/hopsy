@@ -141,15 +141,17 @@ namespace hopsy {
                            unsigned long numberOfChains = 1,
                            std::vector<Eigen::VectorXd> startingPoints = std::vector<Eigen::VectorXd>()) {
 		hops::MarkovChainType chainType;
-		if (chainTypeString == "BallWalk") {
+		if (chainTypeString == "AdaptiveMetropolis" || chainTypeString == "AM") {
 			chainType = hops::MarkovChainType::BallWalk;
-		} else if (chainTypeString == "CoordinateHitAndRun") {
+        } else if (chainTypeString == "BallWalk" || chainTypeString == "BW") {
+			chainType = hops::MarkovChainType::BallWalk;
+		} else if (chainTypeString == "CoordinateHitAndRun" || chainTypeString == "CHR") {
 			chainType = hops::MarkovChainType::CoordinateHitAndRun;
-		} else if (chainTypeString == "DikinWalk") {
+		} else if (chainTypeString == "DikinWalk" || chainTypeString == "DW") {
 			chainType = hops::MarkovChainType::DikinWalk;
-		} else if (chainTypeString == "Gaussian") {
+		} else if (chainTypeString == "Gaussian" || chainTypeString == "GRW") {
 			chainType = hops::MarkovChainType::Gaussian;
-		} else if (chainTypeString == "HitAndRun") {
+		} else if (chainTypeString == "HitAndRun" || chainTypeString == "HR") {
 			chainType = hops::MarkovChainType::HitAndRun;
 		}
 

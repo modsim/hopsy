@@ -4,6 +4,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include "Utility/Data.hpp"
 #include "hopsy.hpp"
 
 #include <Eigen/Core>
@@ -620,8 +621,10 @@ PYBIND11_MODULE(_hopsy, m) {
                 ----------
                 )pbdoc", 
                 py::arg("data"));
-    m.def("compute_expected_squared_jump_distance", py::overload_cast<hops::Data&>(
-                (computeStatisticsSignature*)&hops::computeExpectedSquaredJumpDistance),
+
+    using computeExpectedSquaredJumpDistanceSignature = std::tuple<Eigen::VectorXd, hops::IntermediateExpectedSquaredJumpDistanceResults_>(const hops::Data&, const Eigen::MatrixXd&);
+    m.def("compute_expected_squared_jump_distance", py::overload_cast<const hops::Data&, const Eigen::MatrixXd&>(
+                (computeExpectedSquaredJumpDistanceSignature*)&hops::computeExpectedSquaredJumpDistanceIncrementally),
 				R"pbdoc(
                 Compute the expected squared jump distance of the chains in ``data``. 
                 The expected squared jump distance is computed for every chain individually and is then
@@ -631,7 +634,37 @@ PYBIND11_MODULE(_hopsy, m) {
                 Parameters
                 ----------
                 )pbdoc", 
-                py::arg("data"));
+                py::arg("data"), py::arg("sqrt_covariance") = Eigen::MatrixXd(0, 0));
+
+    using computeExpectedSquaredJumpDistanceIncrementallySignature = std::tuple<Eigen::VectorXd, hops::IntermediateExpectedSquaredJumpDistanceResults_>(
+            const hops::Data&, const hops::IntermediateExpectedSquaredJumpDistanceResults_&, const Eigen::MatrixXd&);
+    m.def("compute_expected_squared_jump_distance", py::overload_cast<const hops::Data&, const hops::IntermediateExpectedSquaredJumpDistanceResults_&, const Eigen::MatrixXd&>(
+                (computeExpectedSquaredJumpDistanceIncrementallySignature*)&hops::computeExpectedSquaredJumpDistanceIncrementally),
+				R"pbdoc(
+                Compute the expected squared jump distance of the chains in ``data``. 
+                The expected squared jump distance is computed for every chain individually and is then
+                returned in an ``m`` x ``1`` column vector, 
+                where ``m`` is the number of chains stored in ``data``.
+
+                Parameters
+                ----------
+                )pbdoc", 
+                py::arg("data"), py::arg("intermediate_result"), py::arg("sqrt_covariance") = Eigen::MatrixXd(0, 0));
+
+    using computeExpectedSquaredJumpDistanceEverySignature = Eigen::MatrixXd(const hops::Data&, size_t, const Eigen::MatrixXd&);
+    m.def("compute_expected_squared_jump_distance", py::overload_cast<const hops::Data&, size_t, const Eigen::MatrixXd&>(
+                (computeExpectedSquaredJumpDistanceEverySignature*)&hops::computeExpectedSquaredJumpDistanceEvery),
+				R"pbdoc(
+                Compute the expected squared jump distance of the chains in ``data``. 
+                The expected squared jump distance is computed for every chain individually and is then
+                returned in an ``m`` x ``1`` column vector, 
+                where ``m`` is the number of chains stored in ``data``.
+
+                Parameters
+                ----------
+                )pbdoc", 
+                py::arg("data"), py::arg("every"), py::arg("sqrt_covariance") = Eigen::MatrixXd(0, 0));
+
     m.def("compute_potential_scale_reduction_factor", py::overload_cast<hops::Data&>(
                 (computeStatisticsSignature*)&hops::computePotentialScaleReductionFactor),
 				R"pbdoc(
