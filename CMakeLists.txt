@@ -6,6 +6,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 
+option(HOPSY_TESTS "Enable hopsy tests" OFF)
+option(HOPSY_NO_EIGEN_VECTORIZE "Enable hopsy tests" ON)
+
+if (HOPSY_NO_EIGEN_VECTORIZE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DEIGEN_DONT_VECTORIZE")
+endif ()
+
 set(HOPS_LIBRARY_TYPE STATIC CACHE STRING "use header only" FORCE)
 #set(HOPS_LIBRARY_TYPE "HEADER_ONLY")
 set(HOPS_BINARIES OFF)
@@ -18,8 +25,6 @@ add_subdirectory(extern/hops)
 if (CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Wall")
 endif ()
-
-option(HOPSY_TESTS "Enable hopsy tests" OFF)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHOPS_HEADER_ONLY")
 
