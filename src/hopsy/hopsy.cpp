@@ -6,6 +6,7 @@
 
 #include "Utility/Data.hpp"
 #include "hopsy.hpp"
+#include "doc.hpp"
 
 #include <Eigen/Core>
 
@@ -53,6 +54,25 @@ void addProblemClassToModule(py::module& m, const char* name, const char* doc) {
         .def_property("unrounding_transformation", &Problem::getUnroundingTransformation, &Problem::setUnroundingTransformation)
         .def_property("unrounding_shift", &Problem::getUnroundingShift, &Problem::setUnroundingShift)
         ;
+}
+
+template<typename Run, typename Target>
+void addTuningMethodToModule(py::module& m, const char* doc) {
+    m.def("tune", &hopsy::tune<Run, Target>,
+          doc,
+          py::arg("run"),
+          py::arg("target"),
+          py::arg("method") = "ThompsonSampling",
+          py::arg("n_test_samples") = 100,
+          py::arg("n_posterior_updates") = 100,
+          py::arg("n_pure_sampling") = 1,
+          py::arg("n_convergence_threshold") = 5,
+          py::arg("gridsize") = 101,
+          py::arg("lower_grid_bound") = 1e-5,
+          py::arg("upupp_grid_bound") = 1e5,
+          py::arg("smoothing_length") = 0.5,
+          py::arg("random_seed") = 0,
+          py::arg("record_data") = true);
 }
 
 
@@ -395,42 +415,42 @@ PYBIND11_MODULE(_hopsy, m) {
 	m.def("Run", &hopsy::createRun<hopsy::DegenerateMultivariateGaussianModel>, 
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
-                py::arg("proposal_name") = "HitAndRun", 
+                py::arg("proposal") = "HitAndRun", 
                 py::arg("n_samples") = 1000, 
                 py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRun<hopsy::MixtureModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
-                py::arg("proposal_name") = "HitAndRun", 
+                py::arg("proposal") = "HitAndRun", 
                 py::arg("n_samples") = 1000, 
                 py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRun<hopsy::MultivariateGaussianModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
-                py::arg("proposal_name") = "HitAndRun", 
+                py::arg("proposal") = "HitAndRun", 
                 py::arg("n_samples") = 1000, 
                 py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRun<hopsy::PyModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
-                py::arg("proposal_name") = "HitAndRun", 
+                py::arg("proposal") = "HitAndRun", 
                 py::arg("n_samples") = 1000, 
                 py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRun<hopsy::RosenbrockModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
-                py::arg("proposal_name") = "HitAndRun", 
+                py::arg("proposal") = "HitAndRun", 
                 py::arg("n_samples") = 1000, 
                 py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
 	m.def("Run", &hopsy::createRun<hopsy::UniformModel>,
             	R"pbdoc()pbdoc",
             	py::arg("problem"), 
-                py::arg("proposal_name") = "HitAndRun", 
+                py::arg("proposal") = "HitAndRun", 
                 py::arg("n_samples") = 1000, 
                 py::arg("n_chains") = 1, 
                 py::arg("starting_points") = std::vector<Eigen::VectorXd>());
@@ -523,6 +543,75 @@ PYBIND11_MODULE(_hopsy, m) {
 
 
     //  
+    // Run tuning
+    // ==========
+    //
+    //
+
+    py::class_<hopsy::AcceptanceRateTarget>(m, "AcceptanceRateTarget", R"pbdoc()pbdoc")
+        .def(py::init(
+                    [] (double acceptanceRate) { 
+                        hopsy::AcceptanceRateTarget tmp; 
+                        tmp.acceptanceRateTargetValue = acceptanceRate; 
+                        return tmp;
+                    }), 
+            py::arg("acceptance_rate") = .234)
+        .def_readwrite("acceptance_rate", &hopsy::AcceptanceRateTarget::acceptanceRateTargetValue);
+
+    py::class_<hopsy::ExpectedSquaredJumpDistanceTarget>(m, "ExpectedSquaredJumpDistanceTarget", R"pbdoc()pbdoc")
+        .def(py::init(
+                    [] (bool considerTimeCost) { 
+                        hopsy::ExpectedSquaredJumpDistanceTarget tmp; 
+                        tmp.considerTimeCost = considerTimeCost; 
+                        return tmp;
+                    }), 
+            py::arg("consider_time_cost") = false)
+        .def_readwrite("consider_time_cost", &hopsy::ExpectedSquaredJumpDistanceTarget::considerTimeCost);
+
+    addTuningMethodToModule<hopsy::DegenerateMultivariateGaussianRun, hopsy::AcceptanceRateTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::MixtureRun, hopsy::AcceptanceRateTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::MultivariateGaussianRun, hopsy::AcceptanceRateTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::RosenbrockRun, hopsy::AcceptanceRateTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::UniformRun, hopsy::AcceptanceRateTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::PyRun, hopsy::AcceptanceRateTarget>(m, hopsy::doc::tuning);
+
+    addTuningMethodToModule<hopsy::DegenerateMultivariateGaussianPyProposalRun, hopsy::AcceptanceRateTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::MixturePyProposalRun, hopsy::AcceptanceRateTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::MultivariateGaussianPyProposalRun, hopsy::AcceptanceRateTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::RosenbrockPyProposalRun, hopsy::AcceptanceRateTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::UniformPyProposalRun, hopsy::AcceptanceRateTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::PyPyProposalRun, hopsy::AcceptanceRateTarget>(m, hopsy::doc::tuning);
+
+    addTuningMethodToModule<hopsy::DegenerateMultivariateGaussianRun, hopsy::ExpectedSquaredJumpDistanceTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::MixtureRun, hopsy::ExpectedSquaredJumpDistanceTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::MultivariateGaussianRun, hopsy::ExpectedSquaredJumpDistanceTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::RosenbrockRun, hopsy::ExpectedSquaredJumpDistanceTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::UniformRun, hopsy::ExpectedSquaredJumpDistanceTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::PyRun, hopsy::ExpectedSquaredJumpDistanceTarget>(m, hopsy::doc::tuning);
+
+    addTuningMethodToModule<hopsy::DegenerateMultivariateGaussianPyProposalRun, hopsy::ExpectedSquaredJumpDistanceTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::MixturePyProposalRun, hopsy::ExpectedSquaredJumpDistanceTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::MultivariateGaussianPyProposalRun, hopsy::ExpectedSquaredJumpDistanceTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::RosenbrockPyProposalRun, hopsy::ExpectedSquaredJumpDistanceTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::UniformPyProposalRun, hopsy::ExpectedSquaredJumpDistanceTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::PyPyProposalRun, hopsy::ExpectedSquaredJumpDistanceTarget>(m, hopsy::doc::tuning);
+
+    addTuningMethodToModule<hopsy::DegenerateMultivariateGaussianRun, hopsy::PyTuningTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::MixtureRun, hopsy::PyTuningTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::MultivariateGaussianRun, hopsy::PyTuningTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::RosenbrockRun, hopsy::PyTuningTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::UniformRun, hopsy::PyTuningTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::PyRun, hopsy::PyTuningTarget>(m, hopsy::doc::tuning);
+
+    addTuningMethodToModule<hopsy::DegenerateMultivariateGaussianPyProposalRun, hopsy::PyTuningTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::MixturePyProposalRun, hopsy::PyTuningTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::MultivariateGaussianPyProposalRun, hopsy::PyTuningTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::RosenbrockPyProposalRun, hopsy::PyTuningTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::UniformPyProposalRun, hopsy::PyTuningTarget>(m, hopsy::doc::tuning);
+    addTuningMethodToModule<hopsy::PyPyProposalRun, hopsy::PyTuningTarget>(m, hopsy::doc::tuning);
+
+
+    //  
     // Data classes
     // ============
     //
@@ -530,7 +619,7 @@ PYBIND11_MODULE(_hopsy, m) {
     py::class_<hops::Data>(m, "Data",
                 R"pbdoc()pbdoc")
         .def(py::init<>())
-        .def(py::init(&hopsy::constructDataFromSimpleData), py::arg("simple_data"))
+        //.def(py::init(&hopsy::constructDataFromSimpleData), py::arg("simple_data"))
 		.def_property_readonly("n_chains",
                 [] (const hops::Data& self) {
                     return self.chains.size();
@@ -595,8 +684,7 @@ PYBIND11_MODULE(_hopsy, m) {
     using computeStatisticsSignature = Eigen::VectorXd(hops::Data&);
     m.def("compute_acceptance_rate", py::overload_cast<hops::Data&>(
                 (computeStatisticsSignature*)&hops::computeAcceptanceRate),
-				R"pbdoc(
-                Compute the average acceptance rate of the chains in ``data``. 
+				R"pbdoc(Compute the average acceptance rate of the chains in ``data``. 
                 Acceptance rates are returned in an ``m`` x ``1`` column vector, 
                 where ``m`` is the number of chains stored in ``data``.
 
@@ -611,8 +699,7 @@ PYBIND11_MODULE(_hopsy, m) {
                 py::arg("data"));
     m.def("compute_effective_sample_size", py::overload_cast<hops::Data&>(
                 (computeStatisticsSignature*)&hops::computeEffectiveSampleSize),
-				R"pbdoc(
-                Compute the effective sample size of the chains in ``data``. 
+				R"pbdoc(Compute the effective sample size of the chains in ``data``. 
                 The effective sample size is computed for every dimension individually and is then
                 returned in an ``m`` x ``1`` column vector, 
                 where ``m`` is the dimension of the states.
@@ -625,8 +712,7 @@ PYBIND11_MODULE(_hopsy, m) {
     using computeExpectedSquaredJumpDistanceSignature = std::tuple<Eigen::VectorXd, hops::IntermediateExpectedSquaredJumpDistanceResults_>(const hops::Data&, const Eigen::MatrixXd&);
     m.def("compute_expected_squared_jump_distance", py::overload_cast<const hops::Data&, const Eigen::MatrixXd&>(
                 (computeExpectedSquaredJumpDistanceSignature*)&hops::computeExpectedSquaredJumpDistanceIncrementally),
-				R"pbdoc(
-                Compute the expected squared jump distance of the chains in ``data``. 
+				R"pbdoc(Compute the expected squared jump distance of the chains in ``data``. 
                 The expected squared jump distance is computed for every chain individually and is then
                 returned in an ``m`` x ``1`` column vector, 
                 where ``m`` is the number of chains stored in ``data``.
@@ -640,8 +726,7 @@ PYBIND11_MODULE(_hopsy, m) {
             const hops::Data&, const hops::IntermediateExpectedSquaredJumpDistanceResults_&, const Eigen::MatrixXd&);
     m.def("compute_expected_squared_jump_distance", py::overload_cast<const hops::Data&, const hops::IntermediateExpectedSquaredJumpDistanceResults_&, const Eigen::MatrixXd&>(
                 (computeExpectedSquaredJumpDistanceIncrementallySignature*)&hops::computeExpectedSquaredJumpDistanceIncrementally),
-				R"pbdoc(
-                Compute the expected squared jump distance of the chains in ``data``. 
+				R"pbdoc(Compute the expected squared jump distance of the chains in ``data``. 
                 The expected squared jump distance is computed for every chain individually and is then
                 returned in an ``m`` x ``1`` column vector, 
                 where ``m`` is the number of chains stored in ``data``.

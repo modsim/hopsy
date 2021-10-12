@@ -91,6 +91,33 @@ namespace hopsy {
     };
 
 
+    class PyTuningTarget {
+    public:
+        PyTuningTarget() = default;
+
+		PyTuningTarget(py::object pyObj) : pyObj(std::move(pyObj)) {};
+
+        std::tuple<double, double> operator() (const Eigen::VectorXd x) {
+            return pyObj.attr("__call__")(x).cast<std::tuple<double, double>>();
+        }
+
+        std::string getName() {
+            try {
+                return pyObj.attr("get_name")().cast<std::string>();
+            } catch (...) {
+                return "";
+            }
+        }
+
+        std::vector<std::shared_ptr<hops::MarkovChain>> markovChain;
+        std::vector<hops::RandomNumberGenerator>* randomNumberGenerator;
+        unsigned long numberOfTestSamples;
+
+	private:
+		py::object pyObj;
+    };
+
+
     typedef hops::DegenerateMultivariateGaussianModel<Eigen::MatrixXd, Eigen::VectorXd> DegenerateMultivariateGaussianModel;
     typedef hops::DynMultimodalModel<PyModel> MixtureModel;
     typedef hops::MultivariateGaussianModel<Eigen::MatrixXd, Eigen::VectorXd> MultivariateGaussianModel;
@@ -230,19 +257,68 @@ namespace hopsy {
     }
 
 
+    py::dict tuningDataToDict(const hops::TuningData& tuningData) {
+        py::dict dict;
+        dict["method"] = tuningData.method;
+        dict["target"] = tuningData.target;
+        dict["n_samples"] = tuningData.totalNumberOfSamples;
+        dict["n_iterations"] = tuningData.totalNumberOfIterations;
+        dict["tuned_f"] = tuningData.tunedObjectiveValue;
+        dict["time_taken"] = tuningData.totalTimeTaken;
+        dict["data"] = tuningData.data;
+        dict["posterior"] = tuningData.posterior;
+        return dict;
+    }
+
+    template<typename Run, typename Target>
+    std::tuple<Eigen::VectorXd, py::dict> tune(const Run& run, 
+                                               Target& target,
+                                               std::string method,
+                                               size_t numberOfTestSamples,
+                                               size_t posteriorUpdateIterations,
+                                               size_t pureSamplingIterations,
+                                               size_t iterationsForConvergence,
+                                               size_t stepSizeGridSize,
+                                               double stepSizeLowerBound,
+                                               double stepSizeUpperBound,
+                                               double smoothingLength,
+                                               size_t randomSeed,
+                                               bool recordData) {
+        if (method == "ThompsonSampling" || method == "TS") {
+            hops::ThompsonSamplingTuner::param_type parameters{
+                      numberOfTestSamples,
+                      posteriorUpdateIterations,
+                      pureSamplingIterations,
+                      iterationsForConvergence,
+                      stepSizeGridSize,
+                      stepSizeLowerBound,
+                      stepSizeUpperBound,
+                      smoothingLength,
+                      randomSeed,
+                      recordData};
+            auto[tunedParameters, tuningData] = tune(run, parameters, target);
+            return std::make_tuple(tunedParameters, tuningDataToDict(tuningData));
+        } else {
+            throw std::invalid_argument(method + std::string(" does not name a known tuning method."));
+        }
+    }
+
+    using AcceptanceRateTarget = hops::AcceptanceRateTarget<Eigen::VectorXd>;
+    using ExpectedSquaredJumpDistanceTarget = hops::ExpectedSquaredJumpDistanceTarget<Eigen::VectorXd>;
+
     /*
      *
      *  Data __getitem__
      *
      */
 
-    using SimpleData = std::vector<         // chains
-        std::tuple<
-            std::vector<double>,            // acceptance rates
-            std::vector<double>,            // negative log likelihood
-            std::vector<Eigen::VectorXd>,   // states
-            std::vector<long>               // timestamps
-        >>;
+    //using SimpleData = std::vector<         // chains
+    //    std::tuple<
+    //        std::vector<double>,            // acceptance rates
+    //        std::vector<double>,            // negative log likelihood
+    //        std::vector<Eigen::VectorXd>,   // states
+    //        std::vector<long>               // timestamps
+    //    >>;
 
     hops::Data getDataItem (const hops::Data& data, const py::slice& slice) {
         py::ssize_t numberOfChains = static_cast<py::ssize_t>(data.chains.size());
@@ -318,20 +394,20 @@ namespace hopsy {
         return newData;
     }
 
-    hops::Data constructDataFromSimpleData(const SimpleData& simpleData) {
-        hops::Data data;
-        for (const auto& simpleChain : simpleData) {
-            data.chains.push_back(
-                    hops::ChainData(
-                        std::get<0>(simpleChain),
-                        std::get<1>(simpleChain),
-                        std::get<2>(simpleChain),
-                        std::get<3>(simpleChain)
-                    )
-                );
-        }
-        return data;
-    }
+    //hops::Data constructDataFromSimpleData(const SimpleData& simpleData) {
+    //    hops::Data data;
+    //    for (const auto& simpleChain : simpleData) {
+    //        data.chains.push_back(
+    //                hops::ChainData(
+    //                    std::get<0>(simpleChain),
+    //                    std::get<1>(simpleChain),
+    //                    std::get<2>(simpleChain),
+    //                    std::get<3>(simpleChain)
+    //                )
+    //            );
+    //    }
+    //    return data;
+    //}
 } // namespace hopsy
 
 #endif // HOPSY_HPP
