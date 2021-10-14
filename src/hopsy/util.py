@@ -5,7 +5,7 @@ import hopsy._hopsy
 
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.cm
+import matplotlib.cm 
 
 from sklearn.neighbors import KernelDensity
 from sklearn.mixture import GaussianMixture
@@ -119,7 +119,7 @@ def scatterplot(data,
         rows, cols = len(axs), len(axs[0])
 
     # hack to save an if statement since int(True) == 1 and int(False) == 0
-    colors = [cm.tab10(int((distinguish_chains) * i) % 10) for i in range(number_of_chains)]
+    colors = [matplotlib.cm.tab10(int((distinguish_chains) * i) % 10) for i in range(number_of_chains)]
     alpha = np.max([1./len(states[0]), 1./255]) # apperantly minimal valid alpha
 
     if "alpha" not in kwargs:
