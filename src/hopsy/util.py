@@ -242,8 +242,8 @@ def jointplot(data,
         for j in range(1, cols-i):
             off_diag_axs[i].append(axs[i][j])
 
-    diag_plot(data, fig, [diag_axs], distinguish_chains, dims, **kwargs)
-    off_diag_plot(data, fig, off_diag_axs, distinguish_chains, dims, **kwargs)
+    diag_plot(data, fig, [diag_axs], distinguish_chains, dims, cm, **kwargs)
+    off_diag_plot(data, fig, off_diag_axs, distinguish_chains, dims, cm, **kwargs)
 
     return fig, axs
 
