@@ -560,11 +560,28 @@ PYBIND11_MODULE(_hopsy, m) {
 
     py::class_<hopsy::ExpectedSquaredJumpDistanceTarget>(m, "ExpectedSquaredJumpDistanceTarget", R"pbdoc()pbdoc")
         .def(py::init(
-                    [] (bool considerTimeCost) { 
+                    [] (unsigned long lags, bool considerTimeCost) { 
                         hopsy::ExpectedSquaredJumpDistanceTarget tmp; 
+                        std::vector<unsigned long> _lags;
+
+                        for (unsigned long i = 0; i < lags; ++i) {
+                            _lags.push_back(i);
+                        }
+
+                        tmp.lags = _lags;
                         tmp.considerTimeCost = considerTimeCost; 
                         return tmp;
                     }), 
+            py::arg("lags") = 1,
+            py::arg("consider_time_cost") = false)
+        .def(py::init(
+                    [] (std::vector<unsigned long> lags, bool considerTimeCost) { 
+                        hopsy::ExpectedSquaredJumpDistanceTarget tmp; 
+                        tmp.lags = lags;
+                        tmp.considerTimeCost = considerTimeCost; 
+                        return tmp;
+                    }), 
+            py::arg("lags") = std::vector<unsigned long>{1},
             py::arg("consider_time_cost") = false)
         .def_readwrite("consider_time_cost", &hopsy::ExpectedSquaredJumpDistanceTarget::considerTimeCost);
 
