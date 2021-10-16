@@ -11,6 +11,7 @@
 #include "../../extern/hops/include/hops/hops.hpp"
 #include "hopsy_linprog.hpp"
 
+#include <stdexcept>
 #include <string>
 #include <tuple>
 
@@ -180,7 +181,9 @@ namespace hopsy {
 			chainType = hops::MarkovChainType::Gaussian;
 		} else if (chainTypeString == "HitAndRun" || chainTypeString == "HR") {
 			chainType = hops::MarkovChainType::HitAndRun;
-		}
+		} else {
+            throw std::invalid_argument("Proposal algorithm not known.");
+        }
 
         // initialize missing starting points with chebyshev center
         if (startingPoints.size() < numberOfChains) {
@@ -304,7 +307,7 @@ namespace hopsy {
     }
 
     using AcceptanceRateTarget = hops::AcceptanceRateTarget<Eigen::VectorXd>;
-    using ExpectedSquaredJumpDistanceTarget = hops::ExpectedSquaredJumpDistanceTarget<Eigen::VectorXd>;
+    using ExpectedSquaredJumpDistanceTarget = hops::ExpectedSquaredJumpDistanceTarget<Eigen::VectorXd, Eigen::MatrixXd>;
 
     /*
      *
