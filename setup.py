@@ -127,6 +127,9 @@ setup(
     package_dir={"": "src"},
     install_requires=[
         'PolyRound',
+        'numpy',
+        'matplotlib',
+        'scikit-learn',
     ],
     zip_safe=False,
 )
