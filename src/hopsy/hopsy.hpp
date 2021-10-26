@@ -120,31 +120,35 @@ namespace hopsy {
 
 
     typedef hops::DegenerateMultivariateGaussianModel<Eigen::MatrixXd, Eigen::VectorXd> DegenerateMultivariateGaussianModel;
+    typedef hops::DynMultimodalModel<DegenerateMultivariateGaussianModel> GaussianMixtureModel;
     typedef hops::DynMultimodalModel<PyModel> MixtureModel;
-    typedef hops::MultivariateGaussianModel<Eigen::MatrixXd, Eigen::VectorXd> MultivariateGaussianModel;
+    //typedef hops::MultivariateGaussianModel<Eigen::MatrixXd, Eigen::VectorXd> MultivariateGaussianModel;
     typedef hops::RosenbrockModel<Eigen::MatrixXd, Eigen::VectorXd> RosenbrockModel;
     typedef hops::UniformDummyModel<Eigen::MatrixXd, Eigen::VectorXd> UniformModel;
 
     typedef hops::Problem<DegenerateMultivariateGaussianModel> DegenerateMultivariateGaussianProblem;
+    typedef hops::Problem<GaussianMixtureModel> GaussianMixtureProblem;
     typedef hops::Problem<MixtureModel> MixtureProblem;
-    typedef hops::Problem<MultivariateGaussianModel> MultivariateGaussianProblem;
+    //typedef hops::Problem<MultivariateGaussianModel> MultivariateGaussianProblem;
+    typedef hops::Problem<PyModel> PyProblem;
     typedef hops::Problem<RosenbrockModel> RosenbrockProblem;
     typedef hops::Problem<UniformModel> UniformProblem;
-    typedef hops::Problem<PyModel> PyProblem;
 
 	typedef hops::Run<DegenerateMultivariateGaussianModel> DegenerateMultivariateGaussianRun;
+    typedef hops::Run<GaussianMixtureModel> GaussianMixtureRun;
     typedef hops::Run<MixtureModel> MixtureRun;
-    typedef hops::Run<MultivariateGaussianModel> MultivariateGaussianRun;
+    //typedef hops::Run<MultivariateGaussianModel> MultivariateGaussianRun;
+    typedef hops::Run<PyModel> PyRun;
     typedef hops::Run<RosenbrockModel> RosenbrockRun;
     typedef hops::Run<UniformModel> UniformRun;
-    typedef hops::Run<PyModel> PyRun;
 
 	typedef hops::RunBase<DegenerateMultivariateGaussianModel, PyProposal> DegenerateMultivariateGaussianPyProposalRun;
+    typedef hops::RunBase<GaussianMixtureModel, PyProposal> GaussianMixturePyProposalRun;
     typedef hops::RunBase<MixtureModel, PyProposal> MixturePyProposalRun;
-    typedef hops::RunBase<MultivariateGaussianModel, PyProposal> MultivariateGaussianPyProposalRun;
+    //typedef hops::RunBase<MultivariateGaussianModel, PyProposal> MultivariateGaussianPyProposalRun;
+    typedef hops::RunBase<PyModel, PyProposal> PyPyProposalRun;
     typedef hops::RunBase<RosenbrockModel, PyProposal> RosenbrockPyProposalRun;
     typedef hops::RunBase<UniformModel, PyProposal> UniformPyProposalRun;
-    typedef hops::RunBase<PyModel, PyProposal> PyPyProposalRun;
 
 
 	hops::Problem<UniformModel> createUniformProblem(const Eigen::MatrixXd& A, const Eigen::VectorXd& b) {
@@ -167,7 +171,14 @@ namespace hopsy {
                            std::string chainTypeString = "HitAndRun", 
                            unsigned long numberOfSamples = 1000, 
                            unsigned long numberOfChains = 1,
-                           std::vector<Eigen::VectorXd> startingPoints = std::vector<Eigen::VectorXd>()) {
+                           std::vector<Eigen::VectorXd> startingPoints = std::vector<Eigen::VectorXd>(),
+                           unsigned long thinning = 1,
+                           double stepSize = 1,
+                           double fisherWeight = 0.5,
+                           unsigned long randomSeed = 0,
+                           bool sampleUntilConvergence = false,
+                           double diagnosticsThreshold = 1.05,
+                           unsigned long maxRepetitions = 10) {
 		hops::MarkovChainType chainType;
 		if (chainTypeString == "AdaptiveMetropolis" || chainTypeString == "AM") {
 			chainType = hops::MarkovChainType::BallWalk;
@@ -195,6 +206,14 @@ namespace hopsy {
 
         auto run = hops::Run<T>(t, chainType, numberOfSamples, numberOfChains);
         run.setStartingPoints(startingPoints);
+        run.setStartingPoints(startingPoints);
+        run.setThinning(thinning);
+        run.setStepSize(stepSize);
+        run.setFisherWeight(fisherWeight);
+        run.setRandomSeed(randomSeed);
+        run.setSamplingUntilConvergence(sampleUntilConvergence);
+        run.setConvergenceThreshold(diagnosticsThreshold);
+        run.setMaxRepetitions(maxRepetitions);
         return run;
 	}
 
@@ -203,7 +222,14 @@ namespace hopsy {
                                                          PyProposal proposal, 
                                                          unsigned long numberOfSamples = 1000, 
                                                          unsigned long numberOfChains = 1,
-                                                         std::vector<Eigen::VectorXd> startingPoints = std::vector<Eigen::VectorXd>()) {
+                                                         std::vector<Eigen::VectorXd> startingPoints = std::vector<Eigen::VectorXd>(),
+                                                         unsigned long thinning = 1,
+                                                         double stepSize = 1,
+                                                         double fisherWeight = 0.5,
+                                                         unsigned long randomSeed = 0,
+                                                         bool sampleUntilConvergence = false,
+                                                         double diagnosticsThreshold = 1.05,
+                                                         unsigned long maxRepetitions = 10) {
         // initialize missing starting points with chebyshev center
         if (startingPoints.size() < numberOfChains) {
             Eigen::VectorXd chebyshevCenter = computeChebyshevCenter(t);
@@ -214,6 +240,13 @@ namespace hopsy {
 
         auto run = hops::RunBase<T, PyProposal>(t, proposal, numberOfSamples, numberOfChains);
         run.setStartingPoints(startingPoints);
+        run.setThinning(thinning);
+        run.setStepSize(stepSize);
+        run.setFisherWeight(fisherWeight);
+        run.setRandomSeed(randomSeed);
+        run.setSamplingUntilConvergence(sampleUntilConvergence);
+        run.setConvergenceThreshold(diagnosticsThreshold);
+        run.setMaxRepetitions(maxRepetitions);
         return run;
 	}
 
@@ -223,8 +256,26 @@ namespace hopsy {
                                                        py::object pyObj, 
                                                        unsigned long numberOfSamples = 1000, 
                                                        unsigned long numberOfChains = 1,
-                                                       std::vector<Eigen::VectorXd> startingPoints = std::vector<Eigen::VectorXd>()) {
-        return createRunFromPyProposal(t, PyProposal(pyObj), numberOfSamples, numberOfChains, startingPoints);
+                                                       std::vector<Eigen::VectorXd> startingPoints = std::vector<Eigen::VectorXd>(),
+                                                       unsigned long thinning = 1,
+                                                       double stepSize = 1,
+                                                       double fisherWeight = 0.5,
+                                                       unsigned long randomSeed = 0,
+                                                       bool sampleUntilConvergence = false,
+                                                       double diagnosticsThreshold = 1.05,
+                                                       unsigned long maxRepetitions = 10) {
+        return createRunFromPyProposal(t, 
+                                       PyProposal(pyObj), 
+                                       numberOfSamples, 
+                                       numberOfChains, 
+                                       startingPoints, 
+                                       thinning, 
+                                       stepSize, 
+                                       fisherWeight, 
+                                       randomSeed, 
+                                       sampleUntilConvergence, 
+                                       diagnosticsThreshold, 
+                                       maxRepetitions);
 	}
 
     std::pair<Eigen::MatrixXd, Eigen::VectorXd> addBoxConstraintsToMatrixVector(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::VectorXd& lowerBounds, const Eigen::VectorXd& upperBounds) {
