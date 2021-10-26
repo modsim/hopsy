@@ -151,7 +151,6 @@ Miscellaneous functions
 Possible Problem-types
 ~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: DegenerateMultivariateGaussianProblem
 .. autoclass:: MixtureProblem
 .. autoclass:: MultivariateGaussianProblem
 .. autoclass:: PyProblem

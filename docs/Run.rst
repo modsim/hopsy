@@ -5,7 +5,7 @@ Run
    Further, they provide methods to control the sampling process. 
    Note, that there does not actually exist a class ``hopsy.Run``. 
    Instead there exists a number of ``hopsy.Run``-classes, which all share the same methods, but are in fact different instantiations of
-   the hops template class ``hopsy.Run``.
+   the C++ template class ``hopsy::Run``.
 
    The ``hopsy.Run()`` method, which aims to simulate the look and feel of a constructor, which automatically deduces the correct template
    parameters, acts as a factory for the different ``hopsy.Run`` classes. 
@@ -178,7 +178,6 @@ Reference
 Possible Run-types
 ~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: DegenerateMultivariateGaussianRun
 .. autoclass:: MixtureRun
 .. autoclass:: MultivariateGaussianRun
 .. autoclass:: PyRun

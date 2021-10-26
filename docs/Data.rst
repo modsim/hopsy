@@ -8,7 +8,6 @@ Reference
 .. currentmodule:: hopsy
 
 .. autoclass:: Data
-.. autoclass:: ChainData
 
 .. autofunction:: compute_acceptance_rate
 .. autofunction:: compute_effective_sample_size
