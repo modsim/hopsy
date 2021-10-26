@@ -13,6 +13,8 @@ if (HOPSY_NO_EIGEN_VECTORIZE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DEIGEN_DONT_VECTORIZE")
 endif ()
 
+set(VERSION_INFO "")
+
 set(HOPS_LIBRARY_TYPE STATIC CACHE STRING "use header only" FORCE)
 #set(HOPS_LIBRARY_TYPE "HEADER_ONLY")
 set(HOPS_BINARIES OFF)
@@ -44,7 +46,7 @@ add_subdirectory(extern/pybind11)
 #    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/src/hopsy"
 #)
 
-pybind11_add_module(_hopsy src/hopsy/hopsy.cpp)
+pybind11_add_module(_hopsy src/hopsy/hopsy.cpp src/hopsy/doc.cpp)
 
 #target_compile_options(hopsy PUBLIC "-DHOPS_HEADER_ONLY")
 
