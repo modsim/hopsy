@@ -103,6 +103,7 @@ def scatterplot(data,
                 axs = None,
                 distinguish_chains = False,
                 dims = None,
+                cm = matplotlib.cm.tab10,
                 **kwargs):
     states = np.array(data.states)
     dim = len(states[0,0]) if dims is None else len(dims)
@@ -119,7 +120,7 @@ def scatterplot(data,
         rows, cols = len(axs), len(axs[0])
 
     # hack to save an if statement since int(True) == 1 and int(False) == 0
-    colors = [matplotlib.cm.tab10(int((distinguish_chains) * i) % 10) for i in range(number_of_chains)]
+    colors = [cm(int((distinguish_chains) * i) % 10) for i in range(number_of_chains)]
     alpha = np.max([1./len(states[0]), 1./255]) # apperantly minimal valid alpha
 
     if "alpha" not in kwargs:
@@ -172,8 +173,8 @@ def scatterdensityplot(data,
                        axs = None, 
                        distinguish_chains = False, 
                        dims = None, 
-                       density_estimator = kde,
                        cm = matplotlib.cm.tab10,
+                       density_estimator = kde,
                        **kwargs):
         fig, axs = scatterplot(data, fig, axs, distinguish_chains, dims, cm, **kwargs)
         fig, axs = densityplot(data, fig, axs, distinguish_chains, dims, density_estimator, cm, **kwargs)
