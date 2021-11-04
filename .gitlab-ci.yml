@@ -1,8 +1,8 @@
-image: ubuntu:20.04
+#image: ubuntu:20.04
+image: python:latest
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
-
 
 stages:
   - build
@@ -10,8 +10,10 @@ stages:
 
 build-release:
   stage: build
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq cmake
   script:
-    - python setup.py bdist_wheel
+    - python3 setup.py bdist_wheel
   artifacts:
     paths:
       - dist
@@ -20,5 +22,5 @@ build-release:
 test-release:
   stage: test
   script:
-    - python -m pip install dist/hopsy* && python -m hopsy.test
+    - python3 -m pip install dist/hopsy* && python3 -m hopsy.test
   # TODO add test-reports
