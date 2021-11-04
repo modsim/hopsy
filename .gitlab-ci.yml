@@ -11,7 +11,7 @@ stages:
 build-release:
   stage: build
   before_script:
-    - apt-get update -qq && apt-get install -y -qq cmake
+    - apt-get update -qq && apt-get install -y -qq cmake ninja-build
   script:
     - python3 setup.py bdist_wheel
   artifacts:
