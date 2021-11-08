@@ -298,4 +298,11 @@ texinfo_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {'python': (
+    'https://docs.python.org/3', None),
+    'matplotlib': ('https://matplotlib.org/stable/', None),
+    'ipyparallel': ('https://ipyparallel.readthedocs.io/en/latest/', None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
+    'pagmo': ('https://esa.github.io/pagmo2/', None),
+    'scipy': ('https://docs.scipy.org/doc/scipy/', None),
+    'networkx': ('https://networkx.org/documentation/stable/', None)}

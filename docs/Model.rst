@@ -11,15 +11,15 @@ the model forms a ``hopsy.Problem``.
 
 The simple models provided are 
 
-* ``hopsy.DegenerateMultivariateGaussian``: A multivariate Gaussian with invariant dimensions, meaning it ignores some dimensions of the input vector. This is interesting for simulating non-identifiabilities.
+* :class:`hopsy.GaussianMixture``: A mixture Gaussian model, which is a weighted linear combination of multivariate Gaussians.
 
-* ``hopsy.MixtureModel``: A mixture Gaussian model, which is a weighted linear combination of multivariate Gaussians.
+* :class:`hopsy.Mixture``: A mixture model, which is a weighted linear combination of arbitrary model components.
 
-* ``hopsy.MultivariateGaussian``: A multivariate Gaussian, consisting of mean vector and covariance matrix.
+* :class:`hopsy.MultivariateGaussian`: A multivariate Gaussian which can also have invariant dimensions, meaning it ignores some dimensions of the input vector. This is interesting for simulating non-identifiabilities.
 
-* ``hopsy.Rosenbrock``: Rosenbrock's banana function, a popular test function for computational optimization.
+* :class:`hopsy.Rosenbrock``: Rosenbrock's banana function, a popular test function for computational optimization.
 
-* ``hopsy.Uniform``: The uniform distribution on the Polytope :math:`\mathcal{P}`
+* :class:`hopsy.Uniform``: The uniform distribution on the Polytope :math:`\mathcal{P}`
 
 
 Custom Python models
@@ -97,14 +97,14 @@ Reference
 
 .. currentmodule:: hopsy
 
-.. autoclass:: GaussianMixtureModel
+.. autoclass:: GaussianMixture
 
    .. automethod:: __init__
    .. automethod:: compute_negative_log_likelihood
    .. automethod:: compute_log_likelihood_gradient
    .. automethod:: compute_expected_fisher_information
 
-.. autoclass:: MixtureModel
+.. autoclass:: Mixture
 
    .. automethod:: __init__
    .. automethod:: compute_negative_log_likelihood

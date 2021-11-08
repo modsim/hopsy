@@ -178,9 +178,10 @@ Reference
 Possible Run-types
 ~~~~~~~~~~~~~~~~~~
 
+.. autoclass:: GaussianMixtureRun
 .. autoclass:: MixtureRun
 .. autoclass:: MultivariateGaussianRun
-.. autoclass:: PyRun
+.. autoclass:: PyModelRun
 .. autoclass:: RosenbrockRun
 .. autoclass:: UniformRun
 
