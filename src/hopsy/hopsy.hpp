@@ -151,18 +151,44 @@ namespace hopsy {
     typedef hops::RunBase<UniformModel, PyProposal> UniformPyProposalRun;
 
 
-	hops::Problem<UniformModel> createUniformProblem(const Eigen::MatrixXd& A, const Eigen::VectorXd& b) {
-		return hops::Problem<UniformModel>(A, b);
+	hops::Problem<UniformModel> createUniformProblem(const Eigen::MatrixXd& A, 
+                                                     const Eigen::VectorXd& b,
+                                                     const Eigen::VectorXd& startingPoint,
+                                                     const Eigen::MatrixXd& unroundingTransformation,
+                                                     const Eigen::VectorXd& unroundingShift) {
+        hops::Problem<UniformModel> problem(A, b);
+        problem.setStartingPoint(startingPoint);
+        problem.setUnroundingTransformation(unroundingTransformation);
+        problem.setUnroundingShift(unroundingShift);
+        return problem;
 	}
 
-	hops::Problem<PyModel> createPyProblem(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, py::object& pyObj) {
-		return hops::Problem<PyModel>(A, b, PyModel(pyObj));
+	hops::Problem<PyModel> createPyProblem(const Eigen::MatrixXd& A, 
+                                           const Eigen::VectorXd& b, 
+                                           py::object& pyObj,
+                                           const Eigen::VectorXd& startingPoint,
+                                           const Eigen::MatrixXd& unroundingTransformation,
+                                           const Eigen::VectorXd& unroundingShift) {
+        hops::Problem<PyModel> problem(A, b, PyModel(pyObj));
+        problem.setStartingPoint(startingPoint);
+        problem.setUnroundingTransformation(unroundingTransformation);
+        problem.setUnroundingShift(unroundingShift);
+        return problem;
 	}
 
 
 	template<typename T>
-	hops::Problem<T> createProblem(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const T& t) {
-		return hops::Problem<T>(A, b, t);
+	hops::Problem<T> createProblem(const Eigen::MatrixXd& A, 
+                                   const Eigen::VectorXd& b, 
+                                   const T& t, 
+                                   const Eigen::VectorXd& startingPoint,
+                                   const Eigen::MatrixXd& unroundingTransformation,
+                                   const Eigen::VectorXd& unroundingShift) {
+        hops::Problem<T> problem(A, b, t);
+        problem.setStartingPoint(startingPoint);
+        problem.setUnroundingTransformation(unroundingTransformation);
+        problem.setUnroundingShift(unroundingShift);
+        return problem;
 	}
 
 

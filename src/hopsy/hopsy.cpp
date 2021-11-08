@@ -208,7 +208,7 @@ PYBIND11_MODULE(_hopsy, m) {
                 py::arg("x"))
         ;
 
-    py::class_<hopsy::GaussianMixtureModel>(m, "GaussianMixtureModel",
+    py::class_<hopsy::GaussianMixtureModel>(m, "GaussianMixture",
 				hopsy::doc::GaussianMixtureModel::base)
         .def(py::init<std::vector<hopsy::DegenerateMultivariateGaussianModel>>(),
                 hopsy::doc::GaussianMixtureModel::__init__,
@@ -226,7 +226,7 @@ PYBIND11_MODULE(_hopsy, m) {
                 hopsy::doc::GaussianMixtureModel::computeExpectedFisherInformation,
                 py::arg("x"));
 
-    py::class_<hopsy::MixtureModel>(m, "MixtureModel",
+    py::class_<hopsy::MixtureModel>(m, "Mixture",
 				hopsy::doc::MixtureModel::base)
         .def(py::init<std::vector<hopsy::PyModel>>(),
                 hopsy::doc::MixtureModel::__init__,
@@ -326,7 +326,7 @@ PYBIND11_MODULE(_hopsy, m) {
     //            hopsy::doc::Problem::base);
 
     addProblemClassToModule<hopsy::PyModel, hopsy::PyProblem>(
-                m, "PyProblem", 
+                m, "PyModelProblem", 
                 hopsy::doc::Problem::base);
 
     addProblemClassToModule<hopsy::RosenbrockModel, hopsy::RosenbrockProblem>(
@@ -387,66 +387,62 @@ PYBIND11_MODULE(_hopsy, m) {
     // simulates a general problem constructor which then statically checks the passed model
     // type and returns the correctly instantiated problem object
     //
-	//m.def("Problem", &hopsy::createProblem<hopsy::DegenerateMultivariateGaussianModel>,
-    //            R"pbdoc()pbdoc",
-    //            py::arg("A"),
-    //            py::arg("b"),
-    //            py::arg("model"),
-    //            py::arg("starting_point") = Eigen::VectorXd(0, 0),
-    //            py::arg("unrounding_transformation") = Eigen::MatrixXd(0, 0),
-    //            py::arg("unrounding_shift") = Eigen::VectorXd(0, 0));
-	//m.def("Problem", &hopsy::createProblem<hopsy::MixtureModel>,
-    //            R"pbdoc()pbdoc",
-    //            py::arg("A"),
-    //            py::arg("b"),
-    //            py::arg("model"),
-    //            py::arg("starting_point") = Eigen::VectorXd(0, 0),
-    //            py::arg("unrounding_transformation") = Eigen::MatrixXd(0, 0),
-    //            py::arg("unrounding_shift") = Eigen::VectorXd(0, 0));
+	m.def("Problem", &hopsy::createProblem<hopsy::DegenerateMultivariateGaussianModel>,
+                hopsy::doc::Problem::__init__,
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"),
+                py::arg("starting_point") = Eigen::VectorXd(0),
+                py::arg("transformation") = Eigen::MatrixXd(0, 0),
+                py::arg("shift") = Eigen::VectorXd(0));
+	m.def("Problem", &hopsy::createProblem<hopsy::MixtureModel>,
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"),
+                py::arg("starting_point") = Eigen::VectorXd(0),
+                py::arg("transformation") = Eigen::MatrixXd(0, 0),
+                py::arg("shift") = Eigen::VectorXd(0));
 	//m.def("Problem", &hopsy::createProblem<hopsy::MultivariateGaussianModel>,
-    //            R"pbdoc()pbdoc",
     //            py::arg("A"),
     //            py::arg("b"),
     //            py::arg("model"),
-    //            py::arg("starting_point") = Eigen::VectorXd(0, 0),
-    //            py::arg("unrounding_transformation") = Eigen::MatrixXd(0, 0),
-    //            py::arg("unrounding_shift") = Eigen::VectorXd(0, 0));
-	//m.def("Problem", &hopsy::createProblem<hopsy::PyModel>,
-    //            R"pbdoc()pbdoc",
-    //            py::arg("A"),
-    //            py::arg("b"),
-    //            py::arg("model"),
-    //            py::arg("starting_point") = Eigen::VectorXd(0, 0),
-    //            py::arg("unrounding_transformation") = Eigen::MatrixXd(0, 0),
-    //            py::arg("unrounding_shift") = Eigen::VectorXd(0, 0));
-	//m.def("Problem", &hopsy::createProblem<hopsy::RosenbrockModel>,
-    //            R"pbdoc()pbdoc",
-    //            py::arg("A"),
-    //            py::arg("b"),
-    //            py::arg("model"),
-    //            py::arg("starting_point") = Eigen::VectorXd(0, 0),
-    //            py::arg("unrounding_transformation") = Eigen::MatrixXd(0, 0),
-    //            py::arg("unrounding_shift") = Eigen::VectorXd(0, 0));
-	//m.def("Problem", &hopsy::createProblem<hopsy::UniformModel>,
-    //            R"pbdoc()pbdoc",
-    //            py::arg("A"),
-    //            py::arg("b"),
-    //            py::arg("model"),
-    //            py::arg("starting_point") = Eigen::VectorXd(0, 0),
-    //            py::arg("unrounding_transformation") = Eigen::MatrixXd(0, 0),
-    //            py::arg("unrounding_shift") = Eigen::VectorXd(0, 0));
-	//m.def("Problem", &hopsy::createUniformProblem,
-    //            R"pbdoc()pbdoc",
-    //            py::arg("A"),
-    //            py::arg("b"));
-	//m.def("Problem", &hopsy::createPyProblem,
-    //            R"pbdoc()pbdoc",
-    //            py::arg("A"),
-    //            py::arg("b"),
-    //            py::arg("model"),
-    //            py::arg("starting_point") = Eigen::VectorXd(0, 0),
-    //            py::arg("unrounding_transformation") = Eigen::MatrixXd(0, 0),
-    //            py::arg("unrounding_shift") = Eigen::VectorXd(0, 0));
+    //            py::arg("starting_point") = Eigen::VectorXd(0),
+    //            py::arg("transformation") = Eigen::MatrixXd(0, 0),
+    //            py::arg("shift") = Eigen::VectorXd(0));
+	m.def("Problem", &hopsy::createProblem<hopsy::PyModel>,
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"),
+                py::arg("starting_point") = Eigen::VectorXd(0),
+                py::arg("transformation") = Eigen::MatrixXd(0, 0),
+                py::arg("shift") = Eigen::VectorXd(0));
+	m.def("Problem", &hopsy::createProblem<hopsy::RosenbrockModel>,
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"),
+                py::arg("starting_point") = Eigen::VectorXd(0),
+                py::arg("transformation") = Eigen::MatrixXd(0, 0),
+                py::arg("shift") = Eigen::VectorXd(0));
+	m.def("Problem", &hopsy::createProblem<hopsy::UniformModel>,
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"),
+                py::arg("starting_point") = Eigen::VectorXd(0),
+                py::arg("transformation") = Eigen::MatrixXd(0, 0),
+                py::arg("shift") = Eigen::VectorXd(0));
+	m.def("Problem", &hopsy::createUniformProblem,
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("starting_point") = Eigen::VectorXd(0),
+                py::arg("transformation") = Eigen::MatrixXd(0, 0),
+                py::arg("shift") = Eigen::VectorXd(0));
+	m.def("Problem", &hopsy::createPyProblem,
+                py::arg("A"),
+                py::arg("b"),
+                py::arg("model"),
+                py::arg("starting_point") = Eigen::VectorXd(0),
+                py::arg("transformation") = Eigen::MatrixXd(0, 0),
+                py::arg("shift") = Eigen::VectorXd(0));
 
 
     //
@@ -611,7 +607,7 @@ PYBIND11_MODULE(_hopsy, m) {
     //            m, "MultivariateGaussianRun",
     //            hopsy::doc::Run::base);
     addRunClassToModule<hopsy::PyProblem, hopsy::PyRun>(
-                m, "PyRun",
+                m, "PyModelRun",
                 hopsy::doc::Run::base);
     addRunClassToModule<hopsy::RosenbrockProblem, hopsy::RosenbrockRun>(
                 m, "RosenbrockRun",
@@ -633,7 +629,7 @@ PYBIND11_MODULE(_hopsy, m) {
     //            m, "MultivariateGaussianPyProposalRun",
     //            hopsy::doc::Run::base);
     addRunClassToModule<hopsy::PyProblem, hopsy::PyPyProposalRun>(
-                m, "PyPyProposalRun",
+                m, "PyModelPyProposalRun",
                 hopsy::doc::Run::base);
     addRunClassToModule<hopsy::RosenbrockProblem, hopsy::RosenbrockPyProposalRun>(
                 m, "RosenbrockPyProposalRun",
@@ -658,7 +654,7 @@ PYBIND11_MODULE(_hopsy, m) {
     //overloadCreateRun<hopsy::MultivariateGaussianModel>(m);
     overloadCreateRun<hopsy::PyModel>(m);
     overloadCreateRun<hopsy::RosenbrockModel>(m);
-    overloadCreateRun<hopsy::UniformRun>(m);
+    overloadCreateRun<hopsy::UniformModel>(m);
 
     overloadCreateRunFromPyProposal<hopsy::DegenerateMultivariateGaussianModel>(m);
     overloadCreateRunFromPyProposal<hopsy::GaussianMixtureModel>(m);
@@ -666,7 +662,7 @@ PYBIND11_MODULE(_hopsy, m) {
     //overloadCreateRunFromPyProposal<hopsy::MultivariateGaussianModel>(m);
     overloadCreateRunFromPyProposal<hopsy::PyModel>(m);
     overloadCreateRunFromPyProposal<hopsy::RosenbrockModel>(m);
-    overloadCreateRunFromPyProposal<hopsy::UniformRun>(m);
+    overloadCreateRunFromPyProposal<hopsy::UniformModel>(m);
 
     overloadCreateRunFromPyObject<hopsy::DegenerateMultivariateGaussianModel>(m);
     overloadCreateRunFromPyObject<hopsy::GaussianMixtureModel>(m);
@@ -674,7 +670,7 @@ PYBIND11_MODULE(_hopsy, m) {
     //overloadCreateRunFromPyObject<hopsy::MultivariateGaussianModel>(m);
     overloadCreateRunFromPyObject<hopsy::PyModel>(m);
     overloadCreateRunFromPyObject<hopsy::RosenbrockModel>(m);
-    overloadCreateRunFromPyObject<hopsy::UniformRun>(m);
+    overloadCreateRunFromPyObject<hopsy::UniformModel>(m);
 
 	//m.def("Run", &hopsy::createRunFromPyProposal<hopsy::DegenerateMultivariateGaussianModel>, 
     //        	R"pbdoc()pbdoc",

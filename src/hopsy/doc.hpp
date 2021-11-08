@@ -5,6 +5,8 @@
 
 namespace hopsy {
     namespace doc {
+        extern const char* numberOfThreads;
+
         namespace DegenerateMultivariateGaussianModel {
             extern const char* base;
             extern const char* __init__;
@@ -72,7 +74,7 @@ namespace hopsy {
             extern const char* unroundingShift;
         }
 
-        extern const char* addBoxConstraints;
+        extern const char* addBoxConstraintsToProblem;
         extern const char* computeChebyshevCenter;
         extern const char* round;
 

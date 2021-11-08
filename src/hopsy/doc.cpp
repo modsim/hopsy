@@ -1,5 +1,7 @@
 #include "doc.hpp"
 
+const char* hopsy::doc::numberOfThreads = R"pbdoc()pbdoc";
+
 /*
  *  DegenerateMultivariateGaussianModel
  */
@@ -96,8 +98,8 @@ given as
 .. math::
   f(x) = \sum_{i=1}^n w_i f_i(x)
 
-The components have to be of type ``hopsy.MultivariateGaussian``. If you want to use arbitrary component types, consider using 
-``hopsy.MixtureModel``.
+The components have to be of type :class:`hopsy.MultivariateGaussian`. If you want to use arbitrary component types, consider using 
+:class:`hopsy.MixtureModel`.
 
 **Methods:**
 
@@ -157,9 +159,9 @@ given as
 .. math::
   f(x) = \sum_{i=1}^n w_i f_i(x)
 
-The components may be arbitrary python objects implementing the methods as required in a ``hopsy.PyModel``
-If you plan to use ``hopsy.MultivariateGaussian`` as component type, consider using 
-``hopsy.GaussianMixtureModel`` for performance reasons.
+The components may be arbitrary python objects implementing the methods as required in a :class:`hopsy.PyModel`
+If you plan to use :class:`hopsy.MultivariateGaussian` as component type, consider using 
+:class:`hopsy.GaussianMixtureModel` for performance reasons.
 
 **Methods:**
 
@@ -370,7 +372,7 @@ const char* hopsy::doc::RosenbrockModel::computeExpectedFisherInformation = R"pb
  */
 
 const char* hopsy::doc::UniformModel::base = R"pbdoc(
-The ``hopsy.UniformModel`` defines the uniform target distribution on the polytope
+The :class:`hopsy.UniformModel` defines the uniform target distribution on the polytope
 
 .. math::
    \pi(x) := \frac{1}{Z} \mathbf{1}_{\mathcal{P}}(x)
@@ -385,7 +387,7 @@ thus if the polytope is bounded in all dimensions. So for example, :math:`A = 1`
 define the the inequality :math:`Ax = x \leq 0 = b` which defines the negative real line. This can be
 seen as an unbounded one-dimensional polytope and the uniform distribution is thus not well defined on it.
 
-To prevent your polytope from being unbounded, you can use ``hopsy.add_box_constraints`` to add box constraints,
+To prevent your polytope from being unbounded, you can use :class:`hopsy.add_box_constraints` to add box constraints,
 that guarantee your polytope to be bounded. For more details, please refer :doc:`here<Problem>`.
 
 **Methods:**
@@ -454,43 +456,106 @@ const char* hopsy::doc::Problem::base = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::Problem::__init__ = R"pbdoc(
+const char* hopsy::doc::Problem::__init__ = R"pbdoc(Problem(A, b, model = hopsy.Uniform(), starting_point = numpy.ndarray[shape[0]], transformation = numpy.ndarray[shape[0,0]], shift = numpy.ndarray[shape[0]])
+
+Creates a Problem object of appropriate type using the passed ``model``. The actual return type depends on the type of ``model``. 
+If ``model`` is an arbitrary python object, it will be wrapped inside :class:`hopsy.PyModel`, 
+which works as an interface between HOPS and any Python-implemented model class. 
+Any calls from within HOPS to the model will be delegated by calling the appropriate Python function. 
+
+:param numpy.ndarray[shape[m,n]] A: the left-hand side of the polytope inequality :math:`Ax \leq b`.
+
+:param numpy.ndarray[shape[m,1]] b: the right-hand side of the polytope inequality :math:`Ax \leq b`
+
+:param object model: defines the target distribution and may be any Python object. 
+:param numpy.ndarray[shape[n,1]] starting_point: the starting point. 
+
+:param numpy.ndarray[shape[n,n]] transformation: the matrix :math:`T` in a linear transformation :math:`Tx + h`.
+
+:param numpy.ndarray[shape[n,1]] shift: the vector :math:`h` in a linear transformation :math:`Tx + h`.
+
+:return:
+:rtype:
 )pbdoc";
 
 
-const char* hopsy::doc::Problem::A = R"pbdoc(
+const char* hopsy::doc::Problem::A = R"pbdoc(numpy.ndarray[shape[m,n]]: Left-hand side operator :math:`A` of the polytope-defining inequality :math:`Ax \leq b`. ``A`` has ``m`` rows and ``n`` columns, defining ``m`` constraints in a ``n``-dimensional space.
 )pbdoc";
 
 
-const char* hopsy::doc::Problem::b = R"pbdoc(
+const char* hopsy::doc::Problem::b = R"pbdoc(numpy.ndarray[shape[m,1]]: Right-hand side of the polytope-defining inequality :math:`Ax \leq b`. Note that ``b`` has to match the matrix ``A`` in the number of rows (=constraints).
 )pbdoc";
 
 
-const char* hopsy::doc::Problem::model = R"pbdoc(
+const char* hopsy::doc::Problem::model = R"pbdoc(object: The ``model`` object defines the target distribution inside the polytope via its :meth:`compute_negative_log_likelihood`. If no model is passed, then a uniform target on the polytope will be assumed. **Note that a uniform distribution on a polytope is only defined for bounded polytopes.**
 )pbdoc";
 
 
-const char* hopsy::doc::Problem::startingPoint = R"pbdoc(
+const char* hopsy::doc::Problem::startingPoint = R"pbdoc(numpy.ndarray[float64[n,1]]: A single starting point as part of the problem. Since the asymptotic behaviour of a (well-defined) Markov chain is independent of the starting distribution, the starting points are usually rather considered part of the chain than part of the problem. However, for particular problems, where one wishes to fix the starting point, this field can be used. If no starting point is passed, it will be initialized as an empty vector.
 )pbdoc";
 
 
-const char* hopsy::doc::Problem::unroundingTransformation = R"pbdoc(
+const char* hopsy::doc::Problem::unroundingTransformation = R"pbdoc(numpy.ndarray[float64[n,n]]: For preconditioning (e.g. polytope rounding) one may wish to transform the polytope defined by :math:`Ax \leq b` as :math:`ATy \leq b - As` where `x = Ty + s`. If a non-zero sized ``transformation`` is passed, then it will be used as the matrix :math:`T` to transform all recorded states :math:`x` as `x = Ty`. The matrix ``A`` will be assumed to be the left-hand side operator of the already transformed problem.
 )pbdoc";
 
 
-const char* hopsy::doc::Problem::unroundingShift = R"pbdoc(
+const char* hopsy::doc::Problem::unroundingShift = R"pbdoc(numpy.ndarray[float64[n,1]]: For preconditioning (e.g. polytope rounding) one may wish to transform the polytope defined by :math:`Ax \leq b` as :math:`ATy \leq b - As` where `x = Ty + s`. If a non-zero sized ``shift`` is passed, then it will be used as the vector :math:`s` to transform all recorded states :math:`x` as `x = y + s`. The vector ``b`` will be assumed to be the right-hand side of the already transformed problem.
 )pbdoc";
 
 
-const char* hopsy::doc::addBoxConstraints = R"pbdoc(
+/*
+ *  Problem helper
+ */
+
+const char* hopsy::doc::addBoxConstraintsToProblem = R"pbdoc(add_box_constraints(problem, lower_bound, upper_bound)
+
+Adds box constraints to all dimensions. This will extend :attr:`hopsy.UniformProblem.A` and :attr:`hopsy.UniformProblem.A` of the returned :class:`hopsy.Problem` to have :math:`m+2n` rows.
+Box constraints are added naively, meaning that we do neither check whether the dimension may be already 
+somehow bound nor check whether the very same constraint already exists. You can remove unnecessary constraints
+efficiently using the PolyRound\ [#f1]_ toolbox or by using the :func:`hopsy.round` function, which however will also round
+the polytope.
+
+If ``lower_bound`` and ``upper_bound`` are both ``float``, then every dimension :math:`i` will be bound as 
+:math:`lb \leq x_i \leq ub`. If `lower_bound`` and ``upper_bound`` are both ``numpy.ndarray`` with 
+appropriate length, then every dimension :math:`i` will be bound as :math:`lb_i \leq x_i \leq ub_i`.
+
+:param hopsy.Problem problem: Problem which should be constrained and which contains the matrix :math:`A` and vector :math:`b` in :math:`Ax \leq b`.
+
+:param lower_bound: Specifies the lower bound(s). 
+:type lower_bound: numpy.ndarray[float64[n,1]] or float
+
+:param upper_bound: Specifies the upper bound(s). 
+:type upper_bound: numpy.ndarray[float64[n,1]] or float
+
+:return: A :class:`hopsy.Problem` bounded in all dimensions.
+:rtype: hopsy.Problem
 )pbdoc";
 
 
-const char* hopsy::doc::computeChebyshevCenter = R"pbdoc(
+const char* hopsy::doc::computeChebyshevCenter = R"pbdoc(compute_chebyshev_center(problem)
+
+Computes the Chebyshev center, that is the midpoint of a (non-unique) largest inscribed ball in the polytope defined by :math:`Ax \leq b`. 
+
+:param hopsy.Problem problem: Problem for which the Chebyshev center should be computed and which contains the matrix :math:`A` and vector :math:`b` in :math:`Ax \leq b`.
+
+:return: The Chebyshev center of the passed problem.
+:rtype: numpy.ndarray[float64[n,1]]
 )pbdoc";
 
 
-const char* hopsy::doc::round = R"pbdoc(
+const char* hopsy::doc::round = R"pbdoc(round(problem)
+
+Rounds the polytope defined by the inequality :math:`Ax \leq b` using PolyRound\ [#f1]_. 
+This also strips unnecessary constraints, that is constraints, which can never be active.
+The unrounding transformation :math:`T` and shift :math:`s` will be stored in :attr:`hopsy.UniformProblem.transformation`
+and :attr:`hopsy.UniformProblem.shift` of the returned problem. Its left-hand side operator :attr:`hopsy.UniformProblem.A` and 
+the right-hand side :attr:`hopsy.UniformProblem.b` of the polytope will be transformed as :math:``
+inequality
+
+:param hopsy.Problem problem: Problem that should be rounded and which contains the matrix :math:`A` and vector :math:`b` in :math:`Ax \leq b`.
+
+:return: The rounded problem.
+:rtype: hopsy.Problem
 )pbdoc";
 
 
@@ -679,23 +744,59 @@ const char* hopsy::doc::Data::__getitem__ = R"pbdoc(
  *  Statistics
  */
 
-const char* computeAcceptanceRate = R"pbdoc(
+const char* hopsy::doc::computeAcceptanceRate = R"pbdoc(compute_acceptance_rate(data, sqrt_covariance = numpy.ndarray[float[0, 0]])
+
+Compute the average acceptance rate of the chains in ``data``. 
+Acceptance rates are returned in an ``m`` x ``1`` column vector, 
+where ``m`` is the number of chains stored in ``data``.
+
+The acceptance rate is
+actually also logged after every chain iteration and stored in the ChainData,
+but this initializes the acceptance_rate field inside the Data object and thus
+allows to discard the samples.
+
 )pbdoc";
 
 
-const char* computeEffectiveSampleSize = R"pbdoc(
+const char* hopsy::doc::computeEffectiveSampleSize = R"pbdoc(compute_effective_sample_size(data)
+
+Compute the effective sample size of the chains in ``data``. 
+The effective sample size is computed for every dimension individually and is then
+returned in an ``m`` x ``1`` column vector, 
+where ``m`` is the dimension of the states.
+
 )pbdoc";
 
 
-const char* computeExpectedSquaredJumpDistance = R"pbdoc(
+const char* hopsy::doc::computeExpectedSquaredJumpDistance = R"pbdoc(compute_expected_squared_jump_distance(data)
+
+Compute the expected squared jump distance of the chains in ``data``. 
+The expected squared jump distance is computed for every chain individually and is then
+returned in an ``m`` x ``1`` column vector, 
+where ``m`` is the number of chains stored in ``data``.
 )pbdoc";
 
 
-const char* computePotentialScaleReductionFactor = R"pbdoc(
+const char* hopsy::doc::computePotentialScaleReductionFactor = R"pbdoc(compute_potential_scale_reduction_factor(data)
+
+Compute the potential scale reduction factor (also known as R-hat) 
+of the chains in ``data``. 
+The potential scale reduction factor is computed for every dimension individually and is then
+returned in an ``m`` x ``1`` column vector, 
+where ``m`` is the dimension of the states.
 )pbdoc";
 
 
-const char* computeTotalTimeTaken = R"pbdoc(
+const char* hopsy::doc::computeTotalTimeTaken = R"pbdoc(compute_total_time_taken(data)
+
+Compute the total time taken of the chains in ``data``. 
+Times are returned in an ``m`` x ``1`` column vector, 
+where ``m`` is the number of chains stored in ``data``.
+
+Timestamps are actually also logged after every chain iteration and stored in the ChainData,
+so this function just takes the difference of the last and first timestamp.
+It also initializes the total_time_taken field inside the Data object and thus
+allows to discard the samples.
 )pbdoc";
 
 
