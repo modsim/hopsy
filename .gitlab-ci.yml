@@ -1,54 +1,14 @@
 #image: ubuntu:20.04
 image: python:latest
 
-#variables:
- # GIT_SUBMODULE_STRATEGY: recursive
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
 
 stages:
-  - run_on_windows_with_artifact_gen
   - build
   - test
 
-  yml_embedded_script_on_windows:
-  stage: run_on_windows_with_artifact_gen
-  # There is no image: tag because Windows shared runners are shell runners
-  # These tags are only required for targeting shared Windows runners on GitLab.com, remove for self-hosted private runners
-  tags:  
-  - shared-windows
-  - windows
-  - windows-1809
-
-  variables:
-    SCENARIO: "*** SCENARIO: Run inline .gitlab-ci.yml PowerShell code on a Windows Shell runner"
-
-  script:
-    - |
-      Write-Host "$SCENARIO"
-      If ((!(Test-Path variable:IsWindows)) -OR ($IsWindows)) {
-        #IsWindows does not exist in Windows PowerShell (first check above) and is $True on PowerShell Core / 7 on Windows (second check above)
-        $CurrentUser = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent())
-        $IsAdmin = $CurrentUser.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-        write-host "This session has elevated Administrator rights => $IsAdmin"
-        write-host "Elevated admin is ok because this virtual machine is only ever used for one job and tossed - like a container."
-      } else {
-        write-host "Not running on Windows."
-      }
-      write-host "This script is inline in the .gitlab-ci.yml"
-      write-host "When shell code runs on Windows from an inline script, the default scripting language is PowerShell"      
-      write-host "Running in project $env:CI_PROJECT_NAME with results at $env:CI_JOB_URL ($env:CI_JOB_URL)."
-      write-host "PowerShell Version Details:"
-      $PSVersiontable      
-      write-host "GitLab CI Variables are always propagated to PowerShell as environment variables and ONLY FOR the default PowerShell shell they are also propagated to regular PowerShell variables."
-      write-host "Listing all PowerShell variables:"
-      dir variable: | format-table Name,Value
-      write-host "Listing all Environment variables:"
-      dir env: | format-table Name,Value
-      set-content -path myartifactfile.txt -value "This artifact was built on PowerShell for Windows in a job named yml_embedded_script_on_windows"
-
-
 build-release:
-  tags:
-    - sonic
   stage: build
   before_script:
     - apt-get update -qq && apt-get install -y -qq cmake ninja-build
@@ -60,8 +20,6 @@ build-release:
     expire_in: 7 days
 
 test-release:
-  tags:
-    - sonic
   stage: test
   script:
     - python3 -m pip install dist/hopsy* && python3 -m hopsy.test
