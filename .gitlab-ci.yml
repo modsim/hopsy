@@ -9,6 +9,8 @@ stages:
   - test
 
 build-release:
+  tags:
+    - sonic
   stage: build
   before_script:
     - apt-get update -qq && apt-get install -y -qq cmake ninja-build
@@ -20,6 +22,8 @@ build-release:
     expire_in: 7 days
 
 test-release:
+  tags:
+    - sonic
   stage: test
   script:
     - python3 -m pip install dist/hopsy* && python3 -m hopsy.test
