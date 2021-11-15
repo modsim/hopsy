@@ -13,7 +13,9 @@ build-release:
   tags:
     - sonic
   before_script:
-    - apt-get update -qq && apt-get install -y -qq cmake ninja-build
+    #- apt-get update -qq && apt-get install -y -qq cmake ninja-build
+    - apt-get update
+    - apt-get install -y -qq cmake ninja-build
   script:
     - python3 setup.py bdist_wheel
   artifacts:
