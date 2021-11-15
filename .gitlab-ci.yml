@@ -14,6 +14,7 @@ build-release:
     - sonic
   before_script:
     #- apt-get update -qq && apt-get install -y -qq cmake ninja-build
+    - ubuntu2004
     - apt-get update
     - apt-get install -y -qq cmake ninja-build
   script:
