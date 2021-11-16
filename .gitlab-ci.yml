@@ -1,5 +1,5 @@
-#image: ubuntu:20.04 
-image: python:latest
+image: ubuntu:20.04 
+#image: python:latest
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
@@ -13,7 +13,7 @@ build-release:
   tags:
     - docker_test
   before_script:
-    - apt-get update -qq && apt-get install -y -qq cmake ninja-build
+    - apt-get update -qq && apt-get install -y -qq cmake ninja-build python3 python3-pip
   script:
     - python3 setup.py bdist_wheel
   artifacts:
