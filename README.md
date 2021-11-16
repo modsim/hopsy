@@ -1,3 +1,6 @@
+ [![pipeline status](https://jugit.fz-juelich.de/fluxomics/hopsy/badges/master/pipeline.svg)](https://jugit.fz-juelich.de/fluxomics/hopsy/-/commits/master) 
+  [![coverage report](https://jugit.fz-juelich.de/fluxomics/hopsy/badges/master/coverage.svg)](https://jugit.fz-juelich.de/fluxomics/hopsy/-/commits/master) 
+
 # HOPSY - Python bindings for HOPS
 
 A python interface for HOPS - the **H**ighly **O**ptimized toolbox for **P**olytope **S**ampling.
