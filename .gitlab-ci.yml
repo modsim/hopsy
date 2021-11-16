@@ -11,7 +11,7 @@ stages:
 build-release:
   stage: build
   tags:
-    - sonic
+    - docker_test
   before_script:
     - apt-get update -qq && apt-get install -y -qq cmake ninja-build
   script:
@@ -24,7 +24,7 @@ build-release:
 test-release:
   stage: test
   tags:
-    - sonic
+    - docker_test
   script:
     - python3 -m pip install dist/hopsy* && python3 -m hopsy.test
   # TODO add test-reports
