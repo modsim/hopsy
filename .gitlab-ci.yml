@@ -26,7 +26,7 @@ test-release:
   tags:
     - docker_test
   before_script:
-    - apt-get install libhdf5-serial-dev
+    - apt-get update && apt-get install libhdf5-serial-dev
   script:
     - python3 -m pip install dist/hopsy* && python3 -m hopsy.test
   # TODO add test-reports
