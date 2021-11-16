@@ -13,7 +13,7 @@ build-release:
   tags:
     - docker_test
   before_script:
-    - apt-get update -qq && apt-get install -y -qq cmake ninja-build python3 python3-pip
+    - apt-get update -qq && DEBIAN_FRONTED=noninteractive apt-get install -y -qq cmake ninja-build python3 python3-pip
   script:
     - python3 setup.py bdist_wheel
   artifacts:
