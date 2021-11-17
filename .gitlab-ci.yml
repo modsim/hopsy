@@ -6,6 +6,7 @@ variables:
 
 stages:
   - build
+  - install
   - test
 
 build-release:
@@ -21,14 +22,25 @@ build-release:
       - dist
     expire_in: 7 days
 
+install-release:
+  stage: install
+  tags:
+    - docker_test
+  #before_script:
+  #  - apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cmake ninja-build python3 python3-pip
+    - apt-get update && apt-get install -y libhdf5-serial-dev
+  script:
+    - python3 -m pip install dist/hopsy*
+  # TODO add test-reports
+
 test-release:
   stage: test
   tags:
     - docker_test
   before_script:
-    - apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cmake ninja-build python3 python3-pip
-    - apt-get update && apt-get install -y libhdf5-serial-dev
+  #  - apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cmake ninja-build python3 python3-pip
+  #  - apt-get update && apt-get install -y libhdf5-serial-dev
   script:
-    - python3 -m pip install dist/hopsy* && python3 -m hopsy.test
+    - python3 -m hopsy.test
   # TODO add test-reports
 
