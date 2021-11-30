@@ -1,15 +1,20 @@
-image: ubuntu:20.04
+image: ubuntu:20.04 
+#image: python:latest
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
-
 stages:
   - build
+  - install
   - test
 
 build-release:
   stage: build
+  tags:
+    - server
+  before_script:
+    - apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cmake ninja-build python3 python3-pip
   script:
     - python3 setup.py bdist_wheel
   artifacts:
@@ -17,8 +22,23 @@ build-release:
       - dist
     expire_in: 7 days
 
+install-release:
+  stage: install
+  tags:
+    - server
+  before_script:
+    - apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3 python3-pip libhdf5-serial-dev
+  script:
+    - python3 -m pip install dist/hopsy*
+
 test-release:
   stage: test
+  tags:
+    - server
+  before_script:
+    - apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3 python3-pip
+    - python3 -m pip install dist/hopsy*
   script:
-    - python3 -m pip install dist/hopsy* && python3 -m hopsy.test
+    - python3 -m hopsy.test
   # TODO add test-reports
+
