@@ -3,10 +3,30 @@
 const char* hopsy::doc::numberOfThreads = R"pbdoc()pbdoc";
 
 /*
+ *  Model
+ */
+
+const char* hopsy::doc::Model::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Model::__init__ = R"pbdoc()pbdoc";
+
+
+const char* hopsy::doc::Model::computeNegativeLogLikelihood = R"pbdoc()pbdoc";
+
+
+const char* hopsy::doc::Model::computeLogLikelihoodGradient = R"pbdoc()pbdoc";
+
+
+const char* hopsy::doc::Model::computeExpectedFisherInformation = R"pbdoc()pbdoc";
+        
+
+/*
  *  DegenerateMultivariateGaussianModel
  */
 
-const char* hopsy::doc::DegenerateMultivariateGaussianModel::base = R"pbdoc(
+const char* hopsy::doc::DegenerateGaussian::base = R"pbdoc(
 A degenerate multivariate Gaussian model is a Gaussian model which is invariant in some dimensions of the
 input vector. As an example, consider the one-dimensional squared exponential as a function of two input 
 variables
@@ -28,9 +48,9 @@ unlike a standard multivariate Gaussian model, this model will still (and only) 
 )pbdoc";
 
 
-const char* hopsy::doc::DegenerateMultivariateGaussianModel::__init__ = R"pbdoc(__init__(self, mean, covariance, inactives)
+const char* hopsy::doc::DegenerateGaussian::__init__ = R"pbdoc(__init__(self, mean, covariance, inactives)
 
-Constructs a ``DegenerateMultivariateGaussianModel`` with given mean and covariance and `deactivates` 
+Constructs a ``DegenerateGaussian`` with given mean and covariance and `deactivates` 
 all dimensions specified in ``inactives``. This works by removing the corresponding rows and columns
 from the mean and covariance. 
 
@@ -47,7 +67,7 @@ Passing an empty list as ``inactives`` will actually define a standard multivari
 )pbdoc";
 
 
-const char* hopsy::doc::DegenerateMultivariateGaussianModel::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
+const char* hopsy::doc::DegenerateGaussian::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
 
 Computes the negative logarithm of the probability density function of a multivariate Gaussian model in 
 :math:`m-k` dimensions at ``x``. Note that `x` still has to have dimension :math:`n`.
@@ -60,7 +80,7 @@ Computes the negative logarithm of the probability density function of a multiva
 )pbdoc";
 
 
-const char* hopsy::doc::DegenerateMultivariateGaussianModel::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
+const char* hopsy::doc::DegenerateGaussian::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
 
 Computes the gradient of the logarithm of the probability density function of a multivariate Gaussian 
 model in :math:`n-k` dimensions at ``x``. Note that `x` still has to have dimension :math:`n`.
@@ -73,7 +93,7 @@ model in :math:`n-k` dimensions at ``x``. Note that `x` still has to have dimens
 )pbdoc";
 
 
-const char* hopsy::doc::DegenerateMultivariateGaussianModel::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
+const char* hopsy::doc::DegenerateGaussian::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
 
 Computes the expected fisher information of a multivariate Gaussian model 
 in :math:`n-k` dimensions at ``x``. This turns out to be just the reduced covariance matrix. 
@@ -152,8 +172,8 @@ const char* hopsy::doc::GaussianMixtureModel::computeExpectedFisherInformation =
  *  MixtureModel
  */
 
-const char* hopsy::doc::MixtureModel::base = R"pbdoc(
-The ``MixtureModel`` is a weighted sum of :math:`n` components, so its unnormalized density is
+const char* hopsy::doc::Mixture::base = R"pbdoc(
+The ``Mixture`` is a weighted sum of :math:`n` components, so its unnormalized density is
 given as
 
 .. math::
@@ -161,16 +181,16 @@ given as
 
 The components may be arbitrary python objects implementing the methods as required in a :class:`hopsy.PyModel`
 If you plan to use :class:`hopsy.MultivariateGaussian` as component type, consider using 
-:class:`hopsy.GaussianMixtureModel` for performance reasons.
+:class:`hopsy.GaussianMixture` for performance reasons.
 
 **Methods:**
 
 )pbdoc";
         
 
-const char* hopsy::doc::MixtureModel::__init__ = R"pbdoc(__init__(self, components, weights = [1, ..., 1])
+const char* hopsy::doc::Mixture::__init__ = R"pbdoc(__init__(self, components, weights = [1, ..., 1])
 
-Construct a ``MixtureModel`` as weighted sum over the elements from ``components``.
+Construct a ``Mixture`` as weighted sum over the elements from ``components``.
 
 :param components: Model components
 :type components: list[object] 
@@ -180,7 +200,7 @@ Construct a ``MixtureModel`` as weighted sum over the elements from ``components
 )pbdoc";
         
 
-const char* hopsy::doc::MixtureModel::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
+const char* hopsy::doc::Mixture::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[n,1]]
@@ -190,7 +210,7 @@ const char* hopsy::doc::MixtureModel::computeNegativeLogLikelihood = R"pbdoc(com
 )pbdoc";
         
 
-const char* hopsy::doc::MixtureModel::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
+const char* hopsy::doc::Mixture::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[n,1]]
@@ -200,7 +220,7 @@ const char* hopsy::doc::MixtureModel::computeLogLikelihoodGradient = R"pbdoc(com
 )pbdoc";
         
 
-const char* hopsy::doc::MixtureModel::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
+const char* hopsy::doc::Mixture::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[n,1]]
@@ -318,15 +338,15 @@ const char* hopsy::doc::PyModel::computeExpectedFisherInformation = R"pbdoc(comp
         
 
 /*
- *  RosenbrockModel
+ *  Rosenbrock
  */
 
-const char* hopsy::doc::RosenbrockModel::base = R"pbdoc(
+const char* hopsy::doc::Rosenbrock::base = R"pbdoc(
 **Methods:**
 )pbdoc";
         
 
-const char* hopsy::doc::RosenbrockModel::__init__ = R"pbdoc(__init__(self, scale = 1, shift = [0])
+const char* hopsy::doc::Rosenbrock::__init__ = R"pbdoc(__init__(self, scale = 1, shift = [0])
 
 :param scale: 
 :type scale: float
@@ -336,7 +356,7 @@ const char* hopsy::doc::RosenbrockModel::__init__ = R"pbdoc(__init__(self, scale
 )pbdoc";
         
 
-const char* hopsy::doc::RosenbrockModel::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
+const char* hopsy::doc::Rosenbrock::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[n,1]]
@@ -346,7 +366,7 @@ const char* hopsy::doc::RosenbrockModel::computeNegativeLogLikelihood = R"pbdoc(
 )pbdoc";
         
 
-const char* hopsy::doc::RosenbrockModel::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
+const char* hopsy::doc::Rosenbrock::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[n,1]]
@@ -356,7 +376,7 @@ const char* hopsy::doc::RosenbrockModel::computeLogLikelihoodGradient = R"pbdoc(
 )pbdoc";
         
 
-const char* hopsy::doc::RosenbrockModel::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
+const char* hopsy::doc::Rosenbrock::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[n,1]]

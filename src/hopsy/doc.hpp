@@ -7,7 +7,15 @@ namespace hopsy {
     namespace doc {
         extern const char* numberOfThreads;
 
-        namespace DegenerateMultivariateGaussianModel {
+        namespace Model {
+            extern const char* base;
+            extern const char* __init__;
+            extern const char* computeNegativeLogLikelihood;
+            extern const char* computeLogLikelihoodGradient;
+            extern const char* computeExpectedFisherInformation;
+        }
+
+        namespace DegenerateGaussian {
             extern const char* base;
             extern const char* __init__;
             extern const char* computeNegativeLogLikelihood;
@@ -23,7 +31,7 @@ namespace hopsy {
             extern const char* computeExpectedFisherInformation;
         }
 
-        namespace MixtureModel {
+        namespace Mixture {
             extern const char* base;
             extern const char* __init__;
             extern const char* computeNegativeLogLikelihood;
@@ -47,7 +55,7 @@ namespace hopsy {
             extern const char* computeExpectedFisherInformation;
         }
 
-        namespace RosenbrockModel {
+        namespace Rosenbrock {
             extern const char* base;
             extern const char* __init__;
             extern const char* computeNegativeLogLikelihood;
