@@ -76,9 +76,6 @@ namespace hopsy {
 
     class PyModel : public Model {
 	public:
-        using MatrixType = MatrixType;
-        using VectorType = VectorType;
-
 		PyModel(py::object pyObj) : pyObj(std::move(pyObj)) {};
 
 		double computeNegativeLogLikelihood(const VectorType& x) const override {
