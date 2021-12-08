@@ -64,6 +64,26 @@ To compile wheels for distribution via the Python Package Index (pypi.org), use 
 * Ninja or Pip 10+
 * Docker (optional, for building wheels)
 
+### Installation with pip install on windows
+1. download Python 3.8.0 
+2. open Powershell
+3. `cd "C:\Users\<username>\AppData\Local\Programs\Python\Python38"`
+4. check if directory contains python.exe --> `ls`
+5. `python.exe -m pip install -i https://test.pypi.org/simple/  hopsy==0.2.0`  
+    --> if an error occurs, run commands 6-10:
+6. `./python.exe -m pip install h5py`
+7. `./python.exe -m pip install cobra`
+8. `./python.exe -m pip install scipy`
+9. `./python.exe -m pip install numexpr`
+10. `./python.exe -m pip install -i https://test.pypi.org/simple/  hopsy==0.2.0`
+11. run the python interpreter: `./python.exe`
+12. `import hopsy`
+13. `hopsy.Problem`
+14. if hopsy has been successfully installed, the output should look like this:  
+    \>>> import hopsy  
+    \>>>hopsy.Problem  
+    \<built-in method Problem of PyCapsule object at 0x00000197AB46E7E0> 
+
 
 ## License
 
