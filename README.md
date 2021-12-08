@@ -65,7 +65,9 @@ To compile wheels for distribution via the Python Package Index (pypi.org), use 
 * Docker (optional, for building wheels)
 
 ### Installation with pip install on windows
-1. download Python 3.8.0 
+
+1. download Python 3.8.0   
+**After that, you can either run the provided powershell script install_hopsy.ps1 or you can complete the following instructions manually:** 
 2. open Powershell
 3. `cd "C:\Users\<username>\AppData\Local\Programs\Python\Python38"`
 4. check if directory contains python.exe --> `ls`
@@ -83,7 +85,6 @@ To compile wheels for distribution via the Python Package Index (pypi.org), use 
     \>>> import hopsy  
     \>>>hopsy.Problem  
     \<built-in method Problem of PyCapsule object at 0x00000197AB46E7E0> 
-
 
 ## License
 
