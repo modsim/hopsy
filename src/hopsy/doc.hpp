@@ -7,13 +7,13 @@ namespace hopsy {
     namespace doc {
         extern const char* numberOfThreads;
 
-        namespace Model {
-            extern const char* base;
-            extern const char* __init__;
-            extern const char* computeNegativeLogLikelihood;
-            extern const char* computeLogLikelihoodGradient;
-            extern const char* computeExpectedFisherInformation;
-        }
+        struct Model {
+            static const char* base;
+            static const char* __init__;
+            static const char* computeNegativeLogLikelihood;
+            static const char* computeLogLikelihoodGradient;
+            static const char* computeExpectedFisherInformation;
+        };
 
         namespace DegenerateGaussian {
             extern const char* base;

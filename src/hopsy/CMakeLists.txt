@@ -1,1 +1,1 @@
-pybind11_add_module(_hopsy hopsy.cpp)
+pybind11_add_module(core hopsy.cpp doc.cpp)

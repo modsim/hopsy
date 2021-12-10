@@ -1,4 +1,4 @@
-from . _hopsy import *
+from . core import *
 
 import numpy as np
 import pandas as pd
@@ -8,24 +8,24 @@ from PolyRound.mutable_classes import polytope as prp
 
 from tqdm.auto import tqdm
 
-class Problem:
-    def __init__(self, A, b, model = None, starting_point = None, transformation = None, shift = None):
-        self.A = np.array(A)
-        self.b = np.array(b)
-        self.model = model
-        self.starting_point = np.array(starting_point) if starting_point is not None else None
-        self.transformation = np.array(transformation) if transformation is not None else None
-        self.shift = np.array(shift) if shift is not None else None
-
-
-    def __repr__(self):
-        return "Problem(A=" + self.A.__repr__() + ", " + \
-               "b=" + self.b.__repr__() + ", " + \
-               "model=" + self.model.__repr__() + ", " + \
-               "starting_point=" + self.starting_point.__repr__() + ", " + \
-               "transformation=" + self.transformation.__repr__() + ", " + \
-               "shift=" + self.shift.__repr__() + \
-               ")" 
+#class Problem:
+#    def __init__(self, A, b, model = None, starting_point = None, transformation = None, shift = None):
+#        self.A = np.array(A)
+#        self.b = np.array(b)
+#        self.model = model
+#        self.starting_point = np.array(starting_point) if starting_point is not None else None
+#        self.transformation = np.array(transformation) if transformation is not None else None
+#        self.shift = np.array(shift) if shift is not None else None
+#
+#
+#    def __repr__(self):
+#        return "Problem(A=" + self.A.__repr__() + ", " + \
+#               "b=" + self.b.__repr__() + ", " + \
+#               "model=" + self.model.__repr__() + ", " + \
+#               "starting_point=" + self.starting_point.__repr__() + ", " + \
+#               "transformation=" + self.transformation.__repr__() + ", " + \
+#               "shift=" + self.shift.__repr__() + \
+#               ")" 
 
 
 def add_box_constraints(problem, lower_bound, upper_bound, simplify = True):
@@ -150,34 +150,4 @@ class Sampler:
         self.states = np.array(states)
         return self.states
 
-
-class MarkovChain:
-    def __init__(self, proposal, model, starting_point):
-        self.proposal_dist = proposal
-        self.model = model
-        self.state = starting_point
-        self.state_negative_log_likelihood = model.compute_negative_log_likelihood(self.state) if model is not None else 0
-        self.uniform = Uniform(0, 1)
-
-
-    def draw(self, rng, thinning = 1):
-        for i in range(thinning):
-            proposal_log_acceptance_p, proposal = self.proposal_dist.propose(rng)
-
-            # if the proposal dist knows the negative log likelihood, use it, otherwise compute it 
-            proposal_negative_log_likelihood = self.proposal_dist.get_negative_log_likelihood()
-
-            if proposal_negative_log_likelihood == 0:
-                if self.model is None:
-                    proposal_negative_log_likelihood = 0
-                else:
-                    proposal_negative_log_likelihood = model.compute_negative_log_likelihood(proposal)
-
-            log_acceptance_p = self.state_negative_log_likelihood - proposal_negative_log_likelihood + proposal_log_acceptance_p
-
-            if np.log(self.uniform(rng)) < log_acceptance_p:
-                self.state = proposal
-                self.state_negative_log_likelihood = proposal_negative_log_likelihood
-
-        return self.state
 
