@@ -15,9 +15,9 @@
 
 #include "../../extern/hops/src/hops/hops.hpp"
 
-#include "hops/MarkovChain/Proposal/ProposalParameter.hpp"
 #include "misc.hpp"
 #include "model.hpp"
+#include "problem.hpp"
 #include "random.hpp"
 
 namespace py = pybind11;
@@ -282,9 +282,7 @@ namespace hopsy {
 
     class ProposalWrapper : public Proposal {
     public:
-		ProposalWrapper(const Proposal* proposal) {
-            //proposalPtr = dynamic_cast<Proposal*>(proposal->copyProposal().release());
-            //proposalPtr = proposal;
+		ProposalWrapper(const std::shared_ptr<Proposal> proposal) {
             proposalPtr = std::move(proposal->copyProposal());
         }
 
@@ -502,7 +500,7 @@ namespace hopsy {
     };
 
     using AdaptiveMetropolisProposal = UninitializedProposalWrapper<
-            hops::AdaptiveMetropolisProposal<MatrixType, VectorType>, double, double, long>;
+            hops::AdaptiveMetropolisProposal<MatrixType, VectorType>, MatrixType, double, double, unsigned long>;
     using BallWalkProposal = UninitializedProposalWrapper<
             hops::BallWalkProposal<MatrixType, VectorType>, double>;
     using CSmMALAProposal = UninitializedProposalWrapper<
@@ -600,15 +598,36 @@ namespace hopsy {
         // constructor
         adaptiveMetropolisProposal
             .def(py::init<>()) 
-            .def(py::init(&AdaptiveMetropolisProposal::createFromProblem), 
+            .def(py::init([] (const Problem* problem,
+                              double stepSize,
+                              double boundaryCushion,
+                              double eps,
+                              unsigned long warmUp) {
+                        MatrixType sqrtMve = computeSqrtMaximumVolumeEllipsoid(*problem);
+                        auto proposal = AdaptiveMetropolisProposal::createFromProblem(problem, sqrtMve, stepSize, eps, warmUp);
+                        proposal.setParameter(ProposalParameter::BOUNDARY_CUSHION, boundaryCushion);
+                        return proposal;
+                }),
                 py::arg("problem"),
                 py::arg("stepsize") = 1, 
+                py::arg("boundary_cushion") = 0,
                 py::arg("eps") = 1.e-3, 
                 py::arg("warm_up") = 100)
-            .def(py::init(&AdaptiveMetropolisProposal::create), 
+            .def(py::init([] (const Problem* problem,
+                              const VectorType* startingPoint,
+                              double stepSize,
+                              double boundaryCushion,
+                              double eps,
+                              unsigned long warmUp) {
+                        MatrixType sqrtMve = computeSqrtMaximumVolumeEllipsoid(*problem);
+                        auto proposal = AdaptiveMetropolisProposal::create(problem, startingPoint, sqrtMve, stepSize, eps, warmUp);
+                        proposal.setParameter(ProposalParameter::BOUNDARY_CUSHION, boundaryCushion);
+                        return proposal;
+                }),
                 py::arg("problem"),
                 py::arg("starting_point") = py::none(), 
                 py::arg("stepsize") = 1, 
+                py::arg("boundary_cushion") = 0,
                 py::arg("eps") = 1.e-3, 
                 py::arg("warm_up") = 100)
             ;
@@ -621,7 +640,7 @@ namespace hopsy {
                 m, adaptiveMetropolisProposal, ProposalParameter::EPSILON, "eps");
         proposal::addParameter<AdaptiveMetropolisProposal>(
                 m, adaptiveMetropolisProposal, ProposalParameter::STEP_SIZE, "stepsize");
-        proposal::addParameter<AdaptiveMetropolisProposal, decltype(adaptiveMetropolisProposal), long>(
+        proposal::addParameter<AdaptiveMetropolisProposal, decltype(adaptiveMetropolisProposal), unsigned long>(
                 m, adaptiveMetropolisProposal, ProposalParameter::WARM_UP, "warm_up");
         
         
@@ -653,22 +672,30 @@ namespace hopsy {
         csmmalaProposal    
             .def(py::init<>()) 
             .def(py::init([] (const Problem* problem, 
-                              double fisherWeight,
-                              double stepSize) -> CSmMALAProposal {
+                              double stepSize,
+                              double fisherWeight) -> CSmMALAProposal {
                         if (problem) {
+                            if (!problem->model) {
+                                throw std::runtime_error("Cannot initialize hopsy.CSmMALAProposal for uniform problem (problem.model == None).");
+                            }
+
                             return CSmMALAProposal::createFromProblem(problem, ModelWrapper(problem->model), fisherWeight, stepSize);
                         } else {
                             throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
                         }
                 }), 
                 py::arg("problem"), 
-                py::arg("fisher_weight") = 1, 
-                py::arg("stepsize") = 1)
+                py::arg("stepsize") = 1, 
+                py::arg("fisher_weight") = 1)
             .def(py::init([] (const Problem* problem, 
                               const VectorType* startingPoint, 
-                              double fisherWeight,
-                              double stepSize) -> CSmMALAProposal {
+                              double stepSize,
+                              double fisherWeight) -> CSmMALAProposal {
                         if (problem) {
+                            if (!problem->model) {
+                                throw std::runtime_error("Cannot initialize hopsy.CSmMALAProposal for uniform problem (problem.model == None).");
+                            }
+
                             return CSmMALAProposal::create(problem, startingPoint, ModelWrapper(problem->model), fisherWeight, stepSize);
                         } else {
                             throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
@@ -676,8 +703,8 @@ namespace hopsy {
                 }), 
                 py::arg("problem"), 
 				py::arg("starting_point"), 
-                py::arg("fisher_weight") = 1, 
-                py::arg("stepsize") = 1)
+                py::arg("stepsize") = 1, 
+                py::arg("fisher_weight") = 1)
             ;
         // common
         proposal::addCommon<CSmMALAProposal>(m, csmmalaProposal);
@@ -694,13 +721,28 @@ namespace hopsy {
         // constructor
         dikinWalkProposal
             .def(py::init<>()) 
-            .def(py::init(&DikinWalkProposal::createFromProblem), 
+            .def(py::init([] (const Problem* problem,
+                              double stepSize,
+                              double boundaryCushion) {
+                        auto proposal = DikinWalkProposal::createFromProblem(problem, stepSize);
+                        proposal.setParameter(ProposalParameter::BOUNDARY_CUSHION, boundaryCushion);
+                        return proposal;
+                }),
                 py::arg("problem"),
-                py::arg("stepsize") = 1)
-            .def(py::init(&DikinWalkProposal::create), 
+                py::arg("stepsize") = 1, 
+                py::arg("boundary_cushion") = 0)
+            .def(py::init([] (const Problem* problem,
+                              const VectorType* startingPoint,
+                              double stepSize,
+                              double boundaryCushion) {
+                        auto proposal = DikinWalkProposal::create(problem, startingPoint, stepSize);
+                        proposal.setParameter(ProposalParameter::BOUNDARY_CUSHION, boundaryCushion);
+                        return proposal;
+                }),
                 py::arg("problem"),
-                py::arg("starting_point"), 
-                py::arg("stepsize") = 1)
+                py::arg("starting_point") = py::none(), 
+                py::arg("stepsize") = 1, 
+                py::arg("boundary_cushion") = 0)
             ;
         // common
         proposal::addCommon<DikinWalkProposal>(m, dikinWalkProposal);

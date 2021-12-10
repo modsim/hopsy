@@ -29,8 +29,8 @@ namespace hopsy {
     public:
         MarkovChain() = default;
 
-        MarkovChain(const Proposal* proposal, 
-                    const Model* model = nullptr, 
+        MarkovChain(const std::shared_ptr<Proposal> proposal, 
+                    const std::shared_ptr<Model> model = nullptr, 
                     const std::optional<LinearTransformation>& transformation = std::nullopt) : 
                 proposal(nullptr), 
                 model(nullptr), 
@@ -67,16 +67,16 @@ namespace hopsy {
             return proposal;
         }
 
-        void setProposal(const Proposal* proposal) {
-            createMarkovChain(this, proposal, this->model.get(), this->transformation);
+        void setProposal(const std::shared_ptr<Proposal> proposal) {
+            createMarkovChain(this, proposal, this->model, this->transformation);
         }
 
         Model* getModel() const {
             return model.get();
         }
 
-        void setModel(const Model* model) {
-            createMarkovChain(this, this->proposal.get(), model, this->transformation);
+        void setModel(const std::shared_ptr<Model> model) {
+            createMarkovChain(this, this->proposal, model, this->transformation);
         }
 
     private:
@@ -87,8 +87,8 @@ namespace hopsy {
         std::optional<LinearTransformation> transformation;
 
         static inline void createMarkovChain(MarkovChain* mc,
-                                             const Proposal* proposal, 
-                                             const Model* model, 
+                                             const std::shared_ptr<Proposal> proposal, 
+                                             const std::shared_ptr<Model> model, 
                                              const std::optional<LinearTransformation>& transformation) {
             if (model && transformation) {
                 auto tmp = hops::MarkovChainAdapter(
@@ -244,7 +244,7 @@ namespace hopsy {
 
     };
 
-    MarkovChain createMarkovChain(const Proposal* proposal, const Problem& problem) {
+    MarkovChain createMarkovChain(const std::shared_ptr<Proposal> proposal, const Problem& problem) {
         if (problem.A.rows() != problem.b.rows()) {
             throw std::runtime_error("Dimension mismatch between row dimension of right-hand side operator A and row dimension of left-hand side vector b.");
         }

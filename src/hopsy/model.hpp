@@ -107,7 +107,7 @@ namespace hopsy {
 
     class ModelWrapper : public Model {
     public:
-        ModelWrapper(const Model* model) {
+        ModelWrapper(const std::shared_ptr<Model> model) {
             this->model = std::move(model->copyModel());
         }
 

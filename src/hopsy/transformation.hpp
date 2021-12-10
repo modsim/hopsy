@@ -17,63 +17,64 @@
 namespace py = pybind11;
 
 namespace hopsy {
-    using Transformation = hops::Transformation;
-} // namespace hopsy
-
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::Transformation);
-
-namespace hopsy {
-    template<typename TransformationBase = Transformation>
-	class TransformationTrampoline : public TransformationBase, public py::trampoline_self_life_support {
-	   	VectorType apply(const VectorType& x) const override {
-			PYBIND11_OVERRIDE_PURE(
-				VectorType,
-				TransformationBase,
-				apply,
-                x
-			);
-		}
-
-	   	VectorType revert(const VectorType& x) const override {
-			PYBIND11_OVERRIDE_PURE(
-				VectorType,
-				TransformationBase,
-				revert,
-                x
-			);
-		}
-    };
-
-    class TransformationWrapper : public Transformation {
-    public:
-        TransformationWrapper(const Transformation* transformation) {
-            transformation = dynamic_cast<Transformation*>(transformation->copyTransformation().release());
-        };
-
-        VectorType apply(const VectorType& x) const override {
-            return transformation->apply(x);
-        }
-
-        VectorType revert(const VectorType& x) const override {
-            return transformation->revert(x);
-        }
-
-        std::unique_ptr<Transformation> copyTransformation() const override {
-            return transformation->copyTransformation();
-        }
-
-        Transformation* getTransformationPtr() {
-            return transformation;
-        }
-
-    private:
-        Transformation* transformation;
-    };
-
+//    using Transformation = hops::Transformation;
     using LinearTransformation = hops::LinearTransformation;
 } // namespace hopsy
 
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::LinearTransformation);
+//PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::Transformation);
+//
+//namespace hopsy {
+//    template<typename TransformationBase = Transformation>
+//	class TransformationTrampoline : public TransformationBase, public py::trampoline_self_life_support {
+//	   	VectorType apply(const VectorType& x) const override {
+//			PYBIND11_OVERRIDE_PURE(
+//				VectorType,
+//				TransformationBase,
+//				apply,
+//                x
+//			);
+//		}
+//
+//	   	VectorType revert(const VectorType& x) const override {
+//			PYBIND11_OVERRIDE_PURE(
+//				VectorType,
+//				TransformationBase,
+//				revert,
+//                x
+//			);
+//		}
+//    };
+//
+//    class TransformationWrapper : public Transformation {
+//    public:
+//        TransformationWrapper(const Transformation* transformation) {
+//            transformation = dynamic_cast<Transformation*>(transformation->copyTransformation().release());
+//        };
+//
+//        VectorType apply(const VectorType& x) const override {
+//            return transformation->apply(x);
+//        }
+//
+//        VectorType revert(const VectorType& x) const override {
+//            return transformation->revert(x);
+//        }
+//
+//        std::unique_ptr<Transformation> copyTransformation() const override {
+//            return transformation->copyTransformation();
+//        }
+//
+//        Transformation* getTransformationPtr() {
+//            return transformation;
+//        }
+//
+//    private:
+//        Transformation* transformation;
+//    };
+//
+//    using LinearTransformation = hops::LinearTransformation;
+//} // namespace hopsy
+//
+//PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::LinearTransformation);
 
 #endif // HOPSY_TRANSFORMATION_HPP
 
