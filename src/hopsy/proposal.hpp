@@ -486,8 +486,7 @@ namespace hopsy {
         }
 
         std::unique_ptr<Proposal> copyProposal() const override {
-            if (!proposal) throw std::runtime_error(uninitializedMethod("deepcopy"));
-            return proposal->copyProposal();
+            return std::make_unique<UninitializedProposalWrapper<ProposalImpl, Args...>>(*this);
         }
 
     private:
@@ -548,7 +547,7 @@ namespace hopsy {
 
     namespace proposal {
         template<typename ProposalType, typename ClassType>
-        void addCommon(py::module &m, ClassType& prop) {
+        void addCommon(ClassType& prop) {
             //py::classh<ProposalType, hopsy::Proposal, hopsy::ProposalTrampoline<ProposalType>> proposal(m, proposalName);
             prop.def("propose", [](ProposalType& self, hopsy::RandomNumberGenerator& rng) -> hops::VectorType& { 
                     return self.propose(rng.rng); 
@@ -576,7 +575,7 @@ namespace hopsy {
         }
 
         template<typename ProposalType, typename ClassType, typename ParameterType = double>
-        void addParameter(py::module &m, ClassType& prop, const hops::ProposalParameter &parameter, const char* parameterName) {
+        void addParameter(ClassType& prop, const hops::ProposalParameter &parameter, const char* parameterName) {
             prop.def_property(parameterName, 
                     [=] (const ProposalType& self) { return std::any_cast<ParameterType>(self.getParameter(parameter)); },
                     [=] (ProposalType& self, ParameterType value) { self.setParameter(parameter, value); }
@@ -589,7 +588,7 @@ namespace hopsy {
         // register abstract Proposal
         py::classh<Proposal, ProposalTrampoline<>> proposal(m, "Proposal");
         // common
-        proposal::addCommon<Proposal>(m, proposal);
+        proposal::addCommon<Proposal>(proposal);
 
 
         // register AdaptiveMetropolisProposal
@@ -632,16 +631,16 @@ namespace hopsy {
                 py::arg("warm_up") = 100)
             ;
         // common
-        proposal::addCommon<AdaptiveMetropolisProposal>(m, adaptiveMetropolisProposal);
+        proposal::addCommon<AdaptiveMetropolisProposal>(adaptiveMetropolisProposal);
         // parameters
         proposal::addParameter<AdaptiveMetropolisProposal>(
-                m, adaptiveMetropolisProposal, ProposalParameter::BOUNDARY_CUSHION, "boundary_cushion");
+                adaptiveMetropolisProposal, ProposalParameter::BOUNDARY_CUSHION, "boundary_cushion");
         proposal::addParameter<AdaptiveMetropolisProposal>(
-                m, adaptiveMetropolisProposal, ProposalParameter::EPSILON, "eps");
+                adaptiveMetropolisProposal, ProposalParameter::EPSILON, "eps");
         proposal::addParameter<AdaptiveMetropolisProposal>(
-                m, adaptiveMetropolisProposal, ProposalParameter::STEP_SIZE, "stepsize");
+                adaptiveMetropolisProposal, ProposalParameter::STEP_SIZE, "stepsize");
         proposal::addParameter<AdaptiveMetropolisProposal, decltype(adaptiveMetropolisProposal), unsigned long>(
-                m, adaptiveMetropolisProposal, ProposalParameter::WARM_UP, "warm_up");
+                adaptiveMetropolisProposal, ProposalParameter::WARM_UP, "warm_up");
         
         
         // register BallWalkProposal
@@ -659,10 +658,10 @@ namespace hopsy {
                 py::arg("stepsize") = 1)
             ;
         // common
-        proposal::addCommon<BallWalkProposal>(m, ballWalkProposal);
+        proposal::addCommon<BallWalkProposal>(ballWalkProposal);
         // parameters
         proposal::addParameter<BallWalkProposal>(
-                m, ballWalkProposal, ProposalParameter::STEP_SIZE, "stepsize");
+                ballWalkProposal, ProposalParameter::STEP_SIZE, "stepsize");
 
 
         // register CSmMALAProposal
@@ -707,12 +706,12 @@ namespace hopsy {
                 py::arg("fisher_weight") = 1)
             ;
         // common
-        proposal::addCommon<CSmMALAProposal>(m, csmmalaProposal);
+        proposal::addCommon<CSmMALAProposal>(csmmalaProposal);
         // parameters
         proposal::addParameter<CSmMALAProposal>(
-                m, csmmalaProposal, ProposalParameter::FISHER_WEIGHT, "fisher_weight");
+                csmmalaProposal, ProposalParameter::FISHER_WEIGHT, "fisher_weight");
         proposal::addParameter<CSmMALAProposal>(
-                m, csmmalaProposal, ProposalParameter::STEP_SIZE, "stepsize");
+                csmmalaProposal, ProposalParameter::STEP_SIZE, "stepsize");
         
         
         // register DikinWalkProposal
@@ -745,12 +744,12 @@ namespace hopsy {
                 py::arg("boundary_cushion") = 0)
             ;
         // common
-        proposal::addCommon<DikinWalkProposal>(m, dikinWalkProposal);
+        proposal::addCommon<DikinWalkProposal>(dikinWalkProposal);
         // parameters
         proposal::addParameter<DikinWalkProposal>(
-                m, dikinWalkProposal, ProposalParameter::BOUNDARY_CUSHION, "boundary_cushion");
+                dikinWalkProposal, ProposalParameter::BOUNDARY_CUSHION, "boundary_cushion");
         proposal::addParameter<DikinWalkProposal>(
-                m, dikinWalkProposal, ProposalParameter::STEP_SIZE, "stepsize");
+                dikinWalkProposal, ProposalParameter::STEP_SIZE, "stepsize");
         
         
         // register GaussianCoordinateHitAndRun
@@ -768,10 +767,10 @@ namespace hopsy {
                 py::arg("stepsize") = 1)
             ;        
 		// common
-        proposal::addCommon<GaussianCoordinateHitAndRunProposal>(m, gaussianCoordinateHitAndRunProposal);
+        proposal::addCommon<GaussianCoordinateHitAndRunProposal>(gaussianCoordinateHitAndRunProposal);
         // parameters
         proposal::addParameter<GaussianCoordinateHitAndRunProposal>(
-                m, gaussianCoordinateHitAndRunProposal, ProposalParameter::STEP_SIZE, "stepsize");
+                gaussianCoordinateHitAndRunProposal, ProposalParameter::STEP_SIZE, "stepsize");
 
 
         // register GaussianHitAndRun
@@ -789,10 +788,10 @@ namespace hopsy {
                 py::arg("stepsize") = 1)
             ;
         // common
-        proposal::addCommon<GaussianHitAndRunProposal>(m, gaussianHitAndRunProposal);
+        proposal::addCommon<GaussianHitAndRunProposal>(gaussianHitAndRunProposal);
         // parameters
         proposal::addParameter<GaussianHitAndRunProposal>(
-                m, gaussianHitAndRunProposal, ProposalParameter::STEP_SIZE, "stepsize");
+                gaussianHitAndRunProposal, ProposalParameter::STEP_SIZE, "stepsize");
 
 
         // register GaussianProposal
@@ -810,10 +809,10 @@ namespace hopsy {
                 py::arg("stepsize") = 1)
             ;
         // common
-        proposal::addCommon<GaussianProposal>(m, gaussianProposal);
+        proposal::addCommon<GaussianProposal>(gaussianProposal);
         // parameters
         proposal::addParameter<GaussianProposal>(
-                m, gaussianProposal, ProposalParameter::STEP_SIZE, "stepsize");
+                gaussianProposal, ProposalParameter::STEP_SIZE, "stepsize");
 
 
         // register PyProposal
@@ -822,7 +821,7 @@ namespace hopsy {
         // constructor
         pyProposal.def(py::init<py::object>(), py::arg("proposal"));
         // common
-        proposal::addCommon<PyProposal>(m, pyProposal);
+        proposal::addCommon<PyProposal>(pyProposal);
 
 
         // register UniformCoordinateHitAndRun
@@ -838,7 +837,7 @@ namespace hopsy {
                 py::arg("starting_point"))
             ;
         // common
-        proposal::addCommon<UniformCoordinateHitAndRunProposal>(m, uniformCoordinateHitAndRunProposal);
+        proposal::addCommon<UniformCoordinateHitAndRunProposal>(uniformCoordinateHitAndRunProposal);
 
 
         // register UniformHitAndRun
@@ -854,7 +853,7 @@ namespace hopsy {
                 py::arg("starting_point")) 
             ;
         // common
-        proposal::addCommon<UniformHitAndRunProposal>(m, uniformHitAndRunProposal);
+        proposal::addCommon<UniformHitAndRunProposal>(uniformHitAndRunProposal);
 
 
     }

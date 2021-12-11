@@ -105,12 +105,16 @@ class ProposalTests(unittest.TestCase):
                 proposal = ProposalType(problem_no_start)
 
 
-    @unittest.expectedFailure
     def test_automatic_downcasting(self):
-        uniform_problem = Problem([[1, 1]], [1], starting_point=[0, 0])
+        problem = Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0], Gaussian(), starting_point=[0, 0])
 
         for ProposalType in ProposalTypes:
-            proposal = ProposalType(Problem(A, b, starting_point=x))
-            mc = MarkovChain(proposal, uniform_problem)
-            self.assertIsInstance(mc.proposal, GaussianProposal)
+            proposal = ProposalType(problem)
+            new_proposal = proposal.deepcopy()
+            self.assertIsInstance(new_proposal, ProposalType)
+
+            proposal = ProposalType()
+            new_proposal = proposal.deepcopy()
+            self.assertIsInstance(new_proposal, ProposalType)
+
 
