@@ -1,10 +1,10 @@
+ [![pipeline status](https://jugit.fz-juelich.de/fluxomics/hopsy/badges/develop/pipeline.svg)](https://jugit.fz-juelich.de/fluxomics/hopsy/-/commits/develop) 
+ 
 # HOPSY - Python bindings for HOPS
 
 A python interface for HOPS - the **H**ighly **O**ptimized toolbox for **P**olytope **S**ampling.
 Built using `pybind11`
 
- [![pipeline status](https://jugit.fz-juelich.de/fluxomics/hopsy/badges/develop/pipeline.svg)](https://jugit.fz-juelich.de/fluxomics/hopsy/-/commits/develop) 
- 
 <img src="docs/hopsy.png" alt="HOPSY Logo" width="300"/>
 
 **hopsy** is the attempt to offer some of the key functionatlity of **hops** through a Python interface.
