@@ -128,6 +128,8 @@ setup(
     install_requires=[
         'PolyRound',
         'numpy',
+        'pandas',
+        'tqdm',
         'matplotlib',
         'scikit-learn',
     ],
