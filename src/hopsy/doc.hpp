@@ -118,6 +118,12 @@ namespace hopsy {
             extern const char* considerTimeCost;
         }
 
+        namespace ThompsonSampling {
+            extern const char* base;
+            extern const char* __init__;
+            extern const char* posteriorUpdateIterations;
+        }
+
         extern const char* tune;
 
         namespace Data {

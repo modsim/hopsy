@@ -681,6 +681,15 @@ const char* hopsy::doc::ExpectedSquaredJumpDistanceTarget::considerTimeCost = R"
 
 
 /*
+ *  ThompsonSampling
+ */
+
+const char* hopsy::doc::ThompsonSampling::base;
+const char* hopsy::doc::ThompsonSampling::__init__;
+const char* hopsy::doc::ThompsonSampling::posteriorUpdateIterations;
+
+
+/*
  *  tune
  */
 
