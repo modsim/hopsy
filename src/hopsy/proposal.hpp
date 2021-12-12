@@ -15,6 +15,7 @@
 
 #include "../../extern/hops/src/hops/hops.hpp"
 
+#include "doc.hpp"
 #include "misc.hpp"
 #include "model.hpp"
 #include "problem.hpp"
