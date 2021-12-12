@@ -1,5 +1,7 @@
 # HOPSY - Python bindings for HOPS
 
+ [![pipeline status](https://jugit.fz-juelich.de/fluxomics/hopsy/badges/develop/pipeline.svg)](https://jugit.fz-juelich.de/fluxomics/hopsy/-/commits/develop) 
+ 
 A python interface for HOPS - the **H**ighly **O**ptimized toolbox for **P**olytope **S**ampling.
 Built using `pybind11`
 
