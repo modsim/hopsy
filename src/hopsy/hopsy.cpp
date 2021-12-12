@@ -16,6 +16,7 @@
 #include "model.hpp"
 #include "proposal.hpp"
 #include "random.hpp"
+#include "tuning.hpp"
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
@@ -38,4 +39,5 @@ PYBIND11_MODULE(core, m) {
     hopsy::addProposalParameters(m);
     hopsy::addProposals(m);
     hopsy::addMarkovChain(m);
+    hopsy::addTuning(m);
 }
