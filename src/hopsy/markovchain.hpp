@@ -14,7 +14,7 @@
 
 #include "../../extern/hops/src/hops/hops.hpp"
 
-#include "hops/MarkovChain/Draw/NoOpDrawAdapter.hpp"
+#include "doc.hpp"
 #include "misc.hpp"
 #include "model.hpp"
 #include "problem.hpp"
@@ -79,8 +79,12 @@ namespace hopsy {
             createMarkovChain(this, this->proposal, model, this->transformation);
         }
 
+        std::shared_ptr<hops::MarkovChain>& getMarkovChain() {
+            return markovChain;
+        }
+
     private:
-        std::unique_ptr<hops::MarkovChain> markovChain;
+        std::shared_ptr<hops::MarkovChain> markovChain;
 
         std::shared_ptr<Proposal> proposal;
         std::shared_ptr<Model> model;
