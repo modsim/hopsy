@@ -249,6 +249,29 @@ namespace hopsy {
     };
 
     MarkovChain createMarkovChain(const std::shared_ptr<Proposal> proposal, const Problem& problem) {
+        // hacky proposal initialization if proposal is uninitalized
+        //if (!proposal.isInitialized) {
+        //py::dict local;
+        //local["proposal"] = proposal.get();
+        //local["problem"] = problem;
+
+        //py::exec(R"(
+        //    try: 
+        //        name = proposal.name
+        //    except:
+        //        print(type(proposal))
+        //        if type(proposal) == core.AdapriveMetropolisProposal:
+        //            proposal = core.AdapriveMetropolisProposal(problem)
+        //        elif type(proposal) == core.CSmMALAProposal:
+        //            proposal = CSmMALAProposal(problem)
+        //        elif type(proposal) == core.GaussianProposal:
+        //            proposal = core.GaussianProposal(problem)
+        //)", local);
+
+        //*proposal = *local["proposal"].cast<Proposal*>();
+        //}
+
+
         if (problem.A.rows() != problem.b.rows()) {
             throw std::runtime_error("Dimension mismatch between row dimension of right-hand side operator A and row dimension of left-hand side vector b.");
         }
@@ -260,7 +283,7 @@ namespace hopsy {
         MarkovChain mc;
 
         if (!problem.model && !problem.transformation && !problem.shift) {
-            mc = MarkovChain(proposal);
+            mc = MarkovChain(std::shared_ptr<Proposal>(proposal));
 
         } else if (!problem.model && problem.transformation) {
             VectorType shift = VectorType::Zero(problem.startingPoint->cols());
@@ -268,12 +291,12 @@ namespace hopsy {
                 shift = *problem.shift;
             }
 
-            mc = MarkovChain(proposal, 
+            mc = MarkovChain(std::shared_ptr<Proposal>(proposal), 
                              nullptr, 
                              LinearTransformation(*problem.transformation, *problem.shift));
 
         } else if (problem.model && !problem.transformation) {
-            mc = MarkovChain(proposal, problem.model);
+            mc = MarkovChain(std::shared_ptr<Proposal>(proposal), problem.model);
 
         } else if (problem.model && problem.transformation) {
             VectorType shift = VectorType::Zero(problem.startingPoint->cols());
@@ -281,7 +304,7 @@ namespace hopsy {
                 shift = *problem.shift;
             }
 
-            mc = MarkovChain(proposal, 
+            mc = MarkovChain(std::shared_ptr<Proposal>(proposal), 
                              problem.model, 
                              LinearTransformation(*problem.transformation, *problem.shift));
         }
@@ -294,6 +317,12 @@ namespace hopsy {
             .def(py::init(&createMarkovChain),
                     py::arg("proposal"), 
                     py::arg("problem"))
+            //.def(py::init([] (const py::object& metaclass, const Problem& problem) {
+            //            Proposal* proposal = (metaclass.attr("__call__")(problem).cast<Proposal*>());
+            //            return createMarkovChain(proposal, problem);
+            //        }),
+            //        py::arg("proposal"), 
+            //        py::arg("problem"))
             .def("draw", [] (MarkovChain& self, 
                              RandomNumberGenerator& rng, 
                              long thinning = 1) -> std::pair<double, VectorType> {
