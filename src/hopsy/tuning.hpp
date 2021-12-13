@@ -13,6 +13,7 @@
 #include "../../extern/hops/src/hops/hops.hpp"
 
 #include "doc.hpp"
+#include "hops/MarkovChain/Tuning/ThompsonSamplingTuner.hpp"
 #include "markovchain.hpp"
 #include "misc.hpp"
 #include "random.hpp"
@@ -40,18 +41,22 @@ namespace hopsy {
     public:
         TuningTargetWrapper() = default;
 
-		TuningTargetWrapper(const std::unique_ptr<TuningTarget>& target) : target(target->copyTuningTarget()) {};
+		TuningTargetWrapper(TuningTarget* target) : target(target) {
 
-        std::tuple<double, double> operator() (const VectorType x) {
-            return target->operator()(x);
+        };
+
+        std::tuple<double, double> operator() (const VectorType x, const std::vector<hops::RandomNumberGenerator*>& randomNumberGenerators) {
+            return target->operator()(x, randomNumberGenerators);
         }
 
         std::string getName() const {
             return target->getName();
         }
 
+        std::vector<std::shared_ptr<MarkovChain>> markovChain;
+
 	private:
-        std::unique_ptr<TuningTarget> target;
+        TuningTarget* target;
     };
 
     class PyTuningTarget : public TuningTarget {
@@ -60,29 +65,32 @@ namespace hopsy {
 
         PyTuningTarget(py::object pyObj) : pyObj(std::move(pyObj)) {};
 
-        std::tuple<double, double> operator() (const VectorType x) {
-            return pyObj.attr("__call__")(x).cast<std::tuple<double, double>>();
+        std::tuple<double, double> operator() (const VectorType x, const std::vector<hops::RandomNumberGenerator*>& randomNumberGenerators) {
+            std::vector<RandomNumberGenerator*> _randomNumberGenerators(randomNumberGenerators.size());
+            for (size_t i = 0; i < randomNumberGenerators.size(); ++i) {
+                _randomNumberGenerators[i]->rng = *randomNumberGenerators[i];
+            }
+
+            auto returnValue = pyObj.attr("__call__")(x, _randomNumberGenerators).cast<std::tuple<double, double>>();
+
+            // propagate changes to the rngs which were caused in the python call above back to the passed random generators.
+            for (size_t i = 0; i < randomNumberGenerators.size(); ++i) {
+                *randomNumberGenerators[i] = _randomNumberGenerators[i]->rng;
+            }
+
+            return returnValue;
         }
 
         std::string getName() {
-            try {
-                return pyObj.attr("get_name")().cast<std::string>();
-            } catch (...) {
-                return "";
-            }
+            return pyObj.attr("name").cast<std::string>();
         }
-
-        std::vector<std::shared_ptr<hops::MarkovChain>> markovChain;
-        std::vector<hops::RandomNumberGenerator*> randomNumberGenerator;
-        unsigned long numberOfTestSamples;
 
     private:
         py::object pyObj;
     };
 
     template<typename TargetType, typename ...Args>
-    TargetType createTarget(std::vector<std::shared_ptr<MarkovChain>>& markovChain, 
-                            std::vector<RandomNumberGenerator*>& randomNumberGenerator,
+    TargetType createTarget(std::vector<MarkovChain*>& markovChain, 
                             unsigned long numberOfTestSamples,
                             Args... args
                             ) {
@@ -91,12 +99,7 @@ namespace hopsy {
             _markovChain[i] = markovChain[i]->getMarkovChain();
         }
 
-        std::vector<hops::RandomNumberGenerator*> _randomNumberGenerator;
-        for (size_t i = 0; i < randomNumberGenerator.size(); ++i) {
-            _randomNumberGenerator[i] = &randomNumberGenerator[i]->rng;
-        }
-
-        return TargetType{_markovChain, _randomNumberGenerator, numberOfTestSamples, args...};
+        return TargetType{_markovChain, numberOfTestSamples, args...};
     }
 
     using AcceptanceRateTarget = hops::AcceptanceRateTarget;
@@ -108,79 +111,86 @@ namespace hopsy {
     template<typename MethodType>
     void tune(typename MethodType::param_type& methodParams, 
               TuningTarget* target, 
-              const std::vector<std::shared_ptr<MarkovChain>>& markovChain, 
-              std::vector<std::shared_ptr<RandomNumberGenerator>>& randomNumberGenerator) {
+              std::vector<RandomNumberGenerator*>& randomNumberGenerator) {
         VectorType optimalParameters;
         double optimalTargetValue;
 
-        std::vector<std::shared_ptr<hops::MarkovChain>> _markovChain(markovChain.size());
-        for (size_t i = 0; i < markovChain.size(); ++i) {
-            _markovChain[i] = markovChain[i]->getMarkovChain();
-        }
-
-        std::vector<hops::RandomNumberGenerator*> _randomNumberGenerator;
+        std::vector<hops::RandomNumberGenerator*> _randomNumberGenerator(randomNumberGenerator.size());
         for (size_t i = 0; i < randomNumberGenerator.size(); ++i) {
             _randomNumberGenerator[i] = &randomNumberGenerator[i]->rng;
         }
-
-        MethodType::tune(optimalParameters, optimalTargetValue, _markovChain, _randomNumberGenerator, methodParams, *target);
+        TuningTargetWrapper _target{target};
+        MethodType::tune(optimalParameters, optimalTargetValue, _randomNumberGenerator, methodParams, _target);
     }
 
     void addTuning(py::module& m) {
         // tuning targets
-        py::class_<AcceptanceRateTarget>(m, "AcceptanceRateTarget", doc::AcceptanceRateTarget::base)
-            .def(py::init(
-                        [] (double acceptanceRate) { 
-                            AcceptanceRateTarget tmp; 
-                            tmp.acceptanceRateTargetValue = acceptanceRate; 
-                            return tmp;
-                        }), 
-                doc::AcceptanceRateTarget::__init__, 
-                py::arg("acceptance_rate") = .234)
-            .def_readwrite("acceptance_rate", &AcceptanceRateTarget::acceptanceRateTargetValue, doc::AcceptanceRateTarget::acceptanceRate);
+        py::class_<TuningTarget>(m, "TuningTarget"/*, doc::TuningTarget::base*/);
 
-        py::class_<ExpectedSquaredJumpDistanceTarget>(m, "ExpectedSquaredJumpDistanceTarget", doc::ExpectedSquaredJumpDistanceTarget::base)
-            .def(py::init(
-                        [] (unsigned long lags, 
-                            bool considerTimeCost,
-                            unsigned long numberOfTestSamples, 
-                            std::vector<std::shared_ptr<MarkovChain>>& markovChain,
-                            std::vector<RandomNumberGenerator*>& randomNumberGenerator) 
-                        { 
+        py::class_<AcceptanceRateTarget, TuningTarget>(m, "AcceptanceRateTarget", doc::AcceptanceRateTarget::base)
+            .def(py::init([] (double acceptanceRate,
+                              unsigned long numberOfTestSamples, 
+                              std::vector<MarkovChain*>& markovChain) { 
+                            return createTarget<AcceptanceRateTarget, double>(
+                                    markovChain, numberOfTestSamples, acceptanceRate);
+                        }), 
+                doc::AcceptanceRateTarget::__init__,
+                py::arg("markov_chains"), 
+                py::arg("acceptance_rate") = 0.234,
+                py::arg("n_test_samples") = 1000)
+            .def_readwrite("acceptance_rate", &AcceptanceRateTarget::acceptanceRateTargetValue, 
+                    doc::AcceptanceRateTarget::acceptanceRate)
+            .def("__call__", [] (AcceptanceRateTarget& self, 
+                                 const VectorType& x, 
+                                 std::vector<RandomNumberGenerator*>& randomNumberGenerators) {
+                        std::vector<hops::RandomNumberGenerator*> _randomNumberGenerators(randomNumberGenerators.size());
+                        for (size_t i = 0; i < randomNumberGenerators.size(); ++i) {
+                            _randomNumberGenerators[i] = &randomNumberGenerators[i]->rng;
+                        }
+                        return self(x, _randomNumberGenerators);
+                    },
+                    py::arg("x"), py::arg("rngs"), doc::AcceptanceRateTarget::__call__)
+        ;
+
+        py::class_<ExpectedSquaredJumpDistanceTarget, TuningTarget>(m, "ExpectedSquaredJumpDistanceTarget", doc::ExpectedSquaredJumpDistanceTarget::base)
+            .def(py::init([] (std::vector<MarkovChain*>& markovChain,
+                              unsigned long numberOfTestSamples, 
+                              unsigned long lags, 
+                              bool considerTimeCost) { 
                             std::vector<unsigned long> _lags;
                             for (unsigned long i = 0; i < lags; ++i) {
                                 _lags.push_back(i+1);
                             }
                             return createTarget<ExpectedSquaredJumpDistanceTarget, std::vector<unsigned long>, bool>(
-                                    markovChain, randomNumberGenerator, numberOfTestSamples, _lags, considerTimeCost);
+                                    markovChain, numberOfTestSamples, _lags, considerTimeCost);
                         }), 
                 doc::ExpectedSquaredJumpDistanceTarget::__init__, 
+                py::arg("markov_chains"), 
+                py::arg("n_test_samples") = 1000,
                 py::arg("lags") = 1,
-                py::arg("consider_time_cost") = false,
+                py::arg("consider_time_cost") = false)
+            .def(py::init(&createTarget<ExpectedSquaredJumpDistanceTarget, std::vector<unsigned long>, bool>),
+                py::arg("markov_chains"), 
                 py::arg("n_test_samples") = 1000,
-                py::arg("markov_chains") = std::vector<std::shared_ptr<MarkovChain>>(),
-                py::arg("rngs") = std::vector<RandomNumberGenerator*>())
-            .def(py::init(
-                        [] (std::vector<unsigned long> lags,
-                            bool considerTimeCost,
-                            unsigned long numberOfTestSamples, 
-                            std::vector<std::shared_ptr<MarkovChain>>& markovChain,
-                            std::vector<RandomNumberGenerator*>& randomNumberGenerator) 
-                        { 
-                            return createTarget<ExpectedSquaredJumpDistanceTarget, std::vector<unsigned long>, bool>(
-                                    markovChain, randomNumberGenerator, numberOfTestSamples, lags, considerTimeCost);
-                        }), 
                 py::arg("lags") = std::vector<unsigned long>{1},
-                py::arg("consider_time_cost") = false,
-                py::arg("n_test_samples") = 1000,
-                py::arg("markov_chains") = std::vector<std::shared_ptr<MarkovChain>>(),
-                py::arg("rngs") = std::vector<RandomNumberGenerator*>())
+                py::arg("consider_time_cost") = false)
             .def_readwrite("lags", &ExpectedSquaredJumpDistanceTarget::lags, doc::ExpectedSquaredJumpDistanceTarget::lags)
-            .def_readwrite("consider_time_cost", &ExpectedSquaredJumpDistanceTarget::considerTimeCost, doc::ExpectedSquaredJumpDistanceTarget::considerTimeCost);
+            .def_readwrite("consider_time_cost", &ExpectedSquaredJumpDistanceTarget::considerTimeCost, 
+                    doc::ExpectedSquaredJumpDistanceTarget::considerTimeCost)
+            .def("__call__", [] (ExpectedSquaredJumpDistanceTarget& self, 
+                                 const VectorType& x, 
+                                 std::vector<RandomNumberGenerator*>& randomNumberGenerators) {
+                        std::vector<hops::RandomNumberGenerator*> _randomNumberGenerators(randomNumberGenerators.size());
+                        for (size_t i = 0; i < randomNumberGenerators.size(); ++i) {
+                            _randomNumberGenerators[i] = &randomNumberGenerators[i]->rng;
+                        }
+                        return self(x, _randomNumberGenerators);
+                    },
+                    py::arg("x"), py::arg("rngs"), doc::ExpectedSquaredJumpDistanceTarget::__call__)
+        ;
 
         // tuning methods
         py::class_<ThompsonSampling>(m, "ThompsonSamplingTuning", doc::ThompsonSampling::base)
-            
             .def(py::init<size_t, size_t, size_t, size_t, size_t, double, double, double, size_t, bool>(),
                    py::arg("iterationsToTestStepSize") = 1000,
                    py::arg("posteriorUpdateIterations") = 100,
@@ -193,9 +203,10 @@ namespace hopsy {
                    py::arg("randomSeed") = 0,
                    py::arg("recordData") = false)
           .def_readwrite("n_posterior_updates", &ThompsonSampling::posteriorUpdateIterations, doc::ThompsonSampling::posteriorUpdateIterations);
+
+        m.def("tune", &tune<hops::ThompsonSamplingTuner>, 
+                py::arg("method"), py::arg("target"), py::arg("rngs"));
     }
-
-
 }
 
 #endif // HOPSY_TUNING_HPP
