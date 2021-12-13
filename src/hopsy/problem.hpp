@@ -39,9 +39,10 @@ namespace hopsy {
         void setModel(std::shared_ptr<Model> model) { this->model = model; }
 
         std::string __repr__() const {
+            Model* _model = static_cast<Model*>(model.get());
             std::string repr = "hopsy.Problem(A=" + get__repr__(A) + ", ";
             repr += "b=" + get__repr__(b);
-            repr += ( model ? ", model=" + get__repr__(model) : "" );
+            repr += ( _model ? ", model=" + get__repr__(_model) : "" );
             repr += ( startingPoint ? ", starting_point=" + get__repr__(startingPoint) : "" );
             repr += ( transformation ? ", transformation=" + get__repr__(transformation) : "" );
             repr += ( shift ? ", shift=" + get__repr__(shift) : "" );
@@ -108,7 +109,7 @@ namespace hopsy {
                     py::arg("transformation") = py::none(), 
                     py::arg("shift") = py::none())
             .def_readwrite("A", &Problem::A)
-            .def_readwrite("b", &Problem::A)
+            .def_readwrite("b", &Problem::b)
             .def_readwrite("starting_point", &Problem::startingPoint)
             .def_property("model", &Problem::getModel, &Problem::setModel)
             .def_readwrite("transformation", &Problem::transformation)
