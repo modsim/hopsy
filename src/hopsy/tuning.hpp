@@ -53,8 +53,6 @@ namespace hopsy {
             return target->getName();
         }
 
-        std::vector<std::shared_ptr<MarkovChain>> markovChain;
-
 	private:
         TuningTarget* target;
     };
@@ -109,9 +107,9 @@ namespace hopsy {
     using GridSearch = hops::GridSearchTuner::param_type;
 
     template<typename MethodType>
-    void tune(typename MethodType::param_type& methodParams, 
-              TuningTarget* target, 
-              std::vector<RandomNumberGenerator*>& randomNumberGenerator) {
+    VectorType tune(typename MethodType::param_type& methodParams, 
+                    TuningTarget* target, 
+                    std::vector<RandomNumberGenerator*>& randomNumberGenerator) {
         VectorType optimalParameters;
         double optimalTargetValue;
 
@@ -121,6 +119,8 @@ namespace hopsy {
         }
         TuningTargetWrapper _target{target};
         MethodType::tune(optimalParameters, optimalTargetValue, _randomNumberGenerator, methodParams, _target);
+
+        return optimalParameters;
     }
 
     void addTuning(py::module& m) {
@@ -196,7 +196,7 @@ namespace hopsy {
                    py::arg("posteriorUpdateIterations") = 100,
                    py::arg("pureSamplingIterations") = 1,
                    py::arg("iterationsForConvergence") = 5,
-                   py::arg("stepSizeGridSize") = 100,
+                   py::arg("stepSizeGridSize") = 101,
                    py::arg("stepSizeLowerBound") = 1e-5,
                    py::arg("stepSizeUpperBound") = 1e5,
                    py::arg("smoothingLength") = .5,
