@@ -597,7 +597,7 @@ namespace hopsy {
                 m, "AdaptiveMetropolisProposal");
         // constructor
         adaptiveMetropolisProposal
-            .def(py::init<>()) 
+            //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
             .def(py::init([] (const Problem* problem,
                               double stepSize,
                               double boundaryCushion,
@@ -649,7 +649,7 @@ namespace hopsy {
                 m, "BallWalkProposal");
         // constructor
         ballWalkProposal
-            .def(py::init<>()) 
+            //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
             .def(py::init(&BallWalkProposal::createFromProblem), 
                 py::arg("problem"),
                 py::arg("stepsize") = 1)
@@ -670,7 +670,7 @@ namespace hopsy {
                 m, "CSmMALAProposal");
         // constructor
         csmmalaProposal    
-            .def(py::init<>()) 
+            //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
             .def(py::init([] (const Problem* problem, 
                               double stepSize,
                               double fisherWeight) -> CSmMALAProposal {
@@ -720,7 +720,7 @@ namespace hopsy {
                 m, "DikinWalkProposal");
         // constructor
         dikinWalkProposal
-            .def(py::init<>()) 
+            //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
             .def(py::init([] (const Problem* problem,
                               double stepSize,
                               double boundaryCushion) {
@@ -758,7 +758,7 @@ namespace hopsy {
                 m, "GaussianCoordinateHitAndRunProposal");
         // constructor
         gaussianCoordinateHitAndRunProposal
-            .def(py::init<>()) 
+            //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
             .def(py::init(&GaussianCoordinateHitAndRunProposal::createFromProblem),
                 py::arg("problem"),
                 py::arg("stepsize") = 1)
@@ -779,7 +779,7 @@ namespace hopsy {
                 m, "GaussianHitAndRunProposal");
         // constructor
         gaussianHitAndRunProposal
-            .def(py::init<>()) 
+            //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
             .def(py::init(&GaussianHitAndRunProposal::createFromProblem),
                 py::arg("problem"),
                 py::arg("stepsize") = 1)
@@ -800,7 +800,7 @@ namespace hopsy {
                 m, "GaussianProposal");
         // constructor
         gaussianProposal
-            .def(py::init<>()) 
+            //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
             .def(py::init(&GaussianProposal::createFromProblem),
                 py::arg("problem"),
                 py::arg("stepsize") = 1)
@@ -830,7 +830,7 @@ namespace hopsy {
                 m, "UniformCoordinateHitAndRunProposal");
         // constructor
         uniformCoordinateHitAndRunProposal
-            .def(py::init<>()) 
+            //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
             .def(py::init(&UniformCoordinateHitAndRunProposal::createFromProblem), 
                 py::arg("problem"))
             .def(py::init(&UniformCoordinateHitAndRunProposal::create), 
@@ -846,7 +846,7 @@ namespace hopsy {
                 m, "UniformHitAndRunProposal");
         // constructor
         uniformHitAndRunProposal
-            .def(py::init<>()) 
+            //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
             .def(py::init(&UniformHitAndRunProposal::createFromProblem), 
                 py::arg("problem")) 
             .def(py::init(&UniformHitAndRunProposal::create), 
