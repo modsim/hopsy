@@ -59,20 +59,20 @@ namespace hopsy {
     using Uniform = std::uniform_real_distribution<double>;
 
     void addRandom(py::module& m) {
-        py::class_<hopsy::RandomNumberGenerator>(m, "RandomNumberGenerator")
+        py::class_<RandomNumberGenerator>(m, "RandomNumberGenerator")
             .def(py::init<>())
             .def(py::init<unsigned int>(), py::arg("seed"))
             .def(py::init<unsigned int, unsigned int>(), py::arg("seed"), py::arg("stream"))
-            .def("__call__", [] (hopsy::RandomNumberGenerator& self) { return self(); })
-            .def("__repr__", &hopsy::RandomNumberGenerator::__repr__)
+            .def("__call__", [] (RandomNumberGenerator& self) { return self(); })
+            .def("__repr__", &RandomNumberGenerator::__repr__)
         ;
 
-        py::class_<hopsy::Uniform>(m, "Uniform")
+        py::class_<Uniform>(m, "Uniform")
             .def(py::init<double, double>(), py::arg("a") = 0, py::arg("b") = 1)
-            .def("__call__", [] (hopsy::Uniform& self, hopsy::RandomNumberGenerator& rng) -> double { 
+            .def("__call__", [] (Uniform& self, RandomNumberGenerator& rng) -> double { 
                     return self(rng.rng); 
                 })
-            .def("__repr__", [] (hopsy::Uniform& self) -> std::string {
+            .def("__repr__", [] (Uniform& self) -> std::string {
                     std::string repr = "hopsy.Uniform(";
                     repr += "a=" + std::to_string(self.a()) + ", ";
                     repr += "b=" + std::to_string(self.b()) + ")";
@@ -80,9 +80,9 @@ namespace hopsy {
                 })
         ;
 
-        py::class_<hopsy::Normal>(m, "Normal")
+        py::class_<Normal>(m, "Normal")
             .def(py::init<double, double>(), py::arg("mean") = 0, py::arg("stddev") = 1)
-            .def("__call__", [] (hopsy::Normal& self, hopsy::RandomNumberGenerator& rng) -> double { 
+            .def("__call__", [] (Normal& self, RandomNumberGenerator& rng) -> double { 
                     return self(rng.rng); 
                 })
             .def("__repr__", [] (hopsy::Normal& self) -> std::string {
