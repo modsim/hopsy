@@ -32,7 +32,7 @@ class MarkovChainTests(unittest.TestCase):
     #        mc = MarkovChain(proposal, problem)
     #        self.assertIsInstance(mc.proposal, ProposalType)
 
-    @expectedFailure
+    @unittest.expectedFailure
     def test_empty_proposal_initialization(self):
         problem = Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0], Gaussian(), starting_point=[0, 0])
 
