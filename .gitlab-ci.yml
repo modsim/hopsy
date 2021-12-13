@@ -25,7 +25,8 @@ test-release:
     - apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3 python3-pip
   script:
     - python3 -m pip install dist/hopsy*
-    - python3 -m pip show -f hopsy
+    - ls $(python3 -m pip show -f hopsy | grep Location | cut -f 2 -d' ')/hopsy/
+    - ldd $(python3 -m pip show -f hopsy | grep Location | cut -f 2 -d' ')/hopsy/core.*
     - python3 -m unittest -v hopsy.tests
   # TODO add test-reports
 
