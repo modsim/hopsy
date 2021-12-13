@@ -109,6 +109,7 @@ namespace hopsy {
             extern const char* base;
             extern const char* __init__;
             extern const char* acceptanceRate;
+            extern const char* __call__;
         }
 
         namespace ExpectedSquaredJumpDistanceTarget {
@@ -116,6 +117,7 @@ namespace hopsy {
             extern const char* __init__;
             extern const char* lags;
             extern const char* considerTimeCost;
+            extern const char* __call__;
         }
 
         namespace ThompsonSampling {

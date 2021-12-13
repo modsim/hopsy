@@ -664,6 +664,10 @@ const char* hopsy::doc::AcceptanceRateTarget::acceptanceRate = R"pbdoc(
 )pbdoc";
 
 
+const char* hopsy::doc::AcceptanceRateTarget::__call__= R"pbdoc(
+)pbdoc";
+
+
 const char* hopsy::doc::ExpectedSquaredJumpDistanceTarget::base = R"pbdoc(
 )pbdoc";
 
@@ -677,6 +681,10 @@ const char* hopsy::doc::ExpectedSquaredJumpDistanceTarget::lags = R"pbdoc(
 
 
 const char* hopsy::doc::ExpectedSquaredJumpDistanceTarget::considerTimeCost = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ExpectedSquaredJumpDistanceTarget::__call__= R"pbdoc(
 )pbdoc";
 
 
