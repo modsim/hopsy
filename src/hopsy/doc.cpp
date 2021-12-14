@@ -649,7 +649,7 @@ const char* hopsy::doc::Run::maxRepetitions = R"pbdoc(
 
 
 /*
- *  Tuning Targets
+ *  AcceptanceRateTarget
  */
 
 const char* hopsy::doc::AcceptanceRateTarget::base = R"pbdoc(
@@ -657,6 +657,14 @@ const char* hopsy::doc::AcceptanceRateTarget::base = R"pbdoc(
 
 
 const char* hopsy::doc::AcceptanceRateTarget::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AcceptanceRateTarget::markovChains = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AcceptanceRateTarget::numberOfTestSamples = R"pbdoc(
 )pbdoc";
 
 
@@ -668,11 +676,23 @@ const char* hopsy::doc::AcceptanceRateTarget::__call__= R"pbdoc(
 )pbdoc";
 
 
+/*
+ *  ExpectedSquaredJumpDistanceTarget
+ */
+
 const char* hopsy::doc::ExpectedSquaredJumpDistanceTarget::base = R"pbdoc(
 )pbdoc";
 
 
 const char* hopsy::doc::ExpectedSquaredJumpDistanceTarget::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ExpectedSquaredJumpDistanceTarget::markovChains = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ExpectedSquaredJumpDistanceTarget::numberOfTestSamples = R"pbdoc(
 )pbdoc";
 
 
@@ -692,9 +712,54 @@ const char* hopsy::doc::ExpectedSquaredJumpDistanceTarget::__call__= R"pbdoc(
  *  ThompsonSampling
  */
 
-const char* hopsy::doc::ThompsonSampling::base;
-const char* hopsy::doc::ThompsonSampling::__init__;
-const char* hopsy::doc::ThompsonSampling::posteriorUpdateIterations;
+const char* hopsy::doc::ThompsonSampling::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ThompsonSampling::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ThompsonSampling::posteriorUpdateIterations = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ThompsonSampling::pureSamplingIterations = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ThompsonSampling::iterationsForConvergence = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ThompsonSampling::posteriorUpdateIterationsNeeded = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ThompsonSampling::stepSizeGridSize = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ThompsonSampling::stepSizeLowerBound = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ThompsonSampling::stepSizeUpperBound = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ThompsonSampling::smoothingLength = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ThompsonSampling::randomSeed = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ThompsonSampling::recordData = R"pbdoc(
+)pbdoc";
+
+
 
 
 /*

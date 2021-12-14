@@ -108,6 +108,8 @@ namespace hopsy {
         namespace AcceptanceRateTarget {
             extern const char* base;
             extern const char* __init__;
+            extern const char* markovChains;
+            extern const char* numberOfTestSamples;
             extern const char* acceptanceRate;
             extern const char* __call__;
         }
@@ -115,6 +117,8 @@ namespace hopsy {
         namespace ExpectedSquaredJumpDistanceTarget {
             extern const char* base;
             extern const char* __init__;
+            extern const char* markovChains;
+            extern const char* numberOfTestSamples;
             extern const char* lags;
             extern const char* considerTimeCost;
             extern const char* __call__;
@@ -124,6 +128,16 @@ namespace hopsy {
             extern const char* base;
             extern const char* __init__;
             extern const char* posteriorUpdateIterations;
+            extern const char* pureSamplingIterations;
+            extern const char* iterationsForConvergence;
+            extern const char* posteriorUpdateIterationsNeeded;
+            extern const char* stepSizeGridSize;
+            extern const char* stepSizeLowerBound;
+            extern const char* stepSizeUpperBound;
+            extern const char* smoothingLength;
+            extern const char* randomSeed;
+            extern const char* recordData;
+
         }
 
         extern const char* tune;

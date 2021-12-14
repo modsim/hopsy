@@ -107,20 +107,27 @@ namespace hopsy {
     using GridSearch = hops::GridSearchTuner::param_type;
 
     template<typename MethodType>
-    VectorType tune(typename MethodType::param_type& methodParams, 
-                    TuningTarget* target, 
-                    std::vector<RandomNumberGenerator*>& randomNumberGenerator) {
+    std::pair<VectorType, MatrixType> tune(typename MethodType::param_type& methodParams, 
+                                           TuningTarget* target, 
+                                           std::vector<RandomNumberGenerator*>& randomNumberGenerator) {
         VectorType optimalParameters;
         double optimalTargetValue;
+        MatrixType data;
 
         std::vector<hops::RandomNumberGenerator*> _randomNumberGenerator(randomNumberGenerator.size());
         for (size_t i = 0; i < randomNumberGenerator.size(); ++i) {
             _randomNumberGenerator[i] = &randomNumberGenerator[i]->rng;
         }
-        TuningTargetWrapper _target{target};
-        MethodType::tune(optimalParameters, optimalTargetValue, _randomNumberGenerator, methodParams, _target);
 
-        return optimalParameters;
+        TuningTargetWrapper _target{target};
+        MethodType::tune(optimalParameters, 
+                         optimalTargetValue, 
+                         _randomNumberGenerator, 
+                         methodParams, 
+                         _target,
+                         data);
+
+        return {optimalParameters, data};
     }
 
     void addTuning(py::module& m) {
@@ -138,6 +145,8 @@ namespace hopsy {
                 py::arg("markov_chains"), 
                 py::arg("acceptance_rate") = 0.234,
                 py::arg("n_test_samples") = 1000)
+            .def_readwrite("n_test_samples", &AcceptanceRateTarget::numberOfTestSamples, 
+                    doc::AcceptanceRateTarget::numberOfTestSamples)
             .def_readwrite("acceptance_rate", &AcceptanceRateTarget::acceptanceRateTargetValue, 
                     doc::AcceptanceRateTarget::acceptanceRate)
             .def("__call__", [] (AcceptanceRateTarget& self, 
@@ -174,7 +183,10 @@ namespace hopsy {
                 py::arg("n_test_samples") = 1000,
                 py::arg("lags") = std::vector<unsigned long>{1},
                 py::arg("consider_time_cost") = false)
-            .def_readwrite("lags", &ExpectedSquaredJumpDistanceTarget::lags, doc::ExpectedSquaredJumpDistanceTarget::lags)
+            .def_readwrite("n_test_samples", &ExpectedSquaredJumpDistanceTarget::numberOfTestSamples, 
+                    doc::ExpectedSquaredJumpDistanceTarget::numberOfTestSamples)
+            .def_readwrite("lags", &ExpectedSquaredJumpDistanceTarget::lags, 
+                    doc::ExpectedSquaredJumpDistanceTarget::lags)
             .def_readwrite("consider_time_cost", &ExpectedSquaredJumpDistanceTarget::considerTimeCost, 
                     doc::ExpectedSquaredJumpDistanceTarget::considerTimeCost)
             .def("__call__", [] (ExpectedSquaredJumpDistanceTarget& self, 
@@ -191,18 +203,32 @@ namespace hopsy {
 
         // tuning methods
         py::class_<ThompsonSampling>(m, "ThompsonSamplingTuning", doc::ThompsonSampling::base)
-            .def(py::init<size_t, size_t, size_t, size_t, size_t, double, double, double, size_t, bool>(),
-                   py::arg("iterationsToTestStepSize") = 1000,
-                   py::arg("posteriorUpdateIterations") = 100,
-                   py::arg("pureSamplingIterations") = 1,
-                   py::arg("iterationsForConvergence") = 5,
-                   py::arg("stepSizeGridSize") = 101,
-                   py::arg("stepSizeLowerBound") = 1e-5,
-                   py::arg("stepSizeUpperBound") = 1e5,
-                   py::arg("smoothingLength") = .5,
-                   py::arg("randomSeed") = 0,
-                   py::arg("recordData") = false)
-          .def_readwrite("n_posterior_updates", &ThompsonSampling::posteriorUpdateIterations, doc::ThompsonSampling::posteriorUpdateIterations);
+            .def(py::init<size_t, size_t, size_t, size_t, double, double, double, size_t, bool>(),
+                    py::arg("n_posterior_update") = 100,
+                    py::arg("n_pure_sampling") = 1,
+                    py::arg("n_convergence") = 5,
+                    py::arg("grid_size") = 101,
+                    py::arg("lower_bound") = 1e-5,
+                    py::arg("upper_bound") = 1e5,
+                    py::arg("smoothing_length") = .5,
+                    py::arg("random_seed") = 0,
+                    py::arg("record_data") = false)
+          .def_readwrite("n_posterior_updates", &ThompsonSampling::posteriorUpdateIterations, 
+				    doc::ThompsonSampling::posteriorUpdateIterations)
+          .def_readwrite("n_pure_sampling", &ThompsonSampling::pureSamplingIterations, 
+					doc::ThompsonSampling::pureSamplingIterations)
+          .def_readwrite("n_convergence", &ThompsonSampling::iterationsForConvergence, 
+					doc::ThompsonSampling::iterationsForConvergence)
+          .def_readwrite("grid_size", &ThompsonSampling::stepSizeGridSize, 
+					doc::ThompsonSampling::stepSizeGridSize)
+          .def_readwrite("grid_lower_bound", &ThompsonSampling::stepSizeLowerBound, 
+					doc::ThompsonSampling::stepSizeLowerBound)
+          .def_readwrite("grid_upper_bound", &ThompsonSampling::stepSizeUpperBound, 
+					doc::ThompsonSampling::stepSizeUpperBound)
+          .def_readwrite("smoothing_length", &ThompsonSampling::smoothingLength, 
+					doc::ThompsonSampling::smoothingLength)
+          .def_readwrite("random_seed", &ThompsonSampling::randomSeed, doc::ThompsonSampling::randomSeed)
+          .def_readwrite("record_data", &ThompsonSampling::recordData, doc::ThompsonSampling::recordData);
 
         m.def("tune", &tune<hops::ThompsonSamplingTuner>, 
                 py::arg("method"), py::arg("target"), py::arg("rngs"));
