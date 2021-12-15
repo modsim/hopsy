@@ -165,24 +165,27 @@ namespace hopsy {
             .def(py::init([] (std::vector<MarkovChain*>& markovChain,
                               unsigned long numberOfTestSamples, 
                               unsigned long lags, 
-                              bool considerTimeCost) { 
+                              bool considerTimeCost, 
+                              bool estimateCovariance) { 
                             std::vector<unsigned long> _lags;
                             for (unsigned long i = 0; i < lags; ++i) {
                                 _lags.push_back(i+1);
                             }
-                            return createTarget<ExpectedSquaredJumpDistanceTarget, std::vector<unsigned long>, bool>(
-                                    markovChain, numberOfTestSamples, _lags, considerTimeCost);
+                            return createTarget<ExpectedSquaredJumpDistanceTarget, std::vector<unsigned long>, bool, bool>(
+                                    markovChain, numberOfTestSamples, _lags, considerTimeCost, estimateCovariance);
                         }), 
                 doc::ExpectedSquaredJumpDistanceTarget::__init__, 
                 py::arg("markov_chains"), 
                 py::arg("n_test_samples") = 1000,
                 py::arg("lags") = 1,
-                py::arg("consider_time_cost") = false)
+                py::arg("consider_time_cost") = false,
+                py::arg("estimate_covariance") = true)
             .def(py::init(&createTarget<ExpectedSquaredJumpDistanceTarget, std::vector<unsigned long>, bool>),
                 py::arg("markov_chains"), 
                 py::arg("n_test_samples") = 1000,
                 py::arg("lags") = std::vector<unsigned long>{1},
-                py::arg("consider_time_cost") = false)
+                py::arg("consider_time_cost") = false,
+                py::arg("estimate_covariance") = true)
             .def_readwrite("n_test_samples", &ExpectedSquaredJumpDistanceTarget::numberOfTestSamples, 
                     doc::ExpectedSquaredJumpDistanceTarget::numberOfTestSamples)
             .def_readwrite("lags", &ExpectedSquaredJumpDistanceTarget::lags, 
