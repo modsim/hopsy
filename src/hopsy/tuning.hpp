@@ -180,7 +180,7 @@ namespace hopsy {
                 py::arg("lags") = 1,
                 py::arg("consider_time_cost") = false,
                 py::arg("estimate_covariance") = true)
-            .def(py::init(&createTarget<ExpectedSquaredJumpDistanceTarget, std::vector<unsigned long>, bool>),
+            .def(py::init(&createTarget<ExpectedSquaredJumpDistanceTarget, std::vector<unsigned long>, bool, bool>),
                 py::arg("markov_chains"), 
                 py::arg("n_test_samples") = 1000,
                 py::arg("lags") = std::vector<unsigned long>{1},
