@@ -1,4 +1,5 @@
-image: ubuntu:20.04 
+image: quay.io/pypa/manylinux2014_x86_64
+#image: ubuntu:20.04 
 #image: python:latest
 
 variables:
@@ -10,10 +11,11 @@ stages:
 
 build-release:
   stage: build
-  before_script:
-    - apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cmake ninja-build python3 python3-pip
+    #before_script:
+    #  - apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cmake ninja-build python3 python3-pip
   script:
-    - python3 setup.py bdist_wheel
+    - for PY in "cp36-cp36m" "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/"$py/bin/pip wheel --no-deps; done
+    - VERSION=$(cat .version); for PY in "cp36-cp36m" "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do auditwheel repair /dist/hopsy-$VERSION-$PY-* -w dist; done
   artifacts:
     paths:
       - dist
@@ -21,12 +23,9 @@ build-release:
 
 test-release:
   stage: test
-  before_script:
-    - apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3 python3-pip
+    #before_script:
+    #  - apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3 python3-pip
   script:
-    - python3 -m pip install dist/hopsy*
-    - ls $(python3 -m pip show -f hopsy | grep Location | cut -f 2 -d' ')/hopsy/
-    - ldd $(python3 -m pip show -f hopsy | grep Location | cut -f 2 -d' ')/hopsy/core.*
-    - python3 -m unittest -v hopsy.tests
-  # TODO add test-reports
+    - VERSION=$(cat .version); for PY in "cp36-cp36m" "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl -w dist; done
+    - VERSION=$(cat .version); for PY in "cp36-cp36m" "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m unittest -v hopsy.tests -w dist; done
 
