@@ -15,7 +15,8 @@ build-release:
     #  - apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq cmake ninja-build python3 python3-pip
   script:
     #- for PY in "cp36-cp36m" "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/pip wheel --no-deps; done
-    - for PY in "cp36-cp36m" "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python setup.py bdist_wheel; done
+    - for PY in "cp36-cp36m" "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/pip wheel --no-deps . -w dist; done
+#    - for PY in "cp36-cp36m" "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python setup.py bdist_wheel; done
     - VERSION=$(cat .version); for PY in "cp36-cp36m" "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do auditwheel repair /dist/hopsy-$VERSION-$PY-* -w dist; done
   artifacts:
     paths:
