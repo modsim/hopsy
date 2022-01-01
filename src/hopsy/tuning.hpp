@@ -135,9 +135,9 @@ namespace hopsy {
         py::class_<TuningTarget>(m, "TuningTarget"/*, doc::TuningTarget::base*/);
 
         py::class_<AcceptanceRateTarget, TuningTarget>(m, "AcceptanceRateTarget", doc::AcceptanceRateTarget::base)
-            .def(py::init([] (double acceptanceRate,
-                              unsigned long numberOfTestSamples, 
-                              std::vector<MarkovChain*>& markovChain) { 
+            .def(py::init([] (std::vector<MarkovChain*>& markovChain, 
+                              double acceptanceRate,
+                              unsigned long numberOfTestSamples) { 
                             return createTarget<AcceptanceRateTarget, double>(
                                     markovChain, numberOfTestSamples, acceptanceRate);
                         }), 
