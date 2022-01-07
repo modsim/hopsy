@@ -175,10 +175,34 @@ namespace hopsy {
 
         py::classh<hopsy::DegenerateGaussian, hopsy::Model, hopsy::ModelTrampoline<hopsy::DegenerateGaussian>>(m, "Gaussian", 
                 hopsy::doc::DegenerateGaussian::base)
-            .def(py::init<Eigen::VectorXd, Eigen::MatrixXd, std::vector<long>>(),
+            .def(py::init([] (const Eigen::VectorXd& mean, 
+                              const Eigen::MatrixXd& covariance, 
+                              const std::vector<long>& inactives) {
+                            if (!mean.size() && !covariance.size()) {
+                                return hopsy::DegenerateGaussian(Eigen::VectorXd::Zero(2), 
+                                                                 Eigen::MatrixXd::Identity(2, 2), 
+                                                                 inactives);
+                            } else if(!mean.size() && covariance.size()) {
+                                if (covariance.rows() != covariance.cols()) {
+                                    throw std::invalid_argument("Covariance must be square matrix, but has shape (" + 
+                                            std::to_string(covariance.rows()) + ", " + std::to_string(covariance.cols()) + ").");
+                                }
+                                return hopsy::DegenerateGaussian(Eigen::VectorXd::Zero(covariance.rows()), 
+                                                                 covariance, 
+                                                                 inactives);
+                            } else if(mean.size() && !covariance.size()) {
+                                return hopsy::DegenerateGaussian(mean, 
+                                                                 Eigen::MatrixXd::Identity(mean.size(), mean.size()), 
+                                                                 inactives);
+                            } else if(mean.size() && covariance.size()) {
+                                return hopsy::DegenerateGaussian(mean, 
+                                                                 covariance, 
+                                                                 inactives);
+                            }
+                        }),
                     hopsy::doc::DegenerateGaussian::__init__,
-                    py::arg("mean") = Eigen::VectorXd(Eigen::VectorXd::Zero(2)), 
-                    py::arg("covariance") = Eigen::MatrixXd(Eigen::MatrixXd::Identity(2, 2)),
+                    py::arg("mean") = Eigen::VectorXd(), 
+                    py::arg("covariance") = Eigen::MatrixXd(),
                     py::arg("inactives") = std::vector<long>())
             .def("compute_negative_log_likelihood", &hopsy::DegenerateGaussian::computeNegativeLogLikelihood, 
                     hopsy::doc::DegenerateGaussian::computeNegativeLogLikelihood,

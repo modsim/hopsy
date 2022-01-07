@@ -18,7 +18,7 @@ class TuningTests(unittest.TestCase):
         self.assertEqual(True, True)
 
 
-    def test_target_setup(self):
+    def test_esjd_target_setup(self):
         problem = Problem([[1, 1]], [1], Gaussian(), starting_point=[0, 0]); 
         mcs = [MarkovChain(GaussianProposal(problem), problem) for i in range(5)]; 
 
@@ -35,10 +35,8 @@ class TuningTests(unittest.TestCase):
 
         tune(ts, target, [RandomNumberGenerator(0, i) for i in range(5)])
 
-        self.assertEqual(True, True)
 
-
-    def test_target_setup(self):
+    def test_accrate_target_setup(self):
         problem = Problem([[1, 1]], [1], Gaussian(), starting_point=[0, 0]); 
         mcs = [MarkovChain(GaussianProposal(problem), problem) for i in range(5)]; 
 
