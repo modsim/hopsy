@@ -22,6 +22,11 @@ namespace py = pybind11;
 
 namespace hopsy {
     using TuningTarget = hops::TuningTarget;
+} // namespace hopsy
+
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::TuningTarget);
+
+namespace hopsy {
 
     // currently deprecated. 
     // TODO: 
@@ -63,13 +68,13 @@ namespace hopsy {
 
         PyTuningTarget(py::object pyObj) : pyObj(std::move(pyObj)) {};
 
-        std::tuple<double, double> operator() (const VectorType x, const std::vector<hops::RandomNumberGenerator*>& randomNumberGenerators) {
+        std::pair<double, double> operator()(const VectorType& x, const std::vector<hops::RandomNumberGenerator*>& randomNumberGenerators) override {
             std::vector<RandomNumberGenerator*> _randomNumberGenerators(randomNumberGenerators.size());
             for (size_t i = 0; i < randomNumberGenerators.size(); ++i) {
                 _randomNumberGenerators[i]->rng = *randomNumberGenerators[i];
             }
 
-            auto returnValue = pyObj.attr("__call__")(x, _randomNumberGenerators).cast<std::tuple<double, double>>();
+            auto returnValue = pyObj.attr("__call__")(x, _randomNumberGenerators).cast<std::pair<double, double>>();
 
             // propagate changes to the rngs which were caused in the python call above back to the passed random generators.
             for (size_t i = 0; i < randomNumberGenerators.size(); ++i) {
@@ -79,8 +84,12 @@ namespace hopsy {
             return returnValue;
         }
 
-        std::string getName() {
+        std::string getName() const override {
             return pyObj.attr("name").cast<std::string>();
+        }
+
+        std::unique_ptr<TuningTarget> copyTuningTarget() const override {
+            return pyObj.attr("deepcopy")().cast<std::unique_ptr<TuningTarget>>();
         }
 
     private:
@@ -129,22 +138,28 @@ namespace hopsy {
 
         return {optimalParameters, data};
     }
+} // namespace hopsy
 
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::PyTuningTarget);
+
+namespace hopsy {
     void addTuning(py::module& m) {
         // tuning targets
-        py::class_<TuningTarget>(m, "TuningTarget"/*, doc::TuningTarget::base*/);
+        py::classh<TuningTarget>(m, "TuningTarget"/*, doc::TuningTarget::base*/);
 
         py::class_<AcceptanceRateTarget, TuningTarget>(m, "AcceptanceRateTarget", doc::AcceptanceRateTarget::base)
-            .def(py::init([] (std::vector<MarkovChain*>& markovChain, 
+            .def(py::init([] (std::vector<MarkovChain*>& markovChain,
+                              unsigned long numberOfTestSamples, 
                               double acceptanceRate,
-                              unsigned long numberOfTestSamples) { 
-                            return createTarget<AcceptanceRateTarget, double>(
-                                    markovChain, numberOfTestSamples, acceptanceRate);
+                              unsigned long order) { 
+                            return createTarget<AcceptanceRateTarget, double, unsigned long>(
+                                    markovChain, numberOfTestSamples, acceptanceRate, order);
                         }), 
                 doc::AcceptanceRateTarget::__init__,
-                py::arg("markov_chains"), 
+                py::arg("markov_chains"),
+                py::arg("n_test_samples") = 1000, 
                 py::arg("acceptance_rate") = 0.234,
-                py::arg("n_test_samples") = 1000)
+                py::arg("order") = 1)
             .def_readwrite("n_test_samples", &AcceptanceRateTarget::numberOfTestSamples, 
                     doc::AcceptanceRateTarget::numberOfTestSamples)
             .def_readwrite("acceptance_rate", &AcceptanceRateTarget::acceptanceRateTargetValue, 
@@ -201,6 +216,14 @@ namespace hopsy {
                         }
                         return self(x, _randomNumberGenerators);
                     },
+                    py::arg("x"), py::arg("rngs"), doc::ExpectedSquaredJumpDistanceTarget::__call__)
+        ;
+
+        py::classh<PyTuningTarget, TuningTarget>(m, "PyTuningTarget", doc::ExpectedSquaredJumpDistanceTarget::base)
+            .def(py::init<py::object>(), 
+                doc::ExpectedSquaredJumpDistanceTarget::__init__, 
+                py::arg("tuning_target"))
+            .def("__call__", &PyTuningTarget::operator(),
                     py::arg("x"), py::arg("rngs"), doc::ExpectedSquaredJumpDistanceTarget::__call__)
         ;
 
