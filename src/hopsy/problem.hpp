@@ -119,12 +119,12 @@ namespace hopsy {
                                 /* Return a tuple that fully encodes the state of the object */
                                 return py::make_tuple(self.A, 
                                                       self.b, 
-                                                      py::cast(self.model).attr("__getstate__")(), 
+                                                      ( self.model ? py::cast(static_cast<hopsy::Model*>(self.model.get())).attr("__getstate__")() : py::none() ), 
                                                       self.startingPoint, 
                                                       self.transformation, 
                                                       self.shift);
                             },
-                            [](py::tuple t) { // __setstate__
+                            [] (py::tuple t) { // __setstate__
                                 if (t.size() != 3) throw std::runtime_error("Invalid state!");
 
                                 /* Create a new C++ instance */

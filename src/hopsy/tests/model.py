@@ -4,7 +4,7 @@ from .. import *
 
 class ModelTests(unittest.TestCase):
     def test_gaussian_pickling(self):
-        problem = Gaussian()
-        print(problem)
-        print(problem.__getstate__())
+        model = Gaussian()
+        print(model)
+        print(model.__getstate__())
 

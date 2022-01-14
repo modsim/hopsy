@@ -34,4 +34,10 @@ class ProblemTests(unittest.TestCase):
 
 
     def test_problem_pickling(self):
-        pass
+        problem = Problem([[1, 1]], [1], starting_point=[0, 0])
+        print(problem)
+        print(problem.__getstate__())
+
+        problem = Problem([[1, 1]], [1], Gaussian(), starting_point=[0, 0])
+        print(problem)
+        print(problem.__getstate__())
