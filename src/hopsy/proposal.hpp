@@ -679,7 +679,7 @@ namespace hopsy {
                                 throw std::runtime_error("Cannot initialize hopsy.CSmMALAProposal for uniform problem (problem.model == None).");
                             }
 
-                            return CSmMALAProposal::createFromProblem(problem, ModelWrapper(problem->model), fisherWeight, stepSize);
+                            return CSmMALAProposal::createFromProblem(problem, ModelWrapper(std::move(problem->model->copyModel())), fisherWeight, stepSize);
                         } else {
                             throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
                         }
@@ -696,7 +696,7 @@ namespace hopsy {
                                 throw std::runtime_error("Cannot initialize hopsy.CSmMALAProposal for uniform problem (problem.model == None).");
                             }
 
-                            return CSmMALAProposal::create(problem, startingPoint, ModelWrapper(problem->model), fisherWeight, stepSize);
+                            return CSmMALAProposal::create(problem, startingPoint, ModelWrapper(std::move(problem->model->copyModel())), fisherWeight, stepSize);
                         } else {
                             throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
                         }

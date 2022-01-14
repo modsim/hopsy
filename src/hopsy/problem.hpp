@@ -16,27 +16,27 @@ namespace hopsy {
     struct Problem {
         MatrixType A;
         VectorType b;
-        std::shared_ptr<Model> model;
+        std::unique_ptr<Model> model;
         std::optional<VectorType> startingPoint;
         std::optional<MatrixType> transformation;
         std::optional<VectorType> shift;
 
         Problem(MatrixType A, 
                 VectorType b, 
-                std::shared_ptr<Model> model, 
+                std::unique_ptr<Model> model, 
                 std::optional<VectorType> startingPoint, 
                 std::optional<MatrixType> transformation, 
                 std::optional<VectorType> shift) : 
                 A(A),
                 b(b),
-                model(model),
+                model(std::move(model->copyModel())),
                 startingPoint(startingPoint),
                 transformation(transformation),
                 shift(shift) { 
         }
 
-        std::shared_ptr<Model> getModel() const { return model; }
-        void setModel(std::shared_ptr<Model> model) { this->model = model; }
+        std::unique_ptr<Model>& getModel() { return model; }
+        void setModel(std::unique_ptr<Model> model) { this->model = std::move(model->copyModel()); }
 
         std::string __repr__() const {
             Model* _model = static_cast<Model*>(model.get());
@@ -98,7 +98,7 @@ namespace hopsy {
         py::class_<Problem>(m, "Problem")
             .def(py::init<MatrixType, 
                           VectorType, 
-                          std::shared_ptr<Model>, 
+                          std::unique_ptr<Model>, 
                           std::optional<VectorType>, 
                           std::optional<MatrixType>, 
                           std::optional<VectorType>>(),
@@ -115,6 +115,29 @@ namespace hopsy {
             .def_readwrite("transformation", &Problem::transformation)
             .def_readwrite("shift", &Problem::shift)
             .def("__repr__", &Problem::__repr__)
+            .def(py::pickle([] (const hopsy::Problem& self) { // __getstate__
+                                /* Return a tuple that fully encodes the state of the object */
+                                return py::make_tuple(self.A, 
+                                                      self.b, 
+                                                      py::cast(self.model).attr("__getstate__")(), 
+                                                      self.startingPoint, 
+                                                      self.transformation, 
+                                                      self.shift);
+                            },
+                            [](py::tuple t) { // __setstate__
+                                if (t.size() != 3) throw std::runtime_error("Invalid state!");
+
+                                /* Create a new C++ instance */
+                                hopsy::Problem p(t[0].cast<Eigen::VectorXd>(),
+                                                 t[1].cast<Eigen::MatrixXd>(),
+                                                 t[2].cast<std::unique_ptr<Model>>(),
+                                                 t[3].cast<std::optional<VectorType>>(),
+                                                 t[4].cast<std::optional<MatrixType>>(),
+                                                 t[5].cast<std::optional<VectorType>>());
+
+                                return p;
+                            }
+                    ))
         ;
     }
 }

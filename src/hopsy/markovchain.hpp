@@ -30,12 +30,20 @@ namespace hopsy {
         MarkovChain() = default;
 
         MarkovChain(const std::shared_ptr<Proposal> proposal, 
-                    const std::shared_ptr<Model> model = nullptr, 
                     const std::optional<LinearTransformation>& transformation = std::nullopt) : 
                 proposal(nullptr), 
-                model(nullptr), 
+                model(nullptr),
                 transformation(transformation) {
-            createMarkovChain(this, proposal, model, transformation);
+            createMarkovChain(this, proposal, this->model, transformation);
+        }
+
+        MarkovChain(const std::shared_ptr<Proposal> proposal, 
+                    const std::unique_ptr<Model>& model, 
+                    const std::optional<LinearTransformation>& transformation = std::nullopt) : 
+                proposal(nullptr), 
+                transformation(transformation) {
+            if (model) this->model = std::move(model->copyModel());
+            createMarkovChain(this, proposal, this->model, transformation);
         }
 
 	   	std::pair<double, VectorType> draw(hops::RandomNumberGenerator &randomNumberGenerator, long thinning = 1) override {

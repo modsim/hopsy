@@ -68,7 +68,7 @@ namespace hopsy {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				std::unique_ptr<Model>,     // Return type 
 				ModelBase,                  // Parent class
-                "deepcopy",                 // Python function name
+                "__copy__",                 // Python function name
 				copyModel                    // C++ function name
             );
 		}
@@ -198,6 +198,8 @@ namespace hopsy {
                                 return hopsy::DegenerateGaussian(mean, 
                                                                  covariance, 
                                                                  inactives);
+                            } else {
+                                throw std::runtime_error("Invalid arguments when constructing hopsy.Gaussian.");
                             }
                         }),
                     hopsy::doc::DegenerateGaussian::__init__,
@@ -215,12 +217,29 @@ namespace hopsy {
                     py::arg("x"))
             .def("__repr__", [] (const hopsy::DegenerateGaussian& self) -> std::string {
                         std::string repr = "hopsy.Gaussian(";
-                        //repr += "mean=" + py::cast<std::string>(py::cast(self.mean).attr("__repr__")()) + ", ";
-                        //repr += "covariance=" + py::cast<std::string>(py::cast(self.covariance).attr("__repr__")()) + ", ";
-                        //repr += "inactives=" + py::cast<std::string>(py::cast(self.inactives).attr("__repr__")());
+                        repr += "mean=" + py::cast<std::string>(py::cast(self.getMean()).attr("__repr__")()) + ", ";
+                        repr += "covariance=" + py::cast<std::string>(py::cast(self.getCovariance()).attr("__repr__")());
+                        if (self.getInactive().size()) {
+                            repr += ", inactives=" + py::cast<std::string>(py::cast(self.getInactive()).attr("__repr__")());
+                        }
                         repr += ")";
                         return repr;
                     })
+            .def(py::pickle([] (const hopsy::DegenerateGaussian& self) { // __getstate__
+                                /* Return a tuple that fully encodes the state of the object */
+                                return py::make_tuple(self.getMean(), self.getCovariance(), self.getInactive());
+                            },
+                            [](py::tuple t) { // __setstate__
+                                if (t.size() != 3) throw std::runtime_error("Invalid state!");
+
+                                /* Create a new C++ instance */
+                                hopsy::DegenerateGaussian p(t[0].cast<Eigen::VectorXd>(),
+                                                            t[1].cast<Eigen::MatrixXd>(),
+                                                            t[2].cast<std::vector<long>>());
+
+                                return p;
+                            }
+                    ))
             ;
 
         py::classh<hopsy::Mixture, hopsy::Model, hopsy::ModelTrampoline<hopsy::Mixture>>(m, "Mixture",
@@ -242,19 +261,18 @@ namespace hopsy {
                     py::arg("x"))
             .def("__repr__", [] (const hopsy::Mixture& self) -> std::string {
                         std::string repr = "hopsy.Mixture(";
-                        //repr += "components=[";
-                        //for (auto& component : self.modelComponents) {
-                        //    repr += component.__repr__() + ", ";
-                        //}
-                        //repr += "], ";
-                        //repr += "weights=[";
-                        //for (auto& weight : self.weights) {
-                        //    std::string str = std::to_string(weight);
-                        //    str.erase(str.find_last_not_of('0') + 1, std::string::npos); // remove trailing zeros
-                        //    repr += str + ", ";
-                        //}
-                        //repr += "]";
-                        repr += ")";
+                        repr += "components=[";
+                        for (auto& component : self.getModels()) {
+                            repr += get__repr__(component) + ( &component != &self.getModels().back() ? ", " : "" );
+                        }
+                        repr += "], ";
+                        repr += "weights=[";
+                        for (auto& weight : self.getWeights()) {
+                            std::string str = std::to_string(weight);
+                            str.erase(str.find_last_not_of('0') + 1, std::string::npos); // remove trailing zeros
+                            repr += str + ( &weight != &self.getWeights().back() ? ", " : "" );
+                        }
+                        repr += "])";
                         return repr;
                     })
             ;
