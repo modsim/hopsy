@@ -3,5 +3,8 @@ import unittest
 from .. import *
 
 class ModelTests(unittest.TestCase):
-    pass
+    def test_gaussian_pickling(self):
+        problem = Gaussian()
+        print(problem)
+        print(problem.__getstate__())
 

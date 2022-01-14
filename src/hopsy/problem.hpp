@@ -21,28 +21,28 @@ namespace hopsy {
         std::optional<MatrixType> transformation;
         std::optional<VectorType> shift;
 
-        Problem(MatrixType A, 
-                VectorType b, 
-                std::unique_ptr<Model> model, 
-                std::optional<VectorType> startingPoint, 
-                std::optional<MatrixType> transformation, 
-                std::optional<VectorType> shift) : 
+        Problem(const MatrixType& A, 
+                const VectorType& b, 
+                const std::unique_ptr<Model>& model, 
+                const std::optional<VectorType> startingPoint, 
+                const std::optional<MatrixType> transformation, 
+                const std::optional<VectorType> shift) : 
                 A(A),
                 b(b),
-                model(std::move(model->copyModel())),
                 startingPoint(startingPoint),
                 transformation(transformation),
                 shift(shift) { 
+            if(model) this->model = std::move(model->copyModel());
         }
 
         std::unique_ptr<Model>& getModel() { return model; }
-        void setModel(std::unique_ptr<Model> model) { this->model = std::move(model->copyModel()); }
+        void setModel(std::unique_ptr<Model> model) { if(model) this->model = std::move(model->copyModel()); }
 
         std::string __repr__() const {
             Model* _model = static_cast<Model*>(model.get());
             std::string repr = "hopsy.Problem(A=" + get__repr__(A) + ", ";
             repr += "b=" + get__repr__(b);
-            repr += ( _model ? ", model=" + get__repr__(_model) : "" );
+            repr += ( model ? ", model=" + get__repr__(_model) : "" );
             repr += ( startingPoint ? ", starting_point=" + get__repr__(startingPoint) : "" );
             repr += ( transformation ? ", transformation=" + get__repr__(transformation) : "" );
             repr += ( shift ? ", shift=" + get__repr__(shift) : "" );
@@ -96,12 +96,12 @@ namespace hopsy {
 
     void addProblem(py::module& m) {
         py::class_<Problem>(m, "Problem")
-            .def(py::init<MatrixType, 
-                          VectorType, 
-                          std::unique_ptr<Model>, 
-                          std::optional<VectorType>, 
-                          std::optional<MatrixType>, 
-                          std::optional<VectorType>>(),
+            .def(py::init<const MatrixType&, 
+                          const VectorType&, 
+                          const std::unique_ptr<Model>&, 
+                          const std::optional<VectorType>, 
+                          const std::optional<MatrixType>, 
+                          const std::optional<VectorType>>(),
                     py::arg("A"), 
                     py::arg("b"), 
                     py::arg("model") = py::none(), 

@@ -167,7 +167,7 @@ namespace hopsy {
             .def("compute_expected_fisher_information", &hopsy::Model::computeExpectedFisherInformation, 
                     hopsy::doc::Model::computeExpectedFisherInformation,
                     py::arg("x"))
-            .def("__repr__", [] (const hopsy::Model& self) -> std::string {
+            .def("__repr__", [] (const hopsy::Model&) -> std::string {
                         std::string repr = "hopsy.Model()";
                         return repr;
                     })

@@ -141,13 +141,15 @@ namespace hopsy {
 } // namespace hopsy
 
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::PyTuningTarget);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::AcceptanceRateTarget);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::ExpectedSquaredJumpDistanceTarget);
 
 namespace hopsy {
     void addTuning(py::module& m) {
         // tuning targets
         py::classh<TuningTarget>(m, "TuningTarget"/*, doc::TuningTarget::base*/);
 
-        py::class_<AcceptanceRateTarget, TuningTarget>(m, "AcceptanceRateTarget", doc::AcceptanceRateTarget::base)
+        py::classh<AcceptanceRateTarget, TuningTarget>(m, "AcceptanceRateTarget", doc::AcceptanceRateTarget::base)
             .def(py::init([] (std::vector<MarkovChain*>& markovChain,
                               unsigned long numberOfTestSamples, 
                               double acceptanceRate,
@@ -176,7 +178,7 @@ namespace hopsy {
                     py::arg("x"), py::arg("rngs"), doc::AcceptanceRateTarget::__call__)
         ;
 
-        py::class_<ExpectedSquaredJumpDistanceTarget, TuningTarget>(m, "ExpectedSquaredJumpDistanceTarget", doc::ExpectedSquaredJumpDistanceTarget::base)
+        py::classh<ExpectedSquaredJumpDistanceTarget, TuningTarget>(m, "ExpectedSquaredJumpDistanceTarget", doc::ExpectedSquaredJumpDistanceTarget::base)
             .def(py::init([] (std::vector<MarkovChain*>& markovChain,
                               unsigned long numberOfTestSamples, 
                               unsigned long lags, 

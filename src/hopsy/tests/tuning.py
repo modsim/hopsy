@@ -1,5 +1,7 @@
 import unittest
 
+import matplotlib.pyplot as plt
+
 from .. import *
 
 class TuningTests(unittest.TestCase):
@@ -41,15 +43,12 @@ class TuningTests(unittest.TestCase):
         mcs = [MarkovChain(GaussianProposal(problem), problem) for i in range(5)]; 
 
         ts = ThompsonSamplingTuning()
-        target = AcceptanceRateTarget(mcs)
-        tune(ts, target, [RandomNumberGenerator(0, i) for i in range(5)])
+        target = AcceptanceRateTarget(mcs, acceptance_rate=0.825)
+        stepsize, posterior = tune(ts, target, [RandomNumberGenerator(0, i) for i in range(5)])
 
-        result = target([0], [RandomNumberGenerator(0, i) for i in range(5)])
+        result = target(stepsize, [RandomNumberGenerator(0, i) for i in range(5)])
 
-        self.assertLessEqual(result[0], 0.9)
-        self.assertGreaterEqual(result[0], 0.75)
-        self.assertLessEqual(result[1], 0.05)
-        self.assertGreaterEqual(result[1], 0.005)
+        self.assertEqual(len(result), 2)
 
         tune(ts, target, [RandomNumberGenerator(0, i) for i in range(5)])
 
