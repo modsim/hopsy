@@ -125,7 +125,7 @@ namespace hopsy {
                                                       self.shift);
                             },
                             [] (py::tuple t) { // __setstate__
-                                if (t.size() != 3) throw std::runtime_error("Invalid state!");
+                                if (t.size() != 6) throw std::runtime_error("Tried to build hopsy.Model with invalid state.");
 
                                 /* Create a new C++ instance */
                                 hopsy::Problem p(t[0].cast<Eigen::VectorXd>(),
