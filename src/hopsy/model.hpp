@@ -206,13 +206,46 @@ namespace hopsy {
                     py::arg("mean") = Eigen::VectorXd(), 
                     py::arg("covariance") = Eigen::MatrixXd(),
                     py::arg("inactives") = std::vector<long>())
-            .def("compute_negative_log_likelihood", &hopsy::DegenerateGaussian::computeNegativeLogLikelihood, 
+            .def_property("mean", &hopsy::DegenerateGaussian::getMean, [] (hopsy::DegenerateGaussian& self, 
+                                                                           const Eigen::VectorXd& mean) {
+                        self = hopsy::DegenerateGaussian(mean, self.getCovariance(), self.getInactive());
+                    })
+            .def_property("covariance", &hopsy::DegenerateGaussian::getCovariance, [] (hopsy::DegenerateGaussian& self, 
+                                                                                         const Eigen::MatrixXd& covariance) {
+                        self = hopsy::DegenerateGaussian(self.getMean(), covariance, self.getInactive());
+                    })
+            .def_property("inactives", &hopsy::DegenerateGaussian::getInactive, [] (hopsy::DegenerateGaussian& self, 
+                                                                                      const std::vector<long>& inactives) {
+                        self = hopsy::DegenerateGaussian(self.getMean(), self.getCovariance(), inactives);
+                    })            
+            .def("compute_negative_log_likelihood", [] (const hopsy::DegenerateGaussian& self, const Eigen::VectorXd& x) {
+                        if (self.getMean().rows() != self.getCovariance().rows() || self.getMean().rows() != self.getCovariance().cols()) {
+                            throw std::runtime_error("Dimension mismatch between mean with shape (" + std::to_string(self.getMean().rows()) + 
+                                    ",) and covariance with shape (" + std::to_string(self.getCovariance().rows()) + 
+                                    ", " + std::to_string(self.getCovariance().cols()) + ")");
+                        }
+                        return self.computeNegativeLogLikelihood(x);
+                    },
                     hopsy::doc::DegenerateGaussian::computeNegativeLogLikelihood,
                     py::arg("x"))
-            .def("compute_log_likelihood_gradient", &hopsy::DegenerateGaussian::computeLogLikelihoodGradient, 
+            .def("compute_log_likelihood_gradient", [] (const hopsy::DegenerateGaussian& self, const Eigen::VectorXd& x) {
+                        if (self.getMean().rows() != self.getCovariance().rows() || self.getMean().rows() != self.getCovariance().cols()) {
+                            throw std::runtime_error("Dimension mismatch between mean with shape (" + std::to_string(self.getMean().rows()) + 
+                                    ",) and covariance with shape (" + std::to_string(self.getCovariance().rows()) + 
+                                    ", " + std::to_string(self.getCovariance().cols()) + ")");
+                        }
+                        return self.computeLogLikelihoodGradient(x);
+                    },
                     hopsy::doc::DegenerateGaussian::computeLogLikelihoodGradient,
                     py::arg("x"))
-            .def("compute_expected_fisher_information", &hopsy::DegenerateGaussian::computeExpectedFisherInformation, 
+            .def("compute_expected_fisher_information", [] (const hopsy::DegenerateGaussian& self, const Eigen::VectorXd& x) {
+                        if (self.getMean().rows() != self.getCovariance().rows() || self.getMean().rows() != self.getCovariance().cols()) {
+                            throw std::runtime_error("Dimension mismatch between mean with shape (" + std::to_string(self.getMean().rows()) + 
+                                    ",) and covariance with shape (" + std::to_string(self.getCovariance().rows()) + 
+                                    ", " + std::to_string(self.getCovariance().cols()) + ")");
+                        }
+                        return self.computeExpectedFisherInformation(x);
+                    },
                     hopsy::doc::DegenerateGaussian::computeExpectedFisherInformation,
                     py::arg("x"))
             .def("__repr__", [] (const hopsy::DegenerateGaussian& self) -> std::string {
@@ -227,7 +260,9 @@ namespace hopsy {
                     })
             .def(py::pickle([] (const hopsy::DegenerateGaussian& self) { // __getstate__
                                 /* Return a tuple that fully encodes the state of the object */
-                                return py::make_tuple(self.getMean(), self.getCovariance(), self.getInactive());
+                                return py::make_tuple(self.getMean(), 
+                                                      self.getCovariance(), 
+                                                      self.getInactive());
                             },
                             [](py::tuple t) { // __setstate__
                                 if (t.size() != 3) throw std::runtime_error("Invalid state!");

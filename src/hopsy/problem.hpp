@@ -119,7 +119,7 @@ namespace hopsy {
                                 /* Return a tuple that fully encodes the state of the object */
                                 return py::make_tuple(self.A, 
                                                       self.b, 
-                                                      ( self.model ? py::cast(static_cast<hopsy::Model*>(self.model.get())).attr("__getstate__")() : py::none() ), 
+                                                      static_cast<hopsy::Model*>(self.model.get()), 
                                                       self.startingPoint, 
                                                       self.transformation, 
                                                       self.shift);
@@ -128,9 +128,9 @@ namespace hopsy {
                                 if (t.size() != 6) throw std::runtime_error("Tried to build hopsy.Model with invalid state.");
 
                                 /* Create a new C++ instance */
-                                hopsy::Problem p(t[0].cast<Eigen::VectorXd>(),
-                                                 t[1].cast<Eigen::MatrixXd>(),
-                                                 t[2].cast<std::unique_ptr<Model>>(),
+                                hopsy::Problem p(t[0].cast<Eigen::MatrixXd>(),
+                                                 t[1].cast<Eigen::VectorXd>(),
+                                                 t[2].cast<std::unique_ptr<hopsy::Model>>(),
                                                  t[3].cast<std::optional<VectorType>>(),
                                                  t[4].cast<std::optional<MatrixType>>(),
                                                  t[5].cast<std::optional<VectorType>>());

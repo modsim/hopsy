@@ -1,4 +1,5 @@
 import unittest
+import pickle
 
 from .. import *
 
@@ -35,9 +36,23 @@ class ProblemTests(unittest.TestCase):
 
     def test_problem_pickling(self):
         problem = Problem([[1, 1]], [1], starting_point=[0, 0])
-        print(problem)
-        print(problem.__getstate__())
+        data = pickle.dumps(problem)
+        new = pickle.loads(data)
+        self.assertListEqual(problem.A.tolist(), new.A.tolist())
+        self.assertListEqual(problem.b.tolist(), new.b.tolist())
+        self.assertEqual(problem.model, new.model)
+        self.assertListEqual(problem.starting_point.tolist(), new.starting_point.tolist())
+        self.assertEqual(problem.transformation, new.transformation)
+        self.assertEqual(problem.shift, new.shift)
 
         problem = Problem([[1, 1]], [1], Gaussian(), starting_point=[0, 0])
-        print(problem)
-        print(problem.__getstate__())
+        data = pickle.dumps(problem)
+        new = pickle.loads(data)
+        self.assertListEqual(problem.A.tolist(), new.A.tolist())
+        self.assertListEqual(problem.b.tolist(), new.b.tolist())
+        self.assertEqual(problem.model.mean.tolist(), new.model.mean.tolist())
+        self.assertEqual(problem.model.covariance.tolist(), new.model.covariance.tolist())
+        self.assertEqual(problem.model.inactives, new.model.inactives)
+        self.assertListEqual(problem.starting_point.tolist(), new.starting_point.tolist())
+        self.assertEqual(problem.transformation, new.transformation)
+        self.assertEqual(problem.shift, new.shift)
