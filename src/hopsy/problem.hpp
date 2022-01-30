@@ -6,7 +6,8 @@
 #include <pybind11/detail/common.h>
 #include <pybind11/eigen.h>
 #include <pybind11/embed.h>
-#include <pybind11/smart_holder.h>
+//#include <pybind11/smart_holder.h>
+#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 #include "misc.hpp"
@@ -23,7 +24,7 @@ namespace hopsy {
 
         Problem(const MatrixType& A, 
                 const VectorType& b, 
-                const std::unique_ptr<Model>& model, 
+                const Model* model, 
                 const std::optional<VectorType> startingPoint, 
                 const std::optional<MatrixType> transformation, 
                 const std::optional<VectorType> shift) : 
@@ -34,6 +35,20 @@ namespace hopsy {
                 shift(shift) { 
             if(model) this->model = std::move(model->copyModel());
         }
+
+        //Problem(const MatrixType& A, 
+        //        const VectorType& b, 
+        //        const Model* model, 
+        //        const VectorType* startingPoint, 
+        //        const MatrixType* transformation, 
+        //        const VectorType* shift) : 
+        //        A(A),
+        //        b(b) { 
+        //    if (model) this->model = std::move(model->copyModel());
+        //    if (startingPoint) this->startingPoint = *startingPoint;
+        //    if (transformation) this->transformation = *transformation;
+        //    if (shift) this->shift = *shift;
+        //}
 
         std::unique_ptr<Model>& getModel() { return model; }
         void setModel(std::unique_ptr<Model> model) { if(model) this->model = std::move(model->copyModel()); }
@@ -93,21 +108,27 @@ namespace hopsy {
         return sqrtMve;
     }
 
-
     void addProblem(py::module& m) {
         py::class_<Problem>(m, "Problem")
             .def(py::init<const MatrixType&, 
                           const VectorType&, 
-                          const std::unique_ptr<Model>&, 
+                          const Model*, 
+                          //const VectorType*, 
+                          //const MatrixType*, 
+                          //const VectorType*>(),
                           const std::optional<VectorType>, 
                           const std::optional<MatrixType>, 
                           const std::optional<VectorType>>(),
                     py::arg("A"), 
                     py::arg("b"), 
-                    py::arg("model") = py::none(), 
-                    py::arg("starting_point") = py::none(), 
+                    py::arg("model") = static_cast<Model*>(nullptr), 
+                    //py::arg("starting_point") = static_cast<VectorType*>(nullptr),
+                    //py::arg("transformation") = static_cast<MatrixType*>(nullptr), 
+                    //py::arg("shift") = static_cast<VectorType*>(nullptr)
+                    py::arg("starting_point") = py::none(),
                     py::arg("transformation") = py::none(), 
-                    py::arg("shift") = py::none())
+                    py::arg("shift") = py::none()
+            )
             .def_readwrite("A", &Problem::A)
             .def_readwrite("b", &Problem::b)
             .def_readwrite("starting_point", &Problem::startingPoint)
@@ -115,7 +136,7 @@ namespace hopsy {
             .def_readwrite("transformation", &Problem::transformation)
             .def_readwrite("shift", &Problem::shift)
             .def("__repr__", &Problem::__repr__)
-            .def(py::pickle([] (const hopsy::Problem& self) { // __getstate__
+            .def(py::pickle([] (const Problem& self) { // __getstate__
                                 /* Return a tuple that fully encodes the state of the object */
                                 return py::make_tuple(self.A, 
                                                       self.b, 
@@ -128,12 +149,12 @@ namespace hopsy {
                                 if (t.size() != 6) throw std::runtime_error("Tried to build hopsy.Model with invalid state.");
 
                                 /* Create a new C++ instance */
-                                hopsy::Problem p(t[0].cast<Eigen::MatrixXd>(),
-                                                 t[1].cast<Eigen::VectorXd>(),
-                                                 t[2].cast<std::unique_ptr<hopsy::Model>>(),
-                                                 t[3].cast<std::optional<VectorType>>(),
-                                                 t[4].cast<std::optional<MatrixType>>(),
-                                                 t[5].cast<std::optional<VectorType>>());
+                                Problem p(t[0].cast<MatrixType>(),
+                                          t[1].cast<VectorType>(),
+                                          t[2].cast<Model*>(),
+                                          t[3].cast<std::optional<VectorType>>(),
+                                          t[4].cast<std::optional<MatrixType>>(),
+                                          t[5].cast<std::optional<VectorType>>());
 
                                 return p;
                             }

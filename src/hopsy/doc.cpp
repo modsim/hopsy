@@ -1,6 +1,7 @@
 #include "doc.hpp"
 
-const char* hopsy::doc::numberOfThreads = R"pbdoc()pbdoc";
+const char* hopsy::doc::numberOfThreads = R"pbdoc(
+)pbdoc";
 
 /*
  *  Model
@@ -10,16 +11,20 @@ const char* hopsy::doc::Model::base = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::Model::__init__ = R"pbdoc()pbdoc";
+const char* hopsy::doc::Model::__init__ = R"pbdoc(
+)pbdoc";
 
 
-const char* hopsy::doc::Model::computeNegativeLogLikelihood = R"pbdoc()pbdoc";
+const char* hopsy::doc::Model::computeNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
 
 
-const char* hopsy::doc::Model::computeLogLikelihoodGradient = R"pbdoc()pbdoc";
+const char* hopsy::doc::Model::computeLogLikelihoodGradient = R"pbdoc(
+)pbdoc";
 
 
-const char* hopsy::doc::Model::computeExpectedFisherInformation = R"pbdoc()pbdoc";
+const char* hopsy::doc::Model::computeExpectedFisherInformation = R"pbdoc(
+)pbdoc";
         
 
 /*

@@ -283,7 +283,7 @@ namespace hopsy {
 
     class ProposalWrapper : public Proposal {
     public:
-		ProposalWrapper(const std::shared_ptr<Proposal> proposal) {
+		ProposalWrapper(const Proposal* proposal) {
             proposalPtr = std::move(proposal->copyProposal());
         }
 

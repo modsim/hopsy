@@ -29,7 +29,7 @@ namespace hopsy {
     public:
         MarkovChain() = default;
 
-        MarkovChain(const std::shared_ptr<Proposal> proposal, 
+        MarkovChain(const Proposal* proposal, 
                     const std::optional<LinearTransformation>& transformation = std::nullopt) : 
                 proposal(nullptr), 
                 model(nullptr),
@@ -37,7 +37,7 @@ namespace hopsy {
             createMarkovChain(this, proposal, this->model, transformation);
         }
 
-        MarkovChain(const std::shared_ptr<Proposal> proposal, 
+        MarkovChain(const Proposal* proposal, 
                     const std::unique_ptr<Model>& model, 
                     const std::optional<LinearTransformation>& transformation = std::nullopt) : 
                 proposal(nullptr), 
@@ -75,7 +75,7 @@ namespace hopsy {
             return proposal;
         }
 
-        void setProposal(const std::shared_ptr<Proposal> proposal) {
+        void setProposal(const Proposal* proposal) {
             createMarkovChain(this, proposal, this->model, this->transformation);
         }
 
@@ -84,7 +84,7 @@ namespace hopsy {
         }
 
         void setModel(const std::shared_ptr<Model> model) {
-            createMarkovChain(this, this->proposal, model, this->transformation);
+            createMarkovChain(this, this->proposal.get(), model, this->transformation);
         }
 
         std::shared_ptr<hops::MarkovChain>& getMarkovChain() {
@@ -99,7 +99,8 @@ namespace hopsy {
         std::optional<LinearTransformation> transformation;
 
         static inline void createMarkovChain(MarkovChain* mc,
-                                             const std::shared_ptr<Proposal> proposal, 
+                                             //const std::shared_ptr<Proposal> proposal, 
+                                             const Proposal* proposal, 
                                              const std::shared_ptr<Model> model, 
                                              const std::optional<LinearTransformation>& transformation) {
             if (model && transformation) {
@@ -256,7 +257,8 @@ namespace hopsy {
 
     };
 
-    MarkovChain createMarkovChain(const std::shared_ptr<Proposal> proposal, const Problem& problem) {
+    //MarkovChain createMarkovChain(const std::shared_ptr<Proposal> proposal, const Problem& problem) {
+    MarkovChain createMarkovChain(const Proposal* proposal, const Problem& problem) {
         // hacky proposal initialization if proposal is uninitalized
         //if (!proposal.isInitialized) {
         //py::dict local;
@@ -291,7 +293,7 @@ namespace hopsy {
         MarkovChain mc;
 
         if (!problem.model && !problem.transformation && !problem.shift) {
-            mc = MarkovChain(std::shared_ptr<Proposal>(proposal));
+            mc = MarkovChain(proposal);
 
         } else if (!problem.model && problem.transformation) {
             VectorType shift = VectorType::Zero(problem.startingPoint->cols());
@@ -299,12 +301,12 @@ namespace hopsy {
                 shift = *problem.shift;
             }
 
-            mc = MarkovChain(std::shared_ptr<Proposal>(proposal), 
+            mc = MarkovChain(proposal, 
                              nullptr, 
                              LinearTransformation(*problem.transformation, *problem.shift));
 
         } else if (problem.model && !problem.transformation) {
-            mc = MarkovChain(std::shared_ptr<Proposal>(proposal), problem.model);
+            mc = MarkovChain(proposal, problem.model);
 
         } else if (problem.model && problem.transformation) {
             VectorType shift = VectorType::Zero(problem.startingPoint->cols());
@@ -312,7 +314,7 @@ namespace hopsy {
                 shift = *problem.shift;
             }
 
-            mc = MarkovChain(std::shared_ptr<Proposal>(proposal), 
+            mc = MarkovChain(proposal, 
                              problem.model, 
                              LinearTransformation(*problem.transformation, *problem.shift));
         }

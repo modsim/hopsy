@@ -5,7 +5,6 @@
 
 #include <pybind11/detail/common.h>
 #include <pybind11/eigen.h>
-#include <pybind11/numpy.h>
 #include <pybind11/smart_holder.h>
 #include <pybind11/stl.h>
 #include <pybind11/trampoline_self_life_support.h>
