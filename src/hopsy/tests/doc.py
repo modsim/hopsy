@@ -72,9 +72,9 @@ class DocTests(unittest.TestCase):
                 else:
                     n_sufficient += 1
 
-        docstr_coverage = _round(1. * n_sufficient / n_all, 2)
+        docstr_coverage = _round(1. * n_sufficient / n_all, 2) * 100
         report += "Found" + str(n_all) + "items in hopsy of which" + str(n_sufficient) + "have sufficient docstrings." + "\n"
-        report += "Docstring coverage: " + str(docstr_coverage) + "\n"
+        report += "Docstring coverage: " + str(docstr_coverage) + "%\n"
 
         with open("docs/.docstrcovreport", "w") as f:
             f.write(report)
