@@ -1,20 +1,24 @@
-import numpy as np
-import pandas as pd
 
-from PolyRound.api import PolyRoundApi as prapi
-from PolyRound.mutable_classes import polytope as prp
+class submodules:
+    import numpy
+    import pandas
 
-from tqdm.auto import tqdm
-from PolyRound.settings import PolyRoundSettings
+    from PolyRound.api import PolyRoundApi
+    from PolyRound.mutable_classes import polytope
+
+    from tqdm.auto import tqdm
+    from PolyRound.settings import PolyRoundSettings
+
+    import multiprocessing
 
 #class Problem:
 #    def __init__(self, A, b, model = None, starting_point = None, transformation = None, shift = None):
-#        self.A = np.array(A)
-#        self.b = np.array(b)
+#        self.A = submodules.numpy.array(A)
+#        self.b = submodules.numpy.array(b)
 #        self.model = model
-#        self.starting_point = np.array(starting_point) if starting_point is not None else None
-#        self.transformation = np.array(transformation) if transformation is not None else None
-#        self.shift = np.array(shift) if shift is not None else None
+#        self.starting_point = submodules.numpy.array(starting_point) if starting_point is not None else None
+#        self.transformation = submodules.numpy.array(transformation) if transformation is not None else None
+#        self.shift = submodules.numpy.array(shift) if shift is not None else None
 #
 #
 #    def __repr__(self):
@@ -38,11 +42,11 @@ def add_box_constraints(problem, lower_bound, upper_bound, simplify = True):
 
     dim = problem.A.shape[1]
 
-    _l = np.array(lower_bound) if hasattr(lower_bound, "__len__") else np.array([lower_bound] * dim)
-    _u = np.array(upper_bound) if hasattr(upper_bound, "__len__") else np.array([upper_bound] * dim)
+    _l = submodules.numpy.array(lower_bound) if hasattr(lower_bound, "__len__") else submodules.numpy.array([lower_bound] * dim)
+    _u = submodules.numpy.array(upper_bound) if hasattr(upper_bound, "__len__") else submodules.numpy.array([upper_bound] * dim)
 
-    A = np.vstack([problem.A, -np.eye(dim), np.eye(dim)])
-    b = np.hstack([problem.b.flatten(), _l.flatten(), _u.flatten()]).reshape(-1)
+    A = submodules.numpy.vstack([problem.A, -submodules.numpy.eye(dim), submodules.numpy.eye(dim)])
+    b = submodules.numpy.hstack([problem.b.flatten(), _l.flatten(), _u.flatten()]).reshape(-1)
    
     _problem = Problem(A, b, problem.model, problem.starting_point, problem.transformation, problem.shift)
 
@@ -56,23 +60,23 @@ def compute_chebyshev_center(problem):
     pass
 
 def _compute_maximum_volume_ellipsoid(problem):
-    polytope = prp.Polytope(problem.A, problem.b)
+    polytope = submodules.polytope.Polytope(problem.A, problem.b)
 
-    polytope = prapi.simplify_polytope(polytope)
+    polytope = submodules.PolyRoundApi.simplify_polytope(polytope)
 
     number_of_reactions = polytope.A.shape[1]
-    polytope.transformation = pd.DataFrame(np.identity(number_of_reactions))
+    polytope.transformation = submodules.pandas.DataFrame(submodules.numpy.identity(number_of_reactions))
     polytope.transformation.index = [str(i) for i in range(polytope.transformation.to_numpy().shape[0])]
     polytope.transformation.columns = [str(i) for i in range(polytope.transformation.to_numpy().shape[1])]
-    polytope.shift = pd.Series(np.zeros(number_of_reactions))
+    polytope.shift = submodules.pandas.Series(submodules.numpy.zeros(number_of_reactions))
 
-    MaximumVolumeEllipsoidFinder.iterative_solve(polytope, PolyRoundSettings())
+    MaximumVolumeEllipsoidFinder.iterative_solve(polytope, submodules.PolyRoundSettings())
     return polytope.transform.values
 
 def simplify(problem):
-    polytope = prp.Polytope(problem.A, problem.b)
+    polytope = submodules.polytope.Polytope(problem.A, problem.b)
 
-    polytope = prapi.simplify_polytope(polytope)
+    polytope = submodules.PolyRoundApi.simplify_polytope(polytope)
 
     problem.A = polytope.A.values
     problem.b = polytope.b.values
@@ -84,17 +88,17 @@ _simplify = simplify
 
 
 def round(problem):
-    polytope = prp.Polytope(problem.A, problem.b)
+    polytope = submodules.polytope.Polytope(problem.A, problem.b)
 
-    polytope = prapi.simplify_polytope(polytope)
+    polytope = submodules.PolyRoundApi.simplify_polytope(polytope)
 
     number_of_reactions = polytope.A.shape[1]
-    polytope.transformation = pd.DataFrame(np.identity(number_of_reactions))
+    polytope.transformation = submodules.pandas.DataFrame(submodules.numpy.identity(number_of_reactions))
     polytope.transformation.index = [str(i) for i in range(polytope.transformation.to_numpy().shape[0])]
     polytope.transformation.columns = [str(i) for i in range(polytope.transformation.to_numpy().shape[1])]
-    polytope.shift = pd.Series(np.zeros(number_of_reactions))
+    polytope.shift = submodules.pandas.Series(submodules.numpy.zeros(number_of_reactions))
 
-    polytope = prapi.round_polytope(polytope)
+    polytope = submodules.PolyRoundApi.round_polytope(polytope)
 
     _problem = Problem(polytope.A.values, polytope.b.values, problem.model, transformation=polytope.transformation.values, shift=polytope.shift.values)
 
@@ -121,45 +125,75 @@ def back_transform(problem, points):
 
     for point in points:
         _point = point - problem.shift if problem.shift is not None else point
-        _point = np.linalg.solve(problem.transformation, _point) if problem.transformation is not None else _point
+        _point = submodules.numpy.linalg.solve(problem.transformation, _point) if problem.transformation is not None else _point
 
         transformed_points.append(_point)
 
     return transformed_points
-    
-
-class Sampler:
-    def __init__(self, proposal, problem, starting_points = None, n_chains = 1, n_threads = 1, seed = 0):
-        #self.proposal_dist = proposal  # here we should call create_markov_chain(proposal)
-                                        # which would decide based on the type of proposal
-        self.proposal = proposal
-        self.problem = problem
-
-        self.starting_points = starting_points if problem.starting_point is None else problem.starting_point
-        assert self.starting_points is not None
-
-        self.n_chains = n_chains
-        self.n_threads = n_threads
-
-        self.states = None
-        self.markov_chains = []
-        self.rngs = []
-
-        k = 0
-        for i in range(n_chains):
-            self.markov_chains.append(MarkovChain(self.proposal, self.problem.model, starting_points[k]))
-            self.rngs.append(RandomNumberGenerator(seed, i))
-            k += 1 if k-1 < len(starting_points) else 0
 
 
-    def sample(self, n_samples, thinning = 1):
-        states = [[] for i in range(self.n_chains)]
+def _sample(markov_chain, rng, n_samples, n_thinning):
+    states = []
+    for i in range(n_samples):
+        states.append(markov_chain.draw(rng, n_thinning))
 
-        for i in tqdm(range(n_samples)):
-            for j in range(self.n_chains):
-                states[j].append(self.markov_chains[j].draw(self.rngs[j], thinning))
+    return submodules.numpy.array(states)
 
-        self.states = np.array(states)
-        return self.states
+
+def sample(markov_chains, rngs, n_samples, n_thinning, n_threads = 1):
+    if hasattr(markov_chains, "__len__") and hasattr(rngs, "__len__") and len(markov_chains) != len(rngs):
+        raise ValueError("Number of Markov chains has to match number of random number generators.")
+
+    if n_threads != 1:
+        if n_threads < 0: 
+            n_threads = min(len(markov_chains), submodules.multiprocessing.cpu_count())
+
+        with submodules.multiprocessing.Pool(n_threads) as workers:
+            f = lambda markov_chain, rng: _sample(markov_chain, rng, n_samples, n_thinning)
+            states = workers.starmap(f, [(markov_chains[i], rngs[i]) for i in range(len(markov_chains))])
+
+        return submodules.numpy.array(states)
+    else:
+        states = []
+        for i in range(len(markov_chains)):
+            states.append(_sample(markov_chains[i], rngs[i], n_samples, n_thinning))
+
+        return submodules.numpy.array(states)
+
+
+
+#class Sampler:
+#    def __init__(self, proposal, problem, starting_points = None, n_chains = 1, n_threads = 1, seed = 0):
+#        #self.proposal_dist = proposal  # here we should call create_markov_chain(proposal)
+#                                        # which would decide based on the type of proposal
+#        self.proposal = proposal
+#        self.problem = problem
+#
+#        self.starting_points = starting_points if problem.starting_point is None else problem.starting_point
+#        assert self.starting_points is not None
+#
+#        self.n_chains = n_chains
+#        self.n_threads = n_threads
+#
+#        self.states = None
+#        self.markov_chains = []
+#        self.rngs = []
+#
+#        k = 0
+#        for i in range(n_chains):
+#            self.markov_chains.append(MarkovChain(self.proposal, self.problem.model, starting_points[k]))
+#            self.rngs.append(RandomNumberGenerator(seed, i))
+#            k += 1 if k-1 < len(starting_points) else 0
+#
+#
+#    def sample(self, n_samples, thinning = 1):
+#        states = [[] for i in range(self.n_chains)]
+#
+#        for i in submodules.tqdm(range(n_samples)):
+#            for j in range(self.n_chains):
+#                states[j].append(self.markov_chains[j].draw(self.rngs[j], thinning))
+#
+#        self.states = submodules.numpy.array(states)
+#        return self.states
 
 
