@@ -76,7 +76,10 @@ class DocTests(unittest.TestCase):
         report += "Found" + str(n_all) + "items in hopsy of which" + str(n_sufficient) + "have sufficient docstrings." + "\n"
         report += "Docstring coverage: " + str(docstr_coverage) + "%\n"
 
-        with open("docs/.docstrcovreport", "w") as f:
-            f.write(report)
+        try:
+            with open("docs/.docstrcovreport.txt", "w") as f:
+                f.write(report)
+        except Exception as e:
+            print("Could not write docstring coverage report!\n", e)
 
         self.assertTrue(sufficient_docstrings)
