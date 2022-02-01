@@ -18,6 +18,11 @@ namespace hopsy {
     }
 
     template<typename T>
+    std::string get__repr__(const std::shared_ptr<T>& t) {
+        return py::cast<std::string>(py::cast(static_cast<T*>(t.get())).attr("__repr__")());
+    }
+
+    template<typename T>
     std::string get__repr__(T& t) {
         return py::cast<std::string>(py::cast(t).attr("__repr__")());
     }
