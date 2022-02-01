@@ -18,6 +18,9 @@ namespace hopsy {
         namespace DegenerateGaussian {
             extern const char* base;
             extern const char* __init__;
+            extern const char* mean;
+            extern const char* covariance;
+            extern const char* inactives;
             extern const char* computeNegativeLogLikelihood;
             extern const char* computeLogLikelihoodGradient;
             extern const char* computeExpectedFisherInformation;
@@ -34,6 +37,8 @@ namespace hopsy {
         namespace Mixture {
             extern const char* base;
             extern const char* __init__;
+            extern const char* components;
+            extern const char* weights;
             extern const char* computeNegativeLogLikelihood;
             extern const char* computeLogLikelihoodGradient;
             extern const char* computeExpectedFisherInformation;
@@ -50,6 +55,7 @@ namespace hopsy {
         namespace PyModel {
             extern const char* base;
             extern const char* __init__;
+            extern const char* model;
             extern const char* computeNegativeLogLikelihood;
             extern const char* computeLogLikelihoodGradient;
             extern const char* computeExpectedFisherInformation;
@@ -58,6 +64,8 @@ namespace hopsy {
         namespace Rosenbrock {
             extern const char* base;
             extern const char* __init__;
+            extern const char* scale;
+            extern const char* shift;
             extern const char* computeNegativeLogLikelihood;
             extern const char* computeLogLikelihoodGradient;
             extern const char* computeExpectedFisherInformation;

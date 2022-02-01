@@ -72,6 +72,18 @@ Passing an empty list as ``inactives`` will actually define a standard multivari
 )pbdoc";
 
 
+const char* hopsy::doc::DegenerateGaussian::mean = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::DegenerateGaussian::covariance = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::DegenerateGaussian::inactives = R"pbdoc(
+)pbdoc";
+
+
 const char* hopsy::doc::DegenerateGaussian::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
 
 Computes the negative logarithm of the probability density function of a multivariate Gaussian model in 
@@ -193,6 +205,14 @@ If you plan to use :class:`hopsy.MultivariateGaussian` as component type, consid
 )pbdoc";
         
 
+const char* hopsy::doc::Mixture::components = R"pbdoc(
+)pbdoc";
+        
+
+const char* hopsy::doc::Mixture::weights = R"pbdoc(
+)pbdoc";
+        
+
 const char* hopsy::doc::Mixture::__init__ = R"pbdoc(__init__(self, components, weights = [1, ..., 1])
 
 Construct a ``Mixture`` as weighted sum over the elements from ``components``.
@@ -311,6 +331,11 @@ Wraps the passed object such that it can be correctly called from hops.
 )pbdoc";
         
 
+const char* hopsy::doc::PyModel::model = R"pbdoc(
+The wrapped user-defined model.
+)pbdoc";
+        
+
 const char* hopsy::doc::PyModel::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
 
 :param x: Input vector
@@ -358,6 +383,14 @@ const char* hopsy::doc::Rosenbrock::__init__ = R"pbdoc(__init__(self, scale = 1,
 
 :param shift: 
 :type shift: numpy.ndarray[float64[k,1]]
+)pbdoc";
+        
+
+const char* hopsy::doc::Rosenbrock::scale = R"pbdoc(
+)pbdoc";
+        
+
+const char* hopsy::doc::Rosenbrock::shift = R"pbdoc(
 )pbdoc";
         
 
