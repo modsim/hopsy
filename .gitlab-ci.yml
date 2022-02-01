@@ -22,7 +22,7 @@ test-release:
   script:
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39"; do /opt/python/$PY/bin/python -m unittest -v hopsy.tests; done
-    - /opt/python/cp39-cp39/bin/python -m pip install anybadge; /opt/python/cp39-cp39/bin/python .makedocstrbadge.py
+    - /opt/python/cp39-cp39/bin/python -m pip install docov; /opt/python/cp39-cp39/bin/docov hopsy --output docs/; cat docs/docov.txt
   artifacts:
     paths: 
       - docs
