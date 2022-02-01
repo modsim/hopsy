@@ -37,7 +37,6 @@ items = [
     compute_chebyshev_center,
     round,
     simplify,
-    submodules,
     transform,
     tune,
     sample
