@@ -1,5 +1,5 @@
 
-class submodules:
+class _submodules:
     import numpy
     import pandas
 
@@ -13,12 +13,12 @@ class submodules:
 
 #class Problem:
 #    def __init__(self, A, b, model = None, starting_point = None, transformation = None, shift = None):
-#        self.A = submodules.numpy.array(A)
-#        self.b = submodules.numpy.array(b)
+#        self.A = _submodules.numpy.array(A)
+#        self.b = _submodules.numpy.array(b)
 #        self.model = model
-#        self.starting_point = submodules.numpy.array(starting_point) if starting_point is not None else None
-#        self.transformation = submodules.numpy.array(transformation) if transformation is not None else None
-#        self.shift = submodules.numpy.array(shift) if shift is not None else None
+#        self.starting_point = _submodules.numpy.array(starting_point) if starting_point is not None else None
+#        self.transformation = _submodules.numpy.array(transformation) if transformation is not None else None
+#        self.shift = _submodules.numpy.array(shift) if shift is not None else None
 #
 #
 #    def __repr__(self):
@@ -42,11 +42,11 @@ def add_box_constraints(problem, lower_bound, upper_bound, simplify = True):
 
     dim = problem.A.shape[1]
 
-    _l = submodules.numpy.array(lower_bound) if hasattr(lower_bound, "__len__") else submodules.numpy.array([lower_bound] * dim)
-    _u = submodules.numpy.array(upper_bound) if hasattr(upper_bound, "__len__") else submodules.numpy.array([upper_bound] * dim)
+    _l = _submodules.numpy.array(lower_bound) if hasattr(lower_bound, "__len__") else _submodules.numpy.array([lower_bound] * dim)
+    _u = _submodules.numpy.array(upper_bound) if hasattr(upper_bound, "__len__") else _submodules.numpy.array([upper_bound] * dim)
 
-    A = submodules.numpy.vstack([problem.A, -submodules.numpy.eye(dim), submodules.numpy.eye(dim)])
-    b = submodules.numpy.hstack([problem.b.flatten(), _l.flatten(), _u.flatten()]).reshape(-1)
+    A = _submodules.numpy.vstack([problem.A, -_submodules.numpy.eye(dim), _submodules.numpy.eye(dim)])
+    b = _submodules.numpy.hstack([problem.b.flatten(), _l.flatten(), _u.flatten()]).reshape(-1)
    
     _problem = Problem(A, b, problem.model, problem.starting_point, problem.transformation, problem.shift)
 
@@ -60,23 +60,23 @@ def compute_chebyshev_center(problem):
     pass
 
 def _compute_maximum_volume_ellipsoid(problem):
-    polytope = submodules.polytope.Polytope(problem.A, problem.b)
+    polytope = _submodules.polytope.Polytope(problem.A, problem.b)
 
-    polytope = submodules.PolyRoundApi.simplify_polytope(polytope)
+    polytope = _submodules.PolyRoundApi.simplify_polytope(polytope)
 
     number_of_reactions = polytope.A.shape[1]
-    polytope.transformation = submodules.pandas.DataFrame(submodules.numpy.identity(number_of_reactions))
+    polytope.transformation = _submodules.pandas.DataFrame(_submodules.numpy.identity(number_of_reactions))
     polytope.transformation.index = [str(i) for i in range(polytope.transformation.to_numpy().shape[0])]
     polytope.transformation.columns = [str(i) for i in range(polytope.transformation.to_numpy().shape[1])]
-    polytope.shift = submodules.pandas.Series(submodules.numpy.zeros(number_of_reactions))
+    polytope.shift = _submodules.pandas.Series(_submodules.numpy.zeros(number_of_reactions))
 
-    MaximumVolumeEllipsoidFinder.iterative_solve(polytope, submodules.PolyRoundSettings())
+    MaximumVolumeEllipsoidFinder.iterative_solve(polytope, _submodules.PolyRoundSettings())
     return polytope.transform.values
 
 def simplify(problem):
-    polytope = submodules.polytope.Polytope(problem.A, problem.b)
+    polytope = _submodules.polytope.Polytope(problem.A, problem.b)
 
-    polytope = submodules.PolyRoundApi.simplify_polytope(polytope)
+    polytope = _submodules.PolyRoundApi.simplify_polytope(polytope)
 
     problem.A = polytope.A.values
     problem.b = polytope.b.values
@@ -88,17 +88,17 @@ _simplify = simplify
 
 
 def round(problem):
-    polytope = submodules.polytope.Polytope(problem.A, problem.b)
+    polytope = _submodules.polytope.Polytope(problem.A, problem.b)
 
-    polytope = submodules.PolyRoundApi.simplify_polytope(polytope)
+    polytope = _submodules.PolyRoundApi.simplify_polytope(polytope)
 
     number_of_reactions = polytope.A.shape[1]
-    polytope.transformation = submodules.pandas.DataFrame(submodules.numpy.identity(number_of_reactions))
+    polytope.transformation = _submodules.pandas.DataFrame(_submodules.numpy.identity(number_of_reactions))
     polytope.transformation.index = [str(i) for i in range(polytope.transformation.to_numpy().shape[0])]
     polytope.transformation.columns = [str(i) for i in range(polytope.transformation.to_numpy().shape[1])]
-    polytope.shift = submodules.pandas.Series(submodules.numpy.zeros(number_of_reactions))
+    polytope.shift = _submodules.pandas.Series(_submodules.numpy.zeros(number_of_reactions))
 
-    polytope = submodules.PolyRoundApi.round_polytope(polytope)
+    polytope = _submodules.PolyRoundApi.round_polytope(polytope)
 
     _problem = Problem(polytope.A.values, polytope.b.values, problem.model, transformation=polytope.transformation.values, shift=polytope.shift.values)
 
@@ -125,7 +125,7 @@ def back_transform(problem, points):
 
     for point in points:
         _point = point - problem.shift if problem.shift is not None else point
-        _point = submodules.numpy.linalg.solve(problem.transformation, _point) if problem.transformation is not None else _point
+        _point = _submodules.numpy.linalg.solve(problem.transformation, _point) if problem.transformation is not None else _point
 
         transformed_points.append(_point)
 
@@ -137,7 +137,7 @@ def _sample(markov_chain, rng, n_samples, n_thinning):
     for i in range(n_samples):
         states.append(markov_chain.draw(rng, n_thinning))
 
-    return submodules.numpy.array(states)
+    return _submodules.numpy.array(states)
 
 
 def sample(markov_chains, rngs, n_samples, n_thinning, n_threads = 1):
@@ -146,19 +146,19 @@ def sample(markov_chains, rngs, n_samples, n_thinning, n_threads = 1):
 
     if n_threads != 1:
         if n_threads < 0: 
-            n_threads = min(len(markov_chains), submodules.multiprocessing.cpu_count())
+            n_threads = min(len(markov_chains), _submodules.multiprocessing.cpu_count())
 
-        with submodules.multiprocessing.Pool(n_threads) as workers:
+        with _submodules.multiprocessing.Pool(n_threads) as workers:
             f = lambda markov_chain, rng: _sample(markov_chain, rng, n_samples, n_thinning)
             states = workers.starmap(f, [(markov_chains[i], rngs[i]) for i in range(len(markov_chains))])
 
-        return submodules.numpy.array(states)
+        return _submodules.numpy.array(states)
     else:
         states = []
         for i in range(len(markov_chains)):
             states.append(_sample(markov_chains[i], rngs[i], n_samples, n_thinning))
 
-        return submodules.numpy.array(states)
+        return _submodules.numpy.array(states)
 
 
 
@@ -189,11 +189,11 @@ def sample(markov_chains, rngs, n_samples, n_thinning, n_threads = 1):
 #    def sample(self, n_samples, thinning = 1):
 #        states = [[] for i in range(self.n_chains)]
 #
-#        for i in submodules.tqdm(range(n_samples)):
+#        for i in _submodules.tqdm(range(n_samples)):
 #            for j in range(self.n_chains):
 #                states[j].append(self.markov_chains[j].draw(self.rngs[j], thinning))
 #
-#        self.states = submodules.numpy.array(states)
+#        self.states = _submodules.numpy.array(states)
 #        return self.states
 
 
