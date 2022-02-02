@@ -2,7 +2,7 @@ import unittest
 
 import matplotlib.pyplot as plt
 
-from .. import *
+from hopsy import *
 
 class TuningTests(unittest.TestCase):
 

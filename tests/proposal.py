@@ -1,6 +1,6 @@
-from .. import *
-
 import unittest
+
+from hopsy import *
 
 ProposalTypes = [
             AdaptiveMetropolisProposal,

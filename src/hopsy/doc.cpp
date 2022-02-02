@@ -1,7 +1,48 @@
 #include "doc.hpp"
 
-const char* hopsy::doc::numberOfThreads = R"pbdoc(
+const char* hopsy::doc::base = R"pbdoc(
 )pbdoc";
+
+
+
+const char* hopsy::doc::RandomNumberGenerator::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::RandomNumberGenerator::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::RandomNumberGenerator::__call__ = R"pbdoc(
+)pbdoc";
+
+
+
+const char* hopsy::doc::Uniform::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Uniform::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Uniform::__call__ = R"pbdoc(
+)pbdoc";
+
+
+
+const char* hopsy::doc::Normal::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Normal::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Normal::__call__ = R"pbdoc(
+)pbdoc";
+
+
 
 /*
  *  Model
@@ -553,11 +594,11 @@ const char* hopsy::doc::Problem::startingPoint = R"pbdoc(numpy.ndarray[float64[n
 )pbdoc";
 
 
-const char* hopsy::doc::Problem::unroundingTransformation = R"pbdoc(numpy.ndarray[float64[n,n]]: For preconditioning (e.g. polytope rounding) one may wish to transform the polytope defined by :math:`Ax \leq b` as :math:`ATy \leq b - As` where `x = Ty + s`. If a non-zero sized ``transformation`` is passed, then it will be used as the matrix :math:`T` to transform all recorded states :math:`x` as `x = Ty`. The matrix ``A`` will be assumed to be the left-hand side operator of the already transformed problem.
+const char* hopsy::doc::Problem::transformation = R"pbdoc(numpy.ndarray[float64[n,n]]: For preconditioning (e.g. polytope rounding) one may wish to transform the polytope defined by :math:`Ax \leq b` as :math:`ATy \leq b - As` where `x = Ty + s`. If a non-zero sized ``transformation`` is passed, then it will be used as the matrix :math:`T` to transform all recorded states :math:`x` as `x = Ty`. The matrix ``A`` will be assumed to be the left-hand side operator of the already transformed problem.
 )pbdoc";
 
 
-const char* hopsy::doc::Problem::unroundingShift = R"pbdoc(numpy.ndarray[float64[n,1]]: For preconditioning (e.g. polytope rounding) one may wish to transform the polytope defined by :math:`Ax \leq b` as :math:`ATy \leq b - As` where `x = Ty + s`. If a non-zero sized ``shift`` is passed, then it will be used as the vector :math:`s` to transform all recorded states :math:`x` as `x = y + s`. The vector ``b`` will be assumed to be the right-hand side of the already transformed problem.
+const char* hopsy::doc::Problem::shift = R"pbdoc(numpy.ndarray[float64[n,1]]: For preconditioning (e.g. polytope rounding) one may wish to transform the polytope defined by :math:`Ax \leq b` as :math:`ATy \leq b - As` where `x = Ty + s`. If a non-zero sized ``shift`` is passed, then it will be used as the vector :math:`s` to transform all recorded states :math:`x` as `x = y + s`. The vector ``b`` will be assumed to be the right-hand side of the already transformed problem.
 )pbdoc";
 
 
@@ -618,72 +659,766 @@ inequality
 
 
 
+const char* hopsy::doc::Proposal::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Proposal::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Proposal::propose = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Proposal::acceptProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Proposal::logAcceptanceProbability = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Proposal::proposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Proposal::state = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Proposal::getParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Proposal::setParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Proposal::hasStepSize = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Proposal::name = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Proposal::stateNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Proposal::proposalNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Proposal::hasNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::Proposal::copyProposal = R"pbdoc(
+)pbdoc";
+
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::propose = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::acceptProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::logAcceptanceProbability = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::proposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::state = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::getParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::setParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::hasStepSize = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::name = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::stateNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::proposalNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::hasNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::copyProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::boundaryCushion = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::epsilon = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::stepSize = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::warmUp = R"pbdoc(
+)pbdoc";
+
+
+
+const char* hopsy::doc::BallWalkProposal::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BallWalkProposal::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BallWalkProposal::propose = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BallWalkProposal::acceptProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BallWalkProposal::logAcceptanceProbability = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BallWalkProposal::proposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BallWalkProposal::state = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BallWalkProposal::getParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BallWalkProposal::setParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BallWalkProposal::hasStepSize = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BallWalkProposal::name = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BallWalkProposal::stateNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BallWalkProposal::proposalNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BallWalkProposal::hasNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BallWalkProposal::copyProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BallWalkProposal::stepSize = R"pbdoc(
+)pbdoc";
+
+
+
+const char* hopsy::doc::CSmMALAProposal::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::CSmMALAProposal::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::CSmMALAProposal::propose = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::CSmMALAProposal::acceptProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::CSmMALAProposal::logAcceptanceProbability = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::CSmMALAProposal::proposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::CSmMALAProposal::state = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::CSmMALAProposal::getParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::CSmMALAProposal::setParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::CSmMALAProposal::hasStepSize = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::CSmMALAProposal::name = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::CSmMALAProposal::stateNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::CSmMALAProposal::proposalNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::CSmMALAProposal::hasNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::CSmMALAProposal::copyProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::CSmMALAProposal::fisherWeight = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::CSmMALAProposal::stepSize = R"pbdoc(
+)pbdoc";
+
+
+
+const char* hopsy::doc::DikinWalkProposal::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::DikinWalkProposal::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::DikinWalkProposal::propose = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::DikinWalkProposal::acceptProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::DikinWalkProposal::logAcceptanceProbability = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::DikinWalkProposal::proposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::DikinWalkProposal::state = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::DikinWalkProposal::getParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::DikinWalkProposal::setParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::DikinWalkProposal::hasStepSize = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::DikinWalkProposal::name = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::DikinWalkProposal::stateNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::DikinWalkProposal::proposalNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::DikinWalkProposal::hasNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::DikinWalkProposal::copyProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::DikinWalkProposal::boundaryCushion = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::DikinWalkProposal::stepSize = R"pbdoc(
+)pbdoc";
+
+
+
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::__init__ = R"pbdoc(
+)pbdoc";
+
+
+
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::propose = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::acceptProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::logAcceptanceProbability = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::proposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::state = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::getParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::setParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::hasStepSize = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::name = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::stateNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::proposalNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::hasNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::copyProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::stepSize = R"pbdoc(
+)pbdoc";
+
+
+
+const char* hopsy::doc::GaussianHitAndRunProposal::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianHitAndRunProposal::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianHitAndRunProposal::propose = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianHitAndRunProposal::acceptProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianHitAndRunProposal::logAcceptanceProbability = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianHitAndRunProposal::proposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianHitAndRunProposal::state = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianHitAndRunProposal::getParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianHitAndRunProposal::setParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianHitAndRunProposal::hasStepSize = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianHitAndRunProposal::name = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianHitAndRunProposal::stateNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianHitAndRunProposal::proposalNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianHitAndRunProposal::hasNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianHitAndRunProposal::copyProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianHitAndRunProposal::stepSize = R"pbdoc(
+)pbdoc";
+
+
+
+const char* hopsy::doc::GaussianProposal::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianProposal::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianProposal::propose = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianProposal::acceptProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianProposal::logAcceptanceProbability = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianProposal::proposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianProposal::state = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianProposal::getParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianProposal::setParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianProposal::hasStepSize = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianProposal::name = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianProposal::stateNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianProposal::proposalNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianProposal::hasNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianProposal::copyProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianProposal::stepSize = R"pbdoc(
+)pbdoc";
+
+
+
+const char* hopsy::doc::PyProposal::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::PyProposal::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::PyProposal::propose = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::PyProposal::acceptProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::PyProposal::logAcceptanceProbability = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::PyProposal::proposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::PyProposal::state = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::PyProposal::getParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::PyProposal::setParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::PyProposal::hasStepSize = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::PyProposal::name = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::PyProposal::stateNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::PyProposal::proposalNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::PyProposal::hasNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::PyProposal::copyProposal = R"pbdoc(
+)pbdoc";
+
+
+
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::propose = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::acceptProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::logAcceptanceProbability = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::proposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::state = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::getParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::setParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::hasStepSize = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::name = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::stateNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::proposalNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::hasNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::copyProposal = R"pbdoc(
+)pbdoc";
+
+
+
+const char* hopsy::doc::UniformHitAndRunProposal::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformHitAndRunProposal::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformHitAndRunProposal::propose = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformHitAndRunProposal::acceptProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformHitAndRunProposal::logAcceptanceProbability = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformHitAndRunProposal::proposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformHitAndRunProposal::state = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformHitAndRunProposal::getParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformHitAndRunProposal::setParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformHitAndRunProposal::hasStepSize = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformHitAndRunProposal::name = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformHitAndRunProposal::stateNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformHitAndRunProposal::proposalNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformHitAndRunProposal::hasNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformHitAndRunProposal::copyProposal = R"pbdoc(
+)pbdoc";
+
+
+
 /*
- *  Run
+ *  MarkovChain
  */
 
-const char* hopsy::doc::Run::base = R"pbdoc(
+const char* hopsy::doc::MarkovChain::base = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::Run::__init__ = R"pbdoc(
+const char* hopsy::doc::MarkovChain::__init__ = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::Run::init = R"pbdoc(
+const char* hopsy::doc::MarkovChain::draw = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::Run::sample = R"pbdoc(
+const char* hopsy::doc::MarkovChain::state = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::Run::data = R"pbdoc(
+const char* hopsy::doc::MarkovChain::model = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::Run::problem = R"pbdoc(
+const char* hopsy::doc::MarkovChain::proposal = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::Run::startingPoints = R"pbdoc(
+const char* hopsy::doc::MarkovChain::stateNegativeLogLikelihood = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::Run::numberOfChains = R"pbdoc(
+
+/*
+ *  AcceptanceRateTarget
+ */
+
+const char* hopsy::doc::TuningTarget::base = R"pbdoc(
 )pbdoc";
 
-
-const char* hopsy::doc::Run::numberOfSamples = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Run::thinning = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Run::stepSize = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Run::fisherWeight = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Run::randomSeed = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Run::samplingUntilConvergence = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Run::convergenceThreshold = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Run::maxRepetitions = R"pbdoc(
-)pbdoc";
 
 
 /*
@@ -744,6 +1479,24 @@ const char* hopsy::doc::ExpectedSquaredJumpDistanceTarget::considerTimeCost = R"
 
 const char* hopsy::doc::ExpectedSquaredJumpDistanceTarget::__call__= R"pbdoc(
 )pbdoc";
+
+
+
+/*
+ *  PyTuningTarget
+ */
+
+const char* hopsy::doc::PyTuningTarget::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::PyTuningTarget::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::PyTuningTarget::__call__= R"pbdoc(
+)pbdoc";
+
 
 
 /*
@@ -807,77 +1560,6 @@ const char* hopsy::doc::ThompsonSampling::recordData = R"pbdoc(
 const char* hopsy::doc::tune = R"pbdoc(
 )pbdoc";
 
-
-/*
- *  Data
- */
-
-const char* hopsy::doc::Data::base = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Data::__init__ = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Data::flatten = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Data::reset = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Data::subsample = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Data::thin = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Data::write = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Data::acceptanceRates = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Data::negativeLogLikelihood = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Data::parameterNames = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Data::states = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Data::timestamps = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Data::numberOfChains = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Data::numberOfSamples = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Data::dims = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Data::shape = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::Data::__getitem__ = R"pbdoc(
-)pbdoc";
 
 
 /*

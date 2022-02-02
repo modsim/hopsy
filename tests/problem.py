@@ -1,7 +1,7 @@
 import unittest
 import pickle
 
-from .. import *
+from hopsy import *
 
 class ProblemTests(unittest.TestCase):
 

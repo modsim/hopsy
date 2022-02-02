@@ -1,6 +1,6 @@
 import unittest
 
-from .. import *
+from hopsy import *
 
 class RandomTests(unittest.TestCase):
     pass

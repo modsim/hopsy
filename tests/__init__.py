@@ -1,3 +1,4 @@
+from . doc import DocTests
 from . markovchain import MarkovChainTests
 from . misc import MiscTests
 from . model import ModelTests

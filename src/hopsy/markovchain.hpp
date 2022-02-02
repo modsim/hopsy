@@ -323,8 +323,9 @@ namespace hopsy {
     }
 
     void addMarkovChain(py::module& m) {
-        py::classh<MarkovChain>(m, "MarkovChain")
+        py::classh<MarkovChain>(m, "MarkovChain", doc::MarkovChain::base)
             .def(py::init(&createMarkovChain),
+                    doc::MarkovChain::__init__,
                     py::arg("proposal"), 
                     py::arg("problem"))
             //.def(py::init([] (const py::object& metaclass, const Problem& problem) {
@@ -337,20 +338,28 @@ namespace hopsy {
                              RandomNumberGenerator& rng, 
                              long thinning = 1) -> std::pair<double, VectorType> {
                         return self.draw(rng.rng, thinning);
-                    }, py::arg("rng"), py::arg("thinning") = 1)
-            .def_property("state", &MarkovChain::getState, &MarkovChain::setState)
-            .def_property("model", &MarkovChain::getModel, &MarkovChain::setModel)
-            .def_property("proposal", &MarkovChain::getProposal, &MarkovChain::setProposal)
-            .def_property_readonly("state_negative_log_likelihood", &MarkovChain::getStateNegativeLogLikelihood)
-            .def("_get_parameter", [] (const MarkovChain& self, 
-                                       const ProposalParameter& parameter) {
-                        return std::any_cast<double>(self.getParameter(parameter));
-                    }, py::arg("param"))
-            .def("_set_parameter", [] (MarkovChain& self, 
-                                       const ProposalParameter& parameter,
-                                       double value) {
-                        return self.setParameter(parameter, std::any(value));
-                    }, py::arg("param"), py::arg("value"))
+                    }, 
+                    doc::MarkovChain::draw,
+                    py::arg("rng"), 
+                    py::arg("thinning") = 1)
+            .def_property("state", &MarkovChain::getState, &MarkovChain::setState, doc::MarkovChain::state)
+            .def_property("model", &MarkovChain::getModel, &MarkovChain::setModel, doc::MarkovChain::model)
+            .def_property("proposal", &MarkovChain::getProposal, &MarkovChain::setProposal, doc::MarkovChain::proposal)
+            .def_property_readonly("state_negative_log_likelihood", &MarkovChain::getStateNegativeLogLikelihood, doc::MarkovChain::stateNegativeLogLikelihood)
+            //.def("_get_parameter", [] (const MarkovChain& self, 
+            //                           const ProposalParameter& parameter) {
+            //            return std::any_cast<double>(self.getParameter(parameter));
+            //        }, 
+            //        doc::MarkovChain::getParameter,
+            //        py::arg("param"))
+            //.def("_set_parameter", [] (MarkovChain& self, 
+            //                           const ProposalParameter& parameter,
+            //                           double value) {
+            //            return self.setParameter(parameter, std::any(value));
+            //        },
+            //        doc::MarkovChain::setParameter,
+            //        py::arg("param"), 
+            //        py::arg("value"))
         ;
     }
 } // namespace hopsy

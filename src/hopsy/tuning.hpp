@@ -147,7 +147,7 @@ PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::ExpectedSquaredJumpDistanceTarget);
 namespace hopsy {
     void addTuning(py::module& m) {
         // tuning targets
-        py::classh<TuningTarget>(m, "TuningTarget"/*, doc::TuningTarget::base*/);
+        py::classh<TuningTarget>(m, "TuningTarget", doc::TuningTarget::base);
 
         py::classh<AcceptanceRateTarget, TuningTarget>(m, "AcceptanceRateTarget", doc::AcceptanceRateTarget::base)
             .def(py::init([] (std::vector<MarkovChain*>& markovChain,
@@ -221,17 +221,18 @@ namespace hopsy {
                     py::arg("x"), py::arg("rngs"), doc::ExpectedSquaredJumpDistanceTarget::__call__)
         ;
 
-        py::classh<PyTuningTarget, TuningTarget>(m, "PyTuningTarget", doc::ExpectedSquaredJumpDistanceTarget::base)
+        py::classh<PyTuningTarget, TuningTarget>(m, "PyTuningTarget", doc::PyTuningTarget::base)
             .def(py::init<py::object>(), 
-                doc::ExpectedSquaredJumpDistanceTarget::__init__, 
+                doc::PyTuningTarget::__init__, 
                 py::arg("tuning_target"))
             .def("__call__", &PyTuningTarget::operator(),
-                    py::arg("x"), py::arg("rngs"), doc::ExpectedSquaredJumpDistanceTarget::__call__)
+                    py::arg("x"), py::arg("rngs"), doc::PyTuningTarget::__call__)
         ;
 
         // tuning methods
         py::class_<ThompsonSampling>(m, "ThompsonSamplingTuning", doc::ThompsonSampling::base)
             .def(py::init<size_t, size_t, size_t, size_t, double, double, double, size_t, bool>(),
+                    doc::ThompsonSampling::__init__,
                     py::arg("n_posterior_update") = 100,
                     py::arg("n_pure_sampling") = 1,
                     py::arg("n_convergence") = 5,
@@ -259,6 +260,7 @@ namespace hopsy {
           .def_readwrite("record_data", &ThompsonSampling::recordData, doc::ThompsonSampling::recordData);
 
         m.def("tune", &tune<hops::ThompsonSamplingTuner>, 
+                doc::tune,
                 py::arg("method"), py::arg("target"), py::arg("rngs"));
     }
 }

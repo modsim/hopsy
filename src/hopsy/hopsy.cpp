@@ -26,6 +26,8 @@ PYBIND11_MODULE(core, m) {
     py::options options;
     options.disable_function_signatures();
 
+    m.doc() = hopsy::doc::base;
+
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
 #else

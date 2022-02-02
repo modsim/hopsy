@@ -1,3 +1,6 @@
+"""
+
+"""
 
 class _submodules:
     import numpy
@@ -32,6 +35,9 @@ class _submodules:
 
 
 def add_box_constraints(problem, lower_bound, upper_bound, simplify = True):
+    """
+
+    """
     if problem.A.shape[1] == 0:
         raise ValueError("Cannot determine dimension for empty inequality Ax <= b.")
 
@@ -57,6 +63,9 @@ def add_box_constraints(problem, lower_bound, upper_bound, simplify = True):
 
 
 def compute_chebyshev_center(problem):
+    """
+
+    """
     pass
 
 def _compute_maximum_volume_ellipsoid(problem):
@@ -74,6 +83,9 @@ def _compute_maximum_volume_ellipsoid(problem):
     return polytope.transform.values
 
 def simplify(problem):
+    """
+
+    """
     polytope = _submodules.polytope.Polytope(problem.A, problem.b)
 
     polytope = _submodules.PolyRoundApi.simplify_polytope(polytope)
@@ -88,6 +100,9 @@ _simplify = simplify
 
 
 def round(problem):
+    """
+
+    """
     polytope = _submodules.polytope.Polytope(problem.A, problem.b)
 
     polytope = _submodules.PolyRoundApi.simplify_polytope(polytope)
@@ -109,6 +124,9 @@ def round(problem):
 
 
 def transform(problem, points):
+    """
+
+    """
     transformed_points = []
 
     for point in points:
@@ -121,6 +139,9 @@ def transform(problem, points):
 
 
 def back_transform(problem, points):
+    """
+
+    """
     transformed_points = []
 
     for point in points:
@@ -133,14 +154,19 @@ def back_transform(problem, points):
 
 
 def _sample(markov_chain, rng, n_samples, n_thinning):
-    states = []
+    accrates, states = [], []
     for i in range(n_samples):
-        states.append(markov_chain.draw(rng, n_thinning))
+        accrate, state = markov_chain.draw(rng, n_thinning)
+        accrates.append(accrate)
+        states.append(state)
 
-    return _submodules.numpy.array(states)
+    return accrates, _submodules.numpy.array(states)
 
 
-def sample(markov_chains, rngs, n_samples, n_thinning, n_threads = 1):
+def sample(markov_chains, rngs, n_samples, n_thinning = 1, n_threads = 1):
+    """
+
+    """
     if hasattr(markov_chains, "__len__") and hasattr(rngs, "__len__") and len(markov_chains) != len(rngs):
         raise ValueError("Number of Markov chains has to match number of random number generators.")
 
@@ -149,16 +175,17 @@ def sample(markov_chains, rngs, n_samples, n_thinning, n_threads = 1):
             n_threads = min(len(markov_chains), _submodules.multiprocessing.cpu_count())
 
         with _submodules.multiprocessing.Pool(n_threads) as workers:
-            f = lambda markov_chain, rng: _sample(markov_chain, rng, n_samples, n_thinning)
-            states = workers.starmap(f, [(markov_chains[i], rngs[i]) for i in range(len(markov_chains))])
+            states = workers.starmap(_sample, [(markov_chains[i], rngs[i], n_samples, n_thinning) for i in range(len(markov_chains))])
 
         return _submodules.numpy.array(states)
     else:
-        states = []
+        accrates, states = [], []
         for i in range(len(markov_chains)):
-            states.append(_sample(markov_chains[i], rngs[i], n_samples, n_thinning))
+            _accrates, _states = _sample(markov_chains[i], rngs[i], n_samples, n_thinning)
+            accrates.append(_accrates)
+            states.append(_states)
 
-        return _submodules.numpy.array(states)
+        return accrates, _submodules.numpy.array(states)
 
 
 

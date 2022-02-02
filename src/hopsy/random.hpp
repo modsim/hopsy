@@ -59,38 +59,50 @@ namespace hopsy {
     using Uniform = std::uniform_real_distribution<double>;
 
     void addRandom(py::module& m) {
-        py::class_<RandomNumberGenerator>(m, "RandomNumberGenerator")
-            .def(py::init<>())
-            .def(py::init<unsigned int>(), py::arg("seed"))
-            .def(py::init<unsigned int, unsigned int>(), py::arg("seed"), py::arg("stream"))
-            .def("__call__", [] (RandomNumberGenerator& self) { return self(); })
+        py::class_<RandomNumberGenerator>(m, "RandomNumberGenerator", doc::RandomNumberGenerator::base)
+            .def(py::init<>(), doc::RandomNumberGenerator::__init__)
+            .def(py::init<unsigned int>(), 
+                    doc::RandomNumberGenerator::__init__, 
+                    py::arg("seed"))
+            .def(py::init<unsigned int, unsigned int>(), 
+                    doc::RandomNumberGenerator::__init__, 
+                    py::arg("seed"), 
+                    py::arg("stream"))
+            .def("__call__", [] (RandomNumberGenerator& self) { return self(); }, 
+                    doc::RandomNumberGenerator::__call__)
             .def("__repr__", &RandomNumberGenerator::__repr__)
         ;
 
-        py::class_<Uniform>(m, "Uniform")
-            .def(py::init<double, double>(), py::arg("a") = 0, py::arg("b") = 1)
+        py::class_<Uniform>(m, "Uniform", doc::Uniform::base)
+            .def(py::init<double, double>(), 
+                    doc::Uniform::__init__,
+                    py::arg("a") = 0, 
+                    py::arg("b") = 1)
             .def("__call__", [] (Uniform& self, RandomNumberGenerator& rng) -> double { 
-                    return self(rng.rng); 
-                })
+                        return self(rng.rng); 
+                    },
+                    doc::Uniform::__call__
+                )
             .def("__repr__", [] (Uniform& self) -> std::string {
-                    std::string repr = "hopsy.Uniform(";
-                    repr += "a=" + std::to_string(self.a()) + ", ";
-                    repr += "b=" + std::to_string(self.b()) + ")";
-                    return repr;
-                })
+                        std::string repr = "hopsy.Uniform(";
+                        repr += "a=" + std::to_string(self.a()) + ", ";
+                        repr += "b=" + std::to_string(self.b()) + ")";
+                        return repr;
+                    })
         ;
 
-        py::class_<Normal>(m, "Normal")
+        py::class_<Normal>(m, "Normal", doc::Normal::base)
             .def(py::init<double, double>(), py::arg("mean") = 0, py::arg("stddev") = 1)
             .def("__call__", [] (Normal& self, RandomNumberGenerator& rng) -> double { 
-                    return self(rng.rng); 
-                })
+                        return self(rng.rng); 
+                    },
+                    doc::Normal::__call__)
             .def("__repr__", [] (hopsy::Normal& self) -> std::string {
-                    std::string repr = "hopsy.Normal(";
-                    repr += "mean=" + std::to_string(self.mean()) + ", ";
-                    repr += "stddev=" + std::to_string(self.stddev()) + ")";
-                    return repr;
-                })
+                        std::string repr = "hopsy.Normal(";
+                        repr += "mean=" + std::to_string(self.mean()) + ", ";
+                        repr += "stddev=" + std::to_string(self.stddev()) + ")";
+                        return repr;
+                    })
         ;
     }
 
