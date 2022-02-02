@@ -20,7 +20,7 @@ build-release:
 test-release:
   stage: test
   before_script:
-    - /opt/python/cp39-cp39/bin/python -m pip install docov; 
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39"; do /opt/python/$PY/bin/python -m pip install docov; done
   script:
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39"; do /opt/python/$PY/bin/python -m unittest -v tests; done
