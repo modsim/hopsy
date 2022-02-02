@@ -22,6 +22,16 @@ namespace hopsy {
         std::optional<MatrixType> transformation;
         std::optional<VectorType> shift;
 
+        Problem(const Problem& other) :
+                A(other.A),
+                b(other.b),
+                //model(std::move(other.model->copyModel())),
+                startingPoint(other.startingPoint),
+                transformation(other.transformation),
+                shift(other.shift) {
+            if(other.model) this->model = std::move(other.model->copyModel());
+        }
+
         Problem(const MatrixType& A, 
                 const VectorType& b, 
                 const Model* model, 

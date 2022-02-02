@@ -3,12 +3,14 @@
 
 #include <memory>
 #include <random>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <tuple>
 
 #include <Eigen/Core>
 
+#include <pybind11/cast.h>
 #include <pybind11/detail/common.h>
 #include <pybind11/eigen.h>
 #include <pybind11/smart_holder.h>
@@ -16,26 +18,17 @@
 #include <pybind11/trampoline_self_life_support.h>
 
 #include "../../extern/hops/src/hops/hops.hpp"
+#include "hops/RandomNumberGenerator/RandomNumberGenerator.hpp"
 
 namespace py = pybind11;
 
 namespace hopsy {
     struct RandomNumberGenerator {
-        std::optional<unsigned int> seed;
-        std::optional<unsigned int> stream;
+        unsigned int seed;
+        unsigned int stream;
         hops::RandomNumberGenerator rng;
 
-        RandomNumberGenerator() {
-            // 
-        }
-
-        RandomNumberGenerator(unsigned int seed) :
-            seed(seed),
-            rng(seed) {
-            // 
-        }
-
-        RandomNumberGenerator(unsigned int seed, unsigned int stream) :
+        RandomNumberGenerator(unsigned int seed = 0, unsigned int stream = 0) :
             seed(seed),
             stream(stream),
             rng(seed, stream) {
@@ -48,8 +41,8 @@ namespace hopsy {
 
         std::string __repr__() const {
             std::string repr = "hopsy.RandomNumberGenerator("; 
-            repr += (seed ? "seed=" + std::to_string(*seed) : "");
-            repr += (stream ? ", stream=" + std::to_string(*stream) : "");
+            repr += (seed ? "seed=" + std::to_string(seed) : "");
+            repr += (stream ? ", stream=" + std::to_string(stream) : "");
             repr += ")";
             return repr;
         }
@@ -71,6 +64,18 @@ namespace hopsy {
             .def("__call__", [] (RandomNumberGenerator& self) { return self(); }, 
                     doc::RandomNumberGenerator::__call__)
             .def("__repr__", &RandomNumberGenerator::__repr__)
+            .def(py::pickle([] (const RandomNumberGenerator& self) {
+                        hops::RandomNumberGenerator rng(self.seed, self.stream);
+                        auto state = self.rng - rng;
+                        return py::make_tuple(self.seed, self.stream, state);
+                    },
+                    [] (py::tuple t) {
+                        if (t.size() != 3) throw std::runtime_error("Tried to build hopsy.RandomNumberGenerator with invalid state.");
+
+                        RandomNumberGenerator rng(t[0].cast<unsigned int>(), t[1].cast<unsigned int>());
+                        rng.rng.advance(t[2].cast<hops::RandomNumberGenerator::state_type>());
+                        return rng;
+                    }))
         ;
 
         py::class_<Uniform>(m, "Uniform", doc::Uniform::base)

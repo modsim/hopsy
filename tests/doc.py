@@ -11,8 +11,8 @@ class DocTests(unittest.TestCase):
     def test_docstrings_exist(self):
         good, bad, cond = docov.analyze(hopsy, condition=ExistingDocstring(), ignore = ["ProposalParameter"])
 
-        print()
         if len(bad) > 0:
+            print()
             print("ATTENTION! No docstrings were found for:")
             for name in sorted([name for name, _ in bad]):
                 print("  -- " + name)

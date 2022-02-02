@@ -20,7 +20,7 @@ class MiscTests(unittest.TestCase):
         self.assertListEqual(list(states.shape), [n_chains, n_samples, 2])
 
 
-    @unittest.expectedFailure
+    #@unittest.expectedFailure
     def test_parallel_sampling(self):
         n_threads = 4
 

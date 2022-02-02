@@ -132,6 +132,8 @@ namespace hopsy {
         }
 
         std::unique_ptr<Model> copyModel() const override {
+            //return std::make_unique(ModelWrapper(std::shared_ptr<Model>(std::move(model->copyModel()))));
+            //return std::shared_ptr<Model>(std::move(model->copyModel();
             return model->copyModel();
         }
 
@@ -259,7 +261,6 @@ namespace hopsy {
                         return repr;
                     })
             .def(py::pickle([] (const DegenerateGaussian& self) { // __getstate__
-                                /* Return a tuple that fully encodes the state of the object */
                                 return py::make_tuple(self.getMean(), 
                                                       self.getCovariance(), 
                                                       self.getInactive());
@@ -267,7 +268,6 @@ namespace hopsy {
                             [](py::tuple t) { // __setstate__
                                 if (t.size() != 3) throw std::runtime_error("Invalid state!");
 
-                                /* Create a new C++ instance */
                                 DegenerateGaussian p(t[0].cast<VectorType>(),
                                                             t[1].cast<MatrixType>(),
                                                             t[2].cast<std::vector<long>>());

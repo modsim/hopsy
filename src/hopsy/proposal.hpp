@@ -188,6 +188,24 @@ namespace hopsy {
 			);
         }
 
+        //const MatrixType& getA() const override {
+		//	PYBIND11_OVERRIDE_PURE_NAME(
+		//		const MatrixType&,
+		//		ProposalBase,
+        //        "A",
+        //        getA
+		//	);
+        //}
+
+        //const VectorType& getB() const override {
+		//	PYBIND11_OVERRIDE_PURE_NAME(
+		//		const MatrixType&,
+		//		ProposalBase,
+        //        "b",
+        //        getB
+		//	);
+        //}
+
         std::unique_ptr<Proposal> copyProposal() const override {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				std::unique_ptr<Proposal>,  // Return type 
@@ -270,12 +288,21 @@ namespace hopsy {
             return pyObj.attr("has_negative_log_likelihood")().cast<double>();
         }
 
+        const MatrixType& getA() const override {
+            return pyObj.attr("A").cast<MatrixType>();
+        }
+
+        const VectorType& getB() const override {
+            return pyObj.attr("b").cast<MatrixType>();
+        }
+
         std::unique_ptr<Proposal> copyProposal() const override {
             return pyObj.attr("deepcopy")().cast<std::unique_ptr<Proposal>>();
         }
-	private:
+
 		py::object pyObj;
 
+	private:
         VectorType proposal;
         VectorType state;
     };
@@ -349,6 +376,14 @@ namespace hopsy {
 
         bool hasNegativeLogLikelihood() const override {
             return proposalPtr->hasNegativeLogLikelihood();;
+        }
+
+        const MatrixType& getA() const override {
+            return proposalPtr->getA();
+        }
+
+        const VectorType& getB() const override {
+            return proposalPtr->getB();
         }
 
         std::unique_ptr<Proposal> copyProposal() const override {
@@ -483,19 +518,29 @@ namespace hopsy {
 
         bool hasNegativeLogLikelihood() const override {
             if (!proposal) throw std::runtime_error(uninitializedMethod("has_negative_log_likelihood"));
-            return proposal->hasNegativeLogLikelihood();;
+            return proposal->hasNegativeLogLikelihood();
+        }
+
+        const MatrixType& getA() const override {
+            if (!proposal) throw std::runtime_error(uninitializedMethod("A"));
+            return proposal->getA();
+        }
+
+        const VectorType& getB() const override {
+            if (!proposal) throw std::runtime_error(uninitializedMethod("b"));
+            return proposal->getB();
         }
 
         std::unique_ptr<Proposal> copyProposal() const override {
             return std::make_unique<UninitializedProposalWrapper<ProposalImpl, Args...>>(*this);
         }
 
+        std::optional<ProposalImpl> proposal;
     private:
         std::string uninitializedMethod(const std::string& name) const {
             return "Tried to access " + name + " on an uninitialized proposal.";
         }
 
-        std::optional<ProposalImpl> proposal;
         bool isInitialized;
     };
 
@@ -654,6 +699,32 @@ namespace hopsy {
                 adaptiveMetropolisProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::AdaptiveMetropolisProposal::stepSize);
         proposal::addParameter<AdaptiveMetropolisProposal, decltype(adaptiveMetropolisProposal), unsigned long>(
                 adaptiveMetropolisProposal, ProposalParameter::WARM_UP, "warm_up", doc::AdaptiveMetropolisProposal::warmUp);
+        // pickling
+        adaptiveMetropolisProposal.def(py::pickle([] (const AdaptiveMetropolisProposal& self) {
+                        return py::make_tuple(self.proposal->getA(), 
+                                              self.proposal->getB(), 
+                                              self.proposal->getState(), 
+                                              self.proposal->getCholeskyOfMaximumVolumeEllipsoid(),
+                                              std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)),
+                                              std::any_cast<double>(self.proposal->getParameter(ProposalParameter::BOUNDARY_CUSHION)),
+                                              std::any_cast<double>(self.proposal->getParameter(ProposalParameter::EPSILON)),
+                                              std::any_cast<unsigned long>(self.proposal->getParameter(ProposalParameter::WARM_UP)));
+                    },
+                    [] (py::tuple t) {
+                        if (t.size() != 8) throw std::runtime_error("Invalid state!");
+
+                        auto p = AdaptiveMetropolisProposal(t[0].cast<MatrixType>(),
+                                                            t[1].cast<VectorType>(),
+                                                            t[2].cast<VectorType>(),
+                                                            t[3].cast<MatrixType>(),
+                                                            t[4].cast<double>(),
+                                                            t[6].cast<double>(),
+                                                            t[7].cast<unsigned long>());
+                        p.setParameter(ProposalParameter::BOUNDARY_CUSHION, t[5].cast<double>());
+                        return p;
+                    })
+                );
+        
         
         
         // register BallWalkProposal
@@ -677,7 +748,23 @@ namespace hopsy {
         // parameters
         proposal::addParameter<BallWalkProposal>(
                 ballWalkProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::BallWalkProposal::stepSize);
+        // pickling
+        ballWalkProposal.def(py::pickle([] (const BallWalkProposal& self) {
+                        return py::make_tuple(self.proposal->getA(), 
+                                              self.proposal->getB(), 
+                                              self.proposal->getState(), 
+                                              std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
+                    },
+                    [] (py::tuple t) {
+                        if (t.size() != 4) throw std::runtime_error("Invalid state!");
 
+                        return BallWalkProposal(t[0].cast<MatrixType>(),
+                                                t[1].cast<VectorType>(),
+                                                t[2].cast<VectorType>(),
+                                                t[3].cast<double>());
+                    })
+                );
+        
 
         // register CSmMALAProposal
         py::classh<CSmMALAProposal, Proposal, ProposalTrampoline<CSmMALAProposal>> csmmalaProposal(
@@ -729,6 +816,27 @@ namespace hopsy {
                 csmmalaProposal, ProposalParameter::FISHER_WEIGHT, "fisher_weight", doc::CSmMALAProposal::fisherWeight);
         proposal::addParameter<CSmMALAProposal>(
                 csmmalaProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::CSmMALAProposal::stepSize);
+        // pickling
+        csmmalaProposal.def(py::pickle([] (const CSmMALAProposal& self) {
+                        auto model = self.proposal->getModel()->copyModel().release();
+                        return py::make_tuple(self.proposal->getA(), 
+                                              self.proposal->getB(), 
+                                              self.proposal->getState(), 
+                                              model, 
+                                              std::any_cast<double>(self.proposal->getParameter(ProposalParameter::FISHER_WEIGHT)),
+                                              std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
+                    },
+                    [] (py::tuple t) {
+                        if (t.size() != 6) throw std::runtime_error("Invalid state!");
+
+                        return CSmMALAProposal(t[0].cast<MatrixType>(),
+                                               t[1].cast<VectorType>(),
+                                               t[2].cast<VectorType>(),
+                                               ModelWrapper(std::move(t[3].cast<Model*>()->copyModel())),
+                                               t[4].cast<double>(),
+                                               t[5].cast<double>());
+                    })
+                );
         
         
         // register DikinWalkProposal
@@ -769,6 +877,23 @@ namespace hopsy {
                 dikinWalkProposal, ProposalParameter::BOUNDARY_CUSHION, "boundary_cushion", doc::DikinWalkProposal::boundaryCushion);
         proposal::addParameter<DikinWalkProposal>(
                 dikinWalkProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::DikinWalkProposal::stepSize);
+        // pickling
+        dikinWalkProposal.def(py::pickle([] (const DikinWalkProposal& self) {
+                        return py::make_tuple(self.proposal->getA(), 
+                                              self.proposal->getB(), 
+                                              self.proposal->getState(), 
+                                              std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
+                    },
+                    [] (py::tuple t) {
+                        if (t.size() != 4) throw std::runtime_error("Invalid state!");
+
+                        return DikinWalkProposal(t[0].cast<MatrixType>(),
+                                             t[1].cast<VectorType>(),
+                                             t[2].cast<VectorType>(),
+                                             t[3].cast<double>());
+                    })
+                );
+        
         
         
         // register GaussianCoordinateHitAndRun
@@ -792,6 +917,22 @@ namespace hopsy {
         // parameters
         proposal::addParameter<GaussianCoordinateHitAndRunProposal>(
                 gaussianCoordinateHitAndRunProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::GaussianCoordinateHitAndRunProposal::stepSize);
+        // pickling
+        gaussianCoordinateHitAndRunProposal.def(py::pickle([] (const GaussianCoordinateHitAndRunProposal& self) {
+                        return py::make_tuple(self.proposal->getA(), 
+                                              self.proposal->getB(), 
+                                              self.proposal->getState(), 
+                                              std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
+                    },
+                    [] (py::tuple t) {
+                        if (t.size() != 4) throw std::runtime_error("Invalid state!");
+
+                        return GaussianCoordinateHitAndRunProposal(t[0].cast<MatrixType>(),
+                                                                   t[1].cast<VectorType>(),
+                                                                   t[2].cast<VectorType>(),
+                                                                   t[3].cast<double>());
+                    })
+                );
 
 
         // register GaussianHitAndRun
@@ -815,6 +956,22 @@ namespace hopsy {
         // parameters
         proposal::addParameter<GaussianHitAndRunProposal>(
                 gaussianHitAndRunProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::GaussianHitAndRunProposal::stepSize);
+        // pickling
+        gaussianHitAndRunProposal.def(py::pickle([] (const GaussianHitAndRunProposal& self) {
+                        return py::make_tuple(self.proposal->getA(), 
+                                              self.proposal->getB(), 
+                                              self.proposal->getState(), 
+                                              std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
+                    },
+                    [] (py::tuple t) {
+                        if (t.size() != 4) throw std::runtime_error("Invalid state!");
+
+                        return GaussianHitAndRunProposal(t[0].cast<MatrixType>(),
+                                                         t[1].cast<VectorType>(),
+                                                         t[2].cast<VectorType>(),
+                                                         t[3].cast<double>());
+                    })
+                );
 
 
         // register GaussianProposal
@@ -838,6 +995,23 @@ namespace hopsy {
         // parameters
         proposal::addParameter<GaussianProposal>(
                 gaussianProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::GaussianProposal::stepSize);
+        // pickling
+        gaussianProposal.def(py::pickle([] (const GaussianProposal& self) {
+                        return py::make_tuple(self.proposal->getA(), 
+                                              self.proposal->getB(), 
+                                              self.proposal->getState(), 
+                                              std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
+                    },
+                    [] (py::tuple t) {
+                        if (t.size() != 4) throw std::runtime_error("Invalid state!");
+
+                        return GaussianProposal(t[0].cast<MatrixType>(),
+                                                t[1].cast<VectorType>(),
+                                                t[2].cast<VectorType>(),
+                                                t[3].cast<double>()
+                                );
+                    })
+                );
 
 
         // register PyProposal
@@ -847,6 +1021,16 @@ namespace hopsy {
         pyProposal.def(py::init<py::object>(), doc::PyProposal::__init__, py::arg("proposal"));
         // common
         proposal::addCommon<PyProposal, doc::PyProposal>(pyProposal);
+        // pickling
+        pyProposal.def(py::pickle([] (const PyProposal& self) {
+                        return py::make_tuple(self.pyObj);
+                    },
+                    [] (py::tuple t) {
+                        if (t.size() != 1) throw std::runtime_error("Invalid state!");
+
+                        return PyProposal(t[0].cast<py::object>());
+                    })
+                );
 
 
         // register UniformCoordinateHitAndRun
@@ -865,6 +1049,20 @@ namespace hopsy {
             ;
         // common
         proposal::addCommon<UniformCoordinateHitAndRunProposal, doc::UniformCoordinateHitAndRunProposal>(uniformCoordinateHitAndRunProposal);
+        // pickling
+        uniformCoordinateHitAndRunProposal.def(py::pickle([] (const UniformCoordinateHitAndRunProposal& self) {
+                        return py::make_tuple(self.proposal->getA(), 
+                                              self.proposal->getB(), 
+                                              self.proposal->getState());
+                    },
+                    [] (py::tuple t) {
+                        if (t.size() != 3) throw std::runtime_error("Invalid state!");
+
+                        return UniformCoordinateHitAndRunProposal(t[0].cast<MatrixType>(),
+                                                                  t[1].cast<VectorType>(),
+                                                                  t[2].cast<VectorType>());
+                    })
+                );
 
 
         // register UniformHitAndRun
@@ -883,6 +1081,20 @@ namespace hopsy {
             ;
         // common
         proposal::addCommon<UniformHitAndRunProposal, doc::UniformHitAndRunProposal>(uniformHitAndRunProposal);
+        // pickling
+        uniformHitAndRunProposal.def(py::pickle([] (const UniformHitAndRunProposal& self) {
+                        return py::make_tuple(self.proposal->getA(), 
+                                              self.proposal->getB(), 
+                                              self.proposal->getState());
+                    },
+                    [] (py::tuple t) {
+                        if (t.size() != 3) throw std::runtime_error("Invalid state!");
+
+                        return UniformHitAndRunProposal(t[0].cast<MatrixType>(),
+                                                        t[1].cast<VectorType>(),
+                                                        t[2].cast<VectorType>());
+                    })
+                );
 
     }
 } // namespace hopsy

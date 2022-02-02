@@ -175,9 +175,14 @@ def sample(markov_chains, rngs, n_samples, n_thinning = 1, n_threads = 1):
             n_threads = min(len(markov_chains), _submodules.multiprocessing.cpu_count())
 
         with _submodules.multiprocessing.Pool(n_threads) as workers:
-            states = workers.starmap(_sample, [(markov_chains[i], rngs[i], n_samples, n_thinning) for i in range(len(markov_chains))])
+            result = workers.starmap(_sample, [(markov_chains[i], rngs[i], n_samples, n_thinning) for i in range(len(markov_chains))])
 
-        return _submodules.numpy.array(states)
+            accrates, states = [], []
+            for accrate, state in result:
+                accrates.append(accrate)
+                states.append(state)
+
+        return accrates, _submodules.numpy.array(states)
     else:
         accrates, states = [], []
         for i in range(len(markov_chains)):

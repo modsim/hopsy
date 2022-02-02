@@ -1,4 +1,5 @@
 import unittest
+import pickle
 
 from hopsy import *
 
@@ -115,6 +116,16 @@ class ProposalTests(unittest.TestCase):
 
             #proposal = ProposalType()
             #new_proposal = proposal.deepcopy()
+            #self.assertIsInstance(new_proposal, ProposalType)
+
+
+    def test_proposal_pickling(self):
+        problem = Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0], Gaussian(), starting_point=[0, 0])
+
+        for ProposalType in ProposalTypes:
+            proposal = ProposalType(problem)
+            dump = pickle.dumps(proposal)
+            new_proposal = pickle.loads(dump)
             #self.assertIsInstance(new_proposal, ProposalType)
 
 

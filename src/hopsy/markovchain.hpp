@@ -70,7 +70,6 @@ namespace hopsy {
             return markovChain->setParameter(parameter, value);
         }
 
-
         std::shared_ptr<Proposal> getProposal() const {
             return proposal;
         }
@@ -89,6 +88,25 @@ namespace hopsy {
 
         std::shared_ptr<hops::MarkovChain>& getMarkovChain() {
             return markovChain;
+        }
+
+        Problem getProblem() const {
+            py::object handle = py::cast(proposal->copyProposal().get());
+            if (transformation) {
+                return Problem(proposal->getA(), 
+                               proposal->getB(), 
+                               model->copyModel().release(), 
+                               std::optional(proposal->getState()),
+                               std::optional(transformation->getMatrix()),
+                               std::optional(transformation->getShift()));
+            } else {
+                return Problem(proposal->getA(), 
+                               proposal->getB(), 
+                               model->copyModel().release(), 
+                               std::optional(proposal->getState()),
+                               std::optional<MatrixType>(),
+                               std::optional<VectorType>());
+            }
         }
 
     private:
@@ -346,6 +364,13 @@ namespace hopsy {
             .def_property("model", &MarkovChain::getModel, &MarkovChain::setModel, doc::MarkovChain::model)
             .def_property("proposal", &MarkovChain::getProposal, &MarkovChain::setProposal, doc::MarkovChain::proposal)
             .def_property_readonly("state_negative_log_likelihood", &MarkovChain::getStateNegativeLogLikelihood, doc::MarkovChain::stateNegativeLogLikelihood)
+            .def(py::pickle([] (const MarkovChain& self) {
+                            return py::make_tuple(self.getProposal()->copyProposal().release(), self.getProblem());
+                        }, 
+                        [] (py::tuple t) {
+                            if (t.size() != 2) throw std::runtime_error("Invalid state!");
+                            return createMarkovChain(t[0].cast<Proposal*>(), t[1].cast<Problem>());
+                        }))
             //.def("_get_parameter", [] (const MarkovChain& self, 
             //                           const ProposalParameter& parameter) {
             //            return std::any_cast<double>(self.getParameter(parameter));

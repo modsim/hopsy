@@ -1,4 +1,5 @@
 import unittest
+import pickle
 
 from hopsy import *
 
@@ -39,4 +40,15 @@ class MarkovChainTests(unittest.TestCase):
         for ProposalType in ProposalTypes:
             mc = MarkovChain(ProposalType(), problem)
             self.assertIsInstance(mc.proposal, ProposalType)
+
+    def test_markovchain_pickling(self):
+        problem = Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0], Gaussian(), starting_point=[0, 0])
+
+        for ProposalType in ProposalTypes:
+            print(ProposalType)
+            proposal = ProposalType(problem)
+            mc = MarkovChain(proposal, problem)
+            dump = pickle.dumps(mc)
+            new_mc = pickle.loads(dump)
+
 
