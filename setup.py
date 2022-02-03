@@ -130,6 +130,7 @@ setup(
     package_dir={"": "src"},
     install_requires=[
         'PolyRound',
+        'arviz',
         'numpy',
         'pandas',
         'tqdm',

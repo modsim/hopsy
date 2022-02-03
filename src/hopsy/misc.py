@@ -4,6 +4,7 @@
 
 class _submodules:
     import numpy
+    import arviz
     import pandas
 
     from PolyRound.api import PolyRoundApi
@@ -193,39 +194,37 @@ def sample(markov_chains, rngs, n_samples, n_thinning = 1, n_threads = 1):
         return accrates, _submodules.numpy.array(states)
 
 
+def _arviz(f, data, series=0, *args, **kwargs):
+    n_chains, n_samples, dim = data.shape
+    result = []
+    if series:
+        i = series
+        while i < n_samples:
+            result.append(_submodules.arviz.rhat(_submodules.arviz.convert_to_inference_data(data[:,:i]), *args, **kwargs).x.data)
+            i += series
+    else:
+        result.append(_submodules.arviz.rhat(_submodules.arviz.convert_to_inference_data(data), *args, **kwargs).x.data)
 
-#class Sampler:
-#    def __init__(self, proposal, problem, starting_points = None, n_chains = 1, n_threads = 1, seed = 0):
-#        #self.proposal_dist = proposal  # here we should call create_markov_chain(proposal)
-#                                        # which would decide based on the type of proposal
-#        self.proposal = proposal
-#        self.problem = problem
-#
-#        self.starting_points = starting_points if problem.starting_point is None else problem.starting_point
-#        assert self.starting_points is not None
-#
-#        self.n_chains = n_chains
-#        self.n_threads = n_threads
-#
-#        self.states = None
-#        self.markov_chains = []
-#        self.rngs = []
-#
-#        k = 0
-#        for i in range(n_chains):
-#            self.markov_chains.append(MarkovChain(self.proposal, self.problem.model, starting_points[k]))
-#            self.rngs.append(RandomNumberGenerator(seed, i))
-#            k += 1 if k-1 < len(starting_points) else 0
-#
-#
-#    def sample(self, n_samples, thinning = 1):
-#        states = [[] for i in range(self.n_chains)]
-#
-#        for i in _submodules.tqdm(range(n_samples)):
-#            for j in range(self.n_chains):
-#                states[j].append(self.markov_chains[j].draw(self.rngs[j], thinning))
-#
-#        self.states = _submodules.numpy.array(states)
-#        return self.states
+    return _submodules.numpy.array(result)
 
+
+def ess(*args, **kwargs):
+    """
+
+    """
+    return _arviz(_submodules.arviz.rhat, *args, **kwargs)
+
+
+def rhat(*args, **kwargs):
+    """
+
+    """
+    return _arviz(_submodules.arviz.rhat, *args, **kwargs)
+
+
+def mcse(*args, **kwargs):
+    """
+
+    """
+    return _arviz(_submodules.arviz.rhat, *args, **kwargs)
 
