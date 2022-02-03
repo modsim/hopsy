@@ -66,9 +66,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 endif ()
 
 
-# EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
-# define (VERSION_INFO) here.
-target_compile_definitions(core PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
+target_compile_definitions(core PRIVATE VERSION_INFO=${VERSION_INFO})
 
 if (HOPSY_TESTS)
     enable_testing()
