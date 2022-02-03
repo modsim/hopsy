@@ -46,6 +46,20 @@ namespace hopsy {
             if(model) this->model = std::move(model->copyModel());
         }
 
+        Problem(const MatrixType& A, 
+                const VectorType& b, 
+                const std::unique_ptr<Model> model, 
+                const std::optional<VectorType> startingPoint, 
+                const std::optional<MatrixType> transformation, 
+                const std::optional<VectorType> shift) : 
+                A(A),
+                b(b),
+                startingPoint(startingPoint),
+                transformation(transformation),
+                shift(shift) { 
+            if(model) this->model = std::move(model->copyModel());
+        }
+
         std::unique_ptr<Model>& getModel() { return model; }
         void setModel(std::unique_ptr<Model> model) { if(model) this->model = std::move(model->copyModel()); }
 
@@ -112,6 +126,22 @@ namespace hopsy {
                           const std::optional<VectorType>, 
                           const std::optional<MatrixType>, 
                           const std::optional<VectorType>>(),
+                    doc::Problem::__init__,
+                    py::arg("A"), 
+                    py::arg("b"), 
+                    py::arg("model") = static_cast<Model*>(nullptr), 
+                    py::arg("starting_point") = py::none(),
+                    py::arg("transformation") = py::none(), 
+                    py::arg("shift") = py::none()
+            )
+            .def(py::init([] (const MatrixType& A, 
+                          const VectorType& b, 
+                          const py::object model, 
+                          const std::optional<VectorType> startingPoint, 
+                          const std::optional<MatrixType> transformation, 
+                          const std::optional<VectorType> shift) {
+                        return Problem(A, b, std::make_unique<PyModel>(PyModel(model)), startingPoint, transformation, shift);
+                    }),
                     doc::Problem::__init__,
                     py::arg("A"), 
                     py::arg("b"), 
