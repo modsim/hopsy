@@ -1,6 +1,7 @@
 .idea
 build/
 dist/
+wheelhouse/
 _build/
 _generate/
 *.so
