@@ -1,16 +1,36 @@
 name: pipeline
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+     - main
+  release:
+    types:
+      - published
 
 jobs:
-  test:
-    runs-on: quay.io/pypa/manylinux2014_x86_64
+  build_wheels:
+    name: Wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["cp36-cp36m", "cp37-cp37m", "cp38-cp38", "cp39-cp39", "cp310-cp310"]
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
     - uses: actions/checkout@v2
-    - name: Compile wheel
-      run: |
-        /opt/python/${{ matrix.python-version }}/bin/pip wheel --no-deps . -w dist/
+      with:
+        submodules: true
+
+    - uses: pypa/cibuildwheel@v2.3.1
+
+    - name: Verify clean directory
+      run: git diff --exit-code
+      shell: bash
+
+    - name: Upload wheels
+      uses: actions/upload-artifact@v2
+      with:
+        path: wheelhouse/*.whl
