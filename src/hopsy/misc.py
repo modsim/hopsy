@@ -200,10 +200,10 @@ def _arviz(f, data, series=0, *args, **kwargs):
     if series:
         i = series
         while i < n_samples:
-            result.append(_submodules.arviz.rhat(_submodules.arviz.convert_to_inference_data(data[:,:i]), *args, **kwargs).x.data)
+            result.append(f(_submodules.arviz.convert_to_inference_data(data[:,:i]), *args, **kwargs).x.data)
             i += series
     else:
-        result.append(_submodules.arviz.rhat(_submodules.arviz.convert_to_inference_data(data), *args, **kwargs).x.data)
+        result.append(f(_submodules.arviz.convert_to_inference_data(data), *args, **kwargs).x.data)
 
     return _submodules.numpy.array(result)
 
@@ -212,7 +212,14 @@ def ess(*args, **kwargs):
     """
 
     """
-    return _arviz(_submodules.arviz.rhat, *args, **kwargs)
+    return _arviz(_submodules.arviz.ess, *args, **kwargs)
+
+
+def mcse(*args, **kwargs):
+    """
+
+    """
+    return _arviz(_submodules.arviz.mcse, *args, **kwargs)
 
 
 def rhat(*args, **kwargs):
@@ -221,10 +228,4 @@ def rhat(*args, **kwargs):
     """
     return _arviz(_submodules.arviz.rhat, *args, **kwargs)
 
-
-def mcse(*args, **kwargs):
-    """
-
-    """
-    return _arviz(_submodules.arviz.rhat, *args, **kwargs)
 
