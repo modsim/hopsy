@@ -12,4 +12,5 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Compile wheel
-      uses: /opt/python/${{ matrix.python-version }}/bin/pip wheel --no-deps . -w dist/
+      run: |
+        /opt/python/${{ matrix.python-version }}/bin/pip wheel --no-deps . -w dist/
