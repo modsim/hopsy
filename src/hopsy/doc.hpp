@@ -33,7 +33,7 @@ namespace hopsy {
             static const char* computeExpectedFisherInformation;
         };
 
-        struct DegenerateGaussian {
+        struct Gaussian {
             static const char* base;
             static const char* __init__;
             static const char* mean;

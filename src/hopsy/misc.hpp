@@ -26,6 +26,13 @@ namespace hopsy {
     std::string get__repr__(T& t) {
         return py::cast<std::string>(py::cast(t).attr("__repr__")());
     }
+
+    std::string removeTrailingZeros(double number) {
+        std::string str = std::to_string(number);
+        str.erase(str.find_last_not_of('0') + 1, std::string::npos); // remove trailing zeros
+        return str;
+    }
+
 } // namespace hopsy
 
 #endif // HOPSY_MISC_HPP

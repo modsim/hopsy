@@ -5,7 +5,6 @@
 #include <random>
 #include <stdexcept>
 #include <string>
-#include <tuple>
 
 #include <Eigen/Core>
 
@@ -17,6 +16,7 @@
 
 #include "../../extern/hops/src/hops/hops.hpp"
 
+#include "hops/Model/Gaussian.hpp"
 #include "misc.hpp"
 
 namespace py = pybind11;
@@ -132,8 +132,6 @@ namespace hopsy {
         }
 
         std::unique_ptr<Model> copyModel() const override {
-            //return std::make_unique(ModelWrapper(std::shared_ptr<Model>(std::move(model->copyModel()))));
-            //return std::shared_ptr<Model>(std::move(model->copyModel();
             return model->copyModel();
         }
 
@@ -145,12 +143,49 @@ namespace hopsy {
         std::shared_ptr<Model> model;
     };
 
-    using DegenerateGaussian = hops::DegenerateGaussian;
+    class Gaussian : public hops::DegenerateGaussian {
+    public:
+        Gaussian(const VectorType& mean, 
+                           const MatrixType& covariance, 
+                           const std::vector<long>& inactive = std::vector<long>()) :
+                hops::DegenerateGaussian(mean, covariance, inactive),
+                fullMean(mean),
+                fullCovariance(covariance) {
+        }
+
+        double computeNegativeLogLikelihood(const VectorType &x) const override {
+            return hops::DegenerateGaussian::computeNegativeLogLikelihood(x);
+        }
+
+        std::optional<VectorType> computeLogLikelihoodGradient(const VectorType& x) const override {
+            return hops::DegenerateGaussian::computeLogLikelihoodGradient(x);
+        }
+
+        std::optional<MatrixType> computeExpectedFisherInformation(const VectorType& x) const override {
+            return hops::DegenerateGaussian::computeExpectedFisherInformation(x);
+        }
+
+        std::unique_ptr<Model> copyModel() const override {
+            return std::make_unique<Gaussian>(fullMean, 
+                    fullCovariance, hops::DegenerateGaussian::getInactive());
+        }
+
+        const VectorType& getMean() const { return fullMean; }
+
+        const MatrixType& getCovariance() const { return fullCovariance; }
+
+        const std::vector<long>& getInactive() const { return hops::DegenerateGaussian::getInactive(); }
+
+    private:
+        VectorType fullMean;
+        MatrixType fullCovariance;
+    };
+
     using Mixture = hops::Mixture;
     using Rosenbrock =  hops::Rosenbrock;
 } // namespace hopsy
 
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::DegenerateGaussian);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::Gaussian);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::Mixture);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::PyModel);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::Rosenbrock);
@@ -175,92 +210,102 @@ namespace hopsy {
                     })
             ;
 
-        py::classh<DegenerateGaussian, Model, ModelTrampoline<DegenerateGaussian>>(m, "Gaussian", 
-                doc::DegenerateGaussian::base)
+        py::classh<Gaussian, Model, ModelTrampoline<Gaussian>>(m, "Gaussian", 
+                doc::Gaussian::base)
             .def(py::init([] (const VectorType& mean, 
                               const MatrixType& covariance, 
                               const std::vector<long>& inactives) {
                             if (!mean.size() && !covariance.size()) {
-                                return DegenerateGaussian(VectorType::Zero(2), 
+                                return Gaussian(VectorType::Zero(2), 
                                                                  MatrixType::Identity(2, 2), 
                                                                  inactives);
                             } else if(!mean.size() && covariance.size()) {
                                 if (covariance.rows() != covariance.cols()) {
                                     throw std::invalid_argument("Covariance must be square matrix, but has shape (" + 
-                                            std::to_string(covariance.rows()) + ", " + std::to_string(covariance.cols()) + ").");
+                                            std::to_string(covariance.rows()) + ", " + 
+                                            std::to_string(covariance.cols()) + ").");
                                 }
-                                return DegenerateGaussian(VectorType::Zero(covariance.rows()), 
+                                return Gaussian(VectorType::Zero(covariance.rows()), 
                                                                  covariance, 
                                                                  inactives);
                             } else if(mean.size() && !covariance.size()) {
-                                return DegenerateGaussian(mean, 
+                                return Gaussian(mean, 
                                                                  MatrixType::Identity(mean.size(), mean.size()), 
                                                                  inactives);
                             } else if(mean.size() && covariance.size()) {
-                                return DegenerateGaussian(mean, 
+                                return Gaussian(mean, 
                                                                  covariance, 
                                                                  inactives);
                             } else {
                                 throw std::runtime_error("Invalid arguments when constructing hopsy.Gaussian.");
                             }
                         }),
-                    doc::DegenerateGaussian::__init__,
+                    doc::Gaussian::__init__,
                     py::arg("mean") = VectorType(), 
                     py::arg("covariance") = MatrixType(),
                     py::arg("inactives") = std::vector<long>())
-            .def_property("mean", &DegenerateGaussian::getMean, [] (DegenerateGaussian& self, 
-                                                                           const VectorType& mean) {
-                        self = DegenerateGaussian(mean, self.getCovariance(), self.getInactive());
-                    }, doc::DegenerateGaussian::mean)
-            .def_property("covariance", &DegenerateGaussian::getCovariance, [] (DegenerateGaussian& self, 
-                                                                                         const MatrixType& covariance) {
-                        self = DegenerateGaussian(self.getMean(), covariance, self.getInactive());
-                    }, doc::DegenerateGaussian::covariance)
-            .def_property("inactives", &DegenerateGaussian::getInactive, [] (DegenerateGaussian& self, 
-                                                                                      const std::vector<long>& inactives) {
-                        self = DegenerateGaussian(self.getMean(), self.getCovariance(), inactives);
-                    }, doc::DegenerateGaussian::inactives)
-            .def("compute_negative_log_likelihood", [] (const DegenerateGaussian& self, const VectorType& x) {
-                        if (self.getMean().rows() != self.getCovariance().rows() || self.getMean().rows() != self.getCovariance().cols()) {
-                            throw std::runtime_error("Dimension mismatch between mean with shape (" + std::to_string(self.getMean().rows()) + 
-                                    ",) and covariance with shape (" + std::to_string(self.getCovariance().rows()) + 
-                                    ", " + std::to_string(self.getCovariance().cols()) + ")");
+            .def_property("mean", &Gaussian::getMean, [] (Gaussian& self, 
+                                                                    const VectorType& mean) {
+                        self = Gaussian(mean, self.getCovariance(), self.getInactive());
+                    }, doc::Gaussian::mean)
+            .def_property("covariance", &Gaussian::getCovariance, [] (Gaussian& self, 
+                                                                                const MatrixType& covariance) {
+                        self = Gaussian(self.getMean(), covariance, self.getInactive());
+                    }, doc::Gaussian::covariance)
+            .def_property("inactives", &Gaussian::getInactive, [] (Gaussian& self, 
+                                                                             const std::vector<long>& inactives) {
+                        self = Gaussian(self.getMean(), self.getCovariance(), inactives);
+                    }, doc::Gaussian::inactives)
+            .def("compute_negative_log_likelihood", [] (const Gaussian& self, const VectorType& x) {
+                        if (self.getMean().rows() != self.getCovariance().rows() || 
+                            self.getMean().rows() != self.getCovariance().cols()) {
+                            throw std::runtime_error("Dimension mismatch between mean with shape (" + 
+                                                     std::to_string(self.getMean().rows()) + 
+                                                     ",) and covariance with shape (" + 
+                                                     std::to_string(self.getCovariance().rows()) + 
+                                                     ", " + std::to_string(self.getCovariance().cols()) + ")");
                         }
                         return self.computeNegativeLogLikelihood(x);
                     },
-                    doc::DegenerateGaussian::computeNegativeLogLikelihood,
+                    doc::Gaussian::computeNegativeLogLikelihood,
                     py::arg("x"))
-            .def("compute_log_likelihood_gradient", [] (const DegenerateGaussian& self, const VectorType& x) {
-                        if (self.getMean().rows() != self.getCovariance().rows() || self.getMean().rows() != self.getCovariance().cols()) {
-                            throw std::runtime_error("Dimension mismatch between mean with shape (" + std::to_string(self.getMean().rows()) + 
-                                    ",) and covariance with shape (" + std::to_string(self.getCovariance().rows()) + 
-                                    ", " + std::to_string(self.getCovariance().cols()) + ")");
+            .def("compute_log_likelihood_gradient", [] (const Gaussian& self, const VectorType& x) {
+                        if (self.getMean().rows() != self.getCovariance().rows() || 
+                            self.getMean().rows() != self.getCovariance().cols()) {
+                            throw std::runtime_error("Dimension mismatch between mean with shape (" + 
+                                                     std::to_string(self.getMean().rows()) + 
+                                                     ",) and covariance with shape (" + 
+                                                     std::to_string(self.getCovariance().rows()) + 
+                                                     ", " + std::to_string(self.getCovariance().cols()) + ")");
                         }
                         return self.computeLogLikelihoodGradient(x);
                     },
-                    doc::DegenerateGaussian::computeLogLikelihoodGradient,
+                    doc::Gaussian::computeLogLikelihoodGradient,
                     py::arg("x"))
-            .def("compute_expected_fisher_information", [] (const DegenerateGaussian& self, const VectorType& x) {
-                        if (self.getMean().rows() != self.getCovariance().rows() || self.getMean().rows() != self.getCovariance().cols()) {
-                            throw std::runtime_error("Dimension mismatch between mean with shape (" + std::to_string(self.getMean().rows()) + 
-                                    ",) and covariance with shape (" + std::to_string(self.getCovariance().rows()) + 
-                                    ", " + std::to_string(self.getCovariance().cols()) + ")");
+            .def("compute_expected_fisher_information", [] (const Gaussian& self, const VectorType& x) {
+                        if (self.getMean().rows() != self.getCovariance().rows() || 
+                            self.getMean().rows() != self.getCovariance().cols()) {
+                            throw std::runtime_error("Dimension mismatch between mean with shape (" + 
+                                                     std::to_string(self.getMean().rows()) + 
+                                                     ",) and covariance with shape (" + 
+                                                     std::to_string(self.getCovariance().rows()) + 
+                                                     ", " + std::to_string(self.getCovariance().cols()) + ")");
                         }
                         return self.computeExpectedFisherInformation(x);
                     },
-                    doc::DegenerateGaussian::computeExpectedFisherInformation,
+                    doc::Gaussian::computeExpectedFisherInformation,
                     py::arg("x"))
-            .def("__repr__", [] (const DegenerateGaussian& self) -> std::string {
+            .def("__repr__", [] (const Gaussian& self) -> std::string {
                         std::string repr = "hopsy.Gaussian(";
-                        repr += "mean=" + py::cast<std::string>(py::cast(self.getMean()).attr("__repr__")()) + ", ";
-                        repr += "covariance=" + py::cast<std::string>(py::cast(self.getCovariance()).attr("__repr__")());
+                        repr += "mean=" + get__repr__(py::cast(self.getMean())) + ", ";
+                        repr += "covariance=" + get__repr__(py::cast(self.getCovariance()));
                         if (self.getInactive().size()) {
-                            repr += ", inactives=" + py::cast<std::string>(py::cast(self.getInactive()).attr("__repr__")());
+                            repr += ", inactives=" + get__repr__(py::cast(self.getInactive()));
                         }
                         repr += ")";
                         return repr;
                     })
-            .def(py::pickle([] (const DegenerateGaussian& self) { // __getstate__
+            .def(py::pickle([] (const Gaussian& self) { // __getstate__
                                 return py::make_tuple(self.getMean(), 
                                                       self.getCovariance(), 
                                                       self.getInactive());
@@ -268,7 +313,7 @@ namespace hopsy {
                             [](py::tuple t) { // __setstate__
                                 if (t.size() != 3) throw std::runtime_error("Invalid state!");
 
-                                DegenerateGaussian p(t[0].cast<VectorType>(),
+                                Gaussian p(t[0].cast<VectorType>(),
                                                             t[1].cast<MatrixType>(),
                                                             t[2].cast<std::vector<long>>());
 
@@ -280,23 +325,29 @@ namespace hopsy {
         py::classh<Mixture, Model, ModelTrampoline<Mixture>>(m, "Mixture",
                     doc::Mixture::base)
             .def(py::init([] (const std::vector<Model*>& components) {
-                            std::vector<std::shared_ptr<Model>> _components;
-                            for (auto& component : components) _components.push_back(std::shared_ptr<Model>(std::move(component->copyModel())));
-                            return Mixture(_components);
-                        }),
+                        std::vector<std::shared_ptr<Model>> _components;
+                        for (auto& component : components) {
+                            _components.push_back(std::shared_ptr<Model>(std::move(component->copyModel())));
+                        }
+                        return Mixture(_components);
+                    }),
                     doc::Mixture::__init__,
                     py::arg("components") = std::vector<Model*>())
             .def(py::init([] (const std::vector<Model*>& components, const std::vector<double>& weights) {
-                            std::vector<std::shared_ptr<Model>> _components;
-                            for (auto& component : components) _components.push_back(std::shared_ptr<Model>(std::move(component->copyModel())));
-                            return Mixture(_components, weights);
-                        }),
+                        std::vector<std::shared_ptr<Model>> _components;
+                        for (auto& component : components) {
+                            _components.push_back(std::shared_ptr<Model>(std::move(component->copyModel())));
+                        }
+                        return Mixture(_components, weights);
+                    }),
                     py::arg("components"),
                     py::arg("weights"))
             .def_property("components", &Mixture::getComponents, [] (Mixture& self, 
                                                                      const std::vector<Model*> components) {
                         std::vector<std::shared_ptr<Model>> _components;
-                        for (auto& component : components) _components.push_back(std::shared_ptr<Model>(std::move(component->copyModel())));
+                        for (auto& component : components) {
+                            _components.push_back(std::shared_ptr<Model>(std::move(component->copyModel())));
+                        }
                         self = Mixture(_components, self.getWeights());
                     }, doc::Mixture::weights)
             .def_property("weights", &Mixture::getWeights, [] (Mixture& self, 
@@ -318,7 +369,8 @@ namespace hopsy {
                         if (self.getComponents().size()) {
                             repr += "components=[";
                             for (auto& component : self.getComponents()) {
-                                repr += get__repr__<Model>(component) + ( &component != &self.getComponents().back() ? ", " : "" );
+                                repr += get__repr__<Model>(component); 
+                                repr += ( &component != &self.getComponents().back() ? ", " : "" );
                             }
                             repr += "]";
                         }
@@ -329,9 +381,8 @@ namespace hopsy {
                         if (self.getWeights().size() && !allWeightsOne) {
                             repr += ", weights=[";
                             for (auto& weight : self.getWeights()) {
-                                std::string str = std::to_string(weight);
-                                str.erase(str.find_last_not_of('0') + 1, std::string::npos); // remove trailing zeros
-                                repr += str + ( &weight != &self.getWeights().back() ? ", " : "" );
+                                repr += removeTrailingZeros(weight);
+                                repr += ( &weight != &self.getWeights().back() ? ", " : "" );
                             }
                             repr += "]";
                         }
@@ -414,10 +465,8 @@ namespace hopsy {
                     py::arg("x"))
             .def("__repr__", [] (const Rosenbrock& self) -> std::string {
                         std::string repr = "hopsy.Rosenbrock(";
-                        std::string str = std::to_string(self.getScaleParameter());
-                        str.erase(str.find_last_not_of('0') + 1, std::string::npos); // remove trailing zeros
-                        repr += "scale=" + str + ", ";
-                        repr += "shift=" + py::cast<std::string>(py::cast(self.getShiftParameter()).attr("__repr__")());
+                        repr += "scale=" + removeTrailingZeros(self.getScaleParameter()) + ", ";
+                        repr += "shift=" + get__repr__(py::cast(self.getShiftParameter()));
                         repr += ")";
                         return repr;
                     })
