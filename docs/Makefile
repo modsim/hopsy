@@ -50,6 +50,7 @@ help:
 .PHONY: clean
 clean:
 	rm -rf $(BUILDDIR)/*
+	rm -rf generated/*
 
 .PHONY: html
 html:
