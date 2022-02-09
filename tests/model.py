@@ -67,7 +67,7 @@ class ModelTests(unittest.TestCase):
     
         model = Uniform()
         problem = Problem([[1, 1]], [1], model, starting_point=[0, 0])
-        markovChain = MarkovChain(GaussianProposal, problem)
+        markovChain = MarkovChain(problem, GaussianProposal)
         state = markovChain.draw(RandomNumberGenerator())
 
 
@@ -78,6 +78,6 @@ class ModelTests(unittest.TestCase):
     
         model = Uniform()
         problem = Problem([[1, 1]], [1], model, starting_point=[0, 0])
-        markovChain = MarkovChain(GaussianProposal, problem)
+        markovChain = MarkovChain(problem, GaussianProposal)
         state = markovChain.draw(RandomNumberGenerator())
 

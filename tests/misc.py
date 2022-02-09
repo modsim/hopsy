@@ -12,7 +12,7 @@ problem = Problem([[1, 1]], [1], Gaussian(), starting_point = [0, 0])
 
 class MiscTests(unittest.TestCase):
     def test_sequential_sampling(self):
-        mcs = [MarkovChain(GaussianProposal(problem), problem) for i in range(n_chains)]
+        mcs = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
         rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
 
         accrates, states = sample(mcs, rngs, n_samples, thinning)
@@ -24,7 +24,7 @@ class MiscTests(unittest.TestCase):
     def test_parallel_sampling(self):
         n_threads = 4
 
-        mcs = [MarkovChain(GaussianProposal(problem), problem) for i in range(n_chains)]
+        mcs = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
         rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
 
         accrates, states = sample(mcs, rngs, n_samples, thinning, n_threads)
