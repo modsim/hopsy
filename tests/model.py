@@ -48,3 +48,36 @@ class ModelTests(unittest.TestCase):
         model.components[0].mean = [1, 2]
         self.assertListEqual(model.components[0].mean.tolist(), [1, 2])
 
+    def test_implementing_model(self):
+        class Uniform(Model):
+            def __init__(self):
+                Model.__init__(self)
+
+            def compute_negative_log_likelihood(self, x):
+                return 0
+
+            def compute_log_likelihood_gradient(self, x):
+                raise RuntimeError("Method not implemented.")
+
+            def compute_expected_fisher_information(self, x):
+                raise RuntimeError("Method not implemented.")
+
+            def __copy__(self):
+                return Uniform()
+    
+        model = Uniform()
+        problem = Problem([[1, 1]], [1], model, starting_point=[0, 0])
+        markovChain = MarkovChain(GaussianProposal, problem)
+        state = markovChain.draw(RandomNumberGenerator())
+
+
+    def test_py_model(self):
+        class Uniform:
+            def compute_negative_log_likelihood(self, x):
+                return 0
+    
+        model = Uniform()
+        problem = Problem([[1, 1]], [1], model, starting_point=[0, 0])
+        markovChain = MarkovChain(GaussianProposal, problem)
+        state = markovChain.draw(RandomNumberGenerator())
+
