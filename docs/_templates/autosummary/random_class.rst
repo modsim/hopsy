@@ -22,6 +22,8 @@
    .. autosummary::
       :toctree: objname
 
+         ~{{ name }}.__call__
+
    {% for item in methods %}
       {% if not item.startswith('_') %}
          ~{{ name }}.{{ item }}

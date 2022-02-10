@@ -1,6 +1,10 @@
 First Steps
 ===========
 
+.. raw:: html
+
+   <div style="display: none">
+
 .. toctree::
    :caption: First Steps
    :maxdepth: 1
@@ -9,4 +13,7 @@ First Steps
    firststeps/introduction.rst
    notebooks/QuickTutorial.ipynb
 
+.. raw:: html
+
+   </div>
 

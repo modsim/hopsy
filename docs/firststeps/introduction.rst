@@ -20,11 +20,11 @@ from which we wish to draw samples.
 In hopsy, we assume that :math:`\pi(x) = \exp\big\{-f(x)\big\}`, 
 where :math:`f(x)` is the negative log likelihood, which you have to provide,
 if you want to sample a self-implemented model. 
-To read more about the details on how to sample custom models, please refer to :doc:`this page<model>`.
+To read more about the details on how to sample custom models, please refer to :doc:`this page<../userguide/problem>`.
 
 Although hopsy ships with numerous proposal algorithms optimized 
 to work well in linearily-constrained spaces and written in C++,
 it is also possible to implement the proposal algorithm in Python. 
 To read more about the details on how to implement custom proposal algorithms with hopsy, 
-please refer to :doc:`this page<proposal>`.
+please refer to :doc:`this page<../userguide/sampling>`.
 

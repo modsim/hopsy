@@ -88,7 +88,7 @@ Random
 
 .. autosummary::
    :toctree: ../generated/
-   :template: ../_templates/autosummary/class.rst
+   :template: ../_templates/autosummary/random_class.rst
 
    hopsy.RandomNumberGenerator
    hopsy.Normal

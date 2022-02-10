@@ -281,7 +281,7 @@ def _arviz(f: _s.typing.Callable, data: _s.numpy.typing.ArrayLike, series: int =
     result = []
     if series:
         i = series
-        while i < n_samples:
+        while i <= n_samples:
             result.append(f(_s.arviz.convert_to_inference_data(data[:,:i]), *args, **kwargs).x.data)
             i += series
     else:
@@ -301,7 +301,7 @@ def ess(*args, **kwargs):
             MCMC samples with ``data.shape == (n_chains, n_draws, dim)``.
         series : int
             Compute a series of effective sample sizes every ``series`` samples,
-            so ess will be computed for ``data[:,:n] for n in range(series, n_draws, series)``.
+            so ess will be computed for ``data[:,:n] for n in range(series, n_draws+1, series)``.
             For the default value ``series==0``, ess will be computed only once for the whole data.
         method : str
             Select ess method. Valid methods are:
@@ -369,7 +369,7 @@ def mcse(*args, **kwargs):
             MCMC samples with ``data.shape == (n_chains, n_draws, dim)``.
         series : int
             Compute a series of statistics every ``series`` samples,
-            so mcse will be computed for ``data[:,:n] for n in range(series, n_draws, series)``.
+            so mcse will be computed for ``data[:,:n] for n in range(series, n_draws+1, series)``.
             For the default value ``series==0``, mcse will be computed only once for the whole data.
         method : str
             Select mcse method. Valid methods are:
@@ -413,7 +413,7 @@ def rhat(*args, **kwargs):
             MCMC samples with ``data.shape == (n_chains, n_draws, dim)``.
         series : int
             Compute a series of R-hat statistics every ``series`` samples,
-            so R-hat will be computed for ``data[:,:n] for n in range(series, n_draws, series)``.
+            so R-hat will be computed for ``data[:,:n] for n in range(series, n_draws+1, series)``.
             For the default value ``series==0``, R-hat will be computed only once for the whole data.
         method : str
             Select R-hat method. Valid methods are:

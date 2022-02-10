@@ -66,10 +66,11 @@ Models
    :toctree: ../generated/
    :template: ../_templates/autosummary/class.rst
 
-   hopsy.Problem
-   hopsy.add_box_constraints
-   hopsy.compute_chebyshev_center
-   hopsy.round
+   hopsy.Model
+   hopsy.Gaussian
+   hopsy.Mixture
+   hopsy.PyModel
+   hopsy.Rosenbrock
 
 Problem
 """""""

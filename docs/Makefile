@@ -56,7 +56,11 @@ clean:
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
-	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+	@echo "Post-processing HTML output."
+	stat $(BUILDDIR)/html/zreference.html > /dev/null 2> /dev/null && mv $(BUILDDIR)/html/zreference.html $(BUILDDIR)/html/reference.html
+	sed -i 's/zreference/reference/g' `grep 'zreference' -r $(BUILDDIR)/html/ | cut -f1 -d: | uniq`
+	@echo
+	@echo "Build finished."
 
 .PHONY: dirhtml
 dirhtml:

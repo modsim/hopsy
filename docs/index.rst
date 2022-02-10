@@ -24,7 +24,7 @@ hopsy - Highly Optimized Polytope Sampling in Python
 
 :doc:`hopsy <index>` is a scientific Python tool for Markov chain Monte Carlo sampling on convex polytopes of the form
 
-.. math:: \mathcal{P} = \{ x : Ax \leq b \},
+.. math:: \mathcal{P} := \{ x : Ax \leq b \},
 
 a problem that often arises in 
 `Bayesian metabolic flux analysis <https://onlinelibrary.wiley.com/doi/10.1002/bit.26379>`_.
@@ -36,7 +36,7 @@ maintaining a comprehensible API and interoperability with other Python librarie
 
 :doc:`hopsy <index>` offers not only a magnitude of efficiently implemented algorithms specialized for sampling 
 linearily constrained spaces, but also allows for implementing custom samplers in C++.
-Similarily, besides providing a few test :doc:`models<userguide/problem.rst>`, :doc:`hopsy <index>` allows sampling
+Similarily, besides providing a few test :doc:`models<userguide/problem>`, :doc:`hopsy <index>` allows sampling
 user-implemented models.
 A few examples including :math:`^{13}\mathrm{C}`-metabolic flux analysis, bioreactor kinetics, 
 statistical physics simulations and a SIR-model can be found in the examples section.
@@ -52,7 +52,7 @@ Further resources
 """""""""""""""""
 
 If you encounter bugs, please feel free to open an issue `on GitHub <https://github.com/modsim/hopsy/issues>`_,
-where you can also find the `source code <https://github.com/modsim/hopsy>`_
+where you can also find the `source code <https://github.com/modsim/hopsy>`_.
 For questions, help or feedback regarding :doc:`hopsy <index>`, 
 visit us `on our Gitter <https://gitter.im/modsim/hopsy>`_!
 
@@ -104,7 +104,7 @@ visit us `on our Gitter <https://gitter.im/modsim/hopsy>`_!
    firststeps.rst
    userguide.rst
    examples.rst
-   reference.rst
+   zreference.rst
 
 
 .. raw:: html

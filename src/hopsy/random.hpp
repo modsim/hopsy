@@ -88,6 +88,12 @@ namespace hopsy {
                     },
                     doc::Uniform::__call__
                 )
+            .def_property("a", &Uniform::a, [] (Uniform& self, double a) {
+                        self = Uniform(a, self.b());
+                    })
+            .def_property("b", &Uniform::a, [] (Uniform& self, double b) {
+                        self = Uniform(self.a(), b);
+                    })
             .def("__repr__", [] (Uniform& self) -> std::string {
                         std::string repr = "hopsy.Uniform(";
                         repr += "a=" + std::to_string(self.a()) + ", ";
@@ -102,6 +108,12 @@ namespace hopsy {
                         return self(rng.rng); 
                     },
                     doc::Normal::__call__)
+            .def_property("mean", &Normal::mean, [] (Normal& self, double mean) {
+                        self = Normal(mean, self.stddev());
+                    })
+            .def_property("stddev", &Normal::stddev, [] (Normal& self, double stddev) {
+                        self = Normal(self.mean(), stddev);
+                    })
             .def("__repr__", [] (hopsy::Normal& self) -> std::string {
                         std::string repr = "hopsy.Normal(";
                         repr += "mean=" + std::to_string(self.mean()) + ", ";
