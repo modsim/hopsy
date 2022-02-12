@@ -145,7 +145,7 @@ namespace hopsy {
                     doc::Problem::__init__,
                     py::arg("A"), 
                     py::arg("b"), 
-                    py::arg("model") = static_cast<Model*>(nullptr), 
+                    py::arg("model").none(false), 
                     py::arg("starting_point") = py::none(),
                     py::arg("transformation") = py::none(), 
                     py::arg("shift") = py::none()
