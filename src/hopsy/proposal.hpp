@@ -289,11 +289,11 @@ namespace hopsy {
         }
 
         const MatrixType& getA() const override {
-            return pyObj.attr("A").cast<MatrixType>();
+            throw std::runtime_error("Function not implemented.");
         }
 
         const VectorType& getB() const override {
-            return pyObj.attr("b").cast<MatrixType>();
+            throw std::runtime_error("Function not implemented.");
         }
 
         std::unique_ptr<Proposal> copyProposal() const override {

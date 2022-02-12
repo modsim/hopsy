@@ -26,7 +26,7 @@ class _submodules:
         from PolyRound.mutable_classes import polytope
         from PolyRound.settings import PolyRoundSettings
 
-    from tqdm.auto import tqdm
+    #from tqdm.auto import tqdm
 
     import multiprocessing
 
