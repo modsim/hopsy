@@ -17,7 +17,6 @@ if (HOPSY_NO_EIGEN_VECTORIZE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DEIGEN_DONT_VECTORIZE")
 endif ()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHOPS_WITHIN_HOPSY")
 message("CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 
 set(VERSION_INFO "")
@@ -43,6 +42,8 @@ set(HOPS_INCLUDE_DIR "extern/hops/include/hops")
 
 include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${HOPS_INCLUDE_DIR})
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHOPS_WITHIN_HOPSY")
 
 add_subdirectory(extern/pybind11)
 add_subdirectory(src/hopsy)
