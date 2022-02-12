@@ -70,7 +70,7 @@ namespace hopsy {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				double,
 				ProposalBase,
-                "compute_log_acceptance_probability",
+                "log_acceptance_probability",
                 computeLogAcceptanceProbability
 			);
         }
@@ -94,11 +94,11 @@ namespace hopsy {
 			);
         }
 
-        std::optional<std::vector<std::string>> getDimensionNames() const override {
+        std::vector<std::string> getDimensionNames() const override {
 			PYBIND11_OVERRIDE_PURE_NAME(
-				std::optional<std::vector<std::string>>,
+				std::vector<std::string>,
 				ProposalBase,
-                "get_dimension_names",
+                "dimension_names",
 				getDimension
 			);
         }
@@ -107,7 +107,7 @@ namespace hopsy {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				std::vector<std::string>,
 				ProposalBase,
-                "get_parameter_names",
+                "parameter_names",
 				getParameter
 			);
         }
@@ -156,7 +156,7 @@ namespace hopsy {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				std::string,
 				ProposalBase,
-                "get_proposal_name",
+                "name",
 				getProposalName,
 			);
         }
@@ -165,7 +165,7 @@ namespace hopsy {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				double,
 				ProposalBase,
-                "get_state_negative_log_likelihood",
+                "state_negative_log_likelihood",
                 getStateNegativeLogLikelihood
 			);
         }
@@ -174,7 +174,7 @@ namespace hopsy {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				double,
 				ProposalBase,
-                "get_proposal_negative_log_likelihood",
+                "proposal_negative_log_likelihood",
                 getProposalNegativeLogLikelihood
 			);
         }
@@ -210,7 +210,7 @@ namespace hopsy {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				std::unique_ptr<Proposal>,  // Return type 
 				ProposalBase,               // Parent class
-                "deepcopy",                 // Python function name
+                "__copy__",                 // Python function name
 				copyProposal                    // C++ function name
             );
         }
@@ -233,27 +233,27 @@ namespace hopsy {
         }
 
         double computeLogAcceptanceProbability() override {
-            return pyObj.attr("compute_log_acceptance_probability")().cast<double>();
+            return pyObj.attr("log_acceptance_probability")().cast<double>();
         }
 
         VectorType getProposal() const override {
-            return pyObj.attr("get_proposal")().cast<VectorType>();
+            return pyObj.attr("proposal")().cast<VectorType>();
         }
 
         VectorType getState() const override {
-            return pyObj.attr("get_state")().cast<VectorType>();
+            return pyObj.attr("state")().cast<VectorType>();
         }
 
         void setState(const VectorType& newState) override {
-            pyObj.attr("set_state")(newState);
+            pyObj.attr("state")(newState);
         }
 
-        std::optional<std::vector<std::string>> getDimensionNames() const override {
-            return pyObj.attr("get_dimension_names")().cast<std::optional<std::vector<std::string>>>();
+        std::vector<std::string> getDimensionNames() const override {
+            return pyObj.attr("dimension_names")().cast<std::vector<std::string>>();
         }
 
         std::vector<std::string> getParameterNames() const override {
-            return pyObj.attr("get_parameter_names")().cast<std::vector<std::string>>();
+            return pyObj.attr("parameter_names")().cast<std::vector<std::string>>();
         }
 
         std::any getParameter(const ProposalParameter& parameter) const override {
@@ -297,7 +297,7 @@ namespace hopsy {
         }
 
         std::unique_ptr<Proposal> copyProposal() const override {
-            return pyObj.attr("deepcopy")().cast<std::unique_ptr<Proposal>>();
+            return pyObj.attr("__copy__")().cast<std::unique_ptr<Proposal>>();
         }
 
 		py::object pyObj;
@@ -306,7 +306,6 @@ namespace hopsy {
         VectorType proposal;
         VectorType state;
     };
-
 
     class ProposalWrapper : public Proposal {
     public:
@@ -338,7 +337,7 @@ namespace hopsy {
             proposalPtr->setState(newState);
         }
 
-        std::optional<std::vector<std::string>> getDimensionNames() const override {
+        std::vector<std::string> getDimensionNames() const override {
             return proposalPtr->getDimensionNames();
         }
 
@@ -471,7 +470,7 @@ namespace hopsy {
             proposal->setState(newState);
         }
 
-        std::optional<std::vector<std::string>> getDimensionNames() const override {
+        std::vector<std::string> getDimensionNames() const override {
             if (!proposal) throw std::runtime_error(uninitializedMethod("dimension_names"));
             return proposal->getDimensionNames();
         }
@@ -777,12 +776,15 @@ namespace hopsy {
                               double fisherWeight) -> CSmMALAProposal {
                         if (problem) {
                             if (!problem->model) {
-                                throw std::runtime_error("Cannot initialize hopsy.CSmMALAProposal for uniform problem (problem.model == None).");
+                                throw std::runtime_error("Cannot initialize hopsy.CSmMALAProposal for "
+                                        "uniform problem (problem.model == None).");
                             }
 
-                            return CSmMALAProposal::createFromProblem(problem, ModelWrapper(std::move(problem->model->copyModel())), fisherWeight, stepSize);
+                            return CSmMALAProposal::createFromProblem(
+                                    problem, ModelWrapper(std::move(problem->model->copyModel())), fisherWeight, stepSize);
                         } else {
-                            throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
+                            throw std::runtime_error(std::string("Internal error in ") + 
+                                    std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
                         }
                     }), 
                     doc::CSmMALAProposal::__init__,

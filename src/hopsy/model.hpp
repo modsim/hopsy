@@ -34,7 +34,7 @@ namespace hopsy {
 		/* Inherit the constructors */
 		using ModelBase::ModelBase;
 
-		double computeNegativeLogLikelihood(const VectorType& x) const override {
+		double computeNegativeLogLikelihood(const VectorType& x) override {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				double,     /* Return type */
 				ModelBase,       /* Parent class */
@@ -44,7 +44,7 @@ namespace hopsy {
 			);
         }
 
-        std::optional<MatrixType> computeExpectedFisherInformation(const VectorType& x) const override {
+        std::optional<MatrixType> computeExpectedFisherInformation(const VectorType& x) override {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				std::optional<MatrixType>,     /* Return type */
 				ModelBase,       /* Parent class */
@@ -54,7 +54,7 @@ namespace hopsy {
 			);
 		}
 
-        std::optional<VectorType> computeLogLikelihoodGradient(const VectorType& x) const override {
+        std::optional<VectorType> computeLogLikelihoodGradient(const VectorType& x) override {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				std::optional<VectorType>,     /* Return type */
 				ModelBase,       /* Parent class */
@@ -62,6 +62,15 @@ namespace hopsy {
 				computeLogLikelihoodGradient,  /* Name of function in C++ (must match Python name) */
                 x
 			);
+		}
+
+        std::vector<std::string> getDimensionNames() const override {
+			PYBIND11_OVERRIDE_PURE_NAME(
+				std::vector<std::string>,   // Return type 
+				ModelBase,                  // Parent class
+                "dimension_names",          // Python function name
+				copyModel                   // C++ function name
+            );
 		}
 
         std::unique_ptr<Model> copyModel() const override {
@@ -78,16 +87,20 @@ namespace hopsy {
 	public:
 		PyModel(py::object pyObj) : pyObj(std::move(pyObj)) {};
 
-		double computeNegativeLogLikelihood(const VectorType& x) const override {
+		double computeNegativeLogLikelihood(const VectorType& x) override {
 			return pyObj.attr("compute_negative_log_likelihood")(x).cast<double>();
 		}
 
-        std::optional<MatrixType> computeExpectedFisherInformation(const VectorType& x) const override {
+        std::optional<MatrixType> computeExpectedFisherInformation(const VectorType& x) override {
 			return pyObj.attr("compute_expected_fisher_information")(x).cast<std::optional<MatrixType>>();
 		}
 
-        std::optional<VectorType> computeLogLikelihoodGradient(const VectorType& x) const override {
+        std::optional<VectorType> computeLogLikelihoodGradient(const VectorType& x) override {
 			return pyObj.attr("compute_log_likelihood_gradient")(x).cast<std::optional<VectorType>>();
+		}
+
+        std::vector<std::string> getDimensionNames() const override {
+			return pyObj.attr("dimension_names").cast<std::vector<std::string>>();
 		}
 
         std::unique_ptr<Model> copyModel() const override {
@@ -115,19 +128,19 @@ namespace hopsy {
             this->model = std::move(other.model->copyModel());
         }
 
-        double computeNegativeLogLikelihood(const VectorType &x) const override {
+        double computeNegativeLogLikelihood(const VectorType &x) override {
             return model->computeNegativeLogLikelihood(x);
         }
 
-        std::optional<VectorType> computeLogLikelihoodGradient(const VectorType& x) const override {
+        std::optional<VectorType> computeLogLikelihoodGradient(const VectorType& x) override {
             return model->computeLogLikelihoodGradient(x);
         }
 
-        std::optional<MatrixType> computeExpectedFisherInformation(const VectorType& x) const override {
+        std::optional<MatrixType> computeExpectedFisherInformation(const VectorType& x) override {
             return model->computeExpectedFisherInformation(x);
         }
 
-        std::optional<std::vector<std::string>> getDimensionNames() const override {
+        std::vector<std::string> getDimensionNames() const override {
             return model->getDimensionNames();
         }
 
@@ -153,15 +166,15 @@ namespace hopsy {
                 fullCovariance(covariance) {
         }
 
-        double computeNegativeLogLikelihood(const VectorType &x) const override {
+        double computeNegativeLogLikelihood(const VectorType &x) override {
             return hops::DegenerateGaussian::computeNegativeLogLikelihood(x);
         }
 
-        std::optional<VectorType> computeLogLikelihoodGradient(const VectorType& x) const override {
+        std::optional<VectorType> computeLogLikelihoodGradient(const VectorType& x) override {
             return hops::DegenerateGaussian::computeLogLikelihoodGradient(x);
         }
 
-        std::optional<MatrixType> computeExpectedFisherInformation(const VectorType& x) const override {
+        std::optional<MatrixType> computeExpectedFisherInformation(const VectorType& x) override {
             return hops::DegenerateGaussian::computeExpectedFisherInformation(x);
         }
 
@@ -256,7 +269,7 @@ namespace hopsy {
                                                                              const std::vector<long>& inactives) {
                         self = Gaussian(self.getMean(), self.getCovariance(), inactives);
                     }, doc::Gaussian::inactives)
-            .def("compute_negative_log_likelihood", [] (const Gaussian& self, const VectorType& x) {
+            .def("compute_negative_log_likelihood", [] (Gaussian& self, const VectorType& x) {
                         if (self.getMean().rows() != self.getCovariance().rows() || 
                             self.getMean().rows() != self.getCovariance().cols()) {
                             throw std::runtime_error("Dimension mismatch between mean with shape (" + 
@@ -269,7 +282,7 @@ namespace hopsy {
                     },
                     doc::Gaussian::computeNegativeLogLikelihood,
                     py::arg("x"))
-            .def("compute_log_likelihood_gradient", [] (const Gaussian& self, const VectorType& x) {
+            .def("compute_log_likelihood_gradient", [] (Gaussian& self, const VectorType& x) {
                         if (self.getMean().rows() != self.getCovariance().rows() || 
                             self.getMean().rows() != self.getCovariance().cols()) {
                             throw std::runtime_error("Dimension mismatch between mean with shape (" + 
@@ -282,7 +295,7 @@ namespace hopsy {
                     },
                     doc::Gaussian::computeLogLikelihoodGradient,
                     py::arg("x"))
-            .def("compute_expected_fisher_information", [] (const Gaussian& self, const VectorType& x) {
+            .def("compute_expected_fisher_information", [] (Gaussian& self, const VectorType& x) {
                         if (self.getMean().rows() != self.getCovariance().rows() || 
                             self.getMean().rows() != self.getCovariance().cols()) {
                             throw std::runtime_error("Dimension mismatch between mean with shape (" + 

@@ -50,6 +50,10 @@ namespace hopsy {
             return markovChain->draw(randomNumberGenerator, thinning);
         }
 
+	   	std::tuple<double, VectorType, hops::ProposalStatistics> detailedDraw(hops::RandomNumberGenerator &randomNumberGenerator, long thinning = 1) override {
+            return markovChain->detailedDraw(randomNumberGenerator, thinning);
+        }
+
 	   	VectorType getState() const override {
             return markovChain->getState();
         }
