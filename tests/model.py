@@ -39,7 +39,10 @@ class ModelTests(unittest.TestCase):
         model.mean = [1, 2]
         self.assertListEqual(model.mean.tolist(), [1, 2])
 
-        model.mean = [1, 2, 3]
+        with self.assertRaises(RuntimeError):
+            model.mean = [1, 2, 3]
+
+        model = Gaussian(dim=3)
         with self.assertRaises(RuntimeError):
             model.compute_negative_log_likelihood([0, 0])
 

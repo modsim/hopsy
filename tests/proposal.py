@@ -20,7 +20,6 @@ class ProposalTests(unittest.TestCase):
         pass
 
     def test_unbounded_uniform_problem(self):
-        #problem = Problem([[1, 1], [0, -1]], [1, 0], starting_point=[0, 0]) ## DikinWalk can handle this problem?
         problem = Problem([[1, 1]], [1], starting_point=[0, 0])
 
         for ProposalType in ProposalTypes:
