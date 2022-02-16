@@ -42,7 +42,8 @@ namespace hopsy {
         std::string __repr__() const {
             std::string repr = "hopsy.RandomNumberGenerator("; 
             repr += (seed ? "seed=" + std::to_string(seed) : "");
-            repr += (stream ? ", stream=" + std::to_string(stream) : "");
+            repr += (seed && stream ? ", " : "");
+            repr += (stream ? "stream=" + std::to_string(stream) : "");
             repr += ")";
             return repr;
         }
