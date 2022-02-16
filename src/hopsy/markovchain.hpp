@@ -211,7 +211,7 @@ namespace hopsy {
             }
         }
 
-        const static inline std::set<std::string> symmetricProposals{"BallWalk", "CoordinateHitAndRun", "Gaussian", "HitAndRun"};
+        const static inline std::set<std::string> symmetricProposals{"CoordinateHitAndRun", "HitAndRun"};
     };
 } // namespace hopsy
 
