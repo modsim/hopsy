@@ -225,13 +225,19 @@ namespace hopsy {
 
         py::classh<Gaussian, Model, ModelTrampoline<Gaussian>>(m, "Gaussian", 
                 doc::Gaussian::base)
+            .def(py::init([] (long dim) {
+                            return Gaussian(VectorType::Zero(dim), 
+                                            MatrixType::Identity(dim, dim));
+                        }),
+                    doc::Gaussian::__init__,
+                    py::arg("dim"))
             .def(py::init([] (const VectorType& mean, 
                               const MatrixType& covariance, 
                               const std::vector<long>& inactives) {
                             if (!mean.size() && !covariance.size()) {
                                 return Gaussian(VectorType::Zero(2), 
-                                                                 MatrixType::Identity(2, 2), 
-                                                                 inactives);
+                                                MatrixType::Identity(2, 2), 
+                                                inactives);
                             } else if(!mean.size() && covariance.size()) {
                                 if (covariance.rows() != covariance.cols()) {
                                     throw std::invalid_argument("Covariance must be square matrix, but has shape (" + 
@@ -239,16 +245,16 @@ namespace hopsy {
                                             std::to_string(covariance.cols()) + ").");
                                 }
                                 return Gaussian(VectorType::Zero(covariance.rows()), 
-                                                                 covariance, 
-                                                                 inactives);
+                                                covariance, 
+                                                inactives);
                             } else if(mean.size() && !covariance.size()) {
                                 return Gaussian(mean, 
-                                                                 MatrixType::Identity(mean.size(), mean.size()), 
-                                                                 inactives);
+                                                MatrixType::Identity(mean.size(), mean.size()), 
+                                                inactives);
                             } else if(mean.size() && covariance.size()) {
                                 return Gaussian(mean, 
-                                                                 covariance, 
-                                                                 inactives);
+                                                covariance, 
+                                                inactives);
                             } else {
                                 throw std::runtime_error("Invalid arguments when constructing hopsy.Gaussian.");
                             }
@@ -455,6 +461,11 @@ namespace hopsy {
 
         py::classh<Rosenbrock, Model, ModelTrampoline<Rosenbrock>>(m, "Rosenbrock",
                     doc::Rosenbrock::base)
+            .def(py::init([] (long dim) {
+                        return Rosenbrock(1, VectorType::Zero(static_cast<long>(dim / 2));
+                    }),
+                    doc::Rosenbrock::__init__,
+                    py::arg("dim"))
             .def(py::init<double, VectorType>(),
                     doc::Rosenbrock::__init__,
                     py::arg("scale") = 1,
