@@ -462,7 +462,7 @@ namespace hopsy {
         py::classh<Rosenbrock, Model, ModelTrampoline<Rosenbrock>>(m, "Rosenbrock",
                     doc::Rosenbrock::base)
             .def(py::init([] (long dim) {
-                        return Rosenbrock(1, VectorType::Zero(static_cast<long>(dim / 2));
+                        return Rosenbrock(1, VectorType::Zero(static_cast<long>(dim / 2)));
                     }),
                     doc::Rosenbrock::__init__,
                     py::arg("dim"))
