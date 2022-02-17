@@ -45,7 +45,7 @@ class MiscTests(unittest.TestCase):
 
     def test_add_box_constraints(self):
         uniform_problem = Problem([[1, 1,]], [1])
-        uniform_problem = add_box_constraints(uniform_problem, 0, 1)
+        uniform_problem = add_box_constraints(uniform_problem, -2, 1)
 
         for ProposalType in ProposalTypes:
             if ProposalType == CSmMALAProposal:
@@ -53,7 +53,7 @@ class MiscTests(unittest.TestCase):
             chain = MarkovChain(uniform_problem, ProposalType, starting_point=[.1, .1])
 
         gaussian_problem = Problem([[1, 1,]], [1], Gaussian())
-        gaussian_problem = add_box_constraints(gaussian_problem, 0, 1)
+        gaussian_problem = add_box_constraints(gaussian_problem, -1, 1)
 
         for ProposalType in ProposalTypes:
             chain = MarkovChain(gaussian_problem, ProposalType, starting_point=[.1, .1])

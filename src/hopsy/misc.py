@@ -74,6 +74,7 @@ def add_box_constraints(problem: _c.Problem,
     dim = problem.A.shape[1]
 
     _l = _s.numpy.array(lower_bound) if hasattr(lower_bound, "__len__") else _s.numpy.array([lower_bound] * dim)
+    _l = -_l # flip sign comes from flipping -x<-l to x>l
     _u = _s.numpy.array(upper_bound) if hasattr(upper_bound, "__len__") else _s.numpy.array([upper_bound] * dim)
 
     A = _s.numpy.vstack([problem.A, -_s.numpy.eye(dim), _s.numpy.eye(dim)])
@@ -152,7 +153,7 @@ def round(problem: _c.Problem):
 
         polytope = _s.PolyRoundApi.round_polytope(polytope)
 
-        _problem = Problem(polytope.A.values, polytope.b.values, problem.model, transformation=polytope.transformation.values, shift=polytope.shift.values)
+        _problem = _c.Problem(polytope.A.values, polytope.b.values, problem.model, transformation=polytope.transformation.values, shift=polytope.shift.values)
 
         if problem.starting_point is not None:
             _problem.starting_point = transform(_problem, [problem.starting_point])
