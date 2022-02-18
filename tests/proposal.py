@@ -95,7 +95,7 @@ class ProposalTests(unittest.TestCase):
     def test_starting_points(self):
         problem = Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0], Gaussian(), starting_point=[0, 0])
         problem_no_start = Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0], Gaussian())
-        x = [0.1, 0.2]
+        x = [.1, .2]
 
         for ProposalType in ProposalTypes:
             proposal = ProposalType(problem, starting_point=x)
@@ -126,5 +126,17 @@ class ProposalTests(unittest.TestCase):
             dump = pickle.dumps(proposal)
             new_proposal = pickle.loads(dump)
             #self.assertIsInstance(new_proposal, ProposalType)
+
+
+    def test_starting_point_validation(self):
+        problem = Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0], Gaussian(), starting_point=[0, -.1])
+
+        for ProposalType in ProposalTypes:
+            with self.assertRaises(ValueError):
+                proposal = ProposalType(problem)
+
+            with self.assertRaises(ValueError):
+                proposal = ProposalType(problem, starting_point=[.1, .1])
+                proposal.state = [0, -.1]
 
 
