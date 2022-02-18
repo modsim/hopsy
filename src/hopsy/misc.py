@@ -277,16 +277,36 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
         return accrates, _s.numpy.array(states)
 
 
-def _arviz(f: _s.typing.Callable, data: _s.numpy.typing.ArrayLike, series: int = 0, *args, **kwargs):
+def _is_constant_chains(data):
+    data = _s.numpy.array(data)
+    assert len(data.shape) == 3
+    return _s.numpy.sum(_s.numpy.abs(_s.numpy.diff(data, axis=1))) == 0
+
+
+def _arviz(f: _s.typing.Callable, 
+           data: _s.numpy.typing.ArrayLike, 
+           series: int = 0, 
+           *args, **kwargs):
+    data = _s.numpy.array(data)
+    assert len(data.shape) == 3
     n_chains, n_samples, dim = data.shape
     result = []
     if series:
         i = series
         while i <= n_samples:
-            result.append(f(_s.arviz.convert_to_inference_data(data[:,:i]), *args, **kwargs).x.data)
+            # if chains are constant, ess = 1, no matter what
+            if _is_constant_chains(data[:,:i]) and f == _s.arviz.ess:
+                _result = [1] * dim
+            else:
+                _result = f(_s.arviz.convert_to_inference_data(data[:,:i]), *args, **kwargs).x.data
+            result.append(_result)
             i += series
     else:
-        result.append(f(_s.arviz.convert_to_inference_data(data), *args, **kwargs).x.data)
+        if _is_constant_chains(data) and f == _s.arviz.ess:
+            _result = [1] * dim
+        else:
+            _result = f(_s.arviz.convert_to_inference_data(data), *args, **kwargs).x.data
+        result.append(_result)
 
     return _s.numpy.array(result)
 

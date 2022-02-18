@@ -1,5 +1,7 @@
 import unittest
 
+import numpy
+
 from hopsy import *
 
 n_chains = 4
@@ -43,6 +45,7 @@ class MiscTests(unittest.TestCase):
 
         self.assertListEqual(list(states.shape), [n_chains, n_samples, 2])
 
+
     def test_add_box_constraints(self):
         uniform_problem = Problem([[1, 1,]], [1])
         uniform_problem = add_box_constraints(uniform_problem, -2, 1)
@@ -58,3 +61,18 @@ class MiscTests(unittest.TestCase):
         for ProposalType in ProposalTypes:
             chain = MarkovChain(gaussian_problem, ProposalType, starting_point=[.1, .1])
 
+
+    def test_rounding(self):
+        problem = Problem([[1, 1,]], [1])
+        problem = add_box_constraints(problem, -2, 1)
+        problem = round(problem)
+
+
+    def test_ess(self):
+        states = [[[0, 1, 2, 3, 4]]*100]*4
+        neff = ess(states)
+        self.assertListEqual([1, 1, 1, 1, 1], neff[0].tolist())
+
+        states = numpy.concatenate([[[[0, 1, 2, 3, 4]]*100]*4, numpy.random.rand(4, 100, 5)], axis=1)
+        neff = ess(states, series=100)
+        self.assertListEqual([1, 1, 1, 1, 1], neff[0].tolist())
