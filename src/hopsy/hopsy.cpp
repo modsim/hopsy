@@ -28,11 +28,8 @@ PYBIND11_MODULE(core, m) {
 
     m.doc() = hopsy::doc::base;
 
-#ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
-#else
-    m.attr("__version__") = "dev";
-#endif
+    m.attr("__build__") = MACRO_STRINGIFY(HOPSY_BUILD_ID);
 
     hopsy::addModels(m);
     hopsy::addRandom(m);
