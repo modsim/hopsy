@@ -547,6 +547,8 @@ namespace hopsy {
             hops::AdaptiveMetropolisProposal<MatrixType, VectorType>, MatrixType, double, double, unsigned long>;
     using BallWalkProposal = UninitializedProposalWrapper<
             hops::BallWalkProposal<MatrixType, VectorType>, double>;
+    using BilliardMALAProposal = UninitializedProposalWrapper<
+            hops::BilliardMALAProposal<ModelWrapper, MatrixType>, ModelWrapper, double, double>;
     using CSmMALAProposal = UninitializedProposalWrapper<
             hops::CSmMALAProposal<ModelWrapper, MatrixType>, ModelWrapper, double, double>;
     using DikinWalkProposal = UninitializedProposalWrapper<
@@ -565,6 +567,7 @@ namespace hopsy {
 
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::AdaptiveMetropolisProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::BallWalkProposal);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::BilliardMALAProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::CSmMALAProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::DikinWalkProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::GaussianCoordinateHitAndRunProposal);
@@ -764,6 +767,80 @@ namespace hopsy {
                     })
                 );
         
+        // register BilliardMALAProposal
+        py::classh<BilliardMALAProposal, Proposal, ProposalTrampoline<BilliardMALAProposal>> billiardmalaProposal(
+                m, "BilliardMALAProposal", doc::BilliardMALAProposal::base);
+        // constructor
+        billiardmalaProposal
+            //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
+            .def(py::init([] (const Problem* problem,
+                              double stepSize,
+                              long maximumNumberOfReflections) -> BilliardMALAProposal {
+                        if (problem) {
+                            if (!problem->model) {
+                                throw std::runtime_error("Cannot initialize hopsy.BilliardMALAProposal for "
+                                        "uniform problem (problem.model == None).");
+                            }
+
+                            return BilliardMALAProposal::createFromProblem(
+                                    problem, ModelWrapper(std::move(problem->model->copyModel())), maximumNumberOfReflections, stepSize);
+                        } else {
+                            throw std::runtime_error(std::string("Internal error in ") +
+                                    std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
+                        }
+                    }),
+                    doc::BilliardMALAProposal::__init__,
+                    py::arg("problem"),
+                    py::arg("stepsize") = 1.,
+                    py::arg("maximum_number_of_reflections") = 100)
+            .def(py::init([] (const Problem* problem,
+                              const VectorType* startingPoint,
+                              double stepSize,
+                              long maximumNumberOfReflections) -> BilliardMALAProposal {
+                        if (problem) {
+                            if (!problem->model) {
+                                throw std::runtime_error("Cannot initialize hopsy.BilliardMALAProposal for uniform problem (problem.model == None).");
+                            }
+
+                            return BilliardMALAProposal::create(problem, startingPoint, ModelWrapper(std::move(problem->model->copyModel())), maximumNumberOfReflections, stepSize);
+                        } else {
+                            throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
+                        }
+                    }),
+                    doc::BilliardMALAProposal::__init__,
+                    py::arg("problem"),
+                    py::arg("starting_point"),
+                    py::arg("stepsize") = 1.,
+                    py::arg("maximum_number_of_reflections") = 100)
+            ;
+        // common
+        proposal::addCommon<BilliardMALAProposal, doc::BilliardMALAProposal>(billiardmalaProposal);
+        // parameters
+        proposal::addParameter<BilliardMALAProposal>(
+                billiardmalaProposal, ProposalParameter::MAXIMUM_NUMBER_OF_REFLECTIONS, "maximum_number_of_reflections", doc::BilliardMALAProposal::maximumNumberOfReflections);
+        proposal::addParameter<BilliardMALAProposal>(
+                billiardmalaProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::BilliardMALAProposal::stepSize);
+        // pickling
+        billiardmalaProposal.def(py::pickle([] (const BilliardMALAProposal& self) {
+                        auto model = self.proposal->getModel()->copyModel().release();
+                        return py::make_tuple(self.proposal->getA(),
+                                              self.proposal->getB(),
+                                              self.proposal->getState(),
+                                              model,
+                                              std::any_cast<long>(self.proposal->getParameter(ProposalParameter::MAXIMUM_NUMBER_OF_REFLECTIONS)),
+                                              std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
+                    },
+                    [] (py::tuple t) {
+                        if (t.size() != 6) throw std::runtime_error("Invalid state!");
+
+                        return BilliardMALAProposal(t[0].cast<MatrixType>(),
+                                               t[1].cast<VectorType>(),
+                                               t[2].cast<VectorType>(),
+                                               ModelWrapper(std::move(t[3].cast<Model*>()->copyModel())),
+                                               t[4].cast<long>(),
+                                               t[5].cast<double>());
+                    })
+                );
 
         // register CSmMALAProposal
         py::classh<CSmMALAProposal, Proposal, ProposalTrampoline<CSmMALAProposal>> csmmalaProposal(
@@ -790,7 +867,7 @@ namespace hopsy {
                     doc::CSmMALAProposal::__init__,
                     py::arg("problem"), 
                     py::arg("stepsize") = 1, 
-                    py::arg("fisher_weight") = 1)
+                    py::arg("fisher_weight") = 0.5)
             .def(py::init([] (const Problem* problem, 
                               const VectorType* startingPoint, 
                               double stepSize,
@@ -809,7 +886,7 @@ namespace hopsy {
                     py::arg("problem"), 
                     py::arg("starting_point"), 
                     py::arg("stepsize") = 1, 
-                    py::arg("fisher_weight") = 1)
+                    py::arg("fisher_weight") = 0.5)
             ;
         // common
         proposal::addCommon<CSmMALAProposal, doc::CSmMALAProposal>(csmmalaProposal);

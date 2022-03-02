@@ -825,6 +825,72 @@ const char* hopsy::doc::BallWalkProposal::stepSize = R"pbdoc(
 )pbdoc";
 
 
+const char* hopsy::doc::BilliardMALAProposal::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardMALAProposal::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardMALAProposal::propose = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardMALAProposal::acceptProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardMALAProposal::logAcceptanceProbability = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardMALAProposal::proposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardMALAProposal::state = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardMALAProposal::getParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardMALAProposal::setParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardMALAProposal::hasStepSize = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardMALAProposal::name = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardMALAProposal::stateNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardMALAProposal::proposalNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardMALAProposal::hasNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardMALAProposal::copyProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardMALAProposal::maximumNumberOfReflections = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardMALAProposal::stepSize = R"pbdoc(
+)pbdoc";
 
 const char* hopsy::doc::CSmMALAProposal::base = R"pbdoc(
 )pbdoc";
