@@ -5,7 +5,9 @@ from hopsy import *
 
 ProposalTypes = [
             AdaptiveMetropolisProposal,
+            BilliardAdaptiveMetropolisProposal,
             BallWalkProposal,
+            BilliardMALAProposal,
             CSmMALAProposal,
             DikinWalkProposal,
             GaussianCoordinateHitAndRunProposal,
@@ -24,7 +26,7 @@ class ProposalTests(unittest.TestCase):
 
         for ProposalType in ProposalTypes:
 
-            if ProposalType == CSmMALAProposal or ProposalType == DikinWalkProposal:
+            if ProposalType == CSmMALAProposal or ProposalType == DikinWalkProposal or ProposalType == BilliardMALAProposal:
                 with self.assertRaises(RuntimeError):
                     proposal = ProposalType(problem)
                     self.assertTrue((proposal.state == problem.starting_point).all())
@@ -39,7 +41,7 @@ class ProposalTests(unittest.TestCase):
 
         for ProposalType in ProposalTypes:
 
-            if ProposalType == CSmMALAProposal:
+            if ProposalType == CSmMALAProposal or ProposalType == BilliardMALAProposal:
                 with self.assertRaises(RuntimeError):
                     proposal = ProposalType(problem)
                     self.assertTrue((proposal.state == problem.starting_point).all())
