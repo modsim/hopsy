@@ -49,6 +49,15 @@ class CMakeBuild(build_ext):
         ]
         build_args = []
 
+        try:
+            commit_hash = subprocess.check_output(
+                ['git', 'rev-parse', '--short', 'HEAD'], cwd=self.build_temp
+            ).decode('utf-8').split('\n')[0]
+            print("Build id:", commit_hash)
+            cmake_args.append('-DHOPSY_BUILD_ID={}'.format(commit_hash))
+        except Exception as e:
+            print("ERROR retrieving commit hash. No build ID will be set.")
+
         if self.compiler.compiler_type != 'msvc':
             # Using Ninja-build since it a) is available as a wheel and b)
             # multithreads automatically. MSVC would require all variables be

@@ -19,8 +19,6 @@ endif ()
 
 message("CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 
-set(VERSION_INFO "")
-
 set(HOPS_LIBRARY_TYPE STATIC CACHE STRING "use header only" FORCE)
 set(HOPS_BINARIES OFF)
 set(HOPS_EXAMPLES OFF)
@@ -68,7 +66,7 @@ if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 endif ()
 
-target_compile_definitions(core PRIVATE VERSION_INFO=${HOPSY_VERSION_INFO})
+target_compile_definitions(core PRIVATE VERSION_INFO=${HOPSY_VERSION_INFO} HOPSY_BUILD_ID=${HOPSY_BUILD_ID})
 
 if (HOPSY_TESTS)
     enable_testing()
