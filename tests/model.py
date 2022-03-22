@@ -46,16 +46,16 @@ class ModelTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             model.compute_negative_log_likelihood([0, 0])
 
-        self.assertIsNotNone(model.compute_log_likelihood_gradient(model.mean), None)
-        self.assertIsNotNone(model.compute_expected_fisher_information(model.mean), None)
+        self.assertIsNotNone(model.compute_log_likelihood_gradient(model.mean))
+        self.assertIsNotNone(model.compute_expected_fisher_information(model.mean))
 
     def test_mixture_properties(self):
         model = Mixture([Gaussian()])
         model.components[0].mean = [1, 2]
         self.assertListEqual(model.components[0].mean.tolist(), [1, 2])
 
-        self.assertIsNotNone(model.compute_log_likelihood_gradient(model.components[0].mean), None)
-        self.assertIsNone(model.compute_expected_fisher_information(model.components[0].mean), None)
+        self.assertIsNotNone(model.compute_log_likelihood_gradient(model.components[0].mean))
+        self.assertIsNone(model.compute_expected_fisher_information(model.components[0].mean))
 
     def test_implementing_model(self):
         class Uniform(Model):
