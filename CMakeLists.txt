@@ -68,7 +68,7 @@ if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 endif ()
 
-target_compile_definitions(core PRIVATE VERSION_INFO=${HOPSY_VERSION_INFO})
+target_compile_definitions(core PRIVATE BUILD_INFO=${HOPSY_BUILD_INFO} VERSION_INFO=${HOPSY_VERSION_INFO})
 
 if (HOPSY_TESTS)
     enable_testing()
