@@ -250,9 +250,9 @@ namespace hopsy {
 					doc::ThompsonSampling::iterationsForConvergence)
           .def_readwrite("grid_size", &ThompsonSampling::stepSizeGridSize, 
 					doc::ThompsonSampling::stepSizeGridSize)
-          .def_readwrite("grid_lower_bound", &ThompsonSampling::stepSizeLowerBound, 
+          .def_readwrite("lower_bound", &ThompsonSampling::stepSizeLowerBound, 
 					doc::ThompsonSampling::stepSizeLowerBound)
-          .def_readwrite("grid_upper_bound", &ThompsonSampling::stepSizeUpperBound, 
+          .def_readwrite("upper_bound", &ThompsonSampling::stepSizeUpperBound, 
 					doc::ThompsonSampling::stepSizeUpperBound)
           .def_readwrite("smoothing_length", &ThompsonSampling::smoothingLength, 
 					doc::ThompsonSampling::smoothingLength)
