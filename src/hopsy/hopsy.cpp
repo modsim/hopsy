@@ -32,9 +32,9 @@ PYBIND11_MODULE(core, m) {
     m.attr("__build__") = MACRO_STRINGIFY(BUILD_INFO);
 
 #ifdef IS_DEBUG
-    m.attr("__debug__") = true;
+    m.attr("__is_debug__") = true;
 #else
-    m.attr("__debug__") = false;
+    m.attr("__is_debug__") = false;
 #endif
 
     hopsy::addModels(m);
