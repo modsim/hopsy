@@ -177,6 +177,53 @@ namespace hopsy {
             static const char* stepSize;
         };
 
+        struct BilliardAdaptiveMetropolisProposal {
+            static const char* base;
+            static const char* __init__;
+
+            static const char* propose;
+            static const char* acceptProposal;
+            static const char* logAcceptanceProbability;
+            static const char* proposal;
+            static const char* state;
+            static const char* getParameter;
+            static const char* setParameter;
+            static const char* hasStepSize;
+            static const char* name;
+            static const char* stateNegativeLogLikelihood;
+            static const char* proposalNegativeLogLikelihood;
+            static const char* hasNegativeLogLikelihood;
+            static const char* copyProposal;
+
+            static const char* maxReflections;
+            static const char* boundaryCushion;
+            static const char* epsilon;
+            static const char* stepSize;
+            static const char* warmUp;
+        };
+
+        struct BilliardMALAProposal {
+            static const char* base;
+            static const char* __init__;
+
+            static const char* propose;
+            static const char* acceptProposal;
+            static const char* logAcceptanceProbability;
+            static const char* proposal;
+            static const char* state;
+            static const char* getParameter;
+            static const char* setParameter;
+            static const char* hasStepSize;
+            static const char* name;
+            static const char* stateNegativeLogLikelihood;
+            static const char* proposalNegativeLogLikelihood;
+            static const char* hasNegativeLogLikelihood;
+            static const char* copyProposal;
+
+            static const char* maxReflections;
+            static const char* stepSize;
+        };
+
         struct CSmMALAProposal {
             static const char* base;
             static const char* __init__;
