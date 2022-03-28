@@ -54,7 +54,7 @@ class CMakeBuild(build_ext):
             '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}'.format(extdir),
             '-DPYTHON_EXECUTABLE={}'.format(sys.executable),
             '-DHOPSY_VERSION_INFO={}'.format(self.distribution.get_version()),
-            '-DHOPSY_BUILD_INFO={}'.format(commitid),
+            '-DHOPSY_BUILD_INFO={}'.format(commit),
             '-DCMAKE_BUILD_TYPE={}'.format(cfg),  # not used on MSVC, but no harm
         ]
         build_args = []

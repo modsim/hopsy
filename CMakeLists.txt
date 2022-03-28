@@ -8,7 +8,7 @@ endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -DIS_DEBUG")
 
 option(HOPSY_TESTS "Enable hopsy tests" OFF)
 option(HOPSY_NO_EIGEN_VECTORIZE "Disable Eigen vectorization" ON)

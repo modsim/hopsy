@@ -10,6 +10,7 @@ stages:
 build-release:
   stage: build
   script:
+    - git rev-parse --short HEAD > .commit
     - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39"; do /opt/python/$PY/bin/pip wheel --no-deps . -w dist; done
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39"; do auditwheel repair dist/hopsy-$VERSION-$PY-* -w dist; done
   artifacts:
