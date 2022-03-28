@@ -8,7 +8,7 @@ endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -DIS_DEBUG")
 
 option(HOPSY_TESTS "Enable hopsy tests" OFF)
 option(HOPSY_NO_EIGEN_VECTORIZE "Disable Eigen vectorization" ON)
@@ -66,7 +66,7 @@ if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 endif ()
 
-target_compile_definitions(core PRIVATE VERSION_INFO=${HOPSY_VERSION_INFO} HOPSY_BUILD_ID=${HOPSY_BUILD_ID})
+target_compile_definitions(core PRIVATE BUILD_INFO=${HOPSY_BUILD_INFO} VERSION_INFO=${HOPSY_VERSION_INFO})
 
 if (HOPSY_TESTS)
     enable_testing()

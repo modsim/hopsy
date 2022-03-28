@@ -14,6 +14,15 @@ PLAT_TO_CMAKE = {
     'win-arm64': 'ARM64',
 }
 
+with open('README.md', 'r') as fh:
+    long_description = fh.read()
+
+with open('.version', 'r') as fh:
+    version = fh.read().split('\n')[0]
+
+with open('.commit', 'r') as fh:
+    commit = fh.read().split('\n')[0]
+
 
 # A CMakeExtension needs a sourcedir instead of a file list.
 # The name must be the _single_ output extension from the CMake build.
@@ -45,6 +54,7 @@ class CMakeBuild(build_ext):
             '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}'.format(extdir),
             '-DPYTHON_EXECUTABLE={}'.format(sys.executable),
             '-DHOPSY_VERSION_INFO={}'.format(self.distribution.get_version()),
+            '-DHOPSY_BUILD_INFO={}'.format(commit),
             '-DCMAKE_BUILD_TYPE={}'.format(cfg),  # not used on MSVC, but no harm
         ]
         build_args = []
@@ -107,12 +117,6 @@ class CMakeBuild(build_ext):
             ['cmake', '--build', '.'] + build_args, cwd=self.build_temp
         )
 
-
-with open('README.md', 'r') as fh:
-    long_description = fh.read()
-
-with open('.version', 'r') as fh:
-    version = fh.read().split('\n')[0]
 
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
