@@ -1,4 +1,4 @@
-# HOPSY - Python bindings for HOPS
+# hopsy - Python bindings for HOPS
 
  [![pipeline status](https://jugit.fz-juelich.de/fluxomics/hopsy/badges/develop/pipeline.svg)](https://jugit.fz-juelich.de/fluxomics/hopsy/-/commits/develop)
  [![docstring coverage](https://jugit.fz-juelich.de/fluxomics/hopsy/-/jobs/220246/artifacts/raw/docs/docov.svg?job=test_release)](https://jugit.fz-juelich.de/fluxomics/hopsy/-/jobs/220246/artifacts/file/docs/docov.txt?job=test_release)
@@ -8,8 +8,7 @@ Built using `pybind11`
 
 <img src="docs/hopsy.png" alt="HOPSY Logo" width="300"/>
 
-**hopsy** is the attempt to offer some of the key functionatlity of **hops** through a Python interface.
-hops is a highly template-based C++-library for Markov chain Monte Carlo sampling on convex polytopes
+**hopsy** is a Python package for Markov chain Monte Carlo sampling on convex polytopes
  
 P = {x : Ax &#8804; b},
 
@@ -52,7 +51,7 @@ where the version `x.y.z` and tag `tag` will depend on the verison you downloade
 If you use the CMake routine, the compiled shared library will be located in `build/` and can 
 be used within the directory. 
 
-To compile wheels for distribution via the Python Package Index (pypi.org), use the `makewheels.sh` script.
+To compile binary wheels for distribution (e.g. via the Python Package Index pypi.org), use the `makewheels.sh` script.
 
 
 ### Prerequisites for compiling from source
@@ -67,6 +66,8 @@ To compile wheels for distribution via the Python Package Index (pypi.org), use 
 
 ## License
 
+hopsy is licensed under the [MIT license](LICENSE).
+
 
 ## Examples
 
@@ -74,20 +75,16 @@ A basic usage example is presented below. More examples can be found in `tests/`
 
 ```python
 import hopsy
-import numpy as np
+import matplotlib.pyplot as plt
 
 # the polytope is defined as 
 #          P := {x : Ax <= b}
-# thus we need to define A and b. these constraints form the simple box [0,1]^2.
-A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
-b = np.array([[1], [1], [0], [0]]);
+# thus we need to define A and b. these constraints form the simple box [0,5]^2.
+A = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+b = [5, 5, 0, 0]
 
-# next we define our target distribution as an isotropic Gaussian with mean 0 and 
-# identity covariance.
-mu = np.zeros((2,1))
-cov = np.identity(2)
-
-model = hopsy.MultivariateGaussianModel(mu, cov)
+# next we construct a 2-dim standard Gaussian
+model = hopsy.Gaussian(dim=2)
 
 # the complete problem is defined by the target distribution and the constrained domain, 
 # defined by the above mentioned inequality
@@ -96,18 +93,15 @@ problem = hopsy.Problem(A, b, model)
 # the run object contains and constructs the markov chains. in the default case, the
 # Run object will have a single chain using the Hit-and-Run proposal algorithm and is
 # set to produce 10,000 samples.
-run = hopsy.Run(problem)
+mc = hopsy.MarkovChain(problem, proposal=hopsy.GaussianHitAndRunProposal, starting_point=[.5, .5])
+rng = hopsy.RandomNumberGenerator(seed=42)
 
 # we finally sample
-run.sample()
+acceptance_rate, states = hopsy.sample(mc, rng, n_samples=10_000, thinning=2)
 
-# from the run, we can now extract the produced data
-data = run.data
-
-# the states is a list of lists of numpy.ndarrays, which can be casted to a numpy.ndarray
-# which then has the shape (m,n,d), where m is the number of chains, n the number of samples
-# and d the dimenion
-states  = data.states
+# the states have 3 dimensions: number of chains, number of samples, number of dimensions.
+plt.scatter(states[:,:,0].flatten(), states[:,:,1].flatten())
+plt.show()
 ```
 
 [`cibuildwheel`]:          https://cibuildwheel.readthedocs.io
