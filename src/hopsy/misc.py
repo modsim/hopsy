@@ -156,7 +156,7 @@ def round(problem: _c.Problem):
         _problem = _c.Problem(polytope.A.values, polytope.b.values, problem.model, transformation=polytope.transformation.values, shift=polytope.shift.values)
 
         if problem.starting_point is not None:
-            _problem.starting_point = transform(_problem, [problem.starting_point])
+            _problem.starting_point = transform(_problem, [problem.starting_point])[0]
 
         return _problem
 
