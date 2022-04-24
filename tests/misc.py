@@ -15,11 +15,13 @@ problem = Problem([[1, 1]], [1], Gaussian(), starting_point = [0, 0])
 ProposalTypes = [
             AdaptiveMetropolisProposal,
             BallWalkProposal,
+            BilliardMALAProposal,
             CSmMALAProposal,
             DikinWalkProposal,
             GaussianCoordinateHitAndRunProposal,
             GaussianHitAndRunProposal,
             GaussianProposal,
+            TruncatedGaussianProposal,
             UniformCoordinateHitAndRunProposal,
             UniformHitAndRunProposal,
         ]
@@ -45,13 +47,12 @@ class MiscTests(unittest.TestCase):
 
         self.assertListEqual(list(states.shape), [n_chains, n_samples, 2])
 
-
     def test_add_box_constraints(self):
         uniform_problem = Problem([[1, 1,]], [1])
         uniform_problem = add_box_constraints(uniform_problem, -2, 1)
 
         for ProposalType in ProposalTypes:
-            if ProposalType == CSmMALAProposal:
+            if ProposalType in [BilliardMALAProposal, CSmMALAProposal, TruncatedGaussianProposal]:
                 continue
             chain = MarkovChain(uniform_problem, ProposalType, starting_point=[.1, .1])
 

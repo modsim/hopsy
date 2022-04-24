@@ -1360,6 +1360,64 @@ const char* hopsy::doc::PyProposal::hasNegativeLogLikelihood = R"pbdoc(
 const char* hopsy::doc::PyProposal::copyProposal = R"pbdoc(
 )pbdoc";
 
+const char* hopsy::doc::TruncatedGaussianProposal::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::TruncatedGaussianProposal::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::TruncatedGaussianProposal::propose = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::TruncatedGaussianProposal::acceptProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::TruncatedGaussianProposal::logAcceptanceProbability = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::TruncatedGaussianProposal::proposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::TruncatedGaussianProposal::state = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::TruncatedGaussianProposal::getParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::TruncatedGaussianProposal::setParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::TruncatedGaussianProposal::hasStepSize = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::TruncatedGaussianProposal::name = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::TruncatedGaussianProposal::stateNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::TruncatedGaussianProposal::proposalNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::TruncatedGaussianProposal::hasNegativeLogLikelihood = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::TruncatedGaussianProposal::copyProposal = R"pbdoc(
+)pbdoc";
 
 
 const char* hopsy::doc::UniformCoordinateHitAndRunProposal::base = R"pbdoc(
