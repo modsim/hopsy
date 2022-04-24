@@ -350,6 +350,25 @@ namespace hopsy {
             static const char* copyProposal;
         };
 
+        struct TruncatedGaussianProposal {
+            static const char* base;
+            static const char* __init__;
+
+            static const char* propose;
+            static const char* acceptProposal;
+            static const char* logAcceptanceProbability;
+            static const char* proposal;
+            static const char* state;
+            static const char* getParameter;
+            static const char* setParameter;
+            static const char* hasStepSize;
+            static const char* name;
+            static const char* stateNegativeLogLikelihood;
+            static const char* proposalNegativeLogLikelihood;
+            static const char* hasNegativeLogLikelihood;
+            static const char* copyProposal;
+        };
+
         struct UniformCoordinateHitAndRunProposal {
             static const char* base;
             static const char* __init__;

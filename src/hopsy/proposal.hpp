@@ -561,6 +561,8 @@ namespace hopsy {
 			hops::HitAndRunProposal<MatrixType, VectorType, hops::GaussianStepDistribution<double>>, double>;
     using GaussianProposal = UninitializedProposalWrapper<
 			hops::GaussianProposal<MatrixType, VectorType>, double>;
+    using TruncatedGaussianProposal = UninitializedProposalWrapper<
+            hops::TruncatedGaussianProposal<MatrixType, VectorType>, hops::Gaussian>;
     using UniformCoordinateHitAndRunProposal = UninitializedProposalWrapper<
 			hops::CoordinateHitAndRunProposal<MatrixType, VectorType>>;
     using UniformHitAndRunProposal = UninitializedProposalWrapper<
@@ -577,6 +579,7 @@ PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::GaussianCoordinateHitAndRunProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::GaussianHitAndRunProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::GaussianProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::PyProposal);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::TruncatedGaussianProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::UniformCoordinateHitAndRunProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::UniformHitAndRunProposal);
 
@@ -872,7 +875,7 @@ namespace hopsy {
                             }
 
                             return BilliardMALAProposal::createFromProblem(
-                                    problem, ModelWrapper(std::move(problem->model->copyModel())), maximumNumberOfReflections, stepSize);
+                                    problem, ModelWrapper(problem->model->copyModel()), maximumNumberOfReflections, stepSize);
                         } else {
                             throw std::runtime_error(std::string("Internal error in ") +
                                     std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
@@ -935,9 +938,9 @@ namespace hopsy {
         py::classh<CSmMALAProposal, Proposal, ProposalTrampoline<CSmMALAProposal>> csmmalaProposal(
                 m, "CSmMALAProposal", doc::CSmMALAProposal::base);
         // constructor
-        csmmalaProposal    
+        csmmalaProposal
             //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
-            .def(py::init([] (const Problem* problem, 
+            .def(py::init([] (const Problem* problem,
                               double stepSize,
                               double fisherWeight) -> CSmMALAProposal {
                         if (problem) {
@@ -947,18 +950,18 @@ namespace hopsy {
                             }
 
                             return CSmMALAProposal::createFromProblem(
-                                    problem, ModelWrapper(std::move(problem->model->copyModel())), fisherWeight, stepSize);
+                                    problem, ModelWrapper(problem->model->copyModel()), fisherWeight, stepSize);
                         } else {
-                            throw std::runtime_error(std::string("Internal error in ") + 
+                            throw std::runtime_error(std::string("Internal error in ") +
                                     std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
                         }
-                    }), 
+                    }),
                     doc::CSmMALAProposal::__init__,
-                    py::arg("problem"), 
-                    py::arg("stepsize") = 1, 
+                    py::arg("problem"),
+                    py::arg("stepsize") = 1,
                     py::arg("fisher_weight") = 0.5)
-            .def(py::init([] (const Problem* problem, 
-                              const VectorType* startingPoint, 
+            .def(py::init([] (const Problem* problem,
+                              const VectorType* startingPoint,
                               double stepSize,
                               double fisherWeight) -> CSmMALAProposal {
                         if (problem) {
@@ -966,15 +969,15 @@ namespace hopsy {
                                 throw std::runtime_error("Cannot initialize hopsy.CSmMALAProposal for uniform problem (problem.model == None).");
                             }
 
-                            return CSmMALAProposal::create(problem, startingPoint, ModelWrapper(std::move(problem->model->copyModel())), fisherWeight, stepSize);
+                            return CSmMALAProposal::create(problem, startingPoint, ModelWrapper(problem->model->copyModel()), fisherWeight, stepSize);
                         } else {
                             throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
                         }
-                    }), 
+                    }),
                     doc::CSmMALAProposal::__init__,
-                    py::arg("problem"), 
-                    py::arg("starting_point"), 
-                    py::arg("stepsize") = 1, 
+                    py::arg("problem"),
+                    py::arg("starting_point"),
+                    py::arg("stepsize") = 1,
                     py::arg("fisher_weight") = 0.5)
             ;
         // common
@@ -987,10 +990,10 @@ namespace hopsy {
         // pickling
         csmmalaProposal.def(py::pickle([] (const CSmMALAProposal& self) {
                         auto model = self.proposal->getModel()->copyModel().release();
-                        return py::make_tuple(self.proposal->getA(), 
-                                              self.proposal->getB(), 
-                                              self.proposal->getState(), 
-                                              model, 
+                        return py::make_tuple(self.proposal->getA(),
+                                              self.proposal->getB(),
+                                              self.proposal->getState(),
+                                              model,
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::FISHER_WEIGHT)),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
                     },
@@ -1200,6 +1203,88 @@ namespace hopsy {
                     })
                 );
 
+        // register TruncatedGaussianProposal
+        py::classh<TruncatedGaussianProposal, Proposal, ProposalTrampoline<TruncatedGaussianProposal>> truncatedgaussianProposal(
+                m, "TruncatedGaussianProposal", doc::TruncatedGaussianProposal::base);
+        // constructor
+        truncatedgaussianProposal
+                //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
+                .def(py::init([] (const Problem* problem) -> TruncatedGaussianProposal {
+                         if (problem) {
+                             if (!problem->model) {
+                                 throw std::runtime_error("Cannot initialize hopsy.TruncatedGaussianProposal for "
+                                                          "uniform problem (problem.model == None).");
+                             }
+                             std::shared_ptr<hops::Model> modelPtr = problem->model->copyModel();
+                             std::shared_ptr<Gaussian> casted = std::dynamic_pointer_cast<Gaussian>(modelPtr);
+                             if (!casted) {
+                                 throw std::runtime_error("Model is not Gaussian. Please reconsider.");
+                             }
+                             hops::Gaussian gaussian(casted->getMean(), casted->getCovariance());
+
+                             return TruncatedGaussianProposal::createFromProblem(
+                                     problem,
+                                     gaussian
+                                     );
+                         } else {
+                             throw std::runtime_error(std::string("Internal error in ") +
+                                                      std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
+                         }
+                     }),
+                     doc::TruncatedGaussianProposal::__init__,
+                     py::arg("problem"))
+                .def(py::init([] (const Problem* problem,
+                                  const VectorType* startingPoint) -> TruncatedGaussianProposal {
+                         if (problem) {
+                             if (!problem->model) {
+                                 throw std::runtime_error("Cannot initialize hopsy.TruncatedGaussianProposal for uniform problem (problem.model == None).");
+                             }
+                             std::shared_ptr<hops::Model> modelPtr = problem->model->copyModel();
+                             std::shared_ptr<Gaussian> casted = std::dynamic_pointer_cast<Gaussian>(modelPtr);
+                             if (!casted) {
+                                 throw std::runtime_error("Model is not Gaussian. Please reconsider.");
+                             }
+                             hops::Gaussian gaussian(casted->getMean(), casted->getCovariance());
+
+                             return TruncatedGaussianProposal::create(
+                                     problem,
+                                     startingPoint,
+                                     gaussian
+                             );
+                         } else {
+                             throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
+                         }
+                     }),
+                     doc::TruncatedGaussianProposal::__init__,
+                     py::arg("problem"),
+                     py::arg("starting_point"));
+        // common
+        proposal::addCommon<TruncatedGaussianProposal, doc::TruncatedGaussianProposal>(truncatedgaussianProposal);
+        // pickling
+        truncatedgaussianProposal.def(py::pickle([] (const TruncatedGaussianProposal& self) {
+                                           std::shared_ptr<Model> modelPtr = self.proposal->getModel()->copyModel();
+                                           auto casted = std::dynamic_pointer_cast<hops::Gaussian>(modelPtr);
+                                           if (!casted) {
+                                             throw std::runtime_error("Model is not Gaussian. Please reconsider.");
+                                           }
+
+                                           return py::make_tuple(self.proposal->getA(),
+                                                                 self.proposal->getB(),
+                                                                 self.proposal->getState(),
+                                                                 casted->getMean(),
+                                                                 casted->getCovariance());
+                                       },
+                                       [] (py::tuple t) {
+                                           if (t.size() != 5) throw std::runtime_error("Invalid state!");
+
+                                           hops::Gaussian gaussian(t[3].cast<VectorType>(), t[4].cast<MatrixType>());
+
+                                           return TruncatedGaussianProposal(t[0].cast<MatrixType>(),
+                                                                  t[1].cast<VectorType>(),
+                                                                  t[2].cast<VectorType>(),
+                                                                  gaussian);
+                                       })
+        );
 
         // register UniformCoordinateHitAndRun
         py::classh<UniformCoordinateHitAndRunProposal, Proposal, ProposalTrampoline<UniformCoordinateHitAndRunProposal>> uniformCoordinateHitAndRunProposal(
