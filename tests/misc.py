@@ -67,6 +67,10 @@ class MiscTests(unittest.TestCase):
         problem = add_box_constraints(problem, -2, 1)
         problem = round(problem)
 
+        problem = Problem([[1, 1,]], [1], starting_point=[0, 0])
+        problem = add_box_constraints(problem, -2, 1)
+        problem = round(problem)
+
 
     def test_ess(self):
         states = [[[0, 1, 2, 3, 4]]*100]*4
