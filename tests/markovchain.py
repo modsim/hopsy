@@ -6,11 +6,13 @@ from hopsy import *
 ProposalTypes = [
             AdaptiveMetropolisProposal,
             BallWalkProposal,
+            BilliardMALAProposal,
             CSmMALAProposal,
             DikinWalkProposal,
             GaussianCoordinateHitAndRunProposal,
             GaussianHitAndRunProposal,
             GaussianProposal,
+            TruncatedGaussianProposal,
             UniformCoordinateHitAndRunProposal,
             UniformHitAndRunProposal,
         ]

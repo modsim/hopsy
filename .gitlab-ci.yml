@@ -18,6 +18,19 @@ build-release:
       - dist/*manylinux*
     expire_in: 7 days
 
+build-debug:
+  stage: build
+  script:
+    - git rev-parse --short HEAD > .commit
+    - echo "$(cat .version).dev0" > .version
+    - sed -i 's/debug = 0/debug = 1/g' setup.cfg
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39"; do /opt/python/$PY/bin/pip wheel --no-deps . -w dist; done
+    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39"; do auditwheel repair dist/hopsy-$VERSION-$PY-* -w dist; done
+  artifacts:
+    paths:
+      - dist/*manylinux*
+    expire_in: 7 days
+
 test-release:
   stage: test
   before_script:
@@ -26,6 +39,18 @@ test-release:
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39"; do /opt/python/$PY/bin/python -m unittest -v tests; done
     - /opt/python/cp39-cp39/bin/docov hopsy --output docs/; cat docs/docov.txt
+  artifacts:
+    paths: 
+      - docs
+    expire_in: 7 days
+
+test-debug:
+  stage: test
+  before_script:
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39"; do /opt/python/$PY/bin/python -m pip install docov; done
+  script:
+    - VERSION="$(cat .version).dev0"; for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
+    - VERSION="$(cat .version).dev0"; for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39"; do /opt/python/$PY/bin/python -m unittest -v tests; done
   artifacts:
     paths: 
       - docs

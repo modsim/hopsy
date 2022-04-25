@@ -121,11 +121,11 @@ namespace hopsy {
     class ModelWrapper : public Model {
     public:
         ModelWrapper(const std::shared_ptr<Model> model) {
-            this->model = std::move(model->copyModel());
+            this->model = model->copyModel();
         }
 
         ModelWrapper(const ModelWrapper& other) {
-            this->model = std::move(other.model->copyModel());
+            this->model = other.model->copyModel();
         }
 
         double computeNegativeLogLikelihood(const VectorType &x) override {
@@ -150,6 +150,10 @@ namespace hopsy {
 
         std::shared_ptr<Model> getModelPtr() {
             return model;
+        }
+
+        void setModelPtr(const std::shared_ptr<Model> &newModel) {
+            ModelWrapper::model = newModel;
         }
 
     private:
