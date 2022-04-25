@@ -10,6 +10,7 @@ thinning = 10
 
 seed = 0
 
+uniform = Problem([[1, 1]], [1], starting_point = [0, 0])
 problem = Problem([[1, 1]], [1], Gaussian(), starting_point = [0, 0])
 
 ProposalTypes = [
@@ -33,12 +34,25 @@ class MiscTests(unittest.TestCase):
 
         self.assertListEqual(list(states.shape), [n_chains, n_samples, 2])
 
+        chains = [MarkovChain(uniform, GaussianProposal) for i in range(n_chains)]
+        rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
 
-    #@unittest.expectedFailure
+        accrates, states = sample(chains, rngs, n_samples, thinning)
+
+        self.assertListEqual(list(states.shape), [n_chains, n_samples, 2])
+
+
     def test_parallel_sampling(self):
         n_threads = 4
 
         chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
+        rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
+
+        accrates, states = sample(chains, rngs, n_samples, thinning, n_threads)
+
+        self.assertListEqual(list(states.shape), [n_chains, n_samples, 2])
+
+        chains = [MarkovChain(uniform, GaussianProposal) for i in range(n_chains)]
         rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
 
         accrates, states = sample(chains, rngs, n_samples, thinning, n_threads)
@@ -64,6 +78,10 @@ class MiscTests(unittest.TestCase):
 
     def test_rounding(self):
         problem = Problem([[1, 1,]], [1])
+        problem = add_box_constraints(problem, -2, 1)
+        problem = round(problem)
+
+        problem = Problem([[1, 1,]], [1], starting_point=[0, 0])
         problem = add_box_constraints(problem, -2, 1)
         problem = round(problem)
 
