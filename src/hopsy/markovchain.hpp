@@ -99,14 +99,14 @@ namespace hopsy {
             if (transformation) {
                 return Problem(proposal->getA(), 
                                proposal->getB(), 
-                               model->copyModel().release(), 
+                               ( model ? model->copyModel() : std::unique_ptr<Model>(nullptr) ), 
                                std::optional(proposal->getState()),
                                std::optional(transformation->getMatrix()),
                                std::optional(transformation->getShift()));
             } else {
                 return Problem(proposal->getA(), 
                                proposal->getB(), 
-                               model->copyModel().release(), 
+                               ( model ? model->copyModel() : std::unique_ptr<Model>(nullptr) ), 
                                std::optional(proposal->getState()),
                                std::optional<MatrixType>(),
                                std::optional<VectorType>());
