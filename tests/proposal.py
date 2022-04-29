@@ -183,7 +183,6 @@ class ProposalTests(unittest.TestCase):
                 true_std = 0.5
                 standard_error_of_mean = true_std / np.sqrt(ess(samples))
                 #  checks that mean is within 2 standard errors
-                print(mc.proposal.name, np.sqrt(ess(samples)), np.mean(samples))
                 self.assertTrue(np.abs(np.mean(samples) - model.mean) < 2 * standard_error_of_mean)
                 # checks sample std is close to real std of 1
 
