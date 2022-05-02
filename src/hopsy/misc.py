@@ -25,6 +25,7 @@ class _submodules:
         from PolyRound.api import PolyRoundApi
         from PolyRound.mutable_classes import polytope
         from PolyRound.settings import PolyRoundSettings
+        from PolyRound.static_classes.lp_utils import ChebyshevFinder
 
     #from tqdm.auto import tqdm
 
@@ -93,9 +94,14 @@ def add_box_constraints(problem: _c.Problem,
 
 def compute_chebyshev_center(problem: _c.Problem):
     """
-
+        
     """
-    pass
+    polytope = _s.polytope.Polytope(problem.A, problem.b)
+    settings = _s.PolyRoundSettings()
+    chebyshev_center = _s.ChebyshevFinder.chebyshev_center(polytope, settings)[0]
+
+    return chebyshev_center
+
 
 def _compute_maximum_volume_ellipsoid(problem: _c.Problem):
     with _s.warnings.catch_warnings():
