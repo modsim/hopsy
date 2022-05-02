@@ -56,3 +56,12 @@ class ProblemTests(unittest.TestCase):
         self.assertListEqual(problem.starting_point.tolist(), new.starting_point.tolist())
         self.assertEqual(problem.transformation, new.transformation)
         self.assertEqual(problem.shift, new.shift)
+
+
+    def test_chebyshev_center(self):
+        problem = Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0])
+        chebyshev = compute_chebyshev_center(problem).reshape(-1)
+
+        self.assertListEqual(chebyshev.tolist(), [0.29289322, 0.29289322])
+
+
