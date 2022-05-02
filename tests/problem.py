@@ -62,6 +62,7 @@ class ProblemTests(unittest.TestCase):
         problem = Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0])
         chebyshev = compute_chebyshev_center(problem).reshape(-1)
 
-        self.assertListEqual(chebyshev.tolist(), [0.29289322, 0.29289322])
+        for i in range(len(chebyshev)):
+            self.assertAlmostEqual(chebyshev[i], 0.29289322)
 
 
