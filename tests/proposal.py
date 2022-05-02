@@ -112,11 +112,6 @@ class ProposalTests(unittest.TestCase):
             new_proposal = proposal.deepcopy()
             self.assertIsInstance(new_proposal, ProposalType)
 
-            # TODO
-            # proposal = ProposalType()
-            # new_proposal = proposal.deepcopy()
-            # self.assertIsInstance(new_proposal, ProposalType)
-
     def test_proposal_pickling(self):
         problem = Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0], Gaussian(), starting_point=[0, 0])
 
@@ -124,8 +119,7 @@ class ProposalTests(unittest.TestCase):
             proposal = ProposalType(problem)
             dump = pickle.dumps(proposal)
             new_proposal = pickle.loads(dump)
-            # TODO
-            # self.assertIsInstance(new_proposal, ProposalType)
+            self.assertIsInstance(new_proposal, ProposalType)
 
     def test_starting_point_validation(self):
         problem = Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0], Gaussian(), starting_point=[0, -.1])
@@ -143,9 +137,7 @@ class ProposalTests(unittest.TestCase):
         problem = Problem(np.array([1, -1]), 5 * np.ones(2), model)
 
         for ProposalType in ProposalTypes:
-            if ProposalType in [AdaptiveMetropolisProposal, # TODO fix for this proposal
-                                BilliardAdaptiveMetropolisProposal, # Todo fix for this proposal
-                                UniformCoordinateHitAndRunProposal,
+            if ProposalType in [UniformCoordinateHitAndRunProposal,
                                 UniformHitAndRunProposal]:
                 with self.assertRaises(RuntimeError):
                     proposal = ProposalType(problem)

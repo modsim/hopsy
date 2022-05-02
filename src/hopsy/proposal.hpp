@@ -666,8 +666,9 @@ namespace hopsy {
                               double boundaryCushion,
                               double eps,
                               unsigned long warmUp) {
-                        MatrixType sqrtMve = computeSqrtMaximumVolumeEllipsoid(*problem);
-                        auto proposal = AdaptiveMetropolisProposal::createFromProblem(problem, sqrtMve, stepSize, eps, warmUp);
+                        auto _problem(*problem);
+                        MatrixType sqrtMve = computeSqrtMaximumVolumeEllipsoid(_problem);
+                        auto proposal = AdaptiveMetropolisProposal::createFromProblem(&_problem, sqrtMve, stepSize, eps, warmUp);
                         proposal.setParameter(ProposalParameter::BOUNDARY_CUSHION, boundaryCushion);
                         return proposal;
                     }),
@@ -683,8 +684,9 @@ namespace hopsy {
                               double boundaryCushion,
                               double eps,
                               unsigned long warmUp) {
-                        MatrixType sqrtMve = computeSqrtMaximumVolumeEllipsoid(*problem);
-                        auto proposal = AdaptiveMetropolisProposal::create(problem, startingPoint, sqrtMve, stepSize, eps, warmUp);
+                        auto _problem(*problem);
+                        MatrixType sqrtMve = computeSqrtMaximumVolumeEllipsoid(_problem);
+                        auto proposal = AdaptiveMetropolisProposal::create(&_problem, startingPoint, sqrtMve, stepSize, eps, warmUp);
                         proposal.setParameter(ProposalParameter::BOUNDARY_CUSHION, boundaryCushion);
                         return proposal;
                     }),

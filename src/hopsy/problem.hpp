@@ -83,7 +83,6 @@ namespace hopsy {
         py::dict local;
         local["A"] = problem.A;
         local["b"] = problem.b;
-        local["sqrt_mve"] = sqrtMve;
 
         py::exec(R"(
             from numpy import identity, zeros
@@ -115,6 +114,7 @@ namespace hopsy {
                 sqrt_mve = identity(A.shape[1])
         )", local);
 
+        sqrtMve = local["sqrt_mve"].cast<MatrixType>();
         return sqrtMve;
     }
 
