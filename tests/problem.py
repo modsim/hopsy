@@ -2,6 +2,8 @@ import unittest
 import pickle
 
 from hopsy import *
+import numpy as np
+
 
 class ProblemTests(unittest.TestCase):
 
@@ -33,6 +35,38 @@ class ProblemTests(unittest.TestCase):
         self.assertEqual(id_gaussian, id(gaussian))
         self.assertNotEqual(id_gaussian, id(new_gaussian))
 
+    def test_create_box_and_round_glpk(self):
+        try:
+            lp = LP()
+            lp.settings.backend = 'glpk'
+            problem = add_box_constraints(Problem(np.zeros((0, 2)), np.ones((0))), [.5, 1.e-14], [.95, 1.e-7],
+                                          simplify=True)
+            expected_A = np.array([[-1.],
+                                   [1.]])
+            expected_b = np.array([0.225, 0.225])
+            self.assertTrue(np.isclose(problem.A, expected_A).all())
+            self.assertTrue(np.isclose(problem.b, expected_b).all())
+            problem = round(problem)
+        except:
+            self.fail("Rounding box created from np.zeros unexpectedly raised error.")
+
+    def test_create_box_and_round_glpk_thresh_adjusted(self):
+        try:
+            lp = LP()
+            lp.settings.backend = 'glpk'
+            lp.settings.thresh = 1e-8
+            problem = add_box_constraints(Problem(np.zeros((0, 2)), np.ones((0))), [.5, 1.e-14], [.95, 1.e-7],
+                                          simplify=True)
+            expected_A = np.array([[-1., 0.],
+                                   [0., -1.],
+                                   [1., 0.],
+                                   [0., 1.]])
+            expected_b = np.array([-5.0e-01, -1.0e-14, 9.5e-01, 1.0e-07])
+            self.assertTrue(np.isclose(problem.A, expected_A).all())
+            self.assertTrue(np.isclose(problem.b, expected_b).all())
+            problem = round(problem)
+        except:
+            self.fail("Rounding box created from np.zeros unexpectedly raised error.")
 
     def test_problem_pickling(self):
         problem = Problem([[1, 1]], [1], starting_point=[0, 0])
