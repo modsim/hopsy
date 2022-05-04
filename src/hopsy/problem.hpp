@@ -96,19 +96,19 @@ namespace hopsy {
                 from PolyRound.mutable_classes.polytope import Polytope
                 from PolyRound.static_classes.rounding.maximum_volume_ellipsoid import MaximumVolumeEllipsoidFinder
 
-                from PolyRound.settings import PolyRoundSettings
-
                 polytope = Polytope(A, b)
+                polytope = prapi.simplify_polytope(polytope, LP().settings)
 
-                polytope = prapi.simplify_polytope(polytope)
+                if polytope.S is not None:
+                    polytope = prapi.transform_polytope(polytope, LP().settings)
+                else:
+                    number_of_reactions = polytope.A.shape[1]
+                    polytope.transformation = DataFrame(identity(number_of_reactions))
+                    polytope.transformation.index = [str(i) for i in range(polytope.transformation.to_numpy().shape[0])]
+                    polytope.transformation.columns = [str(i) for i in range(polytope.transformation.to_numpy().shape[1])]
+                    polytope.shift = Series(zeros(number_of_reactions))
 
-                number_of_reactions = polytope.A.shape[1]
-                polytope.transformation = DataFrame(identity(number_of_reactions))
-                polytope.transformation.index = [str(i) for i in range(polytope.transformation.to_numpy().shape[0])]
-                polytope.transformation.columns = [str(i) for i in range(polytope.transformation.to_numpy().shape[1])]
-                polytope.shift = Series(zeros(number_of_reactions))
-
-                MaximumVolumeEllipsoidFinder.iterative_solve(polytope, PolyRoundSettings())
+                MaximumVolumeEllipsoidFinder.iterative_solve(polytope, LP().settings)
                 sqrt_mve = polytope.transformation.values
             except:
                 sqrt_mve = identity(A.shape[1])

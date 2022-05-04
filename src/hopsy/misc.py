@@ -1,13 +1,13 @@
 """
 
 """
-
 class _core:
     from .core import GaussianHitAndRunProposal
     from .core import MarkovChain
     from .core import Problem
     from .core import Proposal
     from .core import RandomNumberGenerator
+    from .lp import LP
 
 _c = _core
 
@@ -24,10 +24,7 @@ class _submodules:
 
         from PolyRound.api import PolyRoundApi
         from PolyRound.mutable_classes import polytope
-        from PolyRound.settings import PolyRoundSettings
         from PolyRound.static_classes.lp_utils import ChebyshevFinder
-
-    #from tqdm.auto import tqdm
 
     import multiprocessing
 
@@ -37,8 +34,8 @@ class _submodules:
 _s = _submodules
 
 
-def MarkovChain(problem: _c.Problem, 
-                proposal: _s.typing.Union[_c.Proposal, _s.typing.Type[_c.Proposal]] = _c.GaussianHitAndRunProposal, 
+def MarkovChain(problem: _c.Problem,
+                proposal: _s.typing.Union[_c.Proposal, _s.typing.Type[_c.Proposal]] = _c.GaussianHitAndRunProposal,
                 starting_point: _s.numpy.typing.ArrayLike = None):
     _proposal = None
     if isinstance(proposal, type):
@@ -52,14 +49,14 @@ def MarkovChain(problem: _c.Problem,
         _proposal = proposal
 
     return _c.MarkovChain(_proposal, problem)
-    
+
 
 MarkovChain.__doc__ = _core.MarkovChain.__doc__ # propagate docstring
 
 
-def add_box_constraints(problem: _c.Problem, 
-                        lower_bound: _s.typing.Union[_s.numpy.typing.ArrayLike, float], 
-                        upper_bound: _s.typing.Union[_s.numpy.typing.ArrayLike, float], 
+def add_box_constraints(problem: _c.Problem,
+                        lower_bound: _s.typing.Union[_s.numpy.typing.ArrayLike, float],
+                        upper_bound: _s.typing.Union[_s.numpy.typing.ArrayLike, float],
                         simplify = True):
     """
 
@@ -80,7 +77,7 @@ def add_box_constraints(problem: _c.Problem,
 
     A = _s.numpy.vstack([problem.A, -_s.numpy.eye(dim), _s.numpy.eye(dim)])
     b = _s.numpy.hstack([problem.b.flatten(), _l.flatten(), _u.flatten()]).reshape(-1)
-   
+
     _problem = _c.Problem(A, b, problem.model, problem.starting_point, problem.transformation, problem.shift)
 
     if simplify:
@@ -97,8 +94,7 @@ def compute_chebyshev_center(problem: _c.Problem):
         
     """
     polytope = _s.polytope.Polytope(problem.A, problem.b)
-    settings = _s.PolyRoundSettings()
-    chebyshev_center = _s.ChebyshevFinder.chebyshev_center(polytope, settings)[0]
+    chebyshev_center = _s.ChebyshevFinder.chebyshev_center(polytope, _c.LP().settings)[0]
 
     return chebyshev_center
 
@@ -109,15 +105,18 @@ def _compute_maximum_volume_ellipsoid(problem: _c.Problem):
 
         polytope = _s.polytope.Polytope(problem.A, problem.b)
 
-        polytope = _s.PolyRoundApi.simplify_polytope(polytope)
+        polytope = _s.PolyRoundApi.simplify_polytope(polytope, _c.LP().settings)
 
-        number_of_reactions = polytope.A.shape[1]
-        polytope.transformation = _s.pandas.DataFrame(_s.numpy.identity(number_of_reactions))
-        polytope.transformation.index = [str(i) for i in range(polytope.transformation.to_numpy().shape[0])]
-        polytope.transformation.columns = [str(i) for i in range(polytope.transformation.to_numpy().shape[1])]
-        polytope.shift = _s.pandas.Series(_s.numpy.zeros(number_of_reactions))
+        if polytope.S is not None:
+            polytope = _s.PolyRoundApi.transform_polytope(polytope, _c.LP().settings)
+        else:
+            number_of_reactions = polytope.A.shape[1]
+            polytope.transformation = _s.pandas.DataFrame(_s.numpy.identity(number_of_reactions))
+            polytope.transformation.index = [str(i) for i in range(polytope.transformation.to_numpy().shape[0])]
+            polytope.transformation.columns = [str(i) for i in range(polytope.transformation.to_numpy().shape[1])]
+            polytope.shift = _s.pandas.Series(_s.numpy.zeros(number_of_reactions))
 
-        MaximumVolumeEllipsoidFinder.iterative_solve(polytope, _s.PolyRoundSettings())
+        MaximumVolumeEllipsoidFinder.iterative_solve(polytope, _c.LP().settings)
         return polytope.transform.values
 
 def simplify(problem: _c.Problem):
@@ -129,7 +128,15 @@ def simplify(problem: _c.Problem):
 
         polytope = _s.polytope.Polytope(problem.A, problem.b)
 
-        polytope = _s.PolyRoundApi.simplify_polytope(polytope)
+        polytope = _s.PolyRoundApi.simplify_polytope(polytope, settings=_c.LP().settings)
+        if polytope.S is not None:
+            polytope = _s.PolyRoundApi.transform_polytope(polytope, _c.LP().settings)
+        else:
+            number_of_reactions = polytope.A.shape[1]
+            polytope.transformation = _s.pandas.DataFrame(_s.numpy.identity(number_of_reactions))
+            polytope.transformation.index = [str(i) for i in range(polytope.transformation.to_numpy().shape[0])]
+            polytope.transformation.columns = [str(i) for i in range(polytope.transformation.to_numpy().shape[1])]
+            polytope.shift = _s.pandas.Series(_s.numpy.zeros(number_of_reactions))
 
         problem.A = polytope.A.values
         problem.b = polytope.b.values
@@ -149,15 +156,18 @@ def round(problem: _c.Problem):
 
         polytope = _s.polytope.Polytope(problem.A, problem.b)
 
-        polytope = _s.PolyRoundApi.simplify_polytope(polytope)
+        polytope = _s.PolyRoundApi.simplify_polytope(polytope, _c.LP().settings)
 
-        number_of_reactions = polytope.A.shape[1]
-        polytope.transformation = _s.pandas.DataFrame(_s.numpy.identity(number_of_reactions))
-        polytope.transformation.index = [str(i) for i in range(polytope.transformation.to_numpy().shape[0])]
-        polytope.transformation.columns = [str(i) for i in range(polytope.transformation.to_numpy().shape[1])]
-        polytope.shift = _s.pandas.Series(_s.numpy.zeros(number_of_reactions))
+        if polytope.S is not None:
+            polytope = _s.PolyRoundApi.transform_polytope(polytope, _c.LP().settings)
+        else:
+            number_of_reactions = polytope.A.shape[1]
+            polytope.transformation = _s.pandas.DataFrame(_s.numpy.identity(number_of_reactions))
+            polytope.transformation.index = [str(i) for i in range(polytope.transformation.to_numpy().shape[0])]
+            polytope.transformation.columns = [str(i) for i in range(polytope.transformation.to_numpy().shape[1])]
+            polytope.shift = _s.pandas.Series(_s.numpy.zeros(number_of_reactions))
 
-        polytope = _s.PolyRoundApi.round_polytope(polytope)
+        polytope = _s.PolyRoundApi.round_polytope(polytope, _c.LP().settings)
 
         _problem = _c.Problem(polytope.A.values, polytope.b.values, problem.model, transformation=polytope.transformation.values, shift=polytope.shift.values)
 
@@ -197,9 +207,9 @@ def back_transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
     return transformed_points
 
 
-def _sample(markov_chain: _c.MarkovChain, 
-            rng: _c.RandomNumberGenerator, 
-            n_samples: int, 
+def _sample(markov_chain: _c.MarkovChain,
+            rng: _c.RandomNumberGenerator,
+            n_samples: int,
             thinning: int):
     accrates, states = [], []
     for i in range(n_samples):
@@ -210,10 +220,10 @@ def _sample(markov_chain: _c.MarkovChain,
     return _s.numpy.mean(accrates), _s.numpy.array(states)
 
 
-def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.MarkovChain]], 
-           rngs: _s.typing.Union[_c.RandomNumberGenerator, _s.typing.List[_c.RandomNumberGenerator]], 
-           n_samples: int, 
-           thinning: int = 1, 
+def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.MarkovChain]],
+           rngs: _s.typing.Union[_c.RandomNumberGenerator, _s.typing.List[_c.RandomNumberGenerator]],
+           n_samples: int,
+           thinning: int = 1,
            n_threads: int = 1):
     r"""sample(markov_chains, rngs, n_samples, thinning=1, n_threads=1)
 
@@ -261,7 +271,7 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
         rngs = [rngs]
 
     if n_threads != 1:
-        if n_threads < 0: 
+        if n_threads < 0:
             n_threads = min(len(markov_chains), _s.multiprocessing.cpu_count())
 
         with _s.multiprocessing.Pool(n_threads) as workers:
@@ -289,9 +299,9 @@ def _is_constant_chains(data: _s.numpy.typing.ArrayLike):
     return _s.numpy.sum(_s.numpy.abs(_s.numpy.diff(data, axis=1))) == 0
 
 
-def _arviz(f: _s.typing.Callable, 
-           data: _s.numpy.typing.ArrayLike, 
-           series: int = 0, 
+def _arviz(f: _s.typing.Callable,
+           data: _s.numpy.typing.ArrayLike,
+           series: int = 0,
            *args, **kwargs):
     data = _s.numpy.array(data)
     assert len(data.shape) == 3
