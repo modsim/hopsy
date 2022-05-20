@@ -20,8 +20,11 @@ with open('README.md', 'r') as fh:
 with open('.version', 'r') as fh:
     version = fh.read().split('\n')[0]
 
-with open('.commit', 'r') as fh:
-    commit = fh.read().split('\n')[0]
+try:
+    with open('.commit', 'r') as fh:
+        commit = fh.read().split('\n')[0]
+except:
+    commit = "dirty"
 
 
 # A CMakeExtension needs a sourcedir instead of a file list.
