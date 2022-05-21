@@ -167,7 +167,7 @@ def round(problem: _c.Problem):
         return _problem
 
 
-def transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
+def back_transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
     """
 
     """
@@ -182,7 +182,7 @@ def transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
     return transformed_points
 
 
-def back_transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
+def transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
     """
 
     """
