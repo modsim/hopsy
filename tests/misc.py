@@ -87,6 +87,8 @@ class MiscTests(unittest.TestCase):
         problem = add_box_constraints(problem, -2, 1)
         problem = round(problem)
 
+        self.assertTrue((problem.b - problem.A @ problem.starting_point >= 0).all())
+
 
     def test_ess(self):
         states = [[[0, 1, 2, 3, 4]]*100]*4
