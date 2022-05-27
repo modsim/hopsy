@@ -242,6 +242,8 @@ namespace hopsy {
                     py::arg("smoothing_length") = .5,
                     py::arg("random_seed") = 0,
                     py::arg("record_data") = false)
+          .def_readonly("n_converged", &ThompsonSampling::posteriorUpdateIterationsNeeded, 
+				    doc::ThompsonSampling::posteriorUpdateIterationsNeeded)
           .def_readwrite("n_posterior_updates", &ThompsonSampling::posteriorUpdateIterations, 
 				    doc::ThompsonSampling::posteriorUpdateIterations)
           .def_readwrite("n_pure_sampling", &ThompsonSampling::pureSamplingIterations, 
