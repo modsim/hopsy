@@ -2,42 +2,43 @@ import hopsy
 import numpy as np
 import sys
 
-class GaussianProposal:
-    def __init__(self, A: np.ndarray, b: np.ndarray, x: np.ndarray, cov: np.ndarray):
+class PyProposal:
+    def __init__(self, A: np.ndarray, b: np.ndarray, state: np.ndarray, cov: np.ndarray):
         self.A = A
         self.b = b
-        self.x = x
+        self.__state = state 
         self.cov = cov
-        self.r = 1
-        self.proposal = x
+        self.__stepsize = 1
+        self.__proposal = state
 
     def propose(self):
         mean = np.zeros((len(cov),))
         y = np.random.multivariate_normal(mean, cov).reshape(-1, 1)
-        self.proposal = self.x + self.r * y 
+        self.__proposal = self.__state + self.stepsize * y 
 
     def accept_proposal(self):
-        self.x = self.proposal
+        self.__state = self.__proposal
 
     def compute_log_acceptance_probability(self) -> float:
-        if ((self.A @ self.proposal - self.b) >= 0).any():
+        if ((self.A @ self.__proposal - self.b) >= 0).any():
             return -np.inf
         return 0
 
-    def get_state(self) -> np.ndarray:
-        return self.x
+    @property
+    def state(self):
+        return self.__state
 
-    def set_state(self, new_state: np.ndarray):
-        self.x = new_state.reshape(-1,1)
+    @property
+    def proposal(self):
+        return self.__proposal
 
-    def get_proposal(self) -> np.ndarray:
-        return self.proposal
+    @property
+    def stepsize(self):
+        return self.__stepsize
 
-    def get_stepsize(self) -> float:
-        return self.r
+    def has_stepsize(self) -> bool:
+        return True
 
-    def set_stepsize(self, new_stepsize: float):
-        self.r = new_stepsize
 
     def get_name(self) -> str:
         return "PyGaussianProposal"
@@ -51,27 +52,21 @@ x0 = np.array([[0.1], [0.1]])
 mu = np.zeros((2,1))
 cov = 0.1*np.identity(2)
 
-proposal = GaussianProposal(A, b, x0, 0.5*np.identity(2))
-
-model = hopsy.MultivariateGaussianModel(mu, cov)
-model = hopsy.RosenbrockModel(1, [1])
+model = hopsy.Gaussian(mu, cov)
 problem = hopsy.Problem(A, b, model)
 
-run = hopsy.Run(problem, proposal, starting_points=[x0])
 
-## alternatively use (which internally happens anyways)
-# run = hopsy.Run(problem, hopsy.PyProposal(proposal))
+mc = hopsy.MarkovChain(problem=problem, proposal=hopsy.UniformCoordinateHitAndRunProposal, starting_point=mu)
 
-run.starting_points = [x0]
+print('mc.proposal')
+print(mc.proposal)
 
-run.sample(10000)
-
-if len(sys.argv) == 1 or sys.argv[1] != "test":
-    import matplotlib.pyplot as plt
-    states = np.array(run.data.states[0])
-
-    fig = plt.figure(figsize=(35,35))
-    fig.patch.set_alpha(1)
-    ax = fig.gca()
-    ax.scatter(states[:,0], states[:,1])
-    plt.show()
+mc.proposal = hopsy.GaussianHitAndRunProposal(problem, x0);
+print('mc.proposal')
+print(mc.proposal)
+mc.proposal = hopsy.UniformHitAndRunProposal(problem, x0);
+print('mc.proposal')
+print(mc.proposal)
+mc.proposal = PyProposal(A, b, x0, cov);
+print('mc.proposal')
+print(mc.proposal)

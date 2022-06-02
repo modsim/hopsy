@@ -90,3 +90,7 @@ class ModelTests(unittest.TestCase):
         markovChain = MarkovChain(problem, GaussianProposal)
         state = markovChain.draw(RandomNumberGenerator())
 
+        # tests switching models works
+        problem.model = Gaussian()
+        problem.model = Uniform()
+

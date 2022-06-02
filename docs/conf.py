@@ -61,8 +61,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'hopsy'
-copyright = u'2021, Richard D. Paul'
-author = u'Richard D. Paul'
+copyright = u'2021-2022, Forschungszentrum Jülich GmbH, authors: Richard D. Paul, Johann F. Jadebeck, Katharina Nöh'
+author = 'Richard D. Paul, Johann F. Jadebeck, Katharina Nöh'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -105,7 +105,7 @@ exclude_patterns = ['_build']
 
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.
-#show_authors = False
+# show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -143,7 +143,6 @@ html_theme = 'pydata_sphinx_theme'
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-#html_logo = None
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -166,8 +165,7 @@ html_logo = "_static/hopsy.png"
 # using the given strftime format.
 #html_last_updated_fmt = '%b %d, %Y'
 
-# If true, SmartyPants will be used to convert quotes and dashes to
-# typographically correct entities.
+# If true, SmartyPants will be used to convert quotes and dashes toc
 #html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.

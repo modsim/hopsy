@@ -32,36 +32,61 @@ namespace hopsy {
             if(other.model) this->model = std::move(other.model->copyModel());
         }
 
-        Problem(const MatrixType& A, 
-                const VectorType& b, 
-                const Model* model, 
-                const std::optional<VectorType> startingPoint, 
-                const std::optional<MatrixType> transformation, 
-                const std::optional<VectorType> shift) : 
+        Problem(const MatrixType& A,
+                const VectorType& b,
+                const Model* model,
+                const std::optional<VectorType> startingPoint,
+                const std::optional<MatrixType> transformation,
+                const std::optional<VectorType> shift) :
                 A(A),
                 b(b),
                 startingPoint(startingPoint),
                 transformation(transformation),
-                shift(shift) { 
+                shift(shift) {
             if(model) this->model = std::move(model->copyModel());
         }
 
-        Problem(const MatrixType& A, 
-                const VectorType& b, 
-                const std::unique_ptr<Model> model, 
-                const std::optional<VectorType> startingPoint, 
-                const std::optional<MatrixType> transformation, 
-                const std::optional<VectorType> shift) : 
+        Problem(const MatrixType& A,
+                const VectorType& b,
+                const std::unique_ptr<Model> model,
+                const std::optional<VectorType> startingPoint,
+                const std::optional<MatrixType> transformation,
+                const std::optional<VectorType> shift) :
                 A(A),
                 b(b),
                 startingPoint(startingPoint),
                 transformation(transformation),
-                shift(shift) { 
-            if(model) this->model = std::move(model->copyModel());
+                shift(shift) {
+            if(model) this->model = model->copyModel();
         }
 
-        std::unique_ptr<Model>& getModel() { return model; }
-        void setModel(std::unique_ptr<Model> model) { if(model) this->model = std::move(model->copyModel()); }
+          std::variant<py::object, std::unique_ptr<Model>> getModel() {
+            if(model) {
+                std::shared_ptr<Model> sharedModelPtr = std::move(model->copyModel());
+                std::shared_ptr<PyModel> pyModelPtr = std::dynamic_pointer_cast<PyModel>(sharedModelPtr);
+                if(pyModelPtr) {
+                    return pyModelPtr->pyObj;
+                }
+                else {
+                    return model->copyModel();
+                }
+            }
+            else return nullptr;
+        }
+
+        void setModel(std::variant<py::object, std::unique_ptr<Model>> model) {
+            std::unique_ptr<Model> modelPtr;
+            try {
+                py::object object = std::get<py::object>(model);
+                this->model = std::make_unique<PyModel>(PyModel(object));
+            }
+            catch(std::bad_variant_access) {
+                if(!std::get<std::unique_ptr<Model>>(model)) {
+                    throw std::runtime_error("Pointer to model is null.");
+                }
+                this->model = std::get<std::unique_ptr<Model>>(model)->copyModel();
+            }
+        }
 
         std::string __repr__() const {
             Model* _model = static_cast<Model*>(model.get());
@@ -73,7 +98,6 @@ namespace hopsy {
             repr += ( shift ? ", shift=" + get__repr__(shift) : "" );
             repr += ")";
             return repr;
-            ;
         }
     };
 
@@ -120,34 +144,34 @@ namespace hopsy {
 
     void addProblem(py::module& m) {
         py::class_<Problem>(m, "Problem", doc::Problem::base)
-            .def(py::init<const MatrixType&, 
-                          const VectorType&, 
-                          const Model*, 
-                          const std::optional<VectorType>, 
-                          const std::optional<MatrixType>, 
+            .def(py::init<const MatrixType&,
+                          const VectorType&,
+                          const Model*,
+                          const std::optional<VectorType>,
+                          const std::optional<MatrixType>,
                           const std::optional<VectorType>>(),
                     doc::Problem::__init__,
-                    py::arg("A"), 
-                    py::arg("b"), 
-                    py::arg("model") = static_cast<Model*>(nullptr), 
+                    py::arg("A"),
+                    py::arg("b"),
+                    py::arg("model") = static_cast<Model*>(nullptr),
                     py::arg("starting_point") = py::none(),
-                    py::arg("transformation") = py::none(), 
+                    py::arg("transformation") = py::none(),
                     py::arg("shift") = py::none()
             )
-            .def(py::init([] (const MatrixType& A, 
-                          const VectorType& b, 
-                          const py::object model, 
-                          const std::optional<VectorType> startingPoint, 
-                          const std::optional<MatrixType> transformation, 
+            .def(py::init([] (const MatrixType& A,
+                          const VectorType& b,
+                          const py::object model,
+                          const std::optional<VectorType> startingPoint,
+                          const std::optional<MatrixType> transformation,
                           const std::optional<VectorType> shift) {
                         return Problem(A, b, std::make_unique<PyModel>(PyModel(model)), startingPoint, transformation, shift);
                     }),
                     doc::Problem::__init__,
-                    py::arg("A"), 
-                    py::arg("b"), 
-                    py::arg("model").none(false), 
+                    py::arg("A"),
+                    py::arg("b"),
+                    py::arg("model").none(false),
                     py::arg("starting_point") = py::none(),
-                    py::arg("transformation") = py::none(), 
+                    py::arg("transformation") = py::none(),
                     py::arg("shift") = py::none()
             )
             .def_readwrite("A", &Problem::A, doc::Problem::A)
@@ -159,11 +183,11 @@ namespace hopsy {
             .def("__repr__", &Problem::__repr__)
             .def(py::pickle([] (const Problem& self) { // __getstate__
                                 /* Return a tuple that fully encodes the state of the object */
-                                return py::make_tuple(self.A, 
-                                                      self.b, 
-                                                      static_cast<hopsy::Model*>(self.model.get()), 
-                                                      self.startingPoint, 
-                                                      self.transformation, 
+                                return py::make_tuple(self.A,
+                                                      self.b,
+                                                      static_cast<hopsy::Model*>(self.model.get()),
+                                                      self.startingPoint,
+                                                      self.transformation,
                                                       self.shift);
                             },
                             [] (py::tuple t) { // __setstate__
