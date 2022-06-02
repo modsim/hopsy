@@ -9,8 +9,8 @@ Examples
    :caption: Examples
    :maxdepth: 1
 
+   notebooks/SamplingAdvice.ipynb
    notebooks/ConstrainedSampling.ipynb
-   notebooks/PyProposal.ipynb
 
 .. raw:: html
 

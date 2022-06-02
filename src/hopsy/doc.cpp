@@ -49,6 +49,9 @@ const char* hopsy::doc::Normal::__call__ = R"pbdoc(
  */
 
 const char* hopsy::doc::Model::base = R"pbdoc(
+Base model class. While custom models are not required to inherit from this base class, they should still
+implement these functions so that all proposal mechanisms work.
+See the methods for more details on how to implement the  methods.
 )pbdoc";
 
 
@@ -57,14 +60,49 @@ const char* hopsy::doc::Model::__init__ = R"pbdoc(
 
 
 const char* hopsy::doc::Model::computeNegativeLogLikelihood = R"pbdoc(
+This method is required for  any custom model and should be implemented for any custom models.
+
+Parameters
+----------
+:param x: Input vector
+:type x: numpy.ndarray[float64[n,1]]
+
+Returns
+-------
+:return: The value of ``model.compute_negative_log_likelihod(x)``
+:rtype: float
 )pbdoc";
 
 
 const char* hopsy::doc::Model::computeLogLikelihoodGradient = R"pbdoc(
+For some proposals, the gradient will help converging faster as long as the gradient computation is not too slow.
+If you can not compute a useful or fast enough gradient for your custom model, you can just return a zero vector with the correct dimensionality (number of rows equal to number of parameters).
+
+Parameters
+----------
+x : numpy.ndarray[n, 1]
+    Input vector
+
+Returns
+-------
+numpy.ndarray[n, 1]
+    The gradient of the (unnormalized) log-likelihood
 )pbdoc";
 
 
 const char* hopsy::doc::Model::computeExpectedFisherInformation = R"pbdoc(
+For some proposals, the expected fisher information will help converging faster as long as the gradient computation is not too slow.
+If you can not compute a useful or fast enough expected fisher information for your custom model, you can just return a zero matrix with the correct dimensionality (number of rows and cols each equal to number of parameters).
+
+Parameters
+----------
+:param x: Input vector
+:type x: numpy.ndarray[float64[n,1]]
+
+Returns
+-------
+:return: The value of ``model.compute_expected_fisher_information(x)``
+:rtype: numpy.ndarray[float64[n,n]] 
 )pbdoc";
         
 
@@ -272,7 +310,7 @@ Computes the gradient of the logarithm of the weighted sum of the probability de
 components
 
 .. math::
-  \grad \log f(x) = \grad \log \sum_{i=1}^n w_i f_i(x).
+  \nabla \log f(x) = \nabla \log \sum_{i=1}^n w_i f_i(x).
 
 Parameters
 ----------
@@ -564,63 +602,6 @@ const char* hopsy::doc::Problem::transformation = R"pbdoc(numpy.ndarray[float64[
 
 const char* hopsy::doc::Problem::shift = R"pbdoc(numpy.ndarray[float64[n,1]]: For preconditioning (e.g. polytope rounding) one may wish to transform the polytope defined by :math:`Ax \leq b` as :math:`ATy \leq b - As` where `x = Ty + s`. If a non-zero sized ``shift`` is passed, then it will be used as the vector :math:`s` to transform all recorded states :math:`x` as `x = y + s`. The vector ``b`` will be assumed to be the right-hand side of the already transformed problem.
 )pbdoc";
-
-
-/*
- *  Problem helper
- */
-
-const char* hopsy::doc::addBoxConstraintsToProblem = R"pbdoc(add_box_constraints(problem, lower_bound, upper_bound)
-
-Adds box constraints to all dimensions. This will extend :attr:`hopsy.UniformProblem.A` and :attr:`hopsy.UniformProblem.A` of the returned :class:`hopsy.Problem` to have :math:`m+2n` rows.
-Box constraints are added naively, meaning that we do neither check whether the dimension may be already 
-somehow bound nor check whether the very same constraint already exists. You can remove unnecessary constraints
-efficiently using the PolyRound\ [#f1]_ toolbox or by using the :func:`hopsy.round` function, which however will also round
-the polytope.
-
-If ``lower_bound`` and ``upper_bound`` are both ``float``, then every dimension :math:`i` will be bound as 
-:math:`lb \leq x_i \leq ub`. If `lower_bound`` and ``upper_bound`` are both ``numpy.ndarray`` with 
-appropriate length, then every dimension :math:`i` will be bound as :math:`lb_i \leq x_i \leq ub_i`.
-
-:param hopsy.Problem problem: Problem which should be constrained and which contains the matrix :math:`A` and vector :math:`b` in :math:`Ax \leq b`.
-
-:param lower_bound: Specifies the lower bound(s). 
-:type lower_bound: numpy.ndarray[float64[n,1]] or float
-
-:param upper_bound: Specifies the upper bound(s). 
-:type upper_bound: numpy.ndarray[float64[n,1]] or float
-
-:return: A :class:`hopsy.Problem` bounded in all dimensions.
-:rtype: hopsy.Problem
-)pbdoc";
-
-
-const char* hopsy::doc::computeChebyshevCenter = R"pbdoc(compute_chebyshev_center(problem)
-
-Computes the Chebyshev center, that is the midpoint of a (non-unique) largest inscribed ball in the polytope defined by :math:`Ax \leq b`. 
-
-:param hopsy.Problem problem: Problem for which the Chebyshev center should be computed and which contains the matrix :math:`A` and vector :math:`b` in :math:`Ax \leq b`.
-
-:return: The Chebyshev center of the passed problem.
-:rtype: numpy.ndarray[float64[n,1]]
-)pbdoc";
-
-
-const char* hopsy::doc::round = R"pbdoc(round(problem)
-
-Rounds the polytope defined by the inequality :math:`Ax \leq b` using PolyRound\ [#f1]_. 
-This also strips unnecessary constraints, that is constraints, which can never be active.
-The unrounding transformation :math:`T` and shift :math:`s` will be stored in :attr:`hopsy.UniformProblem.transformation`
-and :attr:`hopsy.UniformProblem.shift` of the returned problem. Its left-hand side operator :attr:`hopsy.UniformProblem.A` and 
-the right-hand side :attr:`hopsy.UniformProblem.b` of the polytope will be transformed as :math:``
-inequality
-
-:param hopsy.Problem problem: Problem that should be rounded and which contains the matrix :math:`A` and vector :math:`b` in :math:`Ax \leq b`.
-
-:return: The rounded problem.
-:rtype: hopsy.Problem
-)pbdoc";
-
 
 
 const char* hopsy::doc::Proposal::base = R"pbdoc(
@@ -1548,7 +1529,8 @@ const char* hopsy::doc::UniformHitAndRunProposal::copyProposal = R"pbdoc(
 
 const char* hopsy::doc::MarkovChain::base = R"pbdoc(MarkovChain(problem, proposal=hopsy.GaussianHitAndRun, starting_point=None)
 
-Lorem ipsum ...
+Given a hopsy.Problem a MarkovChain object can be constructed. The Markov chain keeps track of the internal state and the selected proposal mechanism, see proposal argument.
+Several Markov chain objects can be sampled in parallel by passing them as a list to hopsy.sample.
 )pbdoc";
 
 

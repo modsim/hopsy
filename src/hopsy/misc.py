@@ -58,8 +58,25 @@ def add_box_constraints(problem: _c.Problem,
                         lower_bound: _s.typing.Union[_s.numpy.typing.ArrayLike, float],
                         upper_bound: _s.typing.Union[_s.numpy.typing.ArrayLike, float],
                         simplify = True):
-    """
+    r"""Adds box constraints to all dimensions. This will extend :attr:`hopsy.Problem.A` and :attr:`hopsy.Problem.A` of the returned :class:`hopsy.Problem` to have :math:`m+2n` rows.
+    Box constraints are added naively, meaning that we do neither check whether the dimension may be already 
+    somehow bound nor check whether the very same constraint already exists. You can remove redundant constraints
+    efficiently using the `PolyRound <https://pypi.org/project/PolyRound/>`_ toolbox or by using the :func:`hopsy.round` function, uses PolyRound to remove redundant constraints and also rounds the polytope.
 
+    If ``lower_bound`` and ``upper_bound`` are both ``float``, then every dimension :math:`i` will be bound as 
+    :math:`lb \leq x_i \leq ub`. If `lower_bound`` and ``upper_bound`` are both ``numpy.ndarray`` with 
+    appropriate length, then every dimension :math:`i` will be bound as :math:`lb_i \leq x_i \leq ub_i`.
+
+    :param hopsy.Problem problem: Problem which should be constrained and which contains the matrix :math:`A` and vector :math:`b` in :math:`Ax \leq b`.
+
+    :param lower_bound: Specifies the lower bound(s). 
+    :type lower_bound: numpy.ndarray[float64[n,1]] or float
+
+    :param upper_bound: Specifies the upper bound(s). 
+    :type upper_bound: numpy.ndarray[float64[n,1]] or float
+
+    :return: A :class:`hopsy.Problem` bounded in all dimensions.
+    :rtype: hopsy.Problem
     """
     if problem.A.shape[1] == 0:
         raise ValueError("Cannot determine dimension for empty inequality Ax <= b.")
@@ -91,7 +108,12 @@ def add_box_constraints(problem: _c.Problem,
 
 def compute_chebyshev_center(problem: _c.Problem):
     """
-        
+    Computes the Chebyshev center, that is the midpoint of a (non-unique) largest inscribed ball in the polytope defined by :math:`Ax \leq b`. 
+
+    :param hopsy.Problem problem: Problem for which the Chebyshev center should be computed and which contains the matrix :math:`A` and vector :math:`b` in :math:`Ax \leq b`.
+
+    :return: The Chebyshev center of the passed problem.
+    :rtype: numpy.ndarray[float64[n,1]]
     """
     polytope = _s.polytope.Polytope(problem.A, problem.b)
     chebyshev_center = _s.ChebyshevFinder.chebyshev_center(polytope, _c.LP().settings)[0]
@@ -149,7 +171,18 @@ _simplify = simplify
 
 def round(problem: _c.Problem):
     """
+    Rounds the polytope defined by the inequality :math:`Ax \leq b` using 
+    `PolyRound <https://pypi.org/project/PolyRound/>`_. 
+    This function also strips redundant constraints.
+    The unrounding transformation :math:`T` and shift :math:`s` will be stored in :attr:`hopsy.UniformProblem.transformation`
+    and :attr:`hopsy.UniformProblem.shift` of the returned problem. Its left-hand side operator :attr:`hopsy.UniformProblem.A` and 
+    the right-hand side :attr:`hopsy.UniformProblem.b` of the polytope will be transformed as :math:``
+    inequality
 
+    :param hopsy.Problem problem: Problem that should be rounded and which contains the matrix :math:`A` and vector :math:`b` in :math:`Ax \leq b`.
+
+    :return: The rounded problem.
+    :rtype: hopsy.Problem
     """
     with _s.warnings.catch_warnings():
         _s.warnings.simplefilter("ignore")
@@ -179,7 +212,7 @@ def round(problem: _c.Problem):
 
 def back_transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
     """
-
+    Transforms samples back from the sampling space (typically rounded) to the original parameter space.
     """
     transformed_points = []
 
@@ -194,6 +227,7 @@ def back_transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
 
 def transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
     """
+    Transforms samples from the parameter space to the sampling space (typically rounded).
 
     """
     transformed_points = []

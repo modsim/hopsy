@@ -461,10 +461,6 @@ namespace hopsy {
             static const char* recordData;
         };
 
-        extern const char* addBoxConstraintsToProblem;
-        extern const char* computeChebyshevCenter;
-        extern const char* round;
-
         extern const char* tune;
 
         extern const char* computeAcceptanceRate;

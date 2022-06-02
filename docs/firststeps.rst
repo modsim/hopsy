@@ -1,6 +1,8 @@
 First Steps
 ===========
 
+The first steps contain a quick installation guide, an introduction to the problems hopsy solves and a quick tutorial.
+
 .. raw:: html
 
    <div style="display: none">
@@ -12,6 +14,7 @@ First Steps
    firststeps/installation.rst
    firststeps/introduction.rst
    notebooks/QuickTutorial.ipynb
+   notebooks/SamplingAdvice.ipynb
 
 .. raw:: html
 

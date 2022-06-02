@@ -1,6 +1,8 @@
 User Guide
 ==========
 
+Compared to the first steps, the user guide contains a more detailed view of the parts that make up hopsy.
+
 .. raw:: html
 
    <div style="display: none">

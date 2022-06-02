@@ -42,7 +42,7 @@ namespace hopsy {
                     const std::optional<LinearTransformation> &transformation = std::nullopt) :
                 proposal(nullptr),
                 transformation(transformation) {
-            if (model) this->model = std::move(model->copyModel());
+            if (model) this->model = model->copyModel();
             createMarkovChain(this, proposal, this->model, transformation);
         }
 
@@ -76,25 +76,61 @@ namespace hopsy {
             return markovChain->setParameter(parameter, value);
         }
 
-        std::shared_ptr<Proposal> getProposal() const {
-            return proposal;
+        std::variant<std::shared_ptr<Proposal>, py::object> getProposal() {
+            if(proposal) {
+                std::shared_ptr<PyProposal> pyProposalPtr = std::dynamic_pointer_cast<PyProposal>(proposal);
+                if(pyProposalPtr) {
+                    return pyProposalPtr->pyObj;
+                }
+                else {
+                    return proposal;
+                }
+            }
+            else {
+                return nullptr;
+            }
         }
 
-        void setProposal(const Proposal *proposal) {
-            createMarkovChain(this, proposal, this->model, this->transformation);
+        void setProposal(std::variant<Proposal *, py::object> proposal) {
+            std::unique_ptr<Proposal> proposalPtr = nullptr;
+            try {
+                proposalPtr = std::make_unique<hopsy::PyProposal>(std::get<py::object>(proposal));
+            }
+            catch(std::bad_variant_access) {
+                proposalPtr = std::get<Proposal*>(proposal)->copyProposal();
+            }
+            createMarkovChain(this, proposalPtr.get(), this->model, this->transformation);
         }
 
-        Model *getModel() const {
-            return model.get();
+        std::variant<py::object, Model *>getModel() const {
+            if(model) {
+                Model* modelPtr = model.get();
+                auto pyModelPtr = dynamic_cast<hopsy::PyModel*>(modelPtr);
+                if(pyModelPtr) {
+                    return pyModelPtr->pyObj;
+                }
+                return modelPtr;
+            }
+            else {
+                return nullptr;
+            }
         }
 
-        void setModel(const std::shared_ptr<Model> model) {
+        void setModel(std::variant<py::object, std::shared_ptr<Model>> model) {
             if (this->proposal->hasNegativeLogLikelihood()) {
                 throw std::runtime_error(
                         "Warning: proposal will not receive new model object. "
                         "Fix this issue by creating a new MarkovChain with a new proposal containing the new model.");
             }
-            createMarkovChain(this, this->proposal.get(), model, this->transformation);
+            std::shared_ptr<Model> modelPtr;
+            try {
+                py::object object = std::get<py::object>(model);
+                modelPtr = std::make_shared<PyModel>(PyModel(object));
+            }
+            catch(std::bad_variant_access) {
+                modelPtr = std::get<std::shared_ptr<Model>>(model);
+            }
+            createMarkovChain(this, this->proposal.get(), modelPtr, this->transformation);
         }
 
         std::shared_ptr<hops::MarkovChain> &getMarkovChain() {
@@ -120,11 +156,12 @@ namespace hopsy {
             }
         }
 
+        std::shared_ptr<Proposal> proposal;
+        std::shared_ptr<Model> model;
+
     private:
         std::shared_ptr<hops::MarkovChain> markovChain;
 
-        std::shared_ptr<Proposal> proposal;
-        std::shared_ptr<Model> model;
         std::optional<LinearTransformation> transformation;
 
         static inline void createMarkovChain(MarkovChain *mc,
@@ -395,7 +432,7 @@ namespace hopsy {
                 .def_property_readonly("state_negative_log_likelihood", &MarkovChain::getStateNegativeLogLikelihood,
                                        doc::MarkovChain::stateNegativeLogLikelihood)
                 .def(py::pickle([](const MarkovChain &self) {
-                                    return py::make_tuple(self.getProposal()->copyProposal().release(), self.getProblem());
+                                    return py::make_tuple(self.proposal->copyProposal().release(), self.getProblem());
                                 },
                                 [](py::tuple t) {
                                     if (t.size() != 2) throw std::runtime_error("Invalid state!");

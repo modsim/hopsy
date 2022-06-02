@@ -237,11 +237,11 @@ namespace hopsy {
         }
 
         VectorType getProposal() const override {
-            return pyObj.attr("proposal")().cast<VectorType>();
+            return pyObj.attr("proposal").cast<VectorType>();
         }
 
         VectorType getState() const override {
-            return pyObj.attr("state")().cast<VectorType>();
+            return pyObj.attr("state").cast<VectorType>();
         }
 
         void setState(const VectorType& newState) override {
@@ -273,19 +273,34 @@ namespace hopsy {
         }
 
         std::string getProposalName() const override {
-            return pyObj.attr("name").cast<std::string>();
+            return pyObj.attr("get_name").cast<std::string>();
         }
 
         double getStateNegativeLogLikelihood() const override {
-            return pyObj.attr("get_state_negative_log_likelihood")().cast<double>();
+            try {
+                return pyObj.attr("get_state_negative_log_likelihood")().cast<double>();
+            }
+            catch(...) {
+                return 0;
+            }
         }
 
         double getProposalNegativeLogLikelihood() const override {
-            return pyObj.attr("get_proposal_negative_log_likelihood")().cast<double>();
+            try {
+                return pyObj.attr("get_proposal_negative_log_likelihood")().cast<double>();
+            }
+            catch(...) {
+                return 0;
+            }
         }
 
         bool hasNegativeLogLikelihood() const override {
-            return pyObj.attr("has_negative_log_likelihood")().cast<double>();
+            try {
+                return pyObj.attr("has_negative_log_likelihood")().cast<double>();
+            }
+            catch(...) {
+                return false;
+            }
         }
 
         const MatrixType& getA() const override {
@@ -297,7 +312,7 @@ namespace hopsy {
         }
 
         std::unique_ptr<Proposal> copyProposal() const override {
-            return pyObj.attr("__copy__")().cast<std::unique_ptr<Proposal>>();
+            return std::make_unique<PyProposal>(PyProposal(pyObj));
         }
 
 		py::object pyObj;
@@ -310,7 +325,7 @@ namespace hopsy {
     class ProposalWrapper : public Proposal {
     public:
 		ProposalWrapper(const Proposal* proposal) {
-            proposalPtr = std::move(proposal->copyProposal());
+            proposalPtr = proposal->copyProposal();
         }
 
         VectorType& propose(hops::RandomNumberGenerator& rng) override {
@@ -390,6 +405,10 @@ namespace hopsy {
         }
 
         std::shared_ptr<Proposal> getProposalPtr() {
+//            auto pyproposalPtr = std::dynamic_pointer_cast<PyModel>(proposalPtr);
+//            if(pyproposalPtr) {
+//                return pyproposalPtr->pyObj;
+//            }
             return proposalPtr;
         }
 
@@ -896,7 +915,7 @@ namespace hopsy {
                                 throw std::runtime_error("Cannot initialize hopsy.BilliardMALAProposal for uniform problem (problem.model == None).");
                             }
 
-                            return BilliardMALAProposal::create(problem, startingPoint, ModelWrapper(std::move(problem->model->copyModel())), maximumNumberOfReflections, stepSize);
+                            return BilliardMALAProposal::create(problem, startingPoint, ModelWrapper(problem->model->copyModel()), maximumNumberOfReflections, stepSize);
                         } else {
                             throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
                         }
@@ -930,7 +949,7 @@ namespace hopsy {
                         return BilliardMALAProposal(t[0].cast<MatrixType>(),
                                                t[1].cast<VectorType>(),
                                                t[2].cast<VectorType>(),
-                                               ModelWrapper(std::move(t[3].cast<Model*>()->copyModel())),
+                                               ModelWrapper(t[3].cast<Model*>()->copyModel()),
                                                t[4].cast<long>(),
                                                t[5].cast<double>());
                     })
@@ -1005,7 +1024,7 @@ namespace hopsy {
                         return CSmMALAProposal(t[0].cast<MatrixType>(),
                                                t[1].cast<VectorType>(),
                                                t[2].cast<VectorType>(),
-                                               ModelWrapper(std::move(t[3].cast<Model*>()->copyModel())),
+                                               ModelWrapper(t[3].cast<Model*>()->copyModel()),
                                                t[4].cast<double>(),
                                                t[5].cast<double>());
                     })
