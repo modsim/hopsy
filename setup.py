@@ -133,7 +133,8 @@ setup(
     long_description_content_type='text/markdown',
     project_urls={
         'Documentation': 'https://modsim.github.io/hopsy/',
-        'GitHub': 'https://github.com/modsim/hopsy/',
+        'Gitlab (Sources&CI)': 'https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy',
+        'GitHub (Mirror)': 'https://github.com/modsim/hopsy/',
     },
     classifiers=[
         'Programming Language :: Python :: 3',
