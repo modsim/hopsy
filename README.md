@@ -15,6 +15,15 @@ P = {x : Ax &#8804; b},
 which often arises in metabolic flux analysis.
 
 
+### Links
+- Source Code & CI: https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy
+- PyPI: https://pypi.org/project/hopsy/
+- Documentation: https://modsim.github.io/hopsy/
+- Github Mirror: https://github.com/modsim/hopsy
+- TestPyPI: https://test.pypi.org/project/hopsy/
+- HOPS (C++ backend): https://gitlab-public.fz-juelich.de/IBG-1/ModSim/hops
+
+
 ## Installation
 
 hopsy can be easily installed from the Python Package Index using ``pip install hopsy``.
