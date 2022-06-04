@@ -15,14 +15,6 @@ P = {x : Ax &#8804; b},
 which often arises in metabolic flux analysis.
 
 
-### Links
-- Source Code & CI: https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy
-- PyPI: https://pypi.org/project/hopsy/
-- Documentation: https://modsim.github.io/hopsy/
-- Github Mirror: https://github.com/modsim/hopsy
-- TestPyPI: https://test.pypi.org/project/hopsy/
-- HOPS (C++ backend): https://gitlab-public.fz-juelich.de/IBG-1/ModSim/hops
-
 
 ## Installation
 
@@ -72,12 +64,6 @@ To compile binary wheels for distribution (e.g. via the Python Package Index pyp
 * Ninja or Pip 10+
 * Docker (optional, for building wheels)
 
-
-## License
-
-hopsy is licensed under the [MIT license](LICENSE).
-
-
 ## Examples
 
 A basic usage example is presented below. More examples can be found in `tests/` directory or in the docs.
@@ -116,3 +102,17 @@ plt.show()
 [`cibuildwheel`]:          https://cibuildwheel.readthedocs.io
 [FAQ]: http://pybind11.rtfd.io/en/latest/faq.html#working-with-ancient-visual-studio-2009-builds-on-windows
 [vs2015_runtime]: https://www.microsoft.com/en-us/download/details.aspx?id=48145
+
+## Links
+- Source Code & CI: https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy
+- PyPI: https://pypi.org/project/hopsy/
+- Documentation: https://modsim.github.io/hopsy/
+- Github Mirror: https://github.com/modsim/hopsy
+- TestPyPI: https://test.pypi.org/project/hopsy/
+- HOPS (C++ backend): https://gitlab-public.fz-juelich.de/IBG-1/ModSim/hops
+
+
+## License
+
+hopsy is licensed under the [MIT license](LICENSE).
+
