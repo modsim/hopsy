@@ -99,7 +99,7 @@ plt.scatter(states[:,:,0].flatten(), states[:,:,1].flatten())
 plt.show()
 ```
 
-<img src="docs/_static/gaussscatter.png" alt="2-dimensional truncated Gaussian scatter plot"/>
+<img src="docs/_static/gaussscatter.png" alt="2-dimensional truncated Gaussian scatter plot" width="600"/>
 
 
 [`cibuildwheel`]:          https://cibuildwheel.readthedocs.io
