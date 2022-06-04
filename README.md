@@ -24,15 +24,6 @@ which often arises in metabolic flux analysis.
 - HOPS (C++ backend): https://gitlab-public.fz-juelich.de/IBG-1/ModSim/hops
 
 
-### Links
-- Source Code & CI: https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy
-- PyPI: https://pypi.org/project/hopsy/
-- Documentation: https://modsim.github.io/hopsy/
-- Github Mirror: https://github.com/modsim/hopsy
-- TestPyPI: https://test.pypi.org/project/hopsy/
-- HOPS (C++ backend): https://gitlab-public.fz-juelich.de/IBG-1/ModSim/hops
-
-
 ## Installation
 
 hopsy can be easily installed from the Python Package Index using ``pip install hopsy``.
@@ -89,7 +80,7 @@ hopsy is licensed under the [MIT license](LICENSE).
 
 ## Examples
 
-A basic usage example is presented below. More examples can be found in `tests/` directory.
+A basic usage example is presented below. More examples can be found in `tests/` directory or in the docs.
 
 ```python
 import hopsy
@@ -114,7 +105,7 @@ problem = hopsy.Problem(A, b, model)
 mc = hopsy.MarkovChain(problem, proposal=hopsy.GaussianHitAndRunProposal, starting_point=[.5, .5])
 rng = hopsy.RandomNumberGenerator(seed=42)
 
-# we finally sample
+# call sample on the mc and rng objects 
 acceptance_rate, states = hopsy.sample(mc, rng, n_samples=10_000, thinning=2)
 
 # the states have 3 dimensions: number of chains, number of samples, number of dimensions.
