@@ -14,6 +14,18 @@ PLAT_TO_CMAKE = {
     'win-arm64': 'ARM64',
 }
 
+with open('README.md', 'r') as fh:
+    long_description = fh.read()
+
+with open('.version', 'r') as fh:
+    version = fh.read().split('\n')[0]
+
+try:
+    with open('.commit', 'r') as fh:
+        commit = fh.read().split('\n')[0]
+except:
+    commit = "dirty"
+
 
 # A CMakeExtension needs a sourcedir instead of a file list.
 # The name must be the _single_ output extension from the CMake build.
@@ -45,9 +57,19 @@ class CMakeBuild(build_ext):
             '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}'.format(extdir),
             '-DPYTHON_EXECUTABLE={}'.format(sys.executable),
             '-DHOPSY_VERSION_INFO={}'.format(self.distribution.get_version()),
+            '-DHOPSY_BUILD_INFO={}'.format(commit),
             '-DCMAKE_BUILD_TYPE={}'.format(cfg),  # not used on MSVC, but no harm
         ]
         build_args = []
+
+        try:
+            commit_hash = subprocess.check_output(
+                ['git', 'rev-parse', '--short', 'HEAD'], cwd=self.build_temp
+            ).decode('utf-8').split('\n')[0]
+            print("Build id:", commit_hash)
+            cmake_args.append('-DHOPSY_BUILD_ID={}'.format(commit_hash))
+        except Exception as e:
+            print("ERROR retrieving commit hash. No build ID will be set.")
 
         if self.compiler.compiler_type != 'msvc':
             # Using Ninja-build since it a) is available as a wheel and b)
@@ -79,6 +101,7 @@ class CMakeBuild(build_ext):
                 ]
                 build_args += ['--config', cfg]
 
+
         # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
         # across all generators.
         if 'CMAKE_BUILD_PARALLEL_LEVEL' not in os.environ:
@@ -91,6 +114,12 @@ class CMakeBuild(build_ext):
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
 
+        
+        if os.name == 'nt': # os.name == nt is True for windows only
+            # Use clang because MSVC is bad
+            cmake_args += ["-T ClangCL"]
+
+
         subprocess.check_call(
             ['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp
         )
@@ -98,12 +127,6 @@ class CMakeBuild(build_ext):
             ['cmake', '--build', '.'] + build_args, cwd=self.build_temp
         )
 
-
-with open('README.md', 'r') as fh:
-    long_description = fh.read()
-
-with open('.version', 'r') as fh:
-    version = fh.read().split('\n')[0]
 
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
@@ -117,7 +140,8 @@ setup(
     long_description_content_type='text/markdown',
     project_urls={
         'Documentation': 'https://modsim.github.io/hopsy/',
-        'GitHub': 'https://github.com/modsim/hopsy/',
+        'Gitlab (Sources&CI)': 'https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy',
+        'GitHub (Mirror)': 'https://github.com/modsim/hopsy/',
     },
     classifiers=[
         'Programming Language :: Python :: 3',

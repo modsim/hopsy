@@ -28,10 +28,13 @@ PYBIND11_MODULE(core, m) {
 
     m.doc() = hopsy::doc::base;
 
-#ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
+    m.attr("__build__") = MACRO_STRINGIFY(BUILD_INFO);
+
+#ifdef IS_DEBUG
+    m.attr("__is_debug__") = true;
 #else
-    m.attr("__version__") = "dev";
+    m.attr("__is_debug__") = false;
 #endif
 
     hopsy::addModels(m);

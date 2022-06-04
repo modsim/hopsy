@@ -70,7 +70,7 @@ namespace hopsy {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				double,
 				ProposalBase,
-                "compute_log_acceptance_probability",
+                "log_acceptance_probability",
                 computeLogAcceptanceProbability
 			);
         }
@@ -94,11 +94,11 @@ namespace hopsy {
 			);
         }
 
-        std::optional<std::vector<std::string>> getDimensionNames() const override {
+        std::vector<std::string> getDimensionNames() const override {
 			PYBIND11_OVERRIDE_PURE_NAME(
-				std::optional<std::vector<std::string>>,
+				std::vector<std::string>,
 				ProposalBase,
-                "get_dimension_names",
+                "dimension_names",
 				getDimension
 			);
         }
@@ -107,7 +107,7 @@ namespace hopsy {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				std::vector<std::string>,
 				ProposalBase,
-                "get_parameter_names",
+                "parameter_names",
 				getParameter
 			);
         }
@@ -156,7 +156,7 @@ namespace hopsy {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				std::string,
 				ProposalBase,
-                "get_proposal_name",
+                "name",
 				getProposalName,
 			);
         }
@@ -165,7 +165,7 @@ namespace hopsy {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				double,
 				ProposalBase,
-                "get_state_negative_log_likelihood",
+                "state_negative_log_likelihood",
                 getStateNegativeLogLikelihood
 			);
         }
@@ -174,7 +174,7 @@ namespace hopsy {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				double,
 				ProposalBase,
-                "get_proposal_negative_log_likelihood",
+                "proposal_negative_log_likelihood",
                 getProposalNegativeLogLikelihood
 			);
         }
@@ -210,7 +210,7 @@ namespace hopsy {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				std::unique_ptr<Proposal>,  // Return type 
 				ProposalBase,               // Parent class
-                "deepcopy",                 // Python function name
+                "__copy__",                 // Python function name
 				copyProposal                    // C++ function name
             );
         }
@@ -233,27 +233,27 @@ namespace hopsy {
         }
 
         double computeLogAcceptanceProbability() override {
-            return pyObj.attr("compute_log_acceptance_probability")().cast<double>();
+            return pyObj.attr("log_acceptance_probability")().cast<double>();
         }
 
         VectorType getProposal() const override {
-            return pyObj.attr("get_proposal")().cast<VectorType>();
+            return pyObj.attr("proposal").cast<VectorType>();
         }
 
         VectorType getState() const override {
-            return pyObj.attr("get_state")().cast<VectorType>();
+            return pyObj.attr("state").cast<VectorType>();
         }
 
         void setState(const VectorType& newState) override {
-            pyObj.attr("set_state")(newState);
+            pyObj.attr("state")(newState);
         }
 
-        std::optional<std::vector<std::string>> getDimensionNames() const override {
-            return pyObj.attr("get_dimension_names")().cast<std::optional<std::vector<std::string>>>();
+        std::vector<std::string> getDimensionNames() const override {
+            return pyObj.attr("dimension_names")().cast<std::vector<std::string>>();
         }
 
         std::vector<std::string> getParameterNames() const override {
-            return pyObj.attr("get_parameter_names")().cast<std::vector<std::string>>();
+            return pyObj.attr("parameter_names")().cast<std::vector<std::string>>();
         }
 
         std::any getParameter(const ProposalParameter& parameter) const override {
@@ -273,31 +273,46 @@ namespace hopsy {
         }
 
         std::string getProposalName() const override {
-            return pyObj.attr("name").cast<std::string>();
+            return pyObj.attr("get_name").cast<std::string>();
         }
 
         double getStateNegativeLogLikelihood() const override {
-            return pyObj.attr("get_state_negative_log_likelihood")().cast<double>();
+            try {
+                return pyObj.attr("get_state_negative_log_likelihood")().cast<double>();
+            }
+            catch(...) {
+                return 0;
+            }
         }
 
         double getProposalNegativeLogLikelihood() const override {
-            return pyObj.attr("get_proposal_negative_log_likelihood")().cast<double>();
+            try {
+                return pyObj.attr("get_proposal_negative_log_likelihood")().cast<double>();
+            }
+            catch(...) {
+                return 0;
+            }
         }
 
         bool hasNegativeLogLikelihood() const override {
-            return pyObj.attr("has_negative_log_likelihood")().cast<double>();
+            try {
+                return pyObj.attr("has_negative_log_likelihood")().cast<double>();
+            }
+            catch(...) {
+                return false;
+            }
         }
 
         const MatrixType& getA() const override {
-            return pyObj.attr("A").cast<MatrixType>();
+            throw std::runtime_error("Function not implemented.");
         }
 
         const VectorType& getB() const override {
-            return pyObj.attr("b").cast<MatrixType>();
+            throw std::runtime_error("Function not implemented.");
         }
 
         std::unique_ptr<Proposal> copyProposal() const override {
-            return pyObj.attr("deepcopy")().cast<std::unique_ptr<Proposal>>();
+            return std::make_unique<PyProposal>(PyProposal(pyObj));
         }
 
 		py::object pyObj;
@@ -307,11 +322,10 @@ namespace hopsy {
         VectorType state;
     };
 
-
     class ProposalWrapper : public Proposal {
     public:
 		ProposalWrapper(const Proposal* proposal) {
-            proposalPtr = std::move(proposal->copyProposal());
+            proposalPtr = proposal->copyProposal();
         }
 
         VectorType& propose(hops::RandomNumberGenerator& rng) override {
@@ -338,7 +352,7 @@ namespace hopsy {
             proposalPtr->setState(newState);
         }
 
-        std::optional<std::vector<std::string>> getDimensionNames() const override {
+        std::vector<std::string> getDimensionNames() const override {
             return proposalPtr->getDimensionNames();
         }
 
@@ -391,6 +405,10 @@ namespace hopsy {
         }
 
         std::shared_ptr<Proposal> getProposalPtr() {
+//            auto pyproposalPtr = std::dynamic_pointer_cast<PyModel>(proposalPtr);
+//            if(pyproposalPtr) {
+//                return pyproposalPtr->pyObj;
+//            }
             return proposalPtr;
         }
 
@@ -471,7 +489,7 @@ namespace hopsy {
             proposal->setState(newState);
         }
 
-        std::optional<std::vector<std::string>> getDimensionNames() const override {
+        std::vector<std::string> getDimensionNames() const override {
             if (!proposal) throw std::runtime_error(uninitializedMethod("dimension_names"));
             return proposal->getDimensionNames();
         }
@@ -545,9 +563,13 @@ namespace hopsy {
     };
 
     using AdaptiveMetropolisProposal = UninitializedProposalWrapper<
-            hops::AdaptiveMetropolisProposal<MatrixType, VectorType>, MatrixType, double, double, unsigned long>;
+            hops::AdaptiveMetropolisProposal<MatrixType>, MatrixType, double, double, unsigned long>;
     using BallWalkProposal = UninitializedProposalWrapper<
             hops::BallWalkProposal<MatrixType, VectorType>, double>;
+    using BilliardAdaptiveMetropolisProposal = UninitializedProposalWrapper<
+            hops::BilliardAdaptiveMetropolisProposal<MatrixType>, MatrixType, double, double, unsigned long, long>;
+    using BilliardMALAProposal = UninitializedProposalWrapper<
+            hops::BilliardMALAProposal<ModelWrapper, MatrixType>, ModelWrapper, long, double>;
     using CSmMALAProposal = UninitializedProposalWrapper<
             hops::CSmMALAProposal<ModelWrapper, MatrixType>, ModelWrapper, double, double>;
     using DikinWalkProposal = UninitializedProposalWrapper<
@@ -558,6 +580,8 @@ namespace hopsy {
 			hops::HitAndRunProposal<MatrixType, VectorType, hops::GaussianStepDistribution<double>>, double>;
     using GaussianProposal = UninitializedProposalWrapper<
 			hops::GaussianProposal<MatrixType, VectorType>, double>;
+    using TruncatedGaussianProposal = UninitializedProposalWrapper<
+            hops::TruncatedGaussianProposal<MatrixType, VectorType>, hops::Gaussian>;
     using UniformCoordinateHitAndRunProposal = UninitializedProposalWrapper<
 			hops::CoordinateHitAndRunProposal<MatrixType, VectorType>>;
     using UniformHitAndRunProposal = UninitializedProposalWrapper<
@@ -566,12 +590,15 @@ namespace hopsy {
 
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::AdaptiveMetropolisProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::BallWalkProposal);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::BilliardAdaptiveMetropolisProposal);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::BilliardMALAProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::CSmMALAProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::DikinWalkProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::GaussianCoordinateHitAndRunProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::GaussianHitAndRunProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::GaussianProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::PyProposal);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::TruncatedGaussianProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::UniformCoordinateHitAndRunProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::UniformHitAndRunProposal);
 
@@ -658,8 +685,9 @@ namespace hopsy {
                               double boundaryCushion,
                               double eps,
                               unsigned long warmUp) {
-                        MatrixType sqrtMve = computeSqrtMaximumVolumeEllipsoid(*problem);
-                        auto proposal = AdaptiveMetropolisProposal::createFromProblem(problem, sqrtMve, stepSize, eps, warmUp);
+                        auto _problem(*problem);
+                        MatrixType sqrtMve = computeSqrtMaximumVolumeEllipsoid(_problem);
+                        auto proposal = AdaptiveMetropolisProposal::createFromProblem(&_problem, sqrtMve, stepSize, eps, warmUp);
                         proposal.setParameter(ProposalParameter::BOUNDARY_CUSHION, boundaryCushion);
                         return proposal;
                     }),
@@ -675,8 +703,9 @@ namespace hopsy {
                               double boundaryCushion,
                               double eps,
                               unsigned long warmUp) {
-                        MatrixType sqrtMve = computeSqrtMaximumVolumeEllipsoid(*problem);
-                        auto proposal = AdaptiveMetropolisProposal::create(problem, startingPoint, sqrtMve, stepSize, eps, warmUp);
+                        auto _problem(*problem);
+                        MatrixType sqrtMve = computeSqrtMaximumVolumeEllipsoid(_problem);
+                        auto proposal = AdaptiveMetropolisProposal::create(&_problem, startingPoint, sqrtMve, stepSize, eps, warmUp);
                         proposal.setParameter(ProposalParameter::BOUNDARY_CUSHION, boundaryCushion);
                         return proposal;
                     }),
@@ -764,15 +793,196 @@ namespace hopsy {
                                                 t[3].cast<double>());
                     })
                 );
-        
+
+        // register BilliardAdaptiveMetropolisProposal
+        py::classh<BilliardAdaptiveMetropolisProposal, Proposal, ProposalTrampoline<BilliardAdaptiveMetropolisProposal>> billiardBilliardAdaptiveMetropolisProposal(
+                m, "BilliardAdaptiveMetropolisProposal", doc::BilliardAdaptiveMetropolisProposal::base);
+        // constructor
+        billiardBilliardAdaptiveMetropolisProposal
+            //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
+            .def(py::init([] (const Problem* problem,
+                              double stepSize,
+                              double boundaryCushion,
+                              double eps,
+                              unsigned long warmUp,
+                              long maxReflections) {
+                        MatrixType sqrtMve = computeSqrtMaximumVolumeEllipsoid(*problem);
+                        auto proposal = BilliardAdaptiveMetropolisProposal::createFromProblem(problem, sqrtMve, stepSize, eps, warmUp, maxReflections);
+                        proposal.setParameter(ProposalParameter::BOUNDARY_CUSHION, boundaryCushion);
+                        return proposal;
+                    }),
+                    doc::BilliardAdaptiveMetropolisProposal::__init__,
+                    py::arg("problem"),
+                    py::arg("stepsize") = 1,
+                    py::arg("boundary_cushion") = 0,
+                    py::arg("eps") = 1.e-3,
+                    py::arg("warm_up") = 100,
+                    py::arg("max_reflections") = 100)
+            .def(py::init([] (const Problem* problem,
+                              const VectorType* startingPoint,
+                              double stepSize,
+                              double boundaryCushion,
+                              double eps,
+                              unsigned long warmUp,
+                              long maxReflections) {
+                        MatrixType sqrtMve = computeSqrtMaximumVolumeEllipsoid(*problem);
+                        auto proposal = BilliardAdaptiveMetropolisProposal::create(problem, startingPoint, sqrtMve, stepSize, eps, warmUp, maxReflections);
+                        proposal.setParameter(ProposalParameter::BOUNDARY_CUSHION, boundaryCushion);
+                        return proposal;
+                    }),
+                    doc::BilliardAdaptiveMetropolisProposal::__init__,
+                    py::arg("problem"),
+                    py::arg("starting_point") = py::none(),
+                    py::arg("stepsize") = 1,
+                    py::arg("boundary_cushion") = 0,
+                    py::arg("eps") = 1.e-3,
+                    py::arg("warm_up") = 100,
+                    py::arg("max_reflections") = 100)
+            ;
+        // common
+        proposal::addCommon<BilliardAdaptiveMetropolisProposal, doc::BilliardAdaptiveMetropolisProposal>(billiardBilliardAdaptiveMetropolisProposal);
+        // parameters
+        proposal::addParameter<BilliardAdaptiveMetropolisProposal>(
+                billiardBilliardAdaptiveMetropolisProposal, ProposalParameter::BOUNDARY_CUSHION, "boundary_cushion", doc::BilliardAdaptiveMetropolisProposal::boundaryCushion);
+        proposal::addParameter<BilliardAdaptiveMetropolisProposal>(
+                billiardBilliardAdaptiveMetropolisProposal, ProposalParameter::EPSILON, "eps", doc::BilliardAdaptiveMetropolisProposal::epsilon);
+        proposal::addParameter<BilliardAdaptiveMetropolisProposal>(
+                billiardBilliardAdaptiveMetropolisProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::BilliardAdaptiveMetropolisProposal::stepSize);
+        proposal::addParameter<BilliardAdaptiveMetropolisProposal, decltype(billiardBilliardAdaptiveMetropolisProposal), unsigned long>(
+                billiardBilliardAdaptiveMetropolisProposal, ProposalParameter::WARM_UP, "warm_up", doc::BilliardAdaptiveMetropolisProposal::warmUp);
+        proposal::addParameter<BilliardAdaptiveMetropolisProposal, decltype(billiardBilliardAdaptiveMetropolisProposal), long>(
+                billiardBilliardAdaptiveMetropolisProposal, ProposalParameter::MAX_REFLECTIONS, "max_reflections", doc::BilliardAdaptiveMetropolisProposal::maxReflections);
+        // pickling
+        billiardBilliardAdaptiveMetropolisProposal.def(py::pickle([] (const BilliardAdaptiveMetropolisProposal& self) {
+                        return py::make_tuple(self.proposal->getA(),
+                                              self.proposal->getB(),
+                                              self.proposal->getState(),
+                                              self.proposal->getCholeskyOfMaximumVolumeEllipsoid(),
+                                              std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)),
+                                              std::any_cast<double>(self.proposal->getParameter(ProposalParameter::BOUNDARY_CUSHION)),
+                                              std::any_cast<double>(self.proposal->getParameter(ProposalParameter::EPSILON)),
+                                              std::any_cast<unsigned long>(self.proposal->getParameter(ProposalParameter::WARM_UP)),
+                                              std::any_cast<long>(self.proposal->getParameter(ProposalParameter::MAX_REFLECTIONS)));
+                    },
+                    [] (py::tuple t) {
+                        if (t.size() != 9) throw std::runtime_error("Invalid state!");
+
+                        auto p = BilliardAdaptiveMetropolisProposal(t[0].cast<MatrixType>(),
+                                                            t[1].cast<VectorType>(),
+                                                            t[2].cast<VectorType>(),
+                                                            t[3].cast<MatrixType>(),
+                                                            t[4].cast<double>(),
+                                                            t[6].cast<double>(),
+                                                            t[7].cast<unsigned long>(),
+                                                            t[8].cast<unsigned long>());
+                        p.setParameter(ProposalParameter::BOUNDARY_CUSHION, t[5].cast<double>());
+                        return p;
+                    })
+                );
+
+        // register BilliardMALAProposal
+        py::classh<BilliardMALAProposal, Proposal, ProposalTrampoline<BilliardMALAProposal>> billiardmalaProposal(
+                m, "BilliardMALAProposal", doc::BilliardMALAProposal::base);
+        // constructor
+        billiardmalaProposal
+            //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
+            .def(py::init([] (const Problem* problem,
+                              double stepSize,
+                              long maximumNumberOfReflections) -> BilliardMALAProposal {
+                        if (problem) {
+                            if (!problem->model) {
+                                throw std::runtime_error("Cannot initialize hopsy.BilliardMALAProposal for "
+                                        "uniform problem (problem.model == None).");
+                            }
+
+                            return BilliardMALAProposal::createFromProblem(
+                                    problem, ModelWrapper(problem->model->copyModel()), maximumNumberOfReflections, stepSize);
+                        } else {
+                            throw std::runtime_error(std::string("Internal error in ") +
+                                    std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
+                        }
+                    }),
+                    doc::BilliardMALAProposal::__init__,
+                    py::arg("problem"),
+                    py::arg("stepsize") = 1.,
+                    py::arg("max_reflections") = 100)
+            .def(py::init([] (const Problem* problem,
+                              const VectorType* startingPoint,
+                              double stepSize,
+                              long maximumNumberOfReflections) -> BilliardMALAProposal {
+                        if (problem) {
+                            if (!problem->model) {
+                                throw std::runtime_error("Cannot initialize hopsy.BilliardMALAProposal for uniform problem (problem.model == None).");
+                            }
+
+                            return BilliardMALAProposal::create(problem, startingPoint, ModelWrapper(problem->model->copyModel()), maximumNumberOfReflections, stepSize);
+                        } else {
+                            throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
+                        }
+                    }),
+                    doc::BilliardMALAProposal::__init__,
+                    py::arg("problem"),
+                    py::arg("starting_point"),
+                    py::arg("stepsize") = 1.,
+                    py::arg("max_reflections") = 100)
+            ;
+        // common
+        proposal::addCommon<BilliardMALAProposal, doc::BilliardMALAProposal>(billiardmalaProposal);
+        // parameters
+        proposal::addParameter<BilliardMALAProposal>(
+                billiardmalaProposal, ProposalParameter::MAX_REFLECTIONS, "max_reflections", doc::BilliardMALAProposal::maxReflections);
+        proposal::addParameter<BilliardMALAProposal>(
+                billiardmalaProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::BilliardMALAProposal::stepSize);
+        // pickling
+        billiardmalaProposal.def(py::pickle([] (const BilliardMALAProposal& self) {
+                        auto model = self.proposal->getModel()->copyModel().release();
+                        return py::make_tuple(self.proposal->getA(),
+                                              self.proposal->getB(),
+                                              self.proposal->getState(),
+                                              model,
+                                              std::any_cast<long>(self.proposal->getParameter(ProposalParameter::MAX_REFLECTIONS)),
+                                              std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
+                    },
+                    [] (py::tuple t) {
+                        if (t.size() != 6) throw std::runtime_error("Invalid state!");
+
+                        return BilliardMALAProposal(t[0].cast<MatrixType>(),
+                                               t[1].cast<VectorType>(),
+                                               t[2].cast<VectorType>(),
+                                               ModelWrapper(t[3].cast<Model*>()->copyModel()),
+                                               t[4].cast<long>(),
+                                               t[5].cast<double>());
+                    })
+                );
 
         // register CSmMALAProposal
         py::classh<CSmMALAProposal, Proposal, ProposalTrampoline<CSmMALAProposal>> csmmalaProposal(
                 m, "CSmMALAProposal", doc::CSmMALAProposal::base);
         // constructor
-        csmmalaProposal    
+        csmmalaProposal
             //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
-            .def(py::init([] (const Problem* problem, 
+            .def(py::init([] (const Problem* problem,
+                              double stepSize,
+                              double fisherWeight) -> CSmMALAProposal {
+                        if (problem) {
+                            if (!problem->model) {
+                                throw std::runtime_error("Cannot initialize hopsy.CSmMALAProposal for "
+                                        "uniform problem (problem.model == None).");
+                            }
+
+                            return CSmMALAProposal::createFromProblem(
+                                    problem, ModelWrapper(problem->model->copyModel()), fisherWeight, stepSize);
+                        } else {
+                            throw std::runtime_error(std::string("Internal error in ") +
+                                    std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
+                        }
+                    }),
+                    doc::CSmMALAProposal::__init__,
+                    py::arg("problem"),
+                    py::arg("stepsize") = 1,
+                    py::arg("fisher_weight") = 0.5)
+            .def(py::init([] (const Problem* problem,
+                              const VectorType* startingPoint,
                               double stepSize,
                               double fisherWeight) -> CSmMALAProposal {
                         if (problem) {
@@ -780,34 +990,16 @@ namespace hopsy {
                                 throw std::runtime_error("Cannot initialize hopsy.CSmMALAProposal for uniform problem (problem.model == None).");
                             }
 
-                            return CSmMALAProposal::createFromProblem(problem, ModelWrapper(std::move(problem->model->copyModel())), fisherWeight, stepSize);
+                            return CSmMALAProposal::create(problem, startingPoint, ModelWrapper(problem->model->copyModel()), fisherWeight, stepSize);
                         } else {
                             throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
                         }
-                    }), 
+                    }),
                     doc::CSmMALAProposal::__init__,
-                    py::arg("problem"), 
-                    py::arg("stepsize") = 1, 
-                    py::arg("fisher_weight") = 1)
-            .def(py::init([] (const Problem* problem, 
-                              const VectorType* startingPoint, 
-                              double stepSize,
-                              double fisherWeight) -> CSmMALAProposal {
-                        if (problem) {
-                            if (!problem->model) {
-                                throw std::runtime_error("Cannot initialize hopsy.CSmMALAProposal for uniform problem (problem.model == None).");
-                            }
-
-                            return CSmMALAProposal::create(problem, startingPoint, ModelWrapper(std::move(problem->model->copyModel())), fisherWeight, stepSize);
-                        } else {
-                            throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
-                        }
-                    }), 
-                    doc::CSmMALAProposal::__init__,
-                    py::arg("problem"), 
-                    py::arg("starting_point"), 
-                    py::arg("stepsize") = 1, 
-                    py::arg("fisher_weight") = 1)
+                    py::arg("problem"),
+                    py::arg("starting_point"),
+                    py::arg("stepsize") = 1,
+                    py::arg("fisher_weight") = 0.5)
             ;
         // common
         proposal::addCommon<CSmMALAProposal, doc::CSmMALAProposal>(csmmalaProposal);
@@ -819,10 +1011,10 @@ namespace hopsy {
         // pickling
         csmmalaProposal.def(py::pickle([] (const CSmMALAProposal& self) {
                         auto model = self.proposal->getModel()->copyModel().release();
-                        return py::make_tuple(self.proposal->getA(), 
-                                              self.proposal->getB(), 
-                                              self.proposal->getState(), 
-                                              model, 
+                        return py::make_tuple(self.proposal->getA(),
+                                              self.proposal->getB(),
+                                              self.proposal->getState(),
+                                              model,
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::FISHER_WEIGHT)),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
                     },
@@ -832,7 +1024,7 @@ namespace hopsy {
                         return CSmMALAProposal(t[0].cast<MatrixType>(),
                                                t[1].cast<VectorType>(),
                                                t[2].cast<VectorType>(),
-                                               ModelWrapper(std::move(t[3].cast<Model*>()->copyModel())),
+                                               ModelWrapper(t[3].cast<Model*>()->copyModel()),
                                                t[4].cast<double>(),
                                                t[5].cast<double>());
                     })
@@ -1032,6 +1224,88 @@ namespace hopsy {
                     })
                 );
 
+        // register TruncatedGaussianProposal
+        py::classh<TruncatedGaussianProposal, Proposal, ProposalTrampoline<TruncatedGaussianProposal>> truncatedgaussianProposal(
+                m, "TruncatedGaussianProposal", doc::TruncatedGaussianProposal::base);
+        // constructor
+        truncatedgaussianProposal
+                //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
+                .def(py::init([] (const Problem* problem) -> TruncatedGaussianProposal {
+                         if (problem) {
+                             if (!problem->model) {
+                                 throw std::runtime_error("Cannot initialize hopsy.TruncatedGaussianProposal for "
+                                                          "uniform problem (problem.model == None).");
+                             }
+                             std::shared_ptr<hops::Model> modelPtr = problem->model->copyModel();
+                             std::shared_ptr<Gaussian> casted = std::dynamic_pointer_cast<Gaussian>(modelPtr);
+                             if (!casted) {
+                                 throw std::runtime_error("Model is not Gaussian. Please reconsider.");
+                             }
+                             hops::Gaussian gaussian(casted->getMean(), casted->getCovariance());
+
+                             return TruncatedGaussianProposal::createFromProblem(
+                                     problem,
+                                     gaussian
+                                     );
+                         } else {
+                             throw std::runtime_error(std::string("Internal error in ") +
+                                                      std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
+                         }
+                     }),
+                     doc::TruncatedGaussianProposal::__init__,
+                     py::arg("problem"))
+                .def(py::init([] (const Problem* problem,
+                                  const VectorType* startingPoint) -> TruncatedGaussianProposal {
+                         if (problem) {
+                             if (!problem->model) {
+                                 throw std::runtime_error("Cannot initialize hopsy.TruncatedGaussianProposal for uniform problem (problem.model == None).");
+                             }
+                             std::shared_ptr<hops::Model> modelPtr = problem->model->copyModel();
+                             std::shared_ptr<Gaussian> casted = std::dynamic_pointer_cast<Gaussian>(modelPtr);
+                             if (!casted) {
+                                 throw std::runtime_error("Model is not Gaussian. Please reconsider.");
+                             }
+                             hops::Gaussian gaussian(casted->getMean(), casted->getCovariance());
+
+                             return TruncatedGaussianProposal::create(
+                                     problem,
+                                     startingPoint,
+                                     gaussian
+                             );
+                         } else {
+                             throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
+                         }
+                     }),
+                     doc::TruncatedGaussianProposal::__init__,
+                     py::arg("problem"),
+                     py::arg("starting_point"));
+        // common
+        proposal::addCommon<TruncatedGaussianProposal, doc::TruncatedGaussianProposal>(truncatedgaussianProposal);
+        // pickling
+        truncatedgaussianProposal.def(py::pickle([] (const TruncatedGaussianProposal& self) {
+                                           std::shared_ptr<Model> modelPtr = self.proposal->getModel()->copyModel();
+                                           auto casted = std::dynamic_pointer_cast<hops::Gaussian>(modelPtr);
+                                           if (!casted) {
+                                             throw std::runtime_error("Model is not Gaussian. Please reconsider.");
+                                           }
+
+                                           return py::make_tuple(self.proposal->getA(),
+                                                                 self.proposal->getB(),
+                                                                 self.proposal->getState(),
+                                                                 casted->getMean(),
+                                                                 casted->getCovariance());
+                                       },
+                                       [] (py::tuple t) {
+                                           if (t.size() != 5) throw std::runtime_error("Invalid state!");
+
+                                           hops::Gaussian gaussian(t[3].cast<VectorType>(), t[4].cast<MatrixType>());
+
+                                           return TruncatedGaussianProposal(t[0].cast<MatrixType>(),
+                                                                  t[1].cast<VectorType>(),
+                                                                  t[2].cast<VectorType>(),
+                                                                  gaussian);
+                                       })
+        );
 
         // register UniformCoordinateHitAndRun
         py::classh<UniformCoordinateHitAndRunProposal, Proposal, ProposalTrampoline<UniformCoordinateHitAndRunProposal>> uniformCoordinateHitAndRunProposal(

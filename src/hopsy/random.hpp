@@ -23,6 +23,26 @@
 namespace py = pybind11;
 
 namespace hopsy {
+    namespace {
+	std::vector<unsigned char> stateToBytes(hops::RandomNumberGenerator::state_type state) {
+	     int numberOfBytes = 16; // state is 128 bit
+	     std::vector<unsigned char> arrayOfByte(numberOfBytes);
+	     for(int i = 0; i < numberOfBytes; i++) {
+		 arrayOfByte[numberOfBytes - 1 - i] = static_cast<unsigned char>(state >> (i * 8));
+	     }
+	     return arrayOfByte;
+	}
+
+	hops::RandomNumberGenerator::state_type bytesToState(const std::vector<unsigned char>& bytes) {
+	     hops::RandomNumberGenerator::state_type state = 0;
+	     
+	     for(size_t i=0; i<bytes.size(); ++i) {
+		     state = static_cast<decltype(state)>(bytes[i]);
+		     state << i*8;
+	     }
+	     return state;
+	}
+    }
     struct RandomNumberGenerator {
         unsigned int seed;
         unsigned int stream;
@@ -42,7 +62,8 @@ namespace hopsy {
         std::string __repr__() const {
             std::string repr = "hopsy.RandomNumberGenerator("; 
             repr += (seed ? "seed=" + std::to_string(seed) : "");
-            repr += (stream ? ", stream=" + std::to_string(stream) : "");
+            repr += (seed && stream ? ", " : "");
+            repr += (stream ? "stream=" + std::to_string(stream) : "");
             repr += ")";
             return repr;
         }
@@ -66,14 +87,14 @@ namespace hopsy {
             .def("__repr__", &RandomNumberGenerator::__repr__)
             .def(py::pickle([] (const RandomNumberGenerator& self) {
                         hops::RandomNumberGenerator rng(self.seed, self.stream);
-                        auto state = self.rng - rng;
+                        auto state = stateToBytes(self.rng - rng);
                         return py::make_tuple(self.seed, self.stream, state);
                     },
                     [] (py::tuple t) {
                         if (t.size() != 3) throw std::runtime_error("Tried to build hopsy.RandomNumberGenerator with invalid state.");
 
                         RandomNumberGenerator rng(t[0].cast<unsigned int>(), t[1].cast<unsigned int>());
-                        rng.rng.advance(t[2].cast<hops::RandomNumberGenerator::state_type>());
+                        rng.rng.advance(bytesToState(t[2].cast<std::vector<unsigned char>>()));
                         return rng;
                     }))
         ;
@@ -88,6 +109,12 @@ namespace hopsy {
                     },
                     doc::Uniform::__call__
                 )
+            .def_property("a", &Uniform::a, [] (Uniform& self, double a) {
+                        self = Uniform(a, self.b());
+                    })
+            .def_property("b", &Uniform::a, [] (Uniform& self, double b) {
+                        self = Uniform(self.a(), b);
+                    })
             .def("__repr__", [] (Uniform& self) -> std::string {
                         std::string repr = "hopsy.Uniform(";
                         repr += "a=" + std::to_string(self.a()) + ", ";
@@ -102,6 +129,12 @@ namespace hopsy {
                         return self(rng.rng); 
                     },
                     doc::Normal::__call__)
+            .def_property("mean", &Normal::mean, [] (Normal& self, double mean) {
+                        self = Normal(mean, self.stddev());
+                    })
+            .def_property("stddev", &Normal::stddev, [] (Normal& self, double stddev) {
+                        self = Normal(self.mean(), stddev);
+                    })
             .def("__repr__", [] (hopsy::Normal& self) -> std::string {
                         std::string repr = "hopsy.Normal(";
                         repr += "mean=" + std::to_string(self.mean()) + ", ";

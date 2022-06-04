@@ -39,12 +39,58 @@ class ModelTests(unittest.TestCase):
         model.mean = [1, 2]
         self.assertListEqual(model.mean.tolist(), [1, 2])
 
-        model.mean = [1, 2, 3]
+        with self.assertRaises(RuntimeError):
+            model.mean = [1, 2, 3]
+
+        model = Gaussian(dim=3)
         with self.assertRaises(RuntimeError):
             model.compute_negative_log_likelihood([0, 0])
+
+        self.assertIsNotNone(model.compute_log_likelihood_gradient(model.mean))
+        self.assertIsNotNone(model.compute_expected_fisher_information(model.mean))
 
     def test_mixture_properties(self):
         model = Mixture([Gaussian()])
         model.components[0].mean = [1, 2]
         self.assertListEqual(model.components[0].mean.tolist(), [1, 2])
+
+        self.assertIsNotNone(model.compute_log_likelihood_gradient(model.components[0].mean))
+        self.assertIsNone(model.compute_expected_fisher_information(model.components[0].mean))
+
+    def test_implementing_model(self):
+        class Uniform(Model):
+            def __init__(self):
+                Model.__init__(self)
+
+            def compute_negative_log_likelihood(self, x):
+                return 0
+
+            def compute_log_likelihood_gradient(self, x):
+                raise RuntimeError("Method not implemented.")
+
+            def compute_expected_fisher_information(self, x):
+                raise RuntimeError("Method not implemented.")
+
+            def __copy__(self):
+                return Uniform()
+    
+        model = Uniform()
+        problem = Problem([[1, 1]], [1], model, starting_point=[0, 0])
+        markovChain = MarkovChain(problem, GaussianProposal)
+        state = markovChain.draw(RandomNumberGenerator())
+
+
+    def test_py_model(self):
+        class Uniform:
+            def compute_negative_log_likelihood(self, x):
+                return 0
+    
+        model = Uniform()
+        problem = Problem([[1, 1]], [1], model, starting_point=[0, 0])
+        markovChain = MarkovChain(problem, GaussianProposal)
+        state = markovChain.draw(RandomNumberGenerator())
+
+        # tests switching models works
+        problem.model = Gaussian()
+        problem.model = Uniform()
 

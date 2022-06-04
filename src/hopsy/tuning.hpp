@@ -242,6 +242,8 @@ namespace hopsy {
                     py::arg("smoothing_length") = .5,
                     py::arg("random_seed") = 0,
                     py::arg("record_data") = false)
+          .def_readonly("n_converged", &ThompsonSampling::posteriorUpdateIterationsNeeded, 
+				    doc::ThompsonSampling::posteriorUpdateIterationsNeeded)
           .def_readwrite("n_posterior_updates", &ThompsonSampling::posteriorUpdateIterations, 
 				    doc::ThompsonSampling::posteriorUpdateIterations)
           .def_readwrite("n_pure_sampling", &ThompsonSampling::pureSamplingIterations, 
@@ -250,9 +252,9 @@ namespace hopsy {
 					doc::ThompsonSampling::iterationsForConvergence)
           .def_readwrite("grid_size", &ThompsonSampling::stepSizeGridSize, 
 					doc::ThompsonSampling::stepSizeGridSize)
-          .def_readwrite("grid_lower_bound", &ThompsonSampling::stepSizeLowerBound, 
+          .def_readwrite("lower_bound", &ThompsonSampling::stepSizeLowerBound, 
 					doc::ThompsonSampling::stepSizeLowerBound)
-          .def_readwrite("grid_upper_bound", &ThompsonSampling::stepSizeUpperBound, 
+          .def_readwrite("upper_bound", &ThompsonSampling::stepSizeUpperBound, 
 					doc::ThompsonSampling::stepSizeUpperBound)
           .def_readwrite("smoothing_length", &ThompsonSampling::smoothingLength, 
 					doc::ThompsonSampling::smoothingLength)

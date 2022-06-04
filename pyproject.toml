@@ -6,3 +6,8 @@ requires = [
     "cmake>=3.12",
 ]
 build-backend = "setuptools.build_meta"
+
+[tool.cibuildwheel]
+build = ["*macosx_x86_64", "*manylinux_x86_64", "*_amd64"]
+skip = ["pp*", "cp36-*", "cp37-*"] # no PyPy, no 3.6 and 3.7
+
