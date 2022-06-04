@@ -99,6 +99,9 @@ plt.scatter(states[:,:,0].flatten(), states[:,:,1].flatten())
 plt.show()
 ```
 
+<img src="docs/_static/gaussscatter.png" alt="HOPSY Logo" width="300"/>
+
+
 [`cibuildwheel`]:          https://cibuildwheel.readthedocs.io
 [FAQ]: http://pybind11.rtfd.io/en/latest/faq.html#working-with-ancient-visual-studio-2009-builds-on-windows
 [vs2015_runtime]: https://www.microsoft.com/en-us/download/details.aspx?id=48145
