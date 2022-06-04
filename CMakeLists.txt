@@ -24,8 +24,8 @@ set(HOPS_BINARIES OFF)
 set(HOPS_EXAMPLES OFF)
 set(HOPS_TESTS OFF)
 set(HOPS_OPENMP OFF)
-set(HOPS_NO_INSTALL ON)
 set(HOPS_DNEST4_SUPPORT OFF)
+set(HOPS_NO_INSTALL ON)
 set(EVENT__DISABLE_TESTS ON)
 set(EIGEN3_INCLUDE_DIR "../../extern/eigen3")
 add_subdirectory(extern/hops)
@@ -60,6 +60,9 @@ target_include_directories(core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_
 target_include_directories(core PUBLIC ${HOPS_INCLUDE_DIR})
 
 target_link_libraries(core PRIVATE hops)
+if (NOT WIN32)
+    target_link_libraries(core PRIVATE stdc++fs)
+endif ()
 
 target_compile_definitions(core PRIVATE BUILD_INFO=${HOPSY_BUILD_INFO} VERSION_INFO=${HOPSY_VERSION_INFO})
 

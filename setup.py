@@ -101,8 +101,6 @@ class CMakeBuild(build_ext):
                 ]
                 build_args += ['--config', cfg]
 
-            # Use clang because MSVC is bad
-            cmake_args += ["-T ClangCL"]
 
         # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
         # across all generators.
@@ -115,6 +113,11 @@ class CMakeBuild(build_ext):
 
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
+
+        
+        if os.name == 'nt': # os.name == nt is True for windows only
+            # Use clang because MSVC is bad
+            cmake_args += ["-T ClangCL"]
 
 
         subprocess.check_call(
