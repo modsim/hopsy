@@ -6,7 +6,7 @@
 A python interface for HOPS - the **H**ighly **O**ptimized toolbox for **P**olytope **S**ampling.
 Built using `pybind11`
 
-<img src="docs/hopsy.png" alt="HOPSY Logo" width="300"/>
+<img src="docs/_static/hopsy.png" alt="HOPSY Logo" width="300"/>
 
 **hopsy** is a Python package for Markov chain Monte Carlo sampling on convex polytopes
  
