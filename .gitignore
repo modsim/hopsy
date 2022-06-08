@@ -1,6 +1,9 @@
+.idea
 build/
 dist/
+wheelhouse/
 _build/
+docs/generated
 _generate/
 *.so
 *.py[cod]
@@ -10,3 +13,5 @@ _generate/
 ssh
 .clangd
 compile_commands.json
+.ipynb_checkpoints
+.commit

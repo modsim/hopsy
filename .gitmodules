@@ -4,7 +4,7 @@
 	branch = stable
 [submodule "extern/hops"]
 	path = extern/hops
-	url = git@jugit.fz-juelich.de:fluxomics/hops.git
+	url = ../hops.git
 [submodule "extern/eigen3"]
 	path = extern/eigen3
 	url = https://gitlab.com/libeigen/eigen.git
