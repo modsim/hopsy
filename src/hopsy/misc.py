@@ -245,7 +245,6 @@ def _sample(markov_chain: _c.MarkovChain,
             rng: _c.RandomNumberGenerator,
             n_samples: int,
             thinning: int,
-            *,
             record_meta = None):
     states = []
     meta = [] if record_meta is None or record_meta is False else {field: [] for field in record_meta}
@@ -296,7 +295,6 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
            n_samples: int,
            thinning: int = 1,
            n_threads: int = 1,
-           *,
            record_meta = None):
     r"""sample(markov_chains, rngs, n_samples, thinning=1, n_threads=1)
 
