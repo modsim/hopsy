@@ -244,21 +244,58 @@ def transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
 def _sample(markov_chain: _c.MarkovChain,
             rng: _c.RandomNumberGenerator,
             n_samples: int,
-            thinning: int):
-    accrates, states = [], []
+            thinning: int,
+            record_meta = None):
+    states = []
+    meta = [] if record_meta is None or record_meta is False else {field: [] for field in record_meta}
+
+    missing_fields = []
+
     for i in range(n_samples):
         accrate, state = markov_chain.draw(rng, thinning)
-        accrates.append(accrate)
+
+        if record_meta is None or record_meta is False:
+            meta.append(accrate)
+        else:
+            for field in record_meta:
+                if field in missing_fields: continue
+
+                if field == "acceptance_rate": # treat acceptance rate differently,
+                                               # as it is no attribute of the markov chain
+                    meta[field].append(accrate)
+                else:
+                    # recurse through the attribute name and record the final value
+                    attrs = field.split('.')
+                    base = markov_chain
+
+                    found = True
+
+                    for attr in attrs:
+                        if hasattr(base, attr):
+                            base = getattr(base, attr)
+                        else:
+                            found = False
+
+                    if found:
+                        meta[field].append(base)
+                    else:
+                        missing_fields.append(field)
+                        meta[field] = None
+
         states.append(state)
 
-    return _s.numpy.mean(accrates), _s.numpy.array(states)
+    if record_meta is None or record_meta is False:
+        meta = _s.numpy.mean(meta)
+
+    return meta, _s.numpy.array(states)
 
 
 def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.MarkovChain]],
            rngs: _s.typing.Union[_c.RandomNumberGenerator, _s.typing.List[_c.RandomNumberGenerator]],
            n_samples: int,
            thinning: int = 1,
-           n_threads: int = 1):
+           n_threads: int = 1,
+           record_meta = None):
     r"""sample(markov_chains, rngs, n_samples, thinning=1, n_threads=1)
 
     Draw ``n_samples`` from every passed chain in ``markov_chains`` 
@@ -283,9 +320,19 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
         Number of parallel threads to use.
         Parallelization is achieved using ``multiprocessing``.
         The worker pool size will be ``min(n_threads, len(markov_chains))``
+    record_meta : list[str] or bool
+        Strings defining :class:`hopsy.MarkovChain` attributes or ``acceptance_rate``, which will
+        then be recorded and returned. All attributes of :class:`hopsy.MarkovChain` can be used here,
+        e.g. ``record_meta=['state_negative_log_likelihood', 'proposal.proposal']``.
 
     Returns
     -------
+    list or dict
+        Meta information about the states. Without using ``record_meta``,
+        this is a list containing the acceptance rates of each chain. 
+        If ``record_meta`` is used, then this is a dict containing the values of the :class:`hopsy.MarkovChain` 
+        attributes defined in ``record_meta``.
+        If the attribute was not found (e.g. because of a typo), then it will have value ``None``.
     numpy.ndarray
         The produced states. Will have shape ``(n_chains, n_draws, dim)``. For single chains, it will
         thus be ``(1, n_draws, dim)``.
@@ -304,28 +351,46 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
         markov_chains = [markov_chains]
         rngs = [rngs]
 
+    result = []
+
+
     if n_threads != 1:
         if n_threads < 0:
-            n_threads = min(len(markov_chains), _s.multiprocessing.cpu_count())
+            n_threads = min(len(markov_chains), _s.multiprocessing.cpu_count()) # do not use more threads than available cpus
 
         with _s.multiprocessing.Pool(n_threads) as workers:
-            result = workers.starmap(_sample, [(markov_chains[i], rngs[i], n_samples, thinning) for i in range(len(markov_chains))])
-
-            accrates, states = [], []
-            for accrate, state in result:
-                accrates.append(accrate)
-                states.append(state)
-
-        return accrates, _s.numpy.array(states)
+            result = workers.starmap(_sample, [(markov_chains[i], rngs[i], n_samples, thinning, record_meta) for i in range(len(markov_chains))])
     else:
-        accrates, states = [], []
         for i in range(len(markov_chains)):
-            _accrates, _states = _sample(markov_chains[i], rngs[i], n_samples, thinning)
-            accrates.append(_accrates)
-            states.append(_states)
+            _accrates, _states = _sample(markov_chains[i], rngs[i], n_samples, thinning, record_meta)
+            result.append((_accrates, _states))
 
-        return accrates, _s.numpy.array(states)
 
+    states = []
+    meta = [] if record_meta is None or record_meta is False else {field: [] for field in record_meta}
+
+    for _meta, _states in result:
+        states.append(_states)
+        
+        if record_meta is None or record_meta is False:
+            meta.append(_meta)
+        else:
+            for field in meta:
+                meta[field].append(_meta[field])
+
+    if record_meta is not None and record_meta is not False:
+        for field in meta:
+            all_none = True
+            for val in meta[field]:
+                if val is not None:
+                    all_none = False
+
+            if all_none:
+                meta[field] = None
+            else:
+                meta[field] = _s.numpy.array(meta[field])
+
+    return meta, _s.numpy.array(states)
 
 def _is_constant_chains(data: _s.numpy.typing.ArrayLike):
     data = _s.numpy.array(data)

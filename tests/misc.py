@@ -109,3 +109,35 @@ class MiscTests(unittest.TestCase):
         neff = ess(states, series=100, relative=True)
         self.assertListEqual([rel_ess]*5, neff[0].tolist())
 
+
+    def test_recording_meta_data(self):
+        problem = Problem([[1, 0], [0, 1], [-1, 0], [0, -1]], [5, 5, 0, 0], Gaussian(dim=2))
+        mcs = [MarkovChain(problem, proposal=GaussianHitAndRunProposal, starting_point=[.5, .5]) for i in range(2)]
+        rngs = [RandomNumberGenerator(42, i) for i in range(2)]
+
+        record_meta=['state_negative_log_likelihood', 'proposal.proposal']
+        meta, states = sample(mcs, rngs, n_samples = 100, record_meta = record_meta)
+        self.assertTrue(len(meta) == len(record_meta))
+        self.assertTrue(meta['proposal.proposal'].shape == (2, 100, 2))
+
+        record_meta=['state_negative_log_likelihood', 'proposal.proposal']
+        meta, states = sample(mcs, rngs, n_samples = 100, n_threads = 2, record_meta = record_meta)
+        self.assertTrue(len(meta) == len(record_meta))
+        self.assertTrue(meta['proposal.proposal'].shape == (2, 100, 2))
+
+        record_meta=['acceptance_rate']
+        meta, states = sample(mcs, rngs, n_samples = 100, record_meta = record_meta)
+        self.assertTrue(len(meta) == len(record_meta))
+
+        record_meta=['foo'] # obviously not an attribute
+        meta, states = sample(mcs, rngs, n_samples = 100, record_meta = record_meta)
+        self.assertTrue(len(meta) == len(record_meta))
+        self.assertTrue(meta['foo'] is None)
+
+        record_meta=False
+        meta, states = sample(mcs, rngs, n_samples = 100, record_meta = record_meta)
+        self.assertTrue(len(meta) == 2) # just usual acceptance rates
+        self.assertTrue(type(meta) is list) # just usual acceptance rates
+
+
+
