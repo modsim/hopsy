@@ -1,0 +1,1058 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Reference &#8212; hopsy 1.0.0b1 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="shortcut icon" href="_static/hopsy.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="hopsy.Proposal" href="generated/hopsy.Proposal.html" />
+    <link rel="prev" title="Constrained Sampling" href="notebooks/ConstrainedSampling.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="index.html">
+  <img src="_static/hopsy.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="firststeps.html">
+  First Steps
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="userguide.html">
+  User Guide
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="examples.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="current reference internal nav-link" href="#">
+  Reference
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+  
+    
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Models
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.Model.html">
+   hopsy.Model
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.Model.compute_expected_fisher_information.html">
+     hopsy.Model.compute_expected_fisher_information
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.Model.compute_log_likelihood_gradient.html">
+     hopsy.Model.compute_log_likelihood_gradient
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.Model.compute_negative_log_likelihood.html">
+     hopsy.Model.compute_negative_log_likelihood
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.Gaussian.html">
+   hopsy.Gaussian
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.Gaussian.compute_expected_fisher_information.html">
+     hopsy.Gaussian.compute_expected_fisher_information
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.Gaussian.compute_log_likelihood_gradient.html">
+     hopsy.Gaussian.compute_log_likelihood_gradient
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.Gaussian.compute_negative_log_likelihood.html">
+     hopsy.Gaussian.compute_negative_log_likelihood
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.Mixture.html">
+   hopsy.Mixture
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.Mixture.compute_expected_fisher_information.html">
+     hopsy.Mixture.compute_expected_fisher_information
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.Mixture.compute_log_likelihood_gradient.html">
+     hopsy.Mixture.compute_log_likelihood_gradient
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.Mixture.compute_negative_log_likelihood.html">
+     hopsy.Mixture.compute_negative_log_likelihood
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.PyModel.html">
+   hopsy.PyModel
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.PyModel.compute_expected_fisher_information.html">
+     hopsy.PyModel.compute_expected_fisher_information
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.PyModel.compute_log_likelihood_gradient.html">
+     hopsy.PyModel.compute_log_likelihood_gradient
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.PyModel.compute_negative_log_likelihood.html">
+     hopsy.PyModel.compute_negative_log_likelihood
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.Rosenbrock.html">
+   hopsy.Rosenbrock
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.Rosenbrock.compute_expected_fisher_information.html">
+     hopsy.Rosenbrock.compute_expected_fisher_information
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.Rosenbrock.compute_log_likelihood_gradient.html">
+     hopsy.Rosenbrock.compute_log_likelihood_gradient
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.Rosenbrock.compute_negative_log_likelihood.html">
+     hopsy.Rosenbrock.compute_negative_log_likelihood
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Problem
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hopsy.Problem.html">
+   hopsy.Problem
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hopsy.add_box_constraints.html">
+   hopsy.add_box_constraints
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hopsy.compute_chebyshev_center.html">
+   hopsy.compute_chebyshev_center
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hopsy.round.html">
+   hopsy.round
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Proposals
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.Proposal.html">
+   hopsy.Proposal
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.Proposal.accept_proposal.html">
+     hopsy.Proposal.accept_proposal
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.Proposal.deepcopy.html">
+     hopsy.Proposal.deepcopy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.Proposal.propose.html">
+     hopsy.Proposal.propose
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.AdaptiveMetropolisProposal.html">
+   hopsy.AdaptiveMetropolisProposal
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.AdaptiveMetropolisProposal.accept_proposal.html">
+     hopsy.AdaptiveMetropolisProposal.accept_proposal
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.AdaptiveMetropolisProposal.deepcopy.html">
+     hopsy.AdaptiveMetropolisProposal.deepcopy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.AdaptiveMetropolisProposal.propose.html">
+     hopsy.AdaptiveMetropolisProposal.propose
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.BallWalkProposal.html">
+   hopsy.BallWalkProposal
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.BallWalkProposal.accept_proposal.html">
+     hopsy.BallWalkProposal.accept_proposal
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.BallWalkProposal.deepcopy.html">
+     hopsy.BallWalkProposal.deepcopy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.BallWalkProposal.propose.html">
+     hopsy.BallWalkProposal.propose
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.CSmMALAProposal.html">
+   hopsy.CSmMALAProposal
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.CSmMALAProposal.accept_proposal.html">
+     hopsy.CSmMALAProposal.accept_proposal
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.CSmMALAProposal.deepcopy.html">
+     hopsy.CSmMALAProposal.deepcopy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.CSmMALAProposal.propose.html">
+     hopsy.CSmMALAProposal.propose
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.DikinWalkProposal.html">
+   hopsy.DikinWalkProposal
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.DikinWalkProposal.accept_proposal.html">
+     hopsy.DikinWalkProposal.accept_proposal
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.DikinWalkProposal.deepcopy.html">
+     hopsy.DikinWalkProposal.deepcopy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.DikinWalkProposal.propose.html">
+     hopsy.DikinWalkProposal.propose
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.GaussianCoordinateHitAndRunProposal.html">
+   hopsy.GaussianCoordinateHitAndRunProposal
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+  <label for="toctree-checkbox-11">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.GaussianCoordinateHitAndRunProposal.accept_proposal.html">
+     hopsy.GaussianCoordinateHitAndRunProposal.accept_proposal
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.GaussianCoordinateHitAndRunProposal.deepcopy.html">
+     hopsy.GaussianCoordinateHitAndRunProposal.deepcopy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.GaussianCoordinateHitAndRunProposal.propose.html">
+     hopsy.GaussianCoordinateHitAndRunProposal.propose
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.GaussianHitAndRunProposal.html">
+   hopsy.GaussianHitAndRunProposal
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+  <label for="toctree-checkbox-12">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.GaussianHitAndRunProposal.accept_proposal.html">
+     hopsy.GaussianHitAndRunProposal.accept_proposal
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.GaussianHitAndRunProposal.deepcopy.html">
+     hopsy.GaussianHitAndRunProposal.deepcopy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.GaussianHitAndRunProposal.propose.html">
+     hopsy.GaussianHitAndRunProposal.propose
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.GaussianProposal.html">
+   hopsy.GaussianProposal
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
+  <label for="toctree-checkbox-13">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.GaussianProposal.accept_proposal.html">
+     hopsy.GaussianProposal.accept_proposal
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.GaussianProposal.deepcopy.html">
+     hopsy.GaussianProposal.deepcopy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.GaussianProposal.propose.html">
+     hopsy.GaussianProposal.propose
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.PyProposal.html">
+   hopsy.PyProposal
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/>
+  <label for="toctree-checkbox-14">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.PyProposal.accept_proposal.html">
+     hopsy.PyProposal.accept_proposal
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.PyProposal.deepcopy.html">
+     hopsy.PyProposal.deepcopy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.PyProposal.propose.html">
+     hopsy.PyProposal.propose
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.UniformCoordinateHitAndRunProposal.html">
+   hopsy.UniformCoordinateHitAndRunProposal
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/>
+  <label for="toctree-checkbox-15">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.UniformCoordinateHitAndRunProposal.accept_proposal.html">
+     hopsy.UniformCoordinateHitAndRunProposal.accept_proposal
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.UniformCoordinateHitAndRunProposal.deepcopy.html">
+     hopsy.UniformCoordinateHitAndRunProposal.deepcopy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.UniformCoordinateHitAndRunProposal.propose.html">
+     hopsy.UniformCoordinateHitAndRunProposal.propose
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.UniformHitAndRunProposal.html">
+   hopsy.UniformHitAndRunProposal
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/>
+  <label for="toctree-checkbox-16">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.UniformHitAndRunProposal.accept_proposal.html">
+     hopsy.UniformHitAndRunProposal.accept_proposal
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.UniformHitAndRunProposal.deepcopy.html">
+     hopsy.UniformHitAndRunProposal.deepcopy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.UniformHitAndRunProposal.propose.html">
+     hopsy.UniformHitAndRunProposal.propose
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Random
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.RandomNumberGenerator.html">
+   hopsy.RandomNumberGenerator
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/>
+  <label for="toctree-checkbox-17">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.RandomNumberGenerator.__call__.html">
+     hopsy.RandomNumberGenerator.__call__
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.Uniform.html">
+   hopsy.Uniform
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/>
+  <label for="toctree-checkbox-18">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.Uniform.__call__.html">
+     hopsy.Uniform.__call__
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="generated/hopsy.Normal.html">
+   hopsy.Normal
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/>
+  <label for="toctree-checkbox-19">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="generated/objname/hopsy.Normal.__call__.html">
+     hopsy.Normal.__call__
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Markov Chain
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hopsy.MarkovChain.html">
+   hopsy.MarkovChain
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hopsy.sample.html">
+   hopsy.sample
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Tuning
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hopsy.tune.html">
+   hopsy.tune
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hopsy.ThompsonSamplingTuning.html">
+   hopsy.ThompsonSamplingTuning
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hopsy.TuningTarget.html">
+   hopsy.TuningTarget
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hopsy.AcceptanceRateTarget.html">
+   hopsy.AcceptanceRateTarget
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hopsy.ExpectedSquaredJumpDistanceTarget.html">
+   hopsy.ExpectedSquaredJumpDistanceTarget
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hopsy.PyTuningTarget.html">
+   hopsy.PyTuningTarget
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Diagnostics
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hopsy.ess.html">
+   hopsy.ess
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hopsy.mcse.html">
+   hopsy.mcse
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="generated/hopsy.rhat.html">
+   hopsy.rhat
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+  
+
+
+          
+  
+    
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#models">
+   Models
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#problem">
+   Problem
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#proposals">
+   Proposals
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#random">
+   Random
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#markov-chain">
+   Markov Chain
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#tuning">
+   Tuning
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#diagnostics">
+   Diagnostics
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+  
+
+
+          
+  
+    
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <section id="reference">
+<h1>Reference<a class="headerlink" href="#reference" title="Permalink to this headline"></a></h1>
+<section id="models">
+<h2>Models<a class="headerlink" href="#models" title="Permalink to this headline"></a></h2>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Model.html#hopsy.Model" title="hopsy.Model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Model</span></code></a></p></td>
+<td><p>Base model class.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.Gaussian.html#hopsy.Gaussian" title="hopsy.Gaussian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Gaussian</span></code></a>(self[, mean, covariance, ...])</p></td>
+<td><p>Gaussian model which can be invariant in some dimensions of the input vector.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Mixture.html#hopsy.Mixture" title="hopsy.Mixture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Mixture</span></code></a>(self, components[, weights])</p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">Mixture</span></code> is a weighted sum of <span class="math notranslate nohighlight">\(n\)</span> components, so its unnormalized density is given as</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.PyModel.html#hopsy.PyModel" title="hopsy.PyModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.PyModel</span></code></a></p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">PyModel</span></code> class allows you to interface arbitrary models implemented in Python to work correctly with hops, given that the <code class="docutils literal notranslate"><span class="pre">model</span></code> object you pass implements the required functions:</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Rosenbrock.html#hopsy.Rosenbrock" title="hopsy.Rosenbrock"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Rosenbrock</span></code></a></p></td>
+<td><p>A multi-dimensional Rosenbrock function in <span class="math notranslate nohighlight">\(2n\)</span> dimensions.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="problem">
+<h2>Problem<a class="headerlink" href="#problem" title="Permalink to this headline"></a></h2>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Problem.html#hopsy.Problem" title="hopsy.Problem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Problem</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.add_box_constraints.html#hopsy.add_box_constraints" title="hopsy.add_box_constraints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.add_box_constraints</span></code></a>(problem, ...[, ...])</p></td>
+<td><p>Adds box constraints to all dimensions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.compute_chebyshev_center.html#hopsy.compute_chebyshev_center" title="hopsy.compute_chebyshev_center"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.compute_chebyshev_center</span></code></a>(problem)</p></td>
+<td><p>Computes the Chebyshev center, that is the midpoint of a (non-unique) largest inscribed ball in the polytope defined by <span class="math notranslate nohighlight">\(Ax \leq b\)</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.round.html#hopsy.round" title="hopsy.round"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.round</span></code></a>(problem)</p></td>
+<td><p>Rounds the polytope defined by the inequality <span class="math notranslate nohighlight">\(Ax \leq b\)</span> using <a class="reference external" href="https://pypi.org/project/PolyRound/">PolyRound</a>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="proposals">
+<h2>Proposals<a class="headerlink" href="#proposals" title="Permalink to this headline"></a></h2>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Proposal.html#hopsy.Proposal" title="hopsy.Proposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Proposal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.AdaptiveMetropolisProposal.html#hopsy.AdaptiveMetropolisProposal" title="hopsy.AdaptiveMetropolisProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.AdaptiveMetropolisProposal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.BallWalkProposal.html#hopsy.BallWalkProposal" title="hopsy.BallWalkProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.BallWalkProposal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.CSmMALAProposal.html#hopsy.CSmMALAProposal" title="hopsy.CSmMALAProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.CSmMALAProposal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.DikinWalkProposal.html#hopsy.DikinWalkProposal" title="hopsy.DikinWalkProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.DikinWalkProposal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.GaussianCoordinateHitAndRunProposal.html#hopsy.GaussianCoordinateHitAndRunProposal" title="hopsy.GaussianCoordinateHitAndRunProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.GaussianCoordinateHitAndRunProposal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.GaussianHitAndRunProposal.html#hopsy.GaussianHitAndRunProposal" title="hopsy.GaussianHitAndRunProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.GaussianHitAndRunProposal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.GaussianProposal.html#hopsy.GaussianProposal" title="hopsy.GaussianProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.GaussianProposal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.PyProposal.html#hopsy.PyProposal" title="hopsy.PyProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.PyProposal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.UniformCoordinateHitAndRunProposal.html#hopsy.UniformCoordinateHitAndRunProposal" title="hopsy.UniformCoordinateHitAndRunProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.UniformCoordinateHitAndRunProposal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.UniformHitAndRunProposal.html#hopsy.UniformHitAndRunProposal" title="hopsy.UniformHitAndRunProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.UniformHitAndRunProposal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="random">
+<h2>Random<a class="headerlink" href="#random" title="Permalink to this headline"></a></h2>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.RandomNumberGenerator.html#hopsy.RandomNumberGenerator" title="hopsy.RandomNumberGenerator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.RandomNumberGenerator</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.Uniform.html#hopsy.Uniform" title="hopsy.Uniform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Uniform</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Normal.html#hopsy.Normal" title="hopsy.Normal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Normal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="markov-chain">
+<h2>Markov Chain<a class="headerlink" href="#markov-chain" title="Permalink to this headline"></a></h2>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.MarkovChain.html#hopsy.MarkovChain" title="hopsy.MarkovChain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.MarkovChain</span></code></a>(problem[, proposal, ...])</p></td>
+<td><p>Given a hopsy.Problem a MarkovChain object can be constructed.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.sample.html#hopsy.sample" title="hopsy.sample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.sample</span></code></a>(markov_chains, rngs, n_samples)</p></td>
+<td><p>Draw <code class="docutils literal notranslate"><span class="pre">n_samples</span></code> from every passed chain in <code class="docutils literal notranslate"><span class="pre">markov_chains</span></code> using the respective random number generator from <code class="docutils literal notranslate"><span class="pre">rngs</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="tuning">
+<h2>Tuning<a class="headerlink" href="#tuning" title="Permalink to this headline"></a></h2>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.tune.html#hopsy.tune" title="hopsy.tune"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.tune</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.ThompsonSamplingTuning.html#hopsy.ThompsonSamplingTuning" title="hopsy.ThompsonSamplingTuning"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.ThompsonSamplingTuning</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.TuningTarget.html#hopsy.TuningTarget" title="hopsy.TuningTarget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.TuningTarget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.AcceptanceRateTarget.html#hopsy.AcceptanceRateTarget" title="hopsy.AcceptanceRateTarget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.AcceptanceRateTarget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.ExpectedSquaredJumpDistanceTarget.html#hopsy.ExpectedSquaredJumpDistanceTarget" title="hopsy.ExpectedSquaredJumpDistanceTarget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.ExpectedSquaredJumpDistanceTarget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.PyTuningTarget.html#hopsy.PyTuningTarget" title="hopsy.PyTuningTarget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.PyTuningTarget</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="diagnostics">
+<h2>Diagnostics<a class="headerlink" href="#diagnostics" title="Permalink to this headline"></a></h2>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.ess.html#hopsy.ess" title="hopsy.ess"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.ess</span></code></a>(data[, series, method, relative, ...])</p></td>
+<td><p>Calculate estimate of the effective sample size (ess).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.mcse.html#hopsy.mcse" title="hopsy.mcse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.mcse</span></code></a>(data[, series, method, prob, ...])</p></td>
+<td><p>Calculate Markov Chain Standard Error statistic.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.rhat.html#hopsy.rhat" title="hopsy.rhat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.rhat</span></code></a>(data[, series, method, dask_kwargs])</p></td>
+<td><p>Compute estimate of rank normalized splitR-hat for a set of traces.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="notebooks/ConstrainedSampling.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Constrained Sampling</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="generated/hopsy.Proposal.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">hopsy.Proposal</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+  
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2021-2022, Forschungszentrum Jülich GmbH, authors: Richard D. Paul, Johann F. Jadebeck, Katharina Nöh.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

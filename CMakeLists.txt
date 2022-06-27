@@ -24,6 +24,7 @@ set(HOPS_BINARIES OFF)
 set(HOPS_EXAMPLES OFF)
 set(HOPS_TESTS OFF)
 set(HOPS_OPENMP OFF)
+set(HOPS_DNEST4_SUPPORT OFF)
 set(HOPS_NO_INSTALL ON)
 set(EVENT__DISABLE_TESTS ON)
 set(EIGEN3_INCLUDE_DIR "../../extern/eigen3")
@@ -32,8 +33,6 @@ add_subdirectory(extern/hops)
 if (CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -Wall")
 endif ()
-
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHOPS_HEADER_ONLY")
 
 set(EIGEN3_INCLUDE_DIR "extern/eigen3")
 set(HOPS_INCLUDE_DIR "extern/hops/include/hops")
@@ -61,9 +60,8 @@ target_include_directories(core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_
 target_include_directories(core PUBLIC ${HOPS_INCLUDE_DIR})
 
 target_link_libraries(core PRIVATE hops)
-if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
+if (NOT WIN32)
     target_link_libraries(core PRIVATE stdc++fs)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 endif ()
 
 target_compile_definitions(core PRIVATE BUILD_INFO=${HOPSY_BUILD_INFO} VERSION_INFO=${HOPSY_VERSION_INFO})
