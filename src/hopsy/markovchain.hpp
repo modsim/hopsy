@@ -217,7 +217,7 @@ namespace hopsy {
 
             } else if (!model && transformation) {
                 auto name = proposal->getProposalName();
-                if (symmetricProposals.find(name) != symmetricProposals.end()) {
+                if (proposal->isSymmetric()) {
                     auto tmp = hops::MarkovChainAdapter(
                             hops::NoOpDrawAdapter(
                                     hops::StateTransformation(
@@ -246,7 +246,7 @@ namespace hopsy {
             } else {
                 // Case: no model and no transformation
                 auto name = proposal->getProposalName();
-                if (symmetricProposals.find(name) != symmetricProposals.end()) {
+                if (proposal->isSymmetric()) {
                     auto tmp = hops::MarkovChainAdapter(
                             hops::NoOpDrawAdapter(
                                     hopsy::ProposalWrapper(proposal)
@@ -268,8 +268,6 @@ namespace hopsy {
                 }
             }
         }
-
-        const static inline std::set<std::string> symmetricProposals{"CoordinateHitAndRun", "HitAndRun"};
     };
 } // namespace hopsy
 
