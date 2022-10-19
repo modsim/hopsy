@@ -164,9 +164,7 @@ class ProposalTests(unittest.TestCase):
         problem = Problem(np.array([1, -1]), 100 * np.ones(2), model)
 
         for ProposalType in ProposalTypes:
-            if ProposalType in [AdaptiveMetropolisProposal, # TODO fix for this proposal
-                                BilliardAdaptiveMetropolisProposal, # Todo fix for this proposal
-                                UniformCoordinateHitAndRunProposal,
+            if ProposalType in [UniformCoordinateHitAndRunProposal,
                                 UniformHitAndRunProposal]:
                 with self.assertRaises(RuntimeError):
                     proposal = ProposalType(problem)
@@ -176,7 +174,8 @@ class ProposalTests(unittest.TestCase):
                 mc = MarkovChain(problem, ProposalType, [0.])
                 rng = RandomNumberGenerator(seed=42)
 
-                num_samples = 50_000
+                num_samples = 150_000 if ProposalType == AdaptiveMetropolisProposal else 25_000
+
                 _, samples = sample(mc, rng, num_samples)
 
                 # checks sample mean is close to real mean of 0

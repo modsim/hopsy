@@ -640,7 +640,7 @@ const char* hopsy::doc::Proposal::setParameter = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::Proposal::hasStepSize = R"pbdoc(
+const char* hopsy::doc::Proposal::getStepSize = R"pbdoc(
 )pbdoc";
 
 
@@ -701,7 +701,7 @@ const char* hopsy::doc::AdaptiveMetropolisProposal::setParameter = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::AdaptiveMetropolisProposal::hasStepSize = R"pbdoc(
+const char* hopsy::doc::AdaptiveMetropolisProposal::getStepSize = R"pbdoc(
 )pbdoc";
 
 
@@ -730,10 +730,6 @@ const char* hopsy::doc::AdaptiveMetropolisProposal::boundaryCushion = R"pbdoc(
 
 
 const char* hopsy::doc::AdaptiveMetropolisProposal::epsilon = R"pbdoc(
-)pbdoc";
-
-
-const char* hopsy::doc::AdaptiveMetropolisProposal::stepSize = R"pbdoc(
 )pbdoc";
 
 
@@ -777,7 +773,7 @@ const char* hopsy::doc::BilliardAdaptiveMetropolisProposal::setParameter = R"pbd
 )pbdoc";
 
 
-const char* hopsy::doc::BilliardAdaptiveMetropolisProposal::hasStepSize = R"pbdoc(
+const char* hopsy::doc::BilliardAdaptiveMetropolisProposal::getStepSize = R"pbdoc(
 )pbdoc";
 
 
@@ -853,7 +849,7 @@ const char* hopsy::doc::BallWalkProposal::getParameter = R"pbdoc(
 const char* hopsy::doc::BallWalkProposal::setParameter = R"pbdoc(
 )pbdoc";
 
-const char* hopsy::doc::BallWalkProposal::hasStepSize = R"pbdoc(
+const char* hopsy::doc::BallWalkProposal::getStepSize = R"pbdoc(
 )pbdoc";
 
 
@@ -917,7 +913,7 @@ const char* hopsy::doc::BilliardMALAProposal::setParameter = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::BilliardMALAProposal::hasStepSize = R"pbdoc(
+const char* hopsy::doc::BilliardMALAProposal::getStepSize = R"pbdoc(
 )pbdoc";
 
 
@@ -984,7 +980,7 @@ const char* hopsy::doc::CSmMALAProposal::setParameter = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::CSmMALAProposal::hasStepSize = R"pbdoc(
+const char* hopsy::doc::CSmMALAProposal::getStepSize = R"pbdoc(
 )pbdoc";
 
 
@@ -1053,7 +1049,7 @@ const char* hopsy::doc::DikinWalkProposal::setParameter = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::DikinWalkProposal::hasStepSize = R"pbdoc(
+const char* hopsy::doc::DikinWalkProposal::getStepSize = R"pbdoc(
 )pbdoc";
 
 
@@ -1123,7 +1119,7 @@ const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::setParameter = R"pb
 )pbdoc";
 
 
-const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::hasStepSize = R"pbdoc(
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::getStepSize = R"pbdoc(
 )pbdoc";
 
 
@@ -1188,7 +1184,7 @@ const char* hopsy::doc::GaussianHitAndRunProposal::setParameter = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::GaussianHitAndRunProposal::hasStepSize = R"pbdoc(
+const char* hopsy::doc::GaussianHitAndRunProposal::getStepSize = R"pbdoc(
 )pbdoc";
 
 
@@ -1253,7 +1249,7 @@ const char* hopsy::doc::GaussianProposal::setParameter = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::GaussianProposal::hasStepSize = R"pbdoc(
+const char* hopsy::doc::GaussianProposal::getStepSize = R"pbdoc(
 )pbdoc";
 
 
@@ -1318,7 +1314,7 @@ const char* hopsy::doc::PyProposal::setParameter = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::PyProposal::hasStepSize = R"pbdoc(
+const char* hopsy::doc::PyProposal::getStepSize = R"pbdoc(
 )pbdoc";
 
 
@@ -1377,7 +1373,7 @@ const char* hopsy::doc::TruncatedGaussianProposal::setParameter = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::TruncatedGaussianProposal::hasStepSize = R"pbdoc(
+const char* hopsy::doc::TruncatedGaussianProposal::getStepSize = R"pbdoc(
 )pbdoc";
 
 
@@ -1437,7 +1433,7 @@ const char* hopsy::doc::UniformCoordinateHitAndRunProposal::setParameter = R"pbd
 )pbdoc";
 
 
-const char* hopsy::doc::UniformCoordinateHitAndRunProposal::hasStepSize = R"pbdoc(
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::getStepSize = R"pbdoc(
 )pbdoc";
 
 
@@ -1498,7 +1494,7 @@ const char* hopsy::doc::UniformHitAndRunProposal::setParameter = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::UniformHitAndRunProposal::hasStepSize = R"pbdoc(
+const char* hopsy::doc::UniformHitAndRunProposal::getStepSize = R"pbdoc(
 )pbdoc";
 
 

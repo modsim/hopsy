@@ -51,11 +51,6 @@ namespace hopsy {
             return markovChain->draw(randomNumberGenerator, thinning);
         }
 
-        std::tuple<double, VectorType, hops::ProposalStatistics>
-        detailedDraw(hops::RandomNumberGenerator &randomNumberGenerator, long thinning = 1) override {
-            return markovChain->detailedDraw(randomNumberGenerator, thinning);
-        }
-
         VectorType getState() const override {
             return markovChain->getState();
         }
@@ -77,16 +72,14 @@ namespace hopsy {
         }
 
         std::variant<std::shared_ptr<Proposal>, py::object> getProposal() {
-            if(proposal) {
+            if (proposal) {
                 std::shared_ptr<PyProposal> pyProposalPtr = std::dynamic_pointer_cast<PyProposal>(proposal);
-                if(pyProposalPtr) {
+                if (pyProposalPtr) {
                     return pyProposalPtr->pyObj;
-                }
-                else {
+                } else {
                     return proposal;
                 }
-            }
-            else {
+            } else {
                 return nullptr;
             }
         }
@@ -96,22 +89,21 @@ namespace hopsy {
             try {
                 proposalPtr = std::make_unique<hopsy::PyProposal>(std::get<py::object>(proposal));
             }
-            catch(std::bad_variant_access) {
-                proposalPtr = std::get<Proposal*>(proposal)->copyProposal();
+            catch (std::bad_variant_access) {
+                proposalPtr = std::get<Proposal *>(proposal)->copyProposal();
             }
             createMarkovChain(this, proposalPtr.get(), this->model, this->transformation);
         }
 
-        std::variant<py::object, Model *>getModel() const {
-            if(model) {
-                Model* modelPtr = model.get();
-                auto pyModelPtr = dynamic_cast<hopsy::PyModel*>(modelPtr);
-                if(pyModelPtr) {
+        std::variant<py::object, Model *> getModel() const {
+            if (model) {
+                Model *modelPtr = model.get();
+                auto pyModelPtr = dynamic_cast<hopsy::PyModel *>(modelPtr);
+                if (pyModelPtr) {
                     return pyModelPtr->pyObj;
                 }
                 return modelPtr;
-            }
-            else {
+            } else {
                 return nullptr;
             }
         }
@@ -127,7 +119,7 @@ namespace hopsy {
                 py::object object = std::get<py::object>(model);
                 modelPtr = std::make_shared<PyModel>(PyModel(object));
             }
-            catch(std::bad_variant_access) {
+            catch (std::bad_variant_access) {
                 modelPtr = std::get<std::shared_ptr<Model>>(model);
             }
             createMarkovChain(this, this->proposal.get(), modelPtr, this->transformation);
@@ -140,16 +132,16 @@ namespace hopsy {
         Problem getProblem() const {
             py::object handle = py::cast(proposal->copyProposal().get());
             if (transformation) {
-                return Problem(proposal->getA(), 
-                               proposal->getB(), 
-                               ( model ? model->copyModel() : std::unique_ptr<Model>(nullptr) ), 
+                return Problem(proposal->getA(),
+                               proposal->getB(),
+                               (model ? model->copyModel() : std::unique_ptr<Model>(nullptr)),
                                std::optional(proposal->getState()),
                                std::optional(transformation->getMatrix()),
                                std::optional(transformation->getShift()));
             } else {
-                return Problem(proposal->getA(), 
-                               proposal->getB(), 
-                               ( model ? model->copyModel() : std::unique_ptr<Model>(nullptr) ), 
+                return Problem(proposal->getA(),
+                               proposal->getB(),
+                               (model ? model->copyModel() : std::unique_ptr<Model>(nullptr)),
                                std::optional(proposal->getState()),
                                std::optional<MatrixType>(),
                                std::optional<VectorType>());
@@ -168,12 +160,14 @@ namespace hopsy {
                                              const Proposal *proposal,
                                              const std::shared_ptr<Model> model,
                                              const std::optional<LinearTransformation> &transformation) {
+            auto wrappedProposal = hopsy::ProposalWrapper(proposal);
+            mc->proposal = wrappedProposal.getProposalPtr();
             if (model && transformation) {
                 auto tmp = hops::MarkovChainAdapter(
                         hops::MetropolisHastingsFilter(
                                 hops::ModelMixin(
                                         hops::StateTransformation(
-                                                hopsy::ProposalWrapper(proposal),
+                                                wrappedProposal,
                                                 *transformation
                                         ),
                                         hopsy::ModelWrapper(model)
@@ -181,7 +175,6 @@ namespace hopsy {
                         )
                 );
 
-                mc->proposal = tmp.getProposalPtr();
                 mc->model = tmp.getModelPtr();
 
                 mc->markovChain = std::make_unique<decltype(tmp)>(tmp);
@@ -191,11 +184,10 @@ namespace hopsy {
                     // proposal knows model already
                     auto tmp = hops::MarkovChainAdapter(
                             hops::MetropolisHastingsFilter(
-                                    hopsy::ProposalWrapper(proposal)
+                                    wrappedProposal
                             )
                     );
 
-                    mc->proposal = tmp.getProposalPtr();
                     mc->model = model;
 
                     mc->markovChain = std::make_unique<decltype(tmp)>(tmp);
@@ -203,15 +195,13 @@ namespace hopsy {
                     auto tmp = hops::MarkovChainAdapter(
                             hops::MetropolisHastingsFilter(
                                     hops::ModelMixin(
-                                            hopsy::ProposalWrapper(proposal),
+                                            wrappedProposal,
                                             hopsy::ModelWrapper(model)
                                     )
                             )
                     );
 
-                    mc->proposal = tmp.getProposalPtr();
                     mc->model = tmp.getModelPtr();
-
                     mc->markovChain = std::make_unique<decltype(tmp)>(tmp);
                 }
 
@@ -221,25 +211,23 @@ namespace hopsy {
                     auto tmp = hops::MarkovChainAdapter(
                             hops::NoOpDrawAdapter(
                                     hops::StateTransformation(
-                                            hopsy::ProposalWrapper(proposal),
+                                            wrappedProposal,
                                             *transformation
                                     )
                             )
                     );
 
-                    mc->proposal = tmp.getProposalPtr();
                     mc->markovChain = std::make_unique<decltype(tmp)>(tmp);
                 } else {
                     auto tmp = hops::MarkovChainAdapter(
                             hops::MetropolisHastingsFilter(
                                     hops::StateTransformation(
-                                            hopsy::ProposalWrapper(proposal),
+                                            wrappedProposal,
                                             *transformation
                                     )
                             )
                     );
 
-                    mc->proposal = tmp.getProposalPtr();
                     mc->markovChain = std::make_unique<decltype(tmp)>(tmp);
                 }
 
@@ -249,7 +237,7 @@ namespace hopsy {
                 if (proposal->isSymmetric()) {
                     auto tmp = hops::MarkovChainAdapter(
                             hops::NoOpDrawAdapter(
-                                    hopsy::ProposalWrapper(proposal)
+                                    wrappedProposal
                             )
                     );
 
@@ -259,11 +247,10 @@ namespace hopsy {
                 } else {
                     auto tmp = hops::MarkovChainAdapter(
                             hops::MetropolisHastingsFilter(
-                                    hopsy::ProposalWrapper(proposal)
+                                    wrappedProposal
                             )
                     );
 
-                    mc->proposal = tmp.getProposalPtr();
                     mc->markovChain = std::make_unique<decltype(tmp)>(tmp);
                 }
             }
