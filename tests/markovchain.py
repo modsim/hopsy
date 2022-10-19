@@ -36,7 +36,7 @@ class MarkovChainTests(unittest.TestCase):
 
     def test_markovchain_pickling(self):
         problem = Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0], Gaussian(), starting_point=[0, 0])
-
+   
         for ProposalType in ProposalTypes:
             proposal = ProposalType(problem)
             mc = MarkovChain(problem, proposal)

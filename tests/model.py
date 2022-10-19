@@ -73,7 +73,11 @@ class ModelTests(unittest.TestCase):
 
             def __copy__(self):
                 return Uniform()
-    
+
+            def dimension_names(self):
+                # implementation could also return empty list theoretically, but then RJMCMC becomes less useful.
+                return ['x0', 'x1']
+
         model = Uniform()
         problem = Problem([[1, 1]], [1], model, starting_point=[0, 0])
         markovChain = MarkovChain(problem, GaussianProposal)
@@ -84,7 +88,7 @@ class ModelTests(unittest.TestCase):
         class Uniform:
             def compute_negative_log_likelihood(self, x):
                 return 0
-    
+
         model = Uniform()
         problem = Problem([[1, 1]], [1], model, starting_point=[0, 0])
         markovChain = MarkovChain(problem, GaussianProposal)
