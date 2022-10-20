@@ -24,29 +24,25 @@ namespace py = pybind11;
 
 namespace hopsy {
     namespace {
-      std::string stateToString(hops::RandomNumberGenerator::state_type state) {
-        std::string str;
-        do {
-            int digit = state % 10;
-            str = std::to_string(digit) + str;
-            state = (state - digit) / 10;
-        } while (state != 0);
-        return str;
-      }
+	std::vector<unsigned char> stateToBytes(hops::RandomNumberGenerator::state_type state) {
+	     int numberOfBytes = 16; // state is 128 bit
+	     std::vector<unsigned char> arrayOfByte(numberOfBytes);
+	     for(int i = 0; i < numberOfBytes; i++) {
+		 arrayOfByte[numberOfBytes - 1 - i] = static_cast<unsigned char>(state >> (i * 8));
+	     }
+	     return arrayOfByte;
+	}
 
-      hops::RandomNumberGenerator::state_type stringToState(std::string str) {
-        hops::RandomNumberGenerator::state_type state = 0;
-
-        int place = 0;
-        for(auto it = str.rbegin(); it!=str.rend(); it++) {
-          decltype(state) digit = std::stoi(std::string(1, *it))*std::pow(10, place);
-          state += digit;
-          place++;
-        }
-        return state;
-      }
+	hops::RandomNumberGenerator::state_type bytesToState(const std::vector<unsigned char>& bytes) {
+	     hops::RandomNumberGenerator::state_type state = 0;
+	     
+	     for(size_t i=0; i<bytes.size(); ++i) {
+		     state = static_cast<decltype(state)>(bytes[i]);
+		     state << i*8;
+	     }
+	     return state;
+	}
     }
-
     struct RandomNumberGenerator {
         unsigned int seed;
         unsigned int stream;
@@ -91,14 +87,14 @@ namespace hopsy {
             .def("__repr__", &RandomNumberGenerator::__repr__)
             .def(py::pickle([] (const RandomNumberGenerator& self) {
                         hops::RandomNumberGenerator rng(self.seed, self.stream);
-                        auto state = stateToString(self.rng - rng);
+                        auto state = stateToBytes(self.rng - rng);
                         return py::make_tuple(self.seed, self.stream, state);
                     },
                     [] (py::tuple t) {
                         if (t.size() != 3) throw std::runtime_error("Tried to build hopsy.RandomNumberGenerator with invalid state.");
 
                         RandomNumberGenerator rng(t[0].cast<unsigned int>(), t[1].cast<unsigned int>());
-                        rng.rng.advance(stringToState(t[2].cast<std::string>()));
+                        rng.rng.advance(bytesToState(t[2].cast<std::vector<unsigned char>>()));
                         return rng;
                     }))
         ;
