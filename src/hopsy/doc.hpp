@@ -119,7 +119,7 @@ namespace hopsy {
             static const char* state;
             static const char* getParameter;
             static const char* setParameter;
-            static const char* hasStepSize;
+            static const char* getStepSize;
             static const char* name;
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
@@ -143,7 +143,7 @@ namespace hopsy {
             static const char* state;
             static const char* getParameter;
             static const char* setParameter;
-            static const char* hasStepSize;
+            static const char* getStepSize;
             static const char* name;
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
@@ -152,7 +152,6 @@ namespace hopsy {
 
             static const char* boundaryCushion;
             static const char* epsilon;
-            static const char* stepSize;
             static const char* warmUp;
         };
 
@@ -167,7 +166,7 @@ namespace hopsy {
             static const char* state;
             static const char* getParameter;
             static const char* setParameter;
-            static const char* hasStepSize;
+            static const char* getStepSize;
             static const char* name;
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
@@ -188,7 +187,7 @@ namespace hopsy {
             static const char* state;
             static const char* getParameter;
             static const char* setParameter;
-            static const char* hasStepSize;
+            static const char* getStepSize;
             static const char* name;
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
@@ -213,7 +212,7 @@ namespace hopsy {
             static const char* state;
             static const char* getParameter;
             static const char* setParameter;
-            static const char* hasStepSize;
+            static const char* getStepSize;
             static const char* name;
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
@@ -235,7 +234,7 @@ namespace hopsy {
             static const char* state;
             static const char* getParameter;
             static const char* setParameter;
-            static const char* hasStepSize;
+            static const char* getStepSize;
             static const char* name;
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
@@ -257,7 +256,7 @@ namespace hopsy {
             static const char* state;
             static const char* getParameter;
             static const char* setParameter;
-            static const char* hasStepSize;
+            static const char* getStepSize;
             static const char* name;
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
@@ -279,7 +278,7 @@ namespace hopsy {
             static const char* state;
             static const char* getParameter;
             static const char* setParameter;
-            static const char* hasStepSize;
+            static const char* getStepSize;
             static const char* name;
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
@@ -300,7 +299,7 @@ namespace hopsy {
             static const char* state;
             static const char* getParameter;
             static const char* setParameter;
-            static const char* hasStepSize;
+            static const char* getStepSize;
             static const char* name;
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
@@ -321,7 +320,7 @@ namespace hopsy {
             static const char* state;
             static const char* getParameter;
             static const char* setParameter;
-            static const char* hasStepSize;
+            static const char* getStepSize;
             static const char* name;
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
@@ -342,7 +341,7 @@ namespace hopsy {
             static const char* state;
             static const char* getParameter;
             static const char* setParameter;
-            static const char* hasStepSize;
+            static const char* getStepSize;
             static const char* name;
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
@@ -361,7 +360,7 @@ namespace hopsy {
             static const char* state;
             static const char* getParameter;
             static const char* setParameter;
-            static const char* hasStepSize;
+            static const char* getStepSize;
             static const char* name;
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
@@ -380,7 +379,7 @@ namespace hopsy {
             static const char* state;
             static const char* getParameter;
             static const char* setParameter;
-            static const char* hasStepSize;
+            static const char* getStepSize;
             static const char* name;
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
@@ -399,7 +398,7 @@ namespace hopsy {
             static const char* state;
             static const char* getParameter;
             static const char* setParameter;
-            static const char* hasStepSize;
+            static const char* getStepSize;
             static const char* name;
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;

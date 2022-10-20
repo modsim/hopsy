@@ -100,7 +100,12 @@ namespace hopsy {
         }
 
         std::vector<std::string> getDimensionNames() const override {
-            return pyObj.attr("dimension_names").cast<std::vector<std::string>>();
+            try {
+                return pyObj.attr("dimension_names").cast<std::vector<std::string>>();
+            }
+            catch (...) {
+                return {};
+            }
         }
 
         std::unique_ptr<Model> copyModel() const override {
