@@ -7,3 +7,5 @@ dependencies:
   - pip:
     - hopsy==1.0.0a0
     - x3cfluxpy==0.0.1
+prefix: /home/rpaul/.miniconda3
+
