@@ -64,7 +64,7 @@ example-debug:
     - bash /root/miniconda.sh -b -p /root/miniconda
     - eval "$(/root/miniconda/bin/conda shell.bash hook)"
     - conda init
-    - conda create -f examples/hopsy-pub-examples.yml
+    - conda env create -f examples/hopsy-pub-examples.yml
   script:
     - echo "hi"
 
