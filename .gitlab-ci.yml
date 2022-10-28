@@ -59,7 +59,7 @@ test-debug:
 example-debug:
   stage: build
   before_script:
-    - yum install wget
+    - yum install wget -y
     - wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /root/miniconda.sh
     - bash /root/miniconda.sh -b -p /root/miniconda
     - eval "$(/Users/jsmith/miniconda/bin/conda shell.bash hook)"
