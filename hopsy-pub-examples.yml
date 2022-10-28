@@ -1,0 +1,9 @@
+name: hopsy-pub-examples
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - pyfoomb=2.17.7=pyhd8ed1ab_0
+  - pip:
+    - hopsy==1.0.0a0
+    - x3cfluxpy==0.0.1
