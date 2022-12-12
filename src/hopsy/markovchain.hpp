@@ -417,11 +417,13 @@ namespace hopsy {
                 .def_property_readonly("state_negative_log_likelihood", &MarkovChain::getStateNegativeLogLikelihood,
                                        doc::MarkovChain::stateNegativeLogLikelihood)
                 .def(py::pickle([](const MarkovChain &self) {
-                                    return py::make_tuple(self.proposal->copyProposal().release(), self.getProblem());
+                                    return py::make_tuple(self.proposal->copyProposal().release(), self.getProblem(), self.getState());
                                 },
                                 [](py::tuple t) {
-                                    if (t.size() != 2) throw std::runtime_error("Invalid state!");
-                                    return createMarkovChain(t[0].cast<Proposal *>(), t[1].cast<Problem>());
+                                    if (t.size() != 3) throw std::runtime_error("Invalid state!");
+                                    auto markovChain = createMarkovChain(t[0].cast<Proposal *>(), t[1].cast<Problem>());
+                                    markovChain.setState(t[1].cast<VectorType>());
+                                    return markovChain;
                                 }))
             //.def("_get_parameter", [] (const MarkovChain& self, 
             //                           const ProposalParameter& parameter) {
