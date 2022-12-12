@@ -422,7 +422,7 @@ namespace hopsy {
                                 [](py::tuple t) {
                                     if (t.size() != 3) throw std::runtime_error("Invalid state!");
                                     auto markovChain = createMarkovChain(t[0].cast<Proposal *>(), t[1].cast<Problem>());
-                                    markovChain.setState(t[1].cast<VectorType>());
+                                    markovChain.setState(t[2].cast<VectorType>());
                                     return markovChain;
                                 }))
             //.def("_get_parameter", [] (const MarkovChain& self, 
