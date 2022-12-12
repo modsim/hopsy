@@ -62,6 +62,33 @@ class MiscTests(unittest.TestCase):
         self.assertListEqual(list(states.shape), [n_chains, n_samples, 2])
 
 
+    def test_sampling_semigroup_property(self):
+        # Test property for sequential chains
+        chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
+        rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
+        _, states0 = sample(chains, rngs, int(n_samples // 2), thinning)
+        _, states1 = sample(chains, rngs, int(n_samples // 2), thinning)
+
+        chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
+        rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
+        _, states2 = sample(chains, rngs, n_samples, thinning)
+
+        self.assertTrue(numpy.linalg.norm(states2[:, -1] - states1[:, -1]) < 1e-7)
+
+
+        # Test property for parallel chains
+        chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
+        rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
+        _, states0 = sample(chains, rngs, int(n_samples // 2), thinning, -1)
+        _, states1 = sample(chains, rngs, int(n_samples // 2), thinning, -1)
+
+        chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
+        rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
+        _, states2 = sample(chains, rngs, n_samples, thinning, -1)
+
+        self.assertTrue(numpy.linalg.norm(states2[:, -1] - states1[:, -1]) < 1e-7)
+
+
     def test_add_box_constraints(self):
         uniform_problem = Problem([[1, 1,]], [1])
         uniform_problem = add_box_constraints(uniform_problem, -2, 1)
