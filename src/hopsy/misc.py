@@ -409,22 +409,33 @@ def _is_constant_chains(data: _s.numpy.typing.ArrayLike):
 def _arviz(f: _s.typing.Callable,
            data: _s.numpy.typing.ArrayLike,
            series: int = 0,
+           n_procs : int = 1,
            *args, **kwargs):
     data = _s.numpy.array(data)
     assert len(data.shape) == 3
     n_chains, n_samples, dim = data.shape
     result = []
+
+    def _compute_statistic(i):
+        # if chains are constant, ess = 1, no matter what
+        if _is_constant_chains(data[:,:i]) and f == _s.arviz.ess:
+            relative = args[3] if len(args) > 4 else kwargs['relative'] if 'relative' in kwargs else False
+            return [1 / (n_chains*i) if relative else 1] * dim
+        else:
+            return f(_s.arviz.convert_to_inference_data(data[:,:i]), *args, **kwargs).x.data
+
     if series:
-        i = series
-        while i <= n_samples:
-            # if chains are constant, ess = 1, no matter what
-            if _is_constant_chains(data[:,:i]) and f == _s.arviz.ess:
-                relative = args[3] if len(args) > 4 else kwargs['relative'] if 'relative' in kwargs else False
-                _result = [1 / (n_chains*i) if relative else 1] * dim
-            else:
-                _result = f(_s.arviz.convert_to_inference_data(data[:,:i]), *args, **kwargs).x.data
-            result.append(_result)
-            i += series
+        if n_procs != 1:
+            indices = list(range(0, n_samples, series))
+            if n_procs < 0:
+                n_procs = min(len(indices), _s.multiprocessing.cpu_count()) # do not use more processes than available cpus
+            
+            result = _parallel_execution(_compute_statistic, indices, n_procs)
+        else:
+            i = series
+            while i <= n_samples:
+                result.append(_compute_statistic(i))
+                i += series
     else:
         if _is_constant_chains(data) and f == _s.arviz.ess:
             relative = args[3] if len(args) > 4 else kwargs['relative'] if 'relative' in kwargs else False
@@ -468,6 +479,9 @@ def ess(*args, **kwargs):
             `ress = ess / n`
         prob : float, or tuple of two floats, optional
             probability value for "tail", "quantile" or "local" ess functions.
+        n_procs : int = 1
+            In combination with "series": compute series of ess in parallel using ``n_procs``
+            subprocesses.
         dask_kwargs : dict, optional
             Dask related kwargs passed to :func:`~arviz.wrap_xarray_ufunc`.
 
@@ -526,6 +540,9 @@ def mcse(*args, **kwargs):
 
         prob : float
             Quantile information.
+        n_procs : int = 1
+            In combination with "series": compute series of mcse in parallel using ``n_procs``
+            subprocesses.
         dask_kwargs : dict, optional
             Dask related kwargs passed to :func:`~arviz.wrap_xarray_ufunc`.
 
@@ -568,6 +585,9 @@ def rhat(*args, **kwargs):
             - "folded"
             - "z_scale"
             - "identity"
+        n_procs : int = 1
+            In combination with "series": compute series of R-hat in parallel using ``n_procs``
+            subprocesses.
         dask_kwargs : dict
             Dask related kwargs passed to :func:`~arviz.wrap_xarray_ufunc`.
 
