@@ -290,6 +290,13 @@ def _sample(markov_chain: _c.MarkovChain,
     return meta, _s.numpy.array(states), markov_chain.state, rng.state
 
 
+def _parallel_execution(func: _s.typing.Callable, args: _s.typing.List[_s.typing.Any], n_procs: int):
+    result = []
+    with _s.multiprocessing.Pool(n_procs) as workers:
+        result = workers.starmap(func, args)
+    return result
+
+
 def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.MarkovChain]],
            rngs: _s.typing.Union[_c.RandomNumberGenerator, _s.typing.List[_c.RandomNumberGenerator]],
            n_samples: int,
@@ -356,13 +363,11 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
     if n_procs != 1:
         if n_procs < 0:
             n_procs = min(len(markov_chains), _s.multiprocessing.cpu_count()) # do not use more procs than available cpus
-
-        with _s.multiprocessing.Pool(n_procs) as workers:
-            result_states = workers.starmap(_sample, [(markov_chains[i], rngs[i], n_samples, thinning, record_meta) for i in range(len(markov_chains))])
-            for i, chain_result in enumerate(result_states):
-                result.append((chain_result[0], chain_result[1]))
-                markov_chains[i].state = chain_result[2]
-                rngs[i].state = chain_result[3]
+        result_states = _parallel_execution(_sample, [(markov_chains[i], rngs[i], n_samples, thinning, record_meta) for i in range(len(markov_chains))], n_procs)
+        for i, chain_result in enumerate(result_states):
+            result.append((chain_result[0], chain_result[1]))
+            markov_chains[i].state = chain_result[2]
+            rngs[i].state = chain_result[3]
     else:
         for i in range(len(markov_chains)):
             _accrates, _states, _, _ = _sample(markov_chains[i], rngs[i], n_samples, thinning, record_meta)
