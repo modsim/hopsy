@@ -426,7 +426,7 @@ def _arviz(f: _s.typing.Callable,
 
     if series:
         if n_procs != 1:
-            indices = list(range(0, n_samples, series))
+            indices = list(range(series, n_samples, series))
             if n_procs < 0:
                 n_procs = min(len(indices), _s.multiprocessing.cpu_count()) # do not use more processes than available cpus
             
