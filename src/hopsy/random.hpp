@@ -24,22 +24,15 @@ namespace py = pybind11;
 
 namespace hopsy {
     namespace {
-	std::vector<unsigned char> stateToBytes(hops::RandomNumberGenerator::state_type state) {
-	     int numberOfBytes = 16; // state is 128 bit
-	     std::vector<unsigned char> arrayOfByte(numberOfBytes);
-	     for(int i = 0; i < numberOfBytes; i++) {
-		 arrayOfByte[numberOfBytes - 1 - i] = static_cast<unsigned char>(state >> (i * 8));
-	     }
-	     return arrayOfByte;
+	std::array<unsigned char, 16> stateToBytes(hops::RandomNumberGenerator::state_type state) {
+         std::array<unsigned char, 16> bytes;
+	     std::memcpy(bytes.data(), &state, 16);
+	     return bytes;
 	}
 
-	hops::RandomNumberGenerator::state_type bytesToState(const std::vector<unsigned char>& bytes) {
+	hops::RandomNumberGenerator::state_type bytesToState(const std::array<unsigned char, 16> &bytes) {
 	     hops::RandomNumberGenerator::state_type state = 0;
-	     
-	     for(size_t i=0; i<bytes.size(); ++i) {
-		     state = static_cast<decltype(state)>(bytes[i]);
-		     state << i*8;
-	     }
+         std::memcpy(&state, bytes.data(), 16);
 	     return state;
 	}
     }
@@ -55,12 +48,36 @@ namespace hopsy {
             // 
         }
 
+        unsigned int getSeed() const {
+            return seed;
+        }
+
+        unsigned int getStream() const {
+            return stream;
+        }
+
+        std::array<unsigned char, 16> getState() const {
+            return stateToBytes(rng - hops::RandomNumberGenerator(seed, stream));
+        }
+
+        void setSeed(unsigned int seed) {
+            RandomNumberGenerator::seed = seed;
+        }
+
+        void setStream(unsigned int stream) {
+            RandomNumberGenerator::stream = stream;
+        }
+
+        void setState(const std::array<unsigned char, 16> &bytes) {
+            rng.advance(bytesToState(bytes));
+        }
+
         unsigned int operator()() {
             return rng();
         }
 
         std::string __repr__() const {
-            std::string repr = "hopsy.RandomNumberGenerator("; 
+            std::string repr = "hopsy.RandomNumberGenerator(";
             repr += (seed ? "seed=" + std::to_string(seed) : "");
             repr += (seed && stream ? ", " : "");
             repr += (stream ? "stream=" + std::to_string(stream) : "");
@@ -86,26 +103,24 @@ namespace hopsy {
                     doc::RandomNumberGenerator::__call__)
             .def("__repr__", &RandomNumberGenerator::__repr__)
             .def(py::pickle([] (const RandomNumberGenerator& self) {
-                        hops::RandomNumberGenerator rng(self.seed, self.stream);
-                        auto state = stateToBytes(self.rng - rng);
-                        return py::make_tuple(self.seed, self.stream, state);
+                        return py::make_tuple(self.seed, self.stream, self.getState());
                     },
                     [] (py::tuple t) {
                         if (t.size() != 3) throw std::runtime_error("Tried to build hopsy.RandomNumberGenerator with invalid state.");
 
                         RandomNumberGenerator rng(t[0].cast<unsigned int>(), t[1].cast<unsigned int>());
-                        rng.rng.advance(bytesToState(t[2].cast<std::vector<unsigned char>>()));
+                        rng.setState(t[2].cast<std::array<unsigned char, 16>>());
                         return rng;
                     }))
         ;
 
         py::class_<Uniform>(m, "Uniform", doc::Uniform::base)
-            .def(py::init<double, double>(), 
+            .def(py::init<double, double>(),
                     doc::Uniform::__init__,
-                    py::arg("a") = 0, 
+                    py::arg("a") = 0,
                     py::arg("b") = 1)
-            .def("__call__", [] (Uniform& self, RandomNumberGenerator& rng) -> double { 
-                        return self(rng.rng); 
+            .def("__call__", [] (Uniform& self, RandomNumberGenerator& rng) -> double {
+                        return self(rng.rng);
                     },
                     doc::Uniform::__call__
                 )
@@ -125,8 +140,8 @@ namespace hopsy {
 
         py::class_<Normal>(m, "Normal", doc::Normal::base)
             .def(py::init<double, double>(), py::arg("mean") = 0, py::arg("stddev") = 1)
-            .def("__call__", [] (Normal& self, RandomNumberGenerator& rng) -> double { 
-                        return self(rng.rng); 
+            .def("__call__", [] (Normal& self, RandomNumberGenerator& rng) -> double {
+                        return self(rng.rng);
                     },
                     doc::Normal::__call__)
             .def_property("mean", &Normal::mean, [] (Normal& self, double mean) {
