@@ -45,19 +45,19 @@ class MiscTests(unittest.TestCase):
 
 
     def test_parallel_sampling(self):
-        n_threads = 4
+        n_procs = 4
 
         chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
         rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
 
-        accrates, states = sample(chains, rngs, n_samples, thinning, n_threads)
+        accrates, states = sample(chains, rngs, n_samples, thinning, n_procs)
 
         self.assertListEqual(list(states.shape), [n_chains, n_samples, 2])
 
         chains = [MarkovChain(uniform, GaussianProposal) for i in range(n_chains)]
         rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
 
-        accrates, states = sample(chains, rngs, n_samples, thinning, n_threads)
+        accrates, states = sample(chains, rngs, n_samples, thinning, n_procs)
 
         self.assertListEqual(list(states.shape), [n_chains, n_samples, 2])
 
@@ -121,7 +121,7 @@ class MiscTests(unittest.TestCase):
         self.assertTrue(meta['proposal.proposal'].shape == (2, 100, 2))
 
         record_meta=['state_negative_log_likelihood', 'proposal.proposal']
-        meta, states = sample(mcs, rngs, n_samples = 100, n_threads = 2, record_meta = record_meta)
+        meta, states = sample(mcs, rngs, n_samples = 100, n_procs = 2, record_meta = record_meta)
         self.assertTrue(len(meta) == len(record_meta))
         self.assertTrue(meta['proposal.proposal'].shape == (2, 100, 2))
 

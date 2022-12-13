@@ -294,9 +294,9 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
            rngs: _s.typing.Union[_c.RandomNumberGenerator, _s.typing.List[_c.RandomNumberGenerator]],
            n_samples: int,
            thinning: int = 1,
-           n_threads: int = 1,
+           n_procs: int = 1,
            record_meta = None):
-    r"""sample(markov_chains, rngs, n_samples, thinning=1, n_threads=1)
+    r"""sample(markov_chains, rngs, n_samples, thinning=1, n_procs=1)
 
     Draw ``n_samples`` from every passed chain in ``markov_chains`` 
     using the respective random number generator from ``rngs``. 
@@ -316,10 +316,10 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
         Number of samples to discard inbetween two saved states. 
         This will increase the number of samples actually produced by the chain
         to ``thinning * n_samples``.
-    n_threads : int
-        Number of parallel threads to use.
+    n_procs : int
+        Number of parallel processes to use.
         Parallelization is achieved using ``multiprocessing``.
-        The worker pool size will be ``min(n_threads, len(markov_chains))``
+        The worker pool size will be ``min(n_procs, len(markov_chains))``
     record_meta : list[str] or bool
         Strings defining :class:`hopsy.MarkovChain` attributes or ``acceptance_rate``, which will
         then be recorded and returned. All attributes of :class:`hopsy.MarkovChain` can be used here,
@@ -354,11 +354,11 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
     result = []
 
 
-    if n_threads != 1:
-        if n_threads < 0:
-            n_threads = min(len(markov_chains), _s.multiprocessing.cpu_count()) # do not use more threads than available cpus
+    if n_procs != 1:
+        if n_procs < 0:
+            n_procs = min(len(markov_chains), _s.multiprocessing.cpu_count()) # do not use more threads than available cpus
 
-        with _s.multiprocessing.Pool(n_threads) as workers:
+        with _s.multiprocessing.Pool(n_procs) as workers:
             result = workers.starmap(_sample, [(markov_chains[i], rngs[i], n_samples, thinning, record_meta) for i in range(len(markov_chains))])
     else:
         for i in range(len(markov_chains)):
