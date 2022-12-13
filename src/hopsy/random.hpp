@@ -99,7 +99,10 @@ namespace hopsy {
                     doc::RandomNumberGenerator::__init__, 
                     py::arg("seed"), 
                     py::arg("stream"))
-            .def("__call__", [] (RandomNumberGenerator& self) { return self(); }, 
+            .def_property("seed", &RandomNumberGenerator::getSeed, &RandomNumberGenerator::setSeed)
+            .def_property("stream", &RandomNumberGenerator::getStream, &RandomNumberGenerator::setStream)
+            .def_property("state", &RandomNumberGenerator::getState, &RandomNumberGenerator::setState)
+            .def("__call__", [] (RandomNumberGenerator& self) { return self(); },
                     doc::RandomNumberGenerator::__call__)
             .def("__repr__", &RandomNumberGenerator::__repr__)
             .def(py::pickle([] (const RandomNumberGenerator& self) {
