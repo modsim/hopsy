@@ -360,8 +360,6 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
         with _s.multiprocessing.Pool(n_procs) as workers:
             result_states = workers.starmap(_sample, [(markov_chains[i], rngs[i], n_samples, thinning, record_meta) for i in range(len(markov_chains))])
             for i, chain_result in enumerate(result_states):
-                rngs[i] = chain_result[2]
-
                 result.append((chain_result[0], chain_result[1]))
                 markov_chains[i].state = chain_result[2]
                 rngs[i].state = chain_result[3]
