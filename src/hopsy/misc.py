@@ -287,7 +287,7 @@ def _sample(markov_chain: _c.MarkovChain,
     if record_meta is None or record_meta is False:
         meta = _s.numpy.mean(meta)
 
-    return meta, _s.numpy.array(states)
+    return meta, _s.numpy.array(states), markov_chain.state, rng.state
 
 
 def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.MarkovChain]],
@@ -353,16 +353,19 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
 
     result = []
 
-
     if n_procs != 1:
         if n_procs < 0:
-            n_procs = min(len(markov_chains), _s.multiprocessing.cpu_count()) # do not use more threads than available cpus
+            n_procs = min(len(markov_chains), _s.multiprocessing.cpu_count()) # do not use more procs than available cpus
 
         with _s.multiprocessing.Pool(n_procs) as workers:
-            result = workers.starmap(_sample, [(markov_chains[i], rngs[i], n_samples, thinning, record_meta) for i in range(len(markov_chains))])
+            result_states = workers.starmap(_sample, [(markov_chains[i], rngs[i], n_samples, thinning, record_meta) for i in range(len(markov_chains))])
+            for i, chain_result in enumerate(result_states):
+                result.append((chain_result[0], chain_result[1]))
+                markov_chains[i].state = chain_result[2]
+                rngs[i].state = chain_result[3]
     else:
         for i in range(len(markov_chains)):
-            _accrates, _states = _sample(markov_chains[i], rngs[i], n_samples, thinning, record_meta)
+            _accrates, _states, _, _ = _sample(markov_chains[i], rngs[i], n_samples, thinning, record_meta)
             result.append((_accrates, _states))
 
 
