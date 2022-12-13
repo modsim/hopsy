@@ -406,6 +406,21 @@ def _is_constant_chains(data: _s.numpy.typing.ArrayLike):
     return _s.numpy.sum(_s.numpy.abs(_s.numpy.diff(data, axis=1))) == 0
 
 
+def _compute_statistic(i: int,
+                       n_chains: int,
+                       dim: int,
+                       f: _s.typing.Callable,
+                       data: _s.numpy.typing.ArrayLike,
+                       args,
+                       kwargs):
+    # if chains are constant, ess = 1, no matter what
+    if _is_constant_chains(data[:,:i]) and f == _s.arviz.ess:
+        relative = args[3] if len(args) > 4 else kwargs['relative'] if 'relative' in kwargs else False
+        return [1 / (n_chains*i) if relative else 1] * dim
+    else:
+        return f(_s.arviz.convert_to_inference_data(data[:,:i]), **kwargs).x.data
+
+
 def _arviz(f: _s.typing.Callable,
            data: _s.numpy.typing.ArrayLike,
            series: int = 0,
@@ -416,25 +431,16 @@ def _arviz(f: _s.typing.Callable,
     n_chains, n_samples, dim = data.shape
     result = []
 
-    def _compute_statistic(i):
-        # if chains are constant, ess = 1, no matter what
-        if _is_constant_chains(data[:,:i]) and f == _s.arviz.ess:
-            relative = args[3] if len(args) > 4 else kwargs['relative'] if 'relative' in kwargs else False
-            return [1 / (n_chains*i) if relative else 1] * dim
-        else:
-            return f(_s.arviz.convert_to_inference_data(data[:,:i]), *args, **kwargs).x.data
-
     if series:
         if n_procs != 1:
             indices = list(range(series, n_samples, series))
             if n_procs < 0:
                 n_procs = min(len(indices), _s.multiprocessing.cpu_count()) # do not use more processes than available cpus
-            
-            result = _parallel_execution(_compute_statistic, indices, n_procs)
+            result = _parallel_execution(_compute_statistic, [(i, n_chains, dim, f, data, args, kwargs) for i in indices], n_procs)
         else:
             i = series
             while i <= n_samples:
-                result.append(_compute_statistic(i))
+                result.append(_compute_statistic(i, n_chains, dim, f, data, args, kwargs))
                 i += series
     else:
         if _is_constant_chains(data) and f == _s.arviz.ess:
