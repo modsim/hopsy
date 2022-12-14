@@ -301,6 +301,7 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
            rngs: _s.typing.Union[_c.RandomNumberGenerator, _s.typing.List[_c.RandomNumberGenerator]],
            n_samples: int,
            thinning: int = 1,
+           n_threads: int = 1,
            n_procs: int = 1,
            record_meta = None):
     r"""sample(markov_chains, rngs, n_samples, thinning=1, n_procs=1)
@@ -323,6 +324,10 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
         Number of samples to discard inbetween two saved states. 
         This will increase the number of samples actually produced by the chain
         to ``thinning * n_samples``.
+    n_threads : int
+        (deprecated) Number of parallel processes to use.
+        Parallelization is achieved using ``multiprocessing``.
+        The worker pool size will be ``min(n_procs, len(markov_chains))``
     n_procs : int
         Number of parallel processes to use.
         Parallelization is achieved using ``multiprocessing``.
@@ -360,7 +365,10 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
 
     result = []
 
-    if n_procs != 1:
+    if n_procs != 1 or n_threads != 1:
+        if n_threads != n_procs and n_threads != 1:
+            n_procs = n_threads
+
         if n_procs < 0:
             n_procs = min(len(markov_chains), _s.multiprocessing.cpu_count()) # do not use more procs than available cpus
         result_states = _parallel_execution(_sample, [(markov_chains[i], rngs[i], n_samples, thinning, record_meta) for i in range(len(markov_chains))], n_procs)
