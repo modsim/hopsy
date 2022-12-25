@@ -64,6 +64,22 @@ To compile binary wheels for distribution (e.g. via the Python Package Index pyp
 * Ninja or Pip 10+
 * Docker (optional, for building wheels)
 
+
+## MPI support for parallel tempering
+
+If you want to use the parallel tempering implemented in hops, you need a working MPI installation, because threads would not work due to the python GIL.
+The next step is to compile hopsy by source and to check that the script  examples/parallel\_tempering.py works. 
+Both modes of the distribution should be found, otherwise there is some issue. In this case, please contact us.
+
+In order to use parallel tempering, python interpreter must be called with MPI:
+
+```
+mpirun -np 10 parallel_tempering_application.py 
+```
+
+In this case, 10 parallel chains would be constructed. 
+
+
 ## Examples
 
 A basic usage example is presented below. More examples can be found in `tests/` directory or in the docs.
