@@ -329,6 +329,10 @@ namespace hopsy {
             proposalPtr = proposal->copyProposal();
         }
 
+        ProposalWrapper(std::shared_ptr<Proposal> proposal) {
+            proposalPtr = proposal;
+        }
+
         VectorType& propose(hops::RandomNumberGenerator& rng) override {
             return proposalPtr->propose(rng);
         }
@@ -410,10 +414,6 @@ namespace hopsy {
         }
 
         std::shared_ptr<Proposal> getProposalPtr() {
-//            auto pyproposalPtr = std::dynamic_pointer_cast<PyModel>(proposalPtr);
-//            if(pyproposalPtr) {
-//                return pyproposalPtr->pyObj;
-//            }
             return proposalPtr;
         }
 

@@ -1,6 +1,8 @@
 """
 
 """
+
+
 class _core:
     from .core import GaussianHitAndRunProposal
     from .core import MarkovChain
@@ -8,6 +10,7 @@ class _core:
     from .core import Proposal
     from .core import RandomNumberGenerator
     from .lp import LP
+
 
 _c = _core
 
@@ -31,12 +34,15 @@ class _submodules:
     import numpy.typing
     import typing
 
+
 _s = _submodules
 
 
 def MarkovChain(problem: _c.Problem,
                 proposal: _s.typing.Union[_c.Proposal, _s.typing.Type[_c.Proposal]] = _c.GaussianHitAndRunProposal,
-                starting_point: _s.numpy.typing.ArrayLike = None):
+                starting_point: _s.numpy.typing.ArrayLike = None,
+                parallelTemperingSyncRng: _c.RandomNumberGenerator = None,
+                exchangeAttemptProbability: float = 0.1):
     _proposal = None
     if isinstance(proposal, type):
         if starting_point is not None:
@@ -48,16 +54,17 @@ def MarkovChain(problem: _c.Problem,
     else:
         _proposal = proposal
 
-    return _c.MarkovChain(_proposal, problem)
+    return _c.MarkovChain(_proposal, problem, parallelTemperingSyncRng=parallelTemperingSyncRng,
+                          exchangeAttemptProbability=exchangeAttemptProbability)
 
 
-MarkovChain.__doc__ = _core.MarkovChain.__doc__ # propagate docstring
+MarkovChain.__doc__ = _core.MarkovChain.__doc__  # propagate docstring
 
 
 def add_box_constraints(problem: _c.Problem,
                         lower_bound: _s.typing.Union[_s.numpy.typing.ArrayLike, float],
                         upper_bound: _s.typing.Union[_s.numpy.typing.ArrayLike, float],
-                        simplify = True):
+                        simplify=True):
     r"""Adds box constraints to all dimensions. This will extend :attr:`hopsy.Problem.A` and :attr:`hopsy.Problem.A` of the returned :class:`hopsy.Problem` to have :math:`m+2n` rows.
     Box constraints are added naively, meaning that we do neither check whether the dimension may be already 
     somehow bound nor check whether the very same constraint already exists. You can remove redundant constraints
@@ -89,7 +96,7 @@ def add_box_constraints(problem: _c.Problem,
     dim = problem.A.shape[1]
 
     _l = _s.numpy.array(lower_bound) if hasattr(lower_bound, "__len__") else _s.numpy.array([lower_bound] * dim)
-    _l = -_l # flip sign comes from flipping -x<-l to x>l
+    _l = -_l  # flip sign comes from flipping -x<-l to x>l
     _u = _s.numpy.array(upper_bound) if hasattr(upper_bound, "__len__") else _s.numpy.array([upper_bound] * dim)
 
     A = _s.numpy.vstack([problem.A, -_s.numpy.eye(dim), _s.numpy.eye(dim)])
@@ -140,6 +147,7 @@ def _compute_maximum_volume_ellipsoid(problem: _c.Problem):
 
         MaximumVolumeEllipsoidFinder.iterative_solve(polytope, _c.LP().settings)
         return polytope.transform.values
+
 
 def simplify(problem: _c.Problem):
     """
@@ -202,7 +210,8 @@ def round(problem: _c.Problem):
 
         polytope = _s.PolyRoundApi.round_polytope(polytope, _c.LP().settings)
 
-        _problem = _c.Problem(polytope.A.values, polytope.b.values, problem.model, transformation=polytope.transformation.values, shift=polytope.shift.values)
+        _problem = _c.Problem(polytope.A.values, polytope.b.values, problem.model,
+                              transformation=polytope.transformation.values, shift=polytope.shift.values)
 
         if problem.starting_point is not None:
             _problem.starting_point = transform(_problem, [problem.starting_point])[0]
@@ -245,7 +254,7 @@ def _sample(markov_chain: _c.MarkovChain,
             rng: _c.RandomNumberGenerator,
             n_samples: int,
             thinning: int,
-            record_meta = None):
+            record_meta=None):
     states = []
     meta = [] if record_meta is None or record_meta is False else {field: [] for field in record_meta}
 
@@ -260,8 +269,8 @@ def _sample(markov_chain: _c.MarkovChain,
             for field in record_meta:
                 if field in missing_fields: continue
 
-                if field == "acceptance_rate": # treat acceptance rate differently,
-                                               # as it is no attribute of the markov chain
+                if field == "acceptance_rate":  # treat acceptance rate differently,
+                    # as it is no attribute of the markov chain
                     meta[field].append(accrate)
                 else:
                     # recurse through the attribute name and record the final value
@@ -303,7 +312,8 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
            thinning: int = 1,
            n_threads: int = 1,
            n_procs: int = 1,
-           record_meta = None):
+           record_meta=None,
+           parallel_tempering=False):
     r"""sample(markov_chains, rngs, n_samples, thinning=1, n_procs=1)
 
     Draw ``n_samples`` from every passed chain in ``markov_chains`` 
@@ -351,12 +361,18 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
 
     """
 
+    # multiprocessing and mpi (parallel tempering) do not work together yet
+    # because forked processes do not get a correct rank.
+    if n_procs != 1 and any([mc.parallelTemperingSyncRng is not None for mc in markov_chains]):
+        raise ValueError("n_procs>1 does not work together with parallel tempering with is based on mpi.")
+
     # if both are lists, they have to match in size
     if hasattr(markov_chains, "__len__") and hasattr(rngs, "__len__") and len(markov_chains) != len(rngs):
         raise ValueError("Number of Markov chains has to match number of random number generators.")
 
     # if only one is a list, also fail
-    elif not (hasattr(markov_chains, "__len__") and hasattr(rngs, "__len__")) and (hasattr(markov_chains, "__len__") or hasattr(rngs, "__len__")):
+    elif not (hasattr(markov_chains, "__len__") and hasattr(rngs, "__len__")) and (
+            hasattr(markov_chains, "__len__") or hasattr(rngs, "__len__")):
         raise ValueError("markov_chains and rngs have to be either both scalar or both lists with matching size.")
 
     if not hasattr(markov_chains, "__len__") and not hasattr(rngs, "__len__"):
@@ -381,13 +397,12 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
             _accrates, _states, _, _ = _sample(markov_chains[i], rngs[i], n_samples, thinning, record_meta)
             result.append((_accrates, _states))
 
-
     states = []
     meta = [] if record_meta is None or record_meta is False else {field: [] for field in record_meta}
 
     for _meta, _states in result:
         states.append(_states)
-        
+
         if record_meta is None or record_meta is False:
             meta.append(_meta)
         else:
@@ -407,6 +422,7 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
                 meta[field] = _s.numpy.array(meta[field])
 
     return meta, _s.numpy.array(states)
+
 
 def _is_constant_chains(data: _s.numpy.typing.ArrayLike):
     data = _s.numpy.array(data)
@@ -453,7 +469,7 @@ def _arviz(f: _s.typing.Callable,
     else:
         if _is_constant_chains(data) and f == _s.arviz.ess:
             relative = args[3] if len(args) > 4 else kwargs['relative'] if 'relative' in kwargs else False
-            _result = [1 / (n_chains*n_samples) if relative else 1] * dim
+            _result = [1 / (n_chains * n_samples) if relative else 1] * dim
         else:
             _result = f(_s.arviz.convert_to_inference_data(data), *args, **kwargs).x.data
         result.append(_result)
@@ -634,5 +650,3 @@ def rhat(*args, **kwargs):
 
     """
     return _arviz(_s.arviz.rhat, *args, **kwargs)
-
-

@@ -80,7 +80,7 @@ namespace hopsy {
                 py::object object = std::get<py::object>(model);
                 this->model = std::make_unique<PyModel>(PyModel(object));
             }
-            catch(std::bad_variant_access) {
+            catch(std::bad_variant_access&) {
                 if(!std::get<std::unique_ptr<Model>>(model)) {
                     throw std::runtime_error("Pointer to model is null.");
                 }

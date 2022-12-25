@@ -1560,6 +1560,10 @@ const char* hopsy::doc::MarkovChain::model = R"pbdoc(
 )pbdoc";
 
 
+const char* hopsy::doc::MarkovChain::exchangeAttemptProbability = R"pbdoc(
+)pbdoc";
+
+
 const char* hopsy::doc::MarkovChain::proposal = R"pbdoc(
 )pbdoc";
 

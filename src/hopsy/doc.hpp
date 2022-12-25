@@ -414,6 +414,7 @@ namespace hopsy {
             static const char* model;
             static const char* proposal;
             static const char* stateNegativeLogLikelihood;
+            static const char* exchangeAttemptProbability;
         };
 
         struct TuningTarget {
