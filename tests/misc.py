@@ -175,4 +175,3 @@ class MiscTests(unittest.TestCase):
         self.assertTrue(type(meta) is list) # just usual acceptance rates
 
 
-
