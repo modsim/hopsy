@@ -155,7 +155,7 @@ setup(
     install_requires=[
         'PolyRound',
         'arviz',
-        'numpy',
+        'numpy==1.23.5',
         'pandas',
         'tqdm',
         'matplotlib',
