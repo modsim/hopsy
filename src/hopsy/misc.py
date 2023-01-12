@@ -34,6 +34,8 @@ class _submodules:
     import numpy.typing
     import typing
 
+    import abc
+
 
 _s = _submodules
 
@@ -245,6 +247,41 @@ def transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
         transformed_points.append(_point)
 
     return transformed_points
+
+
+class BaseTrace(_s.abc.ABC):
+    def __init__(self, chain_idx: int, n_samples: int, n_dims: int, name: str = None):
+        self.chain_idx = chain_idx
+        self.n_samples = n_samples
+        self.n_dims = n_dims
+        self.name = name
+
+    def record(self, state: _s.numpy.ndarray, meta: _s.typing.Union[_s.typing.List[float], _s.typing.Dict]):
+        raise NotImplementedError()
+
+    def get_state(self, idx: int):
+        raise NotImplementedError()
+
+    def get_slice(self, idx: slice):
+        raise NotImplementedError()
+
+    def get_meta(self, name: str, idx: int):
+        raise NotImplementedError()
+
+    def close(self):
+        pass
+
+    def __getitem__(self, idx):
+        if isinstance(idx, slice):
+            return self.get_slice(idx)
+
+        try:
+            return self.get_state(int(idx))
+        except (ValueError, TypeError):
+            raise ValueError("Can only index with slice or integer")
+
+    def __len__(self):
+        raise NotImplementedError
 
 
 def _sample(markov_chain: _c.MarkovChain,
