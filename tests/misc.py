@@ -1,6 +1,8 @@
 import unittest
 
 import numpy
+import numpy as np
+import typing
 
 from hopsy import *
 
@@ -174,5 +176,46 @@ class MiscTests(unittest.TestCase):
         self.assertTrue(len(meta) == 2) # just usual acceptance rates
         self.assertTrue(type(meta) is list) # just usual acceptance rates
 
+    def test_backend(self):
+        states_glob = []
+        meta_glob = []
+
+        class TestTrace(BaseTrace):
+            def __init__(self, name: str = None):
+                super(TestTrace, self).__init__()
+                self.states = None
+                self.state_idx = 0
+                self.meta = None
+
+            def setup(self, chain_idx: int, n_samples: int, n_dims: int):
+                super(TestTrace, self).setup(chain_idx, n_samples, n_dims)
+                self.states = np.zeros((self.n_samples, self.n_dims))
+                states_glob.append(self.states)
+
+            def record(self, state: numpy.ndarray, meta: typing.Union[typing.List[float], typing.Dict]):
+                self.states[self.state_idx] = state
+                self.state_idx += 1
+                if self.meta is None:
+                    if isinstance(meta, list):
+                        self.meta = meta
+                    else:
+                        self.meta = {name: [meta[name]] for name in meta.keys()}
+
+                    meta_glob.append(self.meta)
+                elif isinstance(self.meta, list):
+                    self.meta += meta
+                else:
+                    for name in meta.keys():
+                        self.meta[name] += [meta[name]]
+
+            def close(self):
+                if isinstance(self.meta, list):
+                    self.meta = numpy.array(self.meta)
+                else:
+                    for field in self.meta:
+                        self.meta[field] = numpy.array(self.meta[field])
+
+            def get_slice(self, idx: slice):
+                return self.states[idx]
 
 
