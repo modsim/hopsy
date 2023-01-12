@@ -35,6 +35,7 @@ class _submodules:
     import typing
 
     import abc
+    import copy
 
 
 _s = _submodules
@@ -250,11 +251,16 @@ def transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
 
 
 class BaseTrace(_s.abc.ABC):
-    def __init__(self, chain_idx: int, n_samples: int, n_dims: int, name: str = None):
+    def __init__(self, name: str = None):
+        self.chain_idx = -1
+        self.n_samples = -1
+        self.n_dims = -1
+        self.name = name
+
+    def setup(self, chain_idx: int, n_samples: int, n_dims: int):
         self.chain_idx = chain_idx
         self.n_samples = n_samples
         self.n_dims = n_dims
-        self.name = name
 
     def record(self, state: _s.numpy.ndarray, meta: _s.typing.Union[_s.typing.List[float], _s.typing.Dict]):
         raise NotImplementedError()
@@ -288,11 +294,15 @@ def _sample(markov_chain: _c.MarkovChain,
             rng: _c.RandomNumberGenerator,
             n_samples: int,
             thinning: int,
-            record_meta=None):
+            record_meta=None,
+            chain_idx: int = -1,
+            backend: BaseTrace = None):
     states = []
     meta = [] if record_meta is None or record_meta is False else {field: [] for field in record_meta}
 
     missing_fields = []
+    if backend is not None:
+        backend.setup(chain_idx, n_samples, len(markov_chain.state))
 
     for i in range(n_samples):
         accrate, state = markov_chain.draw(rng, thinning)
@@ -327,8 +337,20 @@ def _sample(markov_chain: _c.MarkovChain,
 
         states.append(state)
 
+        if backend is not None:
+            step_meta = None
+            if record_meta is None or record_meta is False:
+                step_meta = {"acceptance_rate": accrate}
+            else:
+                step_meta = {key: meta[key][-1] for key in meta}
+
+            backend.record(state, step_meta)
+
     if record_meta is None or record_meta is False:
         meta = _s.numpy.mean(meta)
+
+    if backend is not None:
+        backend.close()
 
     return meta, _s.numpy.array(states), markov_chain.state, rng.state
 
@@ -346,7 +368,8 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
            thinning: int = 1,
            n_threads: int = 1,
            n_procs: int = 1,
-           record_meta=None):
+           record_meta=None,
+           backend: BaseTrace = None):
     r"""sample(markov_chains, rngs, n_samples, thinning=1, n_procs=1)
 
     Draw ``n_samples`` from every passed chain in ``markov_chains`` 
@@ -379,6 +402,10 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
         Strings defining :class:`hopsy.MarkovChain` attributes or ``acceptance_rate``, which will
         then be recorded and returned. All attributes of :class:`hopsy.MarkovChain` can be used here,
         e.g. ``record_meta=['state_negative_log_likelihood', 'proposal.proposal']``.
+    backend : derived from hopsy.BaseTrace
+        Observer backend to which states and metadata are passed during the run. The backend is e.g. used
+        to write the obtained information online to permanent storage. This enables online analysis of the
+        MCMC run.
 
     Returns
     -------
@@ -417,15 +444,16 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
             n_procs = min(len(markov_chains),
                           _s.multiprocessing.cpu_count())  # do not use more procs than available cpus
         result_states = _parallel_execution(_sample,
-                                            [(markov_chains[i], rngs[i], n_samples, thinning, record_meta) for i in
-                                             range(len(markov_chains))], n_procs)
+                                            [(markov_chains[i], rngs[i], n_samples, thinning, record_meta, i, _s.copy.deepcopy(backend))
+                                             for i in range(len(markov_chains))],
+                                            n_procs)
         for i, chain_result in enumerate(result_states):
             result.append((chain_result[0], chain_result[1]))
             markov_chains[i].state = chain_result[2]
             rngs[i].state = chain_result[3]
     else:
         for i in range(len(markov_chains)):
-            _accrates, _states, _, _ = _sample(markov_chains[i], rngs[i], n_samples, thinning, record_meta)
+            _accrates, _states, _, _ = _sample(markov_chains[i], rngs[i], n_samples, thinning, record_meta, i, _s.copy.deepcopy(backend))
             result.append((_accrates, _states))
 
     states = []
