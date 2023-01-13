@@ -174,19 +174,19 @@ class MiscTests(unittest.TestCase):
         states_glob = []
         meta_glob = []
 
-        class TestTrace(BaseTrace):
+        class TestBackend(Backend):
             def __init__(self, name: str = None):
-                super(TestTrace, self).__init__()
+                super(TestBackend, self).__init__()
                 self.states = None
                 self.state_idx = 0
                 self.meta = None
 
-            def setup(self, chain_idx: int, n_samples: int, n_dims: int):
-                super(TestTrace, self).setup(chain_idx, n_samples, n_dims)
+            def setup(self, chain_idx: int, n_samples: int, n_dims: int) -> None:
+                super(TestBackend, self).setup(chain_idx, n_samples, n_dims)
                 self.states = np.zeros((self.n_samples, self.n_dims))
                 states_glob.append(self.states)
 
-            def record(self, state: numpy.ndarray, meta: typing.Union[typing.List[float], typing.Dict]):
+            def record(self, state: numpy.ndarray, meta: typing.Union[typing.List[float], typing.Dict]) -> None:
                 self.states[self.state_idx] = state
                 self.state_idx += 1
                 if self.meta is None:
@@ -202,35 +202,18 @@ class MiscTests(unittest.TestCase):
                     for name in meta.keys():
                         self.meta[name] += [meta[name]]
 
-            def close(self):
+            def finish(self) -> None:
                 if isinstance(self.meta, list):
                     self.meta = numpy.array(self.meta)
                 else:
                     for field in self.meta:
                         self.meta[field] = numpy.array(self.meta[field])
 
-            def get_slice(self, idx: slice):
-                return self.states[idx]
-
-            def get_state(self, idx: int):
-                return self.states[idx]
-
-            def get_meta(self, idx: int, name: str = None):
-                if isinstance(self.meta, list):
-                    return self.meta[idx]
-                else:
-                    if name is None:
-                        raise ValueError("Meta data is a dict. You need to supply a key using the \"name\" arg.")
-                    return self.meta[name][idx]
-
-            def __len__(self):
-                return self.state_idx
-
         problem = Problem([[1, 0], [0, 1], [-1, 0], [0, -1]], [5, 5, 0, 0], Gaussian(dim=2))
         mcs = [MarkovChain(problem, proposal=GaussianHitAndRunProposal, starting_point=[.5, .5]) for i in range(2)]
         rngs = [RandomNumberGenerator(42, i) for i in range(2)]
 
-        backend = TestTrace()
+        backend = TestBackend()
         record_meta = ['state_negative_log_likelihood', 'proposal.proposal']
         meta, states = sample(mcs, rngs, n_samples=100, record_meta=record_meta, backend=backend)
         self.assertTrue(np.all([states[i] == states_glob[i] for i in range(2)]))
@@ -239,7 +222,7 @@ class MiscTests(unittest.TestCase):
 
         states_glob.clear()
         meta_glob.clear()
-        backend = TestTrace()
+        backend = TestBackend()
         record_meta = False
         meta, states = sample(mcs, rngs, n_samples=100, record_meta=record_meta, backend=backend)
         self.assertTrue(np.all([states[i] == states_glob[i] for i in range(2)]))
