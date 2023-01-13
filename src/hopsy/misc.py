@@ -250,44 +250,51 @@ def transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
     return transformed_points
 
 
-class BaseTrace(_s.abc.ABC):
+class Backend(_s.abc.ABC):
+    r"""Abstract base class for observing states and metadata"""
     def __init__(self, name: str = None):
+        r"""
+        Construct backend.
+
+        :param name : str
+            Name of the backend
+        """
         self.chain_idx = -1
         self.n_samples = -1
         self.n_dims = -1
         self.name = name
 
-    def setup(self, chain_idx: int, n_samples: int, n_dims: int):
+    def setup(self, chain_idx: int, n_samples: int, n_dims: int) -> None:
+        r"""
+        Setup backend for a specific MCMC chain.
+
+        :param chain_idx : int
+            Index of the chain
+        :param n_samples: int
+            Number of samples to produce
+        :param n_dims: int
+            Number of dimensions of the sampling problem
+        """
         self.chain_idx = chain_idx
         self.n_samples = n_samples
         self.n_dims = n_dims
 
     def record(self, state: _s.numpy.ndarray, meta: _s.typing.Union[_s.typing.List[float], _s.typing.Dict]):
+        r"""
+        Record new MCMC state and metadata.
+
+        :param state : numpy.ndarray
+            New MCMC state
+        :param meta: List[float] or Dict
+            Recorded metadata of the
+        """
         raise NotImplementedError()
 
-    def get_state(self, idx: int):
-        raise NotImplementedError()
-
-    def get_slice(self, idx: slice):
-        raise NotImplementedError()
-
-    def get_meta(self, name: str, idx: int):
-        raise NotImplementedError()
-
-    def close(self):
+    def finish(self) -> None:
+        r"""
+        Finish recording (e.g. close connection to database).
+        """
         pass
-
-    def __getitem__(self, idx):
-        if isinstance(idx, slice):
-            return self.get_slice(idx)
-
-        try:
-            return self.get_state(int(idx))
-        except (ValueError, TypeError):
-            raise ValueError("Can only index with slice or integer")
-
-    def __len__(self):
-        raise NotImplementedError
 
 
 def _sample(markov_chain: _c.MarkovChain,
@@ -296,7 +303,7 @@ def _sample(markov_chain: _c.MarkovChain,
             thinning: int,
             record_meta=None,
             chain_idx: int = -1,
-            backend: BaseTrace = None):
+            backend: Backend = None):
     states = []
     meta = [] if record_meta is None or record_meta is False else {field: [] for field in record_meta}
 
@@ -350,7 +357,7 @@ def _sample(markov_chain: _c.MarkovChain,
         meta = _s.numpy.mean(meta)
 
     if backend is not None:
-        backend.close()
+        backend.finish()
 
     return meta, _s.numpy.array(states), markov_chain.state, rng.state
 
@@ -369,7 +376,7 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
            n_threads: int = 1,
            n_procs: int = 1,
            record_meta=None,
-           backend: BaseTrace = None):
+           backend: Backend = None):
     r"""sample(markov_chains, rngs, n_samples, thinning=1, n_procs=1)
 
     Draw ``n_samples`` from every passed chain in ``markov_chains`` 
@@ -402,7 +409,7 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
         Strings defining :class:`hopsy.MarkovChain` attributes or ``acceptance_rate``, which will
         then be recorded and returned. All attributes of :class:`hopsy.MarkovChain` can be used here,
         e.g. ``record_meta=['state_negative_log_likelihood', 'proposal.proposal']``.
-    backend : derived from hopsy.BaseTrace
+    backend : derived from hopsy.Backend
         Observer backend to which states and metadata are passed during the run. The backend is e.g. used
         to write the obtained information online to permanent storage. This enables online analysis of the
         MCMC run.
