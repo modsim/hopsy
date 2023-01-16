@@ -252,6 +252,7 @@ def transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
 
 class Backend(_s.abc.ABC):
     r"""Abstract base class for observing states and metadata"""
+
     def __init__(self, name: str = None):
         r"""
         Construct backend.
@@ -262,9 +263,10 @@ class Backend(_s.abc.ABC):
         self.chain_idx = -1
         self.n_samples = -1
         self.n_dims = -1
+        self.meta_names = None
         self.name = name
 
-    def setup(self, chain_idx: int, n_samples: int, n_dims: int) -> None:
+    def setup(self, chain_idx: int, n_samples: int, n_dims: int, meta_names: _s.typing.List[str]) -> None:
         r"""
         Setup backend for a specific MCMC chain.
 
@@ -274,12 +276,15 @@ class Backend(_s.abc.ABC):
             Number of samples to produce
         :param n_dims: int
             Number of dimensions of the sampling problem
+        :param meta_names: list of str
+            String identifiers for meta information
         """
         self.chain_idx = chain_idx
         self.n_samples = n_samples
         self.n_dims = n_dims
+        self.meta_names = meta_names
 
-    def record(self, state: _s.numpy.ndarray, meta: _s.typing.Union[_s.typing.List[float], _s.typing.Dict]):
+    def record(self, state: _s.numpy.ndarray, meta: _s.typing.Dict[str, _s.typing.Union[float, _s.numpy.ndarray]]):
         r"""
         Record new MCMC state and metadata.
 
@@ -305,11 +310,29 @@ def _sample(markov_chain: _c.MarkovChain,
             chain_idx: int = -1,
             backend: Backend = None):
     states = []
-    meta = [] if record_meta is None or record_meta is False else {field: [] for field in record_meta}
 
+    meta = None
     missing_fields = []
+    if record_meta is None or record_meta is False:
+        meta = []
+    else:
+        meta = {field: [] for field in record_meta}
+        for field in meta:
+            if field != "acceptance_rate":
+                attrs = field.split('.')
+                base = markov_chain
+
+                for attr in attrs:
+                    if hasattr(base, attr):
+                        base = getattr(base, attr)
+                    else:
+                        missing_fields.append(field)
+                        meta[field] = None
+
     if backend is not None:
-        backend.setup(chain_idx, n_samples, len(markov_chain.state))
+        backend.setup(chain_idx, n_samples, len(markov_chain.state),
+                      ["acceptance_rate" if record_meta is None or record_meta is False
+                       else list(filter(lambda field: field in missing_fields, record_meta))])
 
     for i in range(n_samples):
         accrate, state = markov_chain.draw(rng, thinning)
@@ -318,7 +341,8 @@ def _sample(markov_chain: _c.MarkovChain,
             meta.append(accrate)
         else:
             for field in record_meta:
-                if field in missing_fields: continue
+                if field in missing_fields:
+                    continue
 
                 if field == "acceptance_rate":  # treat acceptance rate differently,
                     # as it is no attribute of the markov chain
@@ -327,20 +351,10 @@ def _sample(markov_chain: _c.MarkovChain,
                     # recurse through the attribute name and record the final value
                     attrs = field.split('.')
                     base = markov_chain
-
-                    found = True
-
                     for attr in attrs:
-                        if hasattr(base, attr):
-                            base = getattr(base, attr)
-                        else:
-                            found = False
+                        base = getattr(base, attr)
 
-                    if found:
-                        meta[field].append(base)
-                    else:
-                        missing_fields.append(field)
-                        meta[field] = None
+                    meta[field].append(base)
 
         states.append(state)
 
@@ -451,7 +465,8 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
             n_procs = min(len(markov_chains),
                           _s.multiprocessing.cpu_count())  # do not use more procs than available cpus
         result_states = _parallel_execution(_sample,
-                                            [(markov_chains[i], rngs[i], n_samples, thinning, record_meta, i, _s.copy.deepcopy(backend))
+                                            [(markov_chains[i], rngs[i], n_samples, thinning, record_meta, i,
+                                              _s.copy.deepcopy(backend))
                                              for i in range(len(markov_chains))],
                                             n_procs)
         for i, chain_result in enumerate(result_states):
@@ -460,7 +475,8 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
             rngs[i].state = chain_result[3]
     else:
         for i in range(len(markov_chains)):
-            _accrates, _states, _, _ = _sample(markov_chains[i], rngs[i], n_samples, thinning, record_meta, i, _s.copy.deepcopy(backend))
+            _accrates, _states, _, _ = _sample(markov_chains[i], rngs[i], n_samples, thinning, record_meta, i,
+                                               _s.copy.deepcopy(backend))
             result.append((_accrates, _states))
 
     states = []

@@ -181,23 +181,17 @@ class MiscTests(unittest.TestCase):
                 self.state_idx = 0
                 self.meta = None
 
-            def setup(self, chain_idx: int, n_samples: int, n_dims: int) -> None:
-                super(TestBackend, self).setup(chain_idx, n_samples, n_dims)
+            def setup(self, chain_idx: int, n_samples: int, n_dims: int, meta_names: typing.List[str]) -> None:
+                super(TestBackend, self).setup(chain_idx, n_samples, n_dims, meta_names)
                 self.states = np.zeros((self.n_samples, self.n_dims))
                 states_glob.append(self.states)
 
-            def record(self, state: numpy.ndarray, meta: typing.Union[typing.List[float], typing.Dict]) -> None:
+            def record(self, state: numpy.ndarray, meta: typing.Dict[str, typing.Union[float, numpy.ndarray]]) -> None:
                 self.states[self.state_idx] = state
                 self.state_idx += 1
                 if self.meta is None:
-                    if isinstance(meta, list):
-                        self.meta = meta
-                    else:
-                        self.meta = {name: [meta[name]] for name in meta.keys()}
-
+                    self.meta = {name: [meta[name]] for name in meta.keys()}
                     meta_glob.append(self.meta)
-                elif isinstance(self.meta, list):
-                    self.meta += meta
                 else:
                     for name in meta.keys():
                         self.meta[name] += [meta[name]]
