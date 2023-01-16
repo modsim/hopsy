@@ -276,7 +276,7 @@ class Backend(_s.abc.ABC):
             Number of samples to produce
         :param n_dims: int
             Number of dimensions of the sampling problem
-        :param meta_names: list of str
+        :param meta_names: List[str]
             String identifiers for meta information
         """
         self.chain_idx = chain_idx
@@ -290,8 +290,8 @@ class Backend(_s.abc.ABC):
 
         :param state : numpy.ndarray
             New MCMC state
-        :param meta: List[float] or Dict
-            Recorded metadata of the
+        :param meta: Dict[str, Union[float, numpy.ndarray]]
+            Recorded metadata of the step
         """
         raise NotImplementedError()
 
