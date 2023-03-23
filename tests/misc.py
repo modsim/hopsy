@@ -211,6 +211,6 @@ class MiscTests(unittest.TestCase):
 
         backend = TestBackend()
         record_meta = False
-        meta, states = sample(mcs, rngs, n_samples=100, record_meta=record_meta, backend=backend)
+        meta, states = sample(mcs, rngs, n_samples=100, n_procs=3, record_meta=record_meta, backend=backend)
         self.assertTrue(np.all(states == backend.states))
         self.assertTrue(np.all(meta == np.mean([backend.meta[i]["acceptance_rate"] for i in range(2)], axis=1)))

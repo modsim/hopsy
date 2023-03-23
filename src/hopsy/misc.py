@@ -412,6 +412,9 @@ def _sample_parallel_chain(markov_chain: _c.MarkovChain,
     if record_meta is None or record_meta is False:
         meta = _s.numpy.mean(meta)
 
+    if queue is not None:
+        queue.put((chain_idx, None, None))
+
     return meta, _s.numpy.array(states), markov_chain.state, rng.state
 
 
@@ -434,7 +437,7 @@ def _prune_record_meta(chain: MarkovChain, record_meta):
 
 
 def _parallel_sampling(args: _s.typing.List[_s.typing.Any], n_procs: int, backend: Backend):
-    result_queue = _s.multiprocessing.Queue() if backend is not None else None
+    result_queue = _s.multiprocessing.Manager().Queue() if backend is not None else None
     for i in range(len(args)):
         args[i] += (result_queue,)
 
@@ -442,7 +445,7 @@ def _parallel_sampling(args: _s.typing.List[_s.typing.Any], n_procs: int, backen
     result = workers.starmap_async(_sample_parallel_chain, args)
 
     if backend is not None:
-        finished = [False for i in range(args)]
+        finished = [False for i in range(len(args))]
         while not _s.numpy.all(finished):
             chain_idx, state, meta = result_queue.get()
             if state is not None:
