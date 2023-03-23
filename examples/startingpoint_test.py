@@ -1,7 +1,8 @@
 import sys
 
-import hopsy
 import numpy as np
+
+import hopsy
 
 if __name__ == "__main__":
     A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
@@ -23,11 +24,11 @@ if __name__ == "__main__":
 
     if len(sys.argv) == 1 or sys.argv[1] != "test":
         import matplotlib.pyplot as plt
+
         states = np.array(run.data.states[0])
 
-        fig = plt.figure(figsize=(35,35))
+        fig = plt.figure(figsize=(35, 35))
         fig.patch.set_alpha(1)
         ax = fig.gca()
-        ax.scatter(states[:,0], states[:,1])
+        ax.scatter(states[:, 0], states[:, 1])
         plt.show()
-

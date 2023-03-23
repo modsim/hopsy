@@ -28,11 +28,11 @@ PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::TuningTarget);
 
 namespace hopsy {
 
-    // currently deprecated. 
-    // TODO: 
-    // in order to have a tuning target, which 
+    // currently deprecated.
+    // TODO:
+    // in order to have a tuning target, which
     //     - can also be evaluated in "stand-alone" fashion,
-    //       that is by calling 
+    //       that is by calling
     //       ```
     //           target = TuningTarget(...) # whatever arguments are needed
     //           target(x=0.5)              # evalute target at x=0.5
@@ -97,7 +97,7 @@ namespace hopsy {
     };
 
     template<typename TargetType, typename ...Args>
-    TargetType createTarget(std::vector<MarkovChain*>& markovChain, 
+    TargetType createTarget(std::vector<MarkovChain*>& markovChain,
                             unsigned long numberOfTestSamples,
                             Args... args
                             ) {
@@ -116,8 +116,8 @@ namespace hopsy {
     using GridSearch = hops::GridSearchTuner::param_type;
 
     template<typename MethodType>
-    std::pair<VectorType, MatrixType> tune(typename MethodType::param_type& methodParams, 
-                                           TuningTarget* target, 
+    std::pair<VectorType, MatrixType> tune(typename MethodType::param_type& methodParams,
+                                           TuningTarget* target,
                                            std::vector<RandomNumberGenerator*>& randomNumberGenerator) {
         VectorType optimalParameters;
         double optimalTargetValue;
@@ -129,10 +129,10 @@ namespace hopsy {
         }
 
         TuningTargetWrapper _target{target};
-        MethodType::tune(optimalParameters, 
-                         optimalTargetValue, 
-                         _randomNumberGenerator, 
-                         methodParams, 
+        MethodType::tune(optimalParameters,
+                         optimalTargetValue,
+                         _randomNumberGenerator,
+                         methodParams,
                          _target,
                          data);
 
@@ -151,23 +151,23 @@ namespace hopsy {
 
         py::classh<AcceptanceRateTarget, TuningTarget>(m, "AcceptanceRateTarget", doc::AcceptanceRateTarget::base)
             .def(py::init([] (std::vector<MarkovChain*>& markovChain,
-                              unsigned long numberOfTestSamples, 
+                              unsigned long numberOfTestSamples,
                               double acceptanceRate,
-                              unsigned long order) { 
+                              unsigned long order) {
                             return createTarget<AcceptanceRateTarget, double, unsigned long>(
                                     markovChain, numberOfTestSamples, acceptanceRate, order);
-                        }), 
+                        }),
                 doc::AcceptanceRateTarget::__init__,
                 py::arg("markov_chains"),
-                py::arg("n_test_samples") = 1000, 
+                py::arg("n_test_samples") = 1000,
                 py::arg("acceptance_rate") = 0.234,
                 py::arg("order") = 1)
-            .def_readwrite("n_test_samples", &AcceptanceRateTarget::numberOfTestSamples, 
+            .def_readwrite("n_test_samples", &AcceptanceRateTarget::numberOfTestSamples,
                     doc::AcceptanceRateTarget::numberOfTestSamples)
-            .def_readwrite("acceptance_rate", &AcceptanceRateTarget::acceptanceRateTargetValue, 
+            .def_readwrite("acceptance_rate", &AcceptanceRateTarget::acceptanceRateTargetValue,
                     doc::AcceptanceRateTarget::acceptanceRate)
-            .def("__call__", [] (AcceptanceRateTarget& self, 
-                                 const VectorType& x, 
+            .def("__call__", [] (AcceptanceRateTarget& self,
+                                 const VectorType& x,
                                  std::vector<RandomNumberGenerator*>& randomNumberGenerators) {
                         std::vector<hops::RandomNumberGenerator*> _randomNumberGenerators(randomNumberGenerators.size());
                         for (size_t i = 0; i < randomNumberGenerators.size(); ++i) {
@@ -180,37 +180,37 @@ namespace hopsy {
 
         py::classh<ExpectedSquaredJumpDistanceTarget, TuningTarget>(m, "ExpectedSquaredJumpDistanceTarget", doc::ExpectedSquaredJumpDistanceTarget::base)
             .def(py::init([] (std::vector<MarkovChain*>& markovChain,
-                              unsigned long numberOfTestSamples, 
-                              unsigned long lags, 
-                              bool considerTimeCost, 
-                              bool estimateCovariance) { 
+                              unsigned long numberOfTestSamples,
+                              unsigned long lags,
+                              bool considerTimeCost,
+                              bool estimateCovariance) {
                             std::vector<unsigned long> _lags;
                             for (unsigned long i = 0; i < lags; ++i) {
                                 _lags.push_back(i+1);
                             }
                             return createTarget<ExpectedSquaredJumpDistanceTarget, std::vector<unsigned long>, bool, bool>(
                                     markovChain, numberOfTestSamples, _lags, considerTimeCost, estimateCovariance);
-                        }), 
-                doc::ExpectedSquaredJumpDistanceTarget::__init__, 
-                py::arg("markov_chains"), 
+                        }),
+                doc::ExpectedSquaredJumpDistanceTarget::__init__,
+                py::arg("markov_chains"),
                 py::arg("n_test_samples") = 1000,
                 py::arg("lags") = 1,
                 py::arg("consider_time_cost") = false,
                 py::arg("estimate_covariance") = true)
             .def(py::init(&createTarget<ExpectedSquaredJumpDistanceTarget, std::vector<unsigned long>, bool, bool>),
-                py::arg("markov_chains"), 
+                py::arg("markov_chains"),
                 py::arg("n_test_samples") = 1000,
                 py::arg("lags") = std::vector<unsigned long>{1},
                 py::arg("consider_time_cost") = false,
                 py::arg("estimate_covariance") = true)
-            .def_readwrite("n_test_samples", &ExpectedSquaredJumpDistanceTarget::numberOfTestSamples, 
+            .def_readwrite("n_test_samples", &ExpectedSquaredJumpDistanceTarget::numberOfTestSamples,
                     doc::ExpectedSquaredJumpDistanceTarget::numberOfTestSamples)
-            .def_readwrite("lags", &ExpectedSquaredJumpDistanceTarget::lags, 
+            .def_readwrite("lags", &ExpectedSquaredJumpDistanceTarget::lags,
                     doc::ExpectedSquaredJumpDistanceTarget::lags)
-            .def_readwrite("consider_time_cost", &ExpectedSquaredJumpDistanceTarget::considerTimeCost, 
+            .def_readwrite("consider_time_cost", &ExpectedSquaredJumpDistanceTarget::considerTimeCost,
                     doc::ExpectedSquaredJumpDistanceTarget::considerTimeCost)
-            .def("__call__", [] (ExpectedSquaredJumpDistanceTarget& self, 
-                                 const VectorType& x, 
+            .def("__call__", [] (ExpectedSquaredJumpDistanceTarget& self,
+                                 const VectorType& x,
                                  std::vector<RandomNumberGenerator*>& randomNumberGenerators) {
                         std::vector<hops::RandomNumberGenerator*> _randomNumberGenerators(randomNumberGenerators.size());
                         for (size_t i = 0; i < randomNumberGenerators.size(); ++i) {
@@ -222,8 +222,8 @@ namespace hopsy {
         ;
 
         py::classh<PyTuningTarget, TuningTarget>(m, "PyTuningTarget", doc::PyTuningTarget::base)
-            .def(py::init<py::object>(), 
-                doc::PyTuningTarget::__init__, 
+            .def(py::init<py::object>(),
+                doc::PyTuningTarget::__init__,
                 py::arg("tuning_target"))
             .def("__call__", &PyTuningTarget::operator(),
                     py::arg("x"), py::arg("rngs"), doc::PyTuningTarget::__call__)
@@ -242,26 +242,26 @@ namespace hopsy {
                     py::arg("smoothing_length") = .5,
                     py::arg("random_seed") = 0,
                     py::arg("record_data") = false)
-          .def_readonly("n_converged", &ThompsonSampling::posteriorUpdateIterationsNeeded, 
+          .def_readonly("n_converged", &ThompsonSampling::posteriorUpdateIterationsNeeded,
 				    doc::ThompsonSampling::posteriorUpdateIterationsNeeded)
-          .def_readwrite("n_posterior_updates", &ThompsonSampling::posteriorUpdateIterations, 
+          .def_readwrite("n_posterior_updates", &ThompsonSampling::posteriorUpdateIterations,
 				    doc::ThompsonSampling::posteriorUpdateIterations)
-          .def_readwrite("n_pure_sampling", &ThompsonSampling::pureSamplingIterations, 
+          .def_readwrite("n_pure_sampling", &ThompsonSampling::pureSamplingIterations,
 					doc::ThompsonSampling::pureSamplingIterations)
-          .def_readwrite("n_convergence", &ThompsonSampling::iterationsForConvergence, 
+          .def_readwrite("n_convergence", &ThompsonSampling::iterationsForConvergence,
 					doc::ThompsonSampling::iterationsForConvergence)
-          .def_readwrite("grid_size", &ThompsonSampling::stepSizeGridSize, 
+          .def_readwrite("grid_size", &ThompsonSampling::stepSizeGridSize,
 					doc::ThompsonSampling::stepSizeGridSize)
-          .def_readwrite("lower_bound", &ThompsonSampling::stepSizeLowerBound, 
+          .def_readwrite("lower_bound", &ThompsonSampling::stepSizeLowerBound,
 					doc::ThompsonSampling::stepSizeLowerBound)
-          .def_readwrite("upper_bound", &ThompsonSampling::stepSizeUpperBound, 
+          .def_readwrite("upper_bound", &ThompsonSampling::stepSizeUpperBound,
 					doc::ThompsonSampling::stepSizeUpperBound)
-          .def_readwrite("smoothing_length", &ThompsonSampling::smoothingLength, 
+          .def_readwrite("smoothing_length", &ThompsonSampling::smoothingLength,
 					doc::ThompsonSampling::smoothingLength)
           .def_readwrite("random_seed", &ThompsonSampling::randomSeed, doc::ThompsonSampling::randomSeed)
           .def_readwrite("record_data", &ThompsonSampling::recordData, doc::ThompsonSampling::recordData);
 
-        m.def("tune", &tune<hops::ThompsonSamplingTuner>, 
+        m.def("tune", &tune<hops::ThompsonSamplingTuner>,
                 doc::tune,
                 py::arg("method"), py::arg("target"), py::arg("rngs"));
     }

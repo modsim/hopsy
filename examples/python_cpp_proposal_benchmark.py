@@ -1,8 +1,10 @@
-import hopsy
-import numpy as np
 import sys
-
 import time
+
+import numpy as np
+
+import hopsy
+
 
 class GaussianProposal:
     def __init__(self, A: np.ndarray, b: np.ndarray, x: np.ndarray, cov: np.ndarray):
@@ -16,7 +18,7 @@ class GaussianProposal:
     def propose(self):
         mean = np.zeros((len(cov),))
         y = np.random.multivariate_normal(mean, cov).reshape(-1, 1)
-        self.proposal = self.x + self.r * y 
+        self.proposal = self.x + self.r * y
 
     def accept_proposal(self):
         self.x = self.proposal
@@ -30,7 +32,7 @@ class GaussianProposal:
         return self.x
 
     def set_state(self, new_state: np.ndarray):
-        self.x = new_state.reshape(-1,1)
+        self.x = new_state.reshape(-1, 1)
 
     def get_proposal(self) -> np.ndarray:
         return self.proposal
@@ -46,14 +48,14 @@ class GaussianProposal:
 
 
 A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
-b = np.array([[1], [1], [0], [0]]);
+b = np.array([[1], [1], [0], [0]])
 
 x0 = np.array([[0.1], [0.1]])
 
-mu = np.zeros((2,1))
-cov = 0.1*np.identity(2)
+mu = np.zeros((2, 1))
+cov = 0.1 * np.identity(2)
 
-proposal = GaussianProposal(A, b, x0, 0.5*np.identity(2))
+proposal = GaussianProposal(A, b, x0, 0.5 * np.identity(2))
 
 model = hopsy.MultivariateGaussianModel(mu, cov)
 problem = hopsy.Problem(A, b, model)
@@ -91,10 +93,11 @@ if len(sys.argv) == 1 or sys.argv[1] != "test":
     print(cpp_proposal[0], cpp_proposal[1])
 
     import matplotlib.pyplot as plt
+
     states = np.array(run.data.states[0])
 
-    fig = plt.figure(figsize=(35,35))
+    fig = plt.figure(figsize=(35, 35))
     fig.patch.set_alpha(1)
     ax = fig.gca()
-    ax.scatter(states[:,0], states[:,1])
+    ax.scatter(states[:, 0], states[:, 1])
     plt.show()

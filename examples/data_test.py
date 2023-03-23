@@ -1,13 +1,13 @@
-import hopsy as hp
-import numpy as np
-import hopsy.util as util
-import matplotlib.pyplot as plt
-
+import os
+import shutil
+import sys
 from copy import deepcopy
 
-import os
-import sys
-import shutil
+import matplotlib.pyplot as plt
+import numpy as np
+
+import hopsy as hp
+import hopsy.util as util
 
 data = hp.Data()
 data.states = [[np.array([0, 0])], [np.array([0, 0])]]
@@ -21,7 +21,7 @@ n_chains = 2
 x0 = [0.2, 0.6]
 starting_points = [deepcopy(x0) for x in range(n_chains)]
 
-run = hp.Run(problem, number_of_chains = n_chains, starting_points=starting_points)
+run = hp.Run(problem, number_of_chains=n_chains, starting_points=starting_points)
 
 run.sample(1000, 10)
 print(np.array(run.data.states).shape)

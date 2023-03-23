@@ -30,4 +30,3 @@ manylinux-build:
 
 manylinux-install:
 	pip3 install --force-reinstall --no-deps dist/hopsy-*-manylinux*.whl
-

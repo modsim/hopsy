@@ -1,5 +1,6 @@
-from . core import *
-del globals()['MarkovChain']
-from . core import __version__, __build__, __is_debug__
-from . misc import *
-from . lp import *
+from .core import *
+
+del globals()["MarkovChain"]
+from .core import __build__, __is_debug__, __version__
+from .lp import *
+from .misc import *

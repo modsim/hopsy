@@ -209,7 +209,7 @@ namespace hopsy {
 
         std::unique_ptr<Proposal> copyProposal() const override {
 			PYBIND11_OVERRIDE_PURE_NAME(
-				std::unique_ptr<Proposal>,  // Return type 
+				std::unique_ptr<Proposal>,  // Return type
 				ProposalBase,               // Parent class
                 "__copy__",                 // Python function name
 				copyProposal                    // C++ function name
@@ -424,17 +424,17 @@ namespace hopsy {
     template<typename ProposalImpl, typename... Args>
     class UninitializedProposalWrapper : public Proposal {
     public:
-        UninitializedProposalWrapper() : 
+        UninitializedProposalWrapper() :
                 isInitialized(false) { }
 
-        UninitializedProposalWrapper(const MatrixType& A, 
-                                     const VectorType& b, 
+        UninitializedProposalWrapper(const MatrixType& A,
+                                     const VectorType& b,
                                      const VectorType& startingPoint,
-                                     const Args&... args) : 
-                proposal(ProposalImpl(A, b, startingPoint, args...)), 
+                                     const Args&... args) :
+                proposal(ProposalImpl(A, b, startingPoint, args...)),
                 isInitialized(true) { }
-                
-        static UninitializedProposalWrapper<ProposalImpl, Args...> createFromProblem(const Problem* problem, 
+
+        static UninitializedProposalWrapper<ProposalImpl, Args...> createFromProblem(const Problem* problem,
                                                                                      const Args&... args) {
             if (problem) {
                 if (!problem->startingPoint) {
@@ -626,8 +626,8 @@ namespace hopsy {
     namespace proposal {
         template<typename ProposalType, typename Docs, typename ClassType>
         void addCommon(ClassType& prop) {
-            prop.def("propose", [](ProposalType& self, hopsy::RandomNumberGenerator& rng) -> hops::VectorType& { 
-                            return self.propose(rng.rng); 
+            prop.def("propose", [](ProposalType& self, hopsy::RandomNumberGenerator& rng) -> hops::VectorType& {
+                            return self.propose(rng.rng);
                         },
                         Docs::propose
                 )
@@ -635,24 +635,24 @@ namespace hopsy {
                 .def_property_readonly("log_acceptance_probability", &ProposalType::computeLogAcceptanceProbability, Docs::logAcceptanceProbability)
                 .def_property_readonly("proposal", &ProposalType::getProposal, Docs::proposal)
                 .def_property("state", &ProposalType::getState, &ProposalType::setState, Docs::state)
-                .def("_get_parameter", [] (const ProposalType& self, 
+                .def("_get_parameter", [] (const ProposalType& self,
                                            const ProposalParameter& parameter) {
                             return std::any_cast<double>(self.getParameter(parameter));
-                        }, 
+                        },
                         Docs::getParameter,
                         py::arg("param"))
-                .def("_set_parameter", [] (ProposalType& self, 
+                .def("_set_parameter", [] (ProposalType& self,
                                            const ProposalParameter& parameter,
                                            double value) {
                             return self.setParameter(parameter, std::any(value));
-                        }, 
+                        },
                         Docs::setParameter,
-                        py::arg("param"), 
+                        py::arg("param"),
                         py::arg("value"))
                 .def_property_readonly("name", &ProposalType::getProposalName, Docs::name)
-                .def_property_readonly("state_negative_log_likelihood", &ProposalType::getStateNegativeLogLikelihood, 
+                .def_property_readonly("state_negative_log_likelihood", &ProposalType::getStateNegativeLogLikelihood,
                         Docs::stateNegativeLogLikelihood)
-                .def_property_readonly("proposal_negative_log_likelihood", &ProposalType::getProposalNegativeLogLikelihood, 
+                .def_property_readonly("proposal_negative_log_likelihood", &ProposalType::getProposalNegativeLogLikelihood,
                         Docs::proposalNegativeLogLikelihood)
                 .def_property_readonly("has_negative_log_likelihood", &ProposalType::hasNegativeLogLikelihood,
                         Docs::hasNegativeLogLikelihood)
@@ -662,7 +662,7 @@ namespace hopsy {
 
         template<typename ProposalType, typename ClassType, typename ParameterType = double>
         void addParameter(ClassType& prop, const hops::ProposalParameter &parameter, const char* parameterName, const char* doc = nullptr) {
-            prop.def_property(parameterName, 
+            prop.def_property(parameterName,
                     [=] (const ProposalType& self) { return std::any_cast<ParameterType>(self.getParameter(parameter)); },
                     [=] (ProposalType& self, ParameterType value) { self.setParameter(parameter, value); },
                     doc
@@ -697,7 +697,7 @@ namespace hopsy {
                     doc::AdaptiveMetropolisProposal::__init__,
                     py::arg("problem"),
                     py::arg("boundary_cushion") = 0,
-                    py::arg("eps") = 1.e-3, 
+                    py::arg("eps") = 1.e-3,
                     py::arg("warm_up") = 100)
             .def(py::init([] (const Problem* problem,
                               const VectorType* startingPoint,
@@ -712,9 +712,9 @@ namespace hopsy {
                     }),
                     doc::AdaptiveMetropolisProposal::__init__,
                     py::arg("problem"),
-                    py::arg("starting_point") = py::none(), 
+                    py::arg("starting_point") = py::none(),
                     py::arg("boundary_cushion") = 0,
-                    py::arg("eps") = 1.e-3, 
+                    py::arg("eps") = 1.e-3,
                     py::arg("warm_up") = 100)
             ;
         // common
@@ -728,9 +728,9 @@ namespace hopsy {
                 adaptiveMetropolisProposal, ProposalParameter::WARM_UP, "warm_up", doc::AdaptiveMetropolisProposal::warmUp);
         // pickling
         adaptiveMetropolisProposal.def(py::pickle([] (const AdaptiveMetropolisProposal& self) {
-                        return py::make_tuple(self.proposal->getA(), 
-                                              self.proposal->getB(), 
-                                              self.proposal->getState(), 
+                        return py::make_tuple(self.proposal->getA(),
+                                              self.proposal->getB(),
+                                              self.proposal->getState(),
                                               self.proposal->getCholeskyOfMaximumVolumeEllipsoid(),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::BOUNDARY_CUSHION)),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::EPSILON)),
@@ -749,23 +749,23 @@ namespace hopsy {
                         return p;
                     })
                 );
-        
-        
-        
+
+
+
         // register BallWalkProposal
         py::classh<BallWalkProposal, Proposal, ProposalTrampoline<BallWalkProposal>> ballWalkProposal(
                 m, "BallWalkProposal", doc::BallWalkProposal::base);
         // constructor
         ballWalkProposal
             //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
-            .def(py::init(&BallWalkProposal::createFromProblem), 
+            .def(py::init(&BallWalkProposal::createFromProblem),
                     doc::BallWalkProposal::__init__,
                     py::arg("problem"),
                     py::arg("stepsize") = 1)
-            .def(py::init(&BallWalkProposal::create), 
+            .def(py::init(&BallWalkProposal::create),
                     doc::BallWalkProposal::__init__,
                     py::arg("problem"),
-                    py::arg("starting_point"), 
+                    py::arg("starting_point"),
                     py::arg("stepsize") = 1)
             ;
         // common
@@ -775,9 +775,9 @@ namespace hopsy {
                 ballWalkProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::BallWalkProposal::stepSize);
         // pickling
         ballWalkProposal.def(py::pickle([] (const BallWalkProposal& self) {
-                        return py::make_tuple(self.proposal->getA(), 
-                                              self.proposal->getB(), 
-                                              self.proposal->getState(), 
+                        return py::make_tuple(self.proposal->getA(),
+                                              self.proposal->getB(),
+                                              self.proposal->getState(),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
                     },
                     [] (py::tuple t) {
@@ -1021,8 +1021,8 @@ namespace hopsy {
                                                t[5].cast<double>());
                     })
                 );
-        
-        
+
+
         // register DikinWalkProposal
         py::classh<DikinWalkProposal, Proposal, ProposalTrampoline<DikinWalkProposal>> dikinWalkProposal(
                 m, "DikinWalkProposal", doc::DikinWalkProposal::base);
@@ -1038,7 +1038,7 @@ namespace hopsy {
                     }),
                     doc::DikinWalkProposal::__init__,
                     py::arg("problem"),
-                    py::arg("stepsize") = 1, 
+                    py::arg("stepsize") = 1,
                     py::arg("boundary_cushion") = 0)
             .def(py::init([] (const Problem* problem,
                               const VectorType* startingPoint,
@@ -1050,8 +1050,8 @@ namespace hopsy {
                     }),
                     doc::DikinWalkProposal::__init__,
                     py::arg("problem"),
-                    py::arg("starting_point") = py::none(), 
-                    py::arg("stepsize") = 1, 
+                    py::arg("starting_point") = py::none(),
+                    py::arg("stepsize") = 1,
                     py::arg("boundary_cushion") = 0)
             ;
         // common
@@ -1063,9 +1063,9 @@ namespace hopsy {
                 dikinWalkProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::DikinWalkProposal::stepSize);
         // pickling
         dikinWalkProposal.def(py::pickle([] (const DikinWalkProposal& self) {
-                        return py::make_tuple(self.proposal->getA(), 
-                                              self.proposal->getB(), 
-                                              self.proposal->getState(), 
+                        return py::make_tuple(self.proposal->getA(),
+                                              self.proposal->getB(),
+                                              self.proposal->getState(),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
                     },
                     [] (py::tuple t) {
@@ -1077,9 +1077,9 @@ namespace hopsy {
                                              t[3].cast<double>());
                     })
                 );
-        
-        
-        
+
+
+
         // register GaussianCoordinateHitAndRun
         py::classh<GaussianCoordinateHitAndRunProposal, Proposal, ProposalTrampoline<GaussianCoordinateHitAndRunProposal>> gaussianCoordinateHitAndRunProposal(
                 m, "GaussianCoordinateHitAndRunProposal", doc::GaussianCoordinateHitAndRunProposal::base);
@@ -1093,9 +1093,9 @@ namespace hopsy {
             .def(py::init(&GaussianCoordinateHitAndRunProposal::create),
                     doc::GaussianCoordinateHitAndRunProposal::__init__,
                     py::arg("problem"),
-                    py::arg("starting_point"), 
+                    py::arg("starting_point"),
                     py::arg("stepsize") = 1)
-            ;        
+            ;
 		// common
         proposal::addCommon<GaussianCoordinateHitAndRunProposal, doc::GaussianCoordinateHitAndRunProposal>(gaussianCoordinateHitAndRunProposal);
         // parameters
@@ -1103,9 +1103,9 @@ namespace hopsy {
                 gaussianCoordinateHitAndRunProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::GaussianCoordinateHitAndRunProposal::stepSize);
         // pickling
         gaussianCoordinateHitAndRunProposal.def(py::pickle([] (const GaussianCoordinateHitAndRunProposal& self) {
-                        return py::make_tuple(self.proposal->getA(), 
-                                              self.proposal->getB(), 
-                                              self.proposal->getState(), 
+                        return py::make_tuple(self.proposal->getA(),
+                                              self.proposal->getB(),
+                                              self.proposal->getState(),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
                     },
                     [] (py::tuple t) {
@@ -1132,7 +1132,7 @@ namespace hopsy {
             .def(py::init(&GaussianHitAndRunProposal::create),
                     doc::GaussianCoordinateHitAndRunProposal::__init__,
                     py::arg("problem"),
-                    py::arg("starting_point"), 
+                    py::arg("starting_point"),
                     py::arg("stepsize") = 1)
             ;
         // common
@@ -1142,9 +1142,9 @@ namespace hopsy {
                 gaussianHitAndRunProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::GaussianHitAndRunProposal::stepSize);
         // pickling
         gaussianHitAndRunProposal.def(py::pickle([] (const GaussianHitAndRunProposal& self) {
-                        return py::make_tuple(self.proposal->getA(), 
-                                              self.proposal->getB(), 
-                                              self.proposal->getState(), 
+                        return py::make_tuple(self.proposal->getA(),
+                                              self.proposal->getB(),
+                                              self.proposal->getState(),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
                     },
                     [] (py::tuple t) {
@@ -1181,9 +1181,9 @@ namespace hopsy {
                 gaussianProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::GaussianProposal::stepSize);
         // pickling
         gaussianProposal.def(py::pickle([] (const GaussianProposal& self) {
-                        return py::make_tuple(self.proposal->getA(), 
-                                              self.proposal->getB(), 
-                                              self.proposal->getState(), 
+                        return py::make_tuple(self.proposal->getA(),
+                                              self.proposal->getB(),
+                                              self.proposal->getState(),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
                     },
                     [] (py::tuple t) {
@@ -1199,7 +1199,7 @@ namespace hopsy {
 
 
         // register PyProposal
-        py::classh<PyProposal, Proposal, ProposalTrampoline<PyProposal>> 
+        py::classh<PyProposal, Proposal, ProposalTrampoline<PyProposal>>
                 pyProposal(m, "PyProposal", doc::PyProposal::base);
         // constructor
         pyProposal.def(py::init<py::object>(), doc::PyProposal::__init__, py::arg("proposal"));
@@ -1305,10 +1305,10 @@ namespace hopsy {
         // constructor
         uniformCoordinateHitAndRunProposal
             //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
-            .def(py::init(&UniformCoordinateHitAndRunProposal::createFromProblem), 
+            .def(py::init(&UniformCoordinateHitAndRunProposal::createFromProblem),
                     doc::UniformCoordinateHitAndRunProposal::__init__,
                     py::arg("problem"))
-            .def(py::init(&UniformCoordinateHitAndRunProposal::create), 
+            .def(py::init(&UniformCoordinateHitAndRunProposal::create),
                     doc::UniformCoordinateHitAndRunProposal::__init__,
                     py::arg("problem"),
                     py::arg("starting_point"))
@@ -1317,8 +1317,8 @@ namespace hopsy {
         proposal::addCommon<UniformCoordinateHitAndRunProposal, doc::UniformCoordinateHitAndRunProposal>(uniformCoordinateHitAndRunProposal);
         // pickling
         uniformCoordinateHitAndRunProposal.def(py::pickle([] (const UniformCoordinateHitAndRunProposal& self) {
-                        return py::make_tuple(self.proposal->getA(), 
-                                              self.proposal->getB(), 
+                        return py::make_tuple(self.proposal->getA(),
+                                              self.proposal->getB(),
                                               self.proposal->getState());
                     },
                     [] (py::tuple t) {
@@ -1337,20 +1337,20 @@ namespace hopsy {
         // constructor
         uniformHitAndRunProposal
             //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
-            .def(py::init(&UniformHitAndRunProposal::createFromProblem), 
+            .def(py::init(&UniformHitAndRunProposal::createFromProblem),
                     doc::UniformHitAndRunProposal::__init__,
-                    py::arg("problem")) 
-            .def(py::init(&UniformHitAndRunProposal::create), 
+                    py::arg("problem"))
+            .def(py::init(&UniformHitAndRunProposal::create),
                     doc::UniformHitAndRunProposal::__init__,
                     py::arg("problem"),
-                    py::arg("starting_point")) 
+                    py::arg("starting_point"))
             ;
         // common
         proposal::addCommon<UniformHitAndRunProposal, doc::UniformHitAndRunProposal>(uniformHitAndRunProposal);
         // pickling
         uniformHitAndRunProposal.def(py::pickle([] (const UniformHitAndRunProposal& self) {
-                        return py::make_tuple(self.proposal->getA(), 
-                                              self.proposal->getB(), 
+                        return py::make_tuple(self.proposal->getA(),
+                                              self.proposal->getB(),
                                               self.proposal->getState());
                     },
                     [] (py::tuple t) {

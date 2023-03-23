@@ -9,4 +9,3 @@ add_test(NAME rounding_test COMMAND python3 rounding_test.py test)
 add_test(NAME pymodel_test COMMAND python3 pymodel_test.py test)
 add_test(NAME pyproposal_test COMMAND python3 pyproposal_test.py test)
 add_test(NAME adaptive_pyproposal_test COMMAND python3 adaptive_pyproposal_test.py test)
-
