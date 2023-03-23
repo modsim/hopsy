@@ -201,7 +201,6 @@ class MiscTests(unittest.TestCase):
         problem = Problem([[1, 0], [0, 1], [-1, 0], [0, -1]], [5, 5, 0, 0], Gaussian(dim=2))
         mcs = [MarkovChain(problem, proposal=GaussianHitAndRunProposal, starting_point=[.5, .5]) for i in range(2)]
         rngs = [RandomNumberGenerator(42, i) for i in range(2)]
-
         backend = TestBackend()
         record_meta = ['state_negative_log_likelihood', 'proposal.proposal']
         meta, states = sample(mcs, rngs, n_samples=100, record_meta=record_meta, backend=backend)

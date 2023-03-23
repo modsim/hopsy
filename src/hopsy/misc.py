@@ -3,6 +3,8 @@
 """
 
 
+
+
 class _core:
     from .core import GaussianHitAndRunProposal
     from .core import MarkovChain
@@ -10,6 +12,7 @@ class _core:
     from .core import Proposal
     from .core import RandomNumberGenerator
     from .lp import LP
+
 
 
 _c = _core
@@ -43,7 +46,9 @@ _s = _submodules
 
 def MarkovChain(problem: _c.Problem,
                 proposal: _s.typing.Union[_c.Proposal, _s.typing.Type[_c.Proposal]] = _c.GaussianHitAndRunProposal,
-                starting_point: _s.numpy.typing.ArrayLike = None):
+                starting_point: _s.numpy.typing.ArrayLike = None,
+                parallelTemperingSyncRng: _c.RandomNumberGenerator = None,
+                exchangeAttemptProbability: float = 0.1):
     _proposal = None
     if isinstance(proposal, type):
         if starting_point is not None:
@@ -55,7 +60,8 @@ def MarkovChain(problem: _c.Problem,
     else:
         _proposal = proposal
 
-    return _c.MarkovChain(_proposal, problem)
+    return _c.MarkovChain(_proposal, problem, parallelTemperingSyncRng=parallelTemperingSyncRng,
+                          exchangeAttemptProbability=exchangeAttemptProbability)
 
 
 MarkovChain.__doc__ = _core.MarkovChain.__doc__  # propagate docstring
@@ -517,6 +523,11 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
         thus be ``(1, n_draws, dim)``.
 
     """
+
+    # multiprocessing and mpi (parallel tempering) do not work together yet
+    # because forked processes do not get a correct rank.
+    if n_procs != 1 and any([mc.parallelTemperingSyncRng is not None for mc in markov_chains]):
+        raise ValueError("n_procs>1 does not work together with parallel tempering with is based on mpi.")
 
     # if both are lists, they have to match in size
     if hasattr(markov_chains, "__len__") and hasattr(rngs, "__len__") and len(markov_chains) != len(rngs):
