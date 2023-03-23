@@ -536,7 +536,7 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
 
     # initialize backend
     if backend is not None:
-        backend.setup(len(markov_chains), n_samples, len(markov_chains[0].state), record_meta.keys() if isinstance(record_meta, dict) else ["acceptance_rate"])
+        backend.setup(len(markov_chains), n_samples, len(markov_chains[0].state), record_meta if isinstance(record_meta, list) else ["acceptance_rate"])
 
     result = []
 
