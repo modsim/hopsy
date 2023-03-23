@@ -260,18 +260,18 @@ class Backend(_s.abc.ABC):
         :param name : str
             Name of the backend
         """
-        self.chain_idx = -1
+        self.n_chain = -1
         self.n_samples = -1
         self.n_dims = -1
         self.meta_names = None
         self.name = name
 
-    def setup(self, chain_idx: int, n_samples: int, n_dims: int, meta_names: _s.typing.List[str]) -> None:
+    def setup(self, n_chains: int, n_samples: int, n_dims: int, meta_names: _s.typing.List[str]) -> None:
         r"""
         Setup backend for a specific MCMC chain.
 
-        :param chain_idx : int
-            Index of the chain
+        :param n_chains : int
+            Number of chains
         :param n_samples: int
             Number of samples to produce
         :param n_dims: int
@@ -279,12 +279,12 @@ class Backend(_s.abc.ABC):
         :param meta_names: List[str]
             String identifiers for meta information
         """
-        self.chain_idx = chain_idx
+        self.n_chains = n_chains
         self.n_samples = n_samples
         self.n_dims = n_dims
         self.meta_names = meta_names
 
-    def record(self, state: _s.numpy.ndarray, meta: _s.typing.Dict[str, _s.typing.Union[float, _s.numpy.ndarray]]):
+    def record(self, chain_idx: int, state: _s.numpy.ndarray, meta: _s.typing.Dict[str, _s.typing.Union[float, _s.numpy.ndarray]]) -> None:
         r"""
         Record new MCMC state and metadata.
 
@@ -302,7 +302,7 @@ class Backend(_s.abc.ABC):
         pass
 
 
-def _sample(markov_chain: _c.MarkovChain,
+def _sequential_sampling(markov_chain: _c.MarkovChain,
             rng: _c.RandomNumberGenerator,
             n_samples: int,
             thinning: int,
@@ -317,22 +317,6 @@ def _sample(markov_chain: _c.MarkovChain,
         meta = []
     else:
         meta = {field: [] for field in record_meta}
-        for field in meta:
-            if field != "acceptance_rate":
-                attrs = field.split('.')
-                base = markov_chain
-
-                for attr in attrs:
-                    if hasattr(base, attr):
-                        base = getattr(base, attr)
-                    else:
-                        missing_fields.append(field)
-                        meta[field] = None
-
-    if backend is not None:
-        backend.setup(chain_idx, n_samples, len(markov_chain.state),
-                      ["acceptance_rate" if record_meta is None or record_meta is False
-                       else list(filter(lambda field: field in missing_fields, record_meta))])
 
     for i in range(n_samples):
         accrate, state = markov_chain.draw(rng, thinning)
@@ -365,7 +349,7 @@ def _sample(markov_chain: _c.MarkovChain,
             else:
                 step_meta = {key: meta[key][-1] for key in meta}
 
-            backend.record(state, step_meta)
+            backend.record(chain_idx, state, step_meta)
 
     if record_meta is None or record_meta is False:
         meta = _s.numpy.mean(meta)
@@ -376,11 +360,100 @@ def _sample(markov_chain: _c.MarkovChain,
     return meta, _s.numpy.array(states), markov_chain.state, rng.state
 
 
-def _parallel_execution(func: _s.typing.Callable, args: _s.typing.List[_s.typing.Any], n_procs: int):
-    result = []
-    with _s.multiprocessing.Pool(n_procs) as workers:
-        result = workers.starmap(func, args)
-    return result
+def _sample_parallel_chain(markov_chain: _c.MarkovChain,
+            rng: _c.RandomNumberGenerator,
+            n_samples: int,
+            thinning: int,
+            record_meta=None,
+            chain_idx: int = -1,
+            queue: _s.multiprocessing.Queue = None):
+    states = []
+
+    meta = None
+    missing_fields = []
+    if record_meta is None or record_meta is False:
+        meta = []
+    else:
+        meta = {field: [] for field in record_meta}
+
+    for i in range(n_samples):
+        accrate, state = markov_chain.draw(rng, thinning)
+
+        if record_meta is None or record_meta is False:
+            meta.append(accrate)
+        else:
+            for field in record_meta:
+                if field in missing_fields:
+                    continue
+
+                if field == "acceptance_rate":  # treat acceptance rate differently,
+                    # as it is no attribute of the markov chain
+                    meta[field].append(accrate)
+                else:
+                    # recurse through the attribute name and record the final value
+                    attrs = field.split('.')
+                    base = markov_chain
+                    for attr in attrs:
+                        base = getattr(base, attr)
+
+                    meta[field].append(base)
+
+        states.append(state)
+
+        if queue is not None:
+            step_meta = None
+            if record_meta is None or record_meta is False:
+                step_meta = {"acceptance_rate": accrate}
+            else:
+                step_meta = {key: meta[key][-1] for key in meta}
+
+            queue.put((chain_idx, state, step_meta))
+
+    if record_meta is None or record_meta is False:
+        meta = _s.numpy.mean(meta)
+
+    return meta, _s.numpy.array(states), markov_chain.state, rng.state
+
+
+def _prune_record_meta(chain: MarkovChain, record_meta):
+    missing_fields = {}
+    if isinstance(record_meta, list):
+        record_meta = record_meta.copy()
+        for field in record_meta:
+            if field != "acceptance_rate":
+                attrs = field.split('.')
+                base = chain
+
+                for attr in attrs:
+                    if hasattr(base, attr):
+                        base = getattr(base, attr)
+                    else:
+                        record_meta.remove(field)
+                        missing_fields[field] = None
+    return record_meta, missing_fields
+
+
+def _parallel_sampling(args: _s.typing.List[_s.typing.Any], n_procs: int, backend: Backend):
+    result_queue = _s.multiprocessing.Queue() if backend is not None else None
+    for i in range(len(args)):
+        args[i] += (result_queue,)
+
+    workers = _s.multiprocessing.Pool(n_procs-1)
+    result = workers.starmap_async(_sample_parallel_chain, args)
+
+    if backend is not None:
+        finished = [False for i in range(args)]
+        while not _s.numpy.all(finished):
+            chain_idx, state, meta = result_queue.get()
+            if state is not None:
+                backend.record(chain_idx, state, meta)
+            else:
+                finished[chain_idx] = True
+        backend.finish()
+    
+    workers.close()
+    workers.join()
+    return result.get()
 
 
 def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.MarkovChain]],
@@ -455,6 +528,13 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
         markov_chains = [markov_chains]
         rngs = [rngs]
 
+    # remove invalid entries from record_meta
+    record_meta, missing_fields = _prune_record_meta(markov_chains[0], record_meta)
+
+    # initialize backend
+    if backend is not None:
+        backend.setup(len(markov_chains), n_samples, len(markov_chains[0].state), record_meta.keys() if isinstance(record_meta, dict) else ["acceptance_rate"])
+
     result = []
 
     if n_procs != 1 or n_threads != 1:
@@ -464,19 +544,17 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
         if n_procs < 0:
             n_procs = min(len(markov_chains),
                           _s.multiprocessing.cpu_count())  # do not use more procs than available cpus
-        result_states = _parallel_execution(_sample,
-                                            [(markov_chains[i], rngs[i], n_samples, thinning, record_meta, i,
-                                              _s.copy.deepcopy(backend))
+        result_states = _parallel_sampling([(markov_chains[i], rngs[i], n_samples, thinning, record_meta, i)
                                              for i in range(len(markov_chains))],
-                                            n_procs)
+                                            n_procs,
+                                            backend)
         for i, chain_result in enumerate(result_states):
             result.append((chain_result[0], chain_result[1]))
             markov_chains[i].state = chain_result[2]
             rngs[i].state = chain_result[3]
     else:
         for i in range(len(markov_chains)):
-            _accrates, _states, _, _ = _sample(markov_chains[i], rngs[i], n_samples, thinning, record_meta, i,
-                                               _s.copy.deepcopy(backend))
+            _accrates, _states, _, _ = _sequential_sampling(markov_chains[i], rngs[i], n_samples, thinning, record_meta, i, backend)
             result.append((_accrates, _states))
 
     states = []
@@ -493,17 +571,15 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
 
     if record_meta is not None and record_meta is not False:
         for field in meta:
-            all_none = True
-            for val in meta[field]:
-                if val is not None:
-                    all_none = False
-
-            if all_none:
-                meta[field] = None
-            else:
-                meta[field] = _s.numpy.array(meta[field])
+            meta[field] = _s.numpy.array(meta[field])
+        meta.update(missing_fields)
 
     return meta, _s.numpy.array(states)
+
+
+def _parallel_execution(func: _s.typing.Callable, args: _s.typing.List[_s.typing.Any], n_procs: int):
+    with _s.multiprocessing.Pool(n_procs) as workers:
+        return workers.starmap(func, args)
 
 
 def _is_constant_chains(data: _s.numpy.typing.ArrayLike):

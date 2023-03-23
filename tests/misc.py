@@ -171,37 +171,32 @@ class MiscTests(unittest.TestCase):
         self.assertTrue(type(meta) is list)  # just usual acceptance rates
 
     def test_backend(self):
-        states_glob = []
-        meta_glob = []
-
         class TestBackend(Backend):
             def __init__(self, name: str = None):
                 super(TestBackend, self).__init__()
                 self.states = None
-                self.state_idx = 0
+                self.state_idx = []
                 self.meta = None
 
-            def setup(self, chain_idx: int, n_samples: int, n_dims: int, meta_names: typing.List[str]) -> None:
-                super(TestBackend, self).setup(chain_idx, n_samples, n_dims, meta_names)
-                self.states = np.zeros((self.n_samples, self.n_dims))
-                states_glob.append(self.states)
+            def setup(self, n_chains: int, n_samples: int, n_dims: int, meta_names: typing.List[str]) -> None:
+                super(TestBackend, self).setup(n_chains, n_samples, n_dims, meta_names)
+                self.states = np.zeros((self.n_chains, self.n_samples, self.n_dims))
+                self.state_idx = [0 for i in range(n_chains)]
+                self.meta = [None for i in range(n_chains)]
 
-            def record(self, state: numpy.ndarray, meta: typing.Dict[str, typing.Union[float, numpy.ndarray]]) -> None:
-                self.states[self.state_idx] = state
-                self.state_idx += 1
-                if self.meta is None:
-                    self.meta = {name: [meta[name]] for name in meta.keys()}
-                    meta_glob.append(self.meta)
+            def record(self, chain_idx: int, state: numpy.ndarray, meta: typing.Dict[str, typing.Union[float, numpy.ndarray]]) -> None:
+                self.states[chain_idx, self.state_idx[chain_idx]] = state
+                self.state_idx[chain_idx] += 1
+                if self.meta[chain_idx] is None:
+                    self.meta[chain_idx] = {name: [meta[name]] for name in meta.keys()}
                 else:
                     for name in meta.keys():
-                        self.meta[name] += [meta[name]]
+                        self.meta[chain_idx][name] += [meta[name]]
 
             def finish(self) -> None:
-                if isinstance(self.meta, list):
-                    self.meta = numpy.array(self.meta)
-                else:
+                for i in range(self.n_chain):
                     for field in self.meta:
-                        self.meta[field] = numpy.array(self.meta[field])
+                        self.meta[i][field] = numpy.array(self.meta[i][field])
 
         problem = Problem([[1, 0], [0, 1], [-1, 0], [0, -1]], [5, 5, 0, 0], Gaussian(dim=2))
         mcs = [MarkovChain(problem, proposal=GaussianHitAndRunProposal, starting_point=[.5, .5]) for i in range(2)]
@@ -210,15 +205,12 @@ class MiscTests(unittest.TestCase):
         backend = TestBackend()
         record_meta = ['state_negative_log_likelihood', 'proposal.proposal']
         meta, states = sample(mcs, rngs, n_samples=100, record_meta=record_meta, backend=backend)
-        self.assertTrue(np.all([states[i] == states_glob[i] for i in range(2)]))
-        self.assertTrue(
-            np.all([[np.all(meta[name][i] == meta_glob[i][name]) for i in range(2)] for name in meta.keys()]))
+        self.assertTrue(np.all(states == backend.states))
+        self.assertTrue(meta.keys() == backend.meta[0].keys())
+        self.assertTrue(np.all([np.all([meta[name][i] == backend.meta[i][name] for i in range(2)]) for name in meta.keys()]))
 
-        states_glob.clear()
-        meta_glob.clear()
         backend = TestBackend()
         record_meta = False
         meta, states = sample(mcs, rngs, n_samples=100, record_meta=record_meta, backend=backend)
-        self.assertTrue(np.all([states[i] == states_glob[i] for i in range(2)]))
-        self.assertTrue(
-            np.all([meta[i] == np.mean(meta_glob[i]["acceptance_rate"]) for i in range(2)]))
+        self.assertTrue(np.all(states == backend.states))
+        self.assertTrue(np.all(meta == np.mean([backend.meta[i]["acceptance_rate"] for i in range(2)], axis=1)))
