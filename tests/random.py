@@ -1,10 +1,10 @@
-import unittest
 import pickle
+import unittest
 
 from hopsy import *
 
+
 class RandomTests(unittest.TestCase):
-    
     def test_randomnumbergenerator_pickling(self):
         rng = RandomNumberGenerator()
         # calls rng to advance it
@@ -14,4 +14,3 @@ class RandomTests(unittest.TestCase):
         new_rng = pickle.loads(dump)
 
         self.assertEqual(rng(), new_rng())
-

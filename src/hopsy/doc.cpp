@@ -102,9 +102,9 @@ Parameters
 Returns
 -------
 :return: The value of ``model.compute_expected_fisher_information(x)``
-:rtype: numpy.ndarray[float64[n,n]] 
+:rtype: numpy.ndarray[float64[n,n]]
 )pbdoc";
-        
+
 
 /*
  *  Gaussian
@@ -114,20 +114,20 @@ const char* hopsy::doc::Gaussian::base = R"pbdoc(
 hopsy.Gaussian(self, mean=[0, 0], covariance=[[1, 0], [0, 1]], inactives=[])
 
 Gaussian model which can be invariant in some dimensions of the
-input vector. As an example, consider the one-dimensional squared exponential as a function of two input 
+input vector. As an example, consider the one-dimensional squared exponential as a function of two input
 variables
 
 .. math::
    f(x_1, x_2) = \exp\big\{ -x_1^2 \big\}
 
-then this function is invariant under the second dimension. We also say, that the second component of the 
+then this function is invariant under the second dimension. We also say, that the second component of the
 input vector :math:`(x_1, x_2)` is inactive. The degenerate multivariate Gaussian is defined
 as a regular Gaussian in :math:`n-k` dimensions, where the input vector has :math:`n` dimensions but :math:`k`
 of its components are inactive.
 
-Technically, this is realized by removing the rows and columns from the mean vector and covariance matrix, that 
-correspond to the inactive dimensions. This then basically constructs a Gaussian in :math:`n-k` dimensions. 
-However, unlike a standard multivariate Gaussian model, this model will still (and only) accept input vectors 
+Technically, this is realized by removing the rows and columns from the mean vector and covariance matrix, that
+correspond to the inactive dimensions. This then basically constructs a Gaussian in :math:`n-k` dimensions.
+However, unlike a standard multivariate Gaussian model, this model will still (and only) accept input vectors
 of dimension :math:`n`.
 
 Passing an empty list as ``inactives`` will define a common multivariate Gaussian.
@@ -135,9 +135,9 @@ Passing an empty list as ``inactives`` will define a common multivariate Gaussia
 Parameters
 ----------
 mean : numpy.ndarray[n, 1]
-    Gaussian mean vector 
+    Gaussian mean vector
 covariance : numpy.ndarray[n, n]
-    Gaussian covariance matrix 
+    Gaussian covariance matrix
 inactives : list[int]
     List of inactive dimensions, so entries should be between 0 and :math:`n-1`.
 
@@ -145,18 +145,18 @@ inactives : list[int]
 
 
 const char* hopsy::doc::Gaussian::__init__ = R"pbdoc(
-Constructs a ``hopsy.Gaussian`` with given mean and covariance and `deactivates` 
+Constructs a ``hopsy.Gaussian`` with given mean and covariance and `deactivates`
 all dimensions specified in ``inactives``. This works by removing the corresponding rows and columns
-from the mean and covariance. 
+from the mean and covariance.
 
 Passing an empty list as ``inactives`` will define a common multivariate Gaussian.
 
 Parameters
 ----------
 mean : numpy.ndarray[n, 1]
-    Gaussian mean vector 
+    Gaussian mean vector
 covariance : numpy.ndarray[n, n]
-    Gaussian covariance matrix 
+    Gaussian covariance matrix
 inactives : list[int]
     List of inactive dimensions, so entries should be between 0 and :math:`n-1`.
 
@@ -180,7 +180,7 @@ List of indices of the inactive dimensions. E.g. ``inactives = [0, 1]`` will ren
 
 const char* hopsy::doc::Gaussian::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
 
-Computes the negative logarithm of the probability density function of a multivariate Gaussian model in 
+Computes the negative logarithm of the probability density function of a multivariate Gaussian model in
 :math:`m-k` dimensions at ``x``. Note that `x` still has to have dimension :math:`n`.
 
 Parameters
@@ -198,7 +198,7 @@ float
 
 const char* hopsy::doc::Gaussian::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
 
-Computes the gradient of the logarithm of the probability density function of a multivariate Gaussian 
+Computes the gradient of the logarithm of the probability density function of a multivariate Gaussian
 model in :math:`n-k` dimensions at ``x``. Note that `x` still has to have dimension :math:`n`.
 
 Parameters
@@ -216,8 +216,8 @@ numpy.ndarray[n, 1]
 
 const char* hopsy::doc::Gaussian::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
 
-Computes the expected fisher information of a multivariate Gaussian model 
-in :math:`n-k` dimensions at ``x``. This turns out to be just the reduced covariance matrix. 
+Computes the expected fisher information of a multivariate Gaussian model
+in :math:`n-k` dimensions at ``x``. This turns out to be just the reduced covariance matrix.
 Note that `x` still has to have dimension :math:`n`.
 
 Parameters
@@ -231,7 +231,7 @@ numpy.narray[n, n]
     The expected Fisher information matrix
 
 )pbdoc";
-        
+
 
 
 /*
@@ -256,18 +256,18 @@ weights : list[float]
     Component weights. If none are given, they will be assumed to be all 1.
 
 )pbdoc";
-        
+
 
 const char* hopsy::doc::Mixture::components = R"pbdoc(
 A list of model components, where every components is supposed to be a Python object implementing `hopsy.Model`
 or being wrapped inside `hopsy.PyModel`.
 )pbdoc";
-        
+
 
 const char* hopsy::doc::Mixture::weights = R"pbdoc(
 A list of component weights, which has to match the number of components.
 )pbdoc";
-        
+
 
 const char* hopsy::doc::Mixture::__init__ = R"pbdoc(__init__(self, components, weights = [1, ..., 1])
 
@@ -281,11 +281,11 @@ weights : list[float]
     Component weights. If none are given, they will be assumed to be all 1.
 
 )pbdoc";
-        
+
 
 const char* hopsy::doc::Mixture::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
 
-Computes the negative logarithm of the weighted sum of the probability density functions of the model 
+Computes the negative logarithm of the weighted sum of the probability density functions of the model
 components
 
 .. math::
@@ -302,11 +302,11 @@ float
     The (unnormalized) negative log-likelihood
 
 )pbdoc";
-        
+
 
 const char* hopsy::doc::Mixture::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
 
-Computes the gradient of the logarithm of the weighted sum of the probability density functions of the model 
+Computes the gradient of the logarithm of the weighted sum of the probability density functions of the model
 components
 
 .. math::
@@ -322,11 +322,11 @@ Returns
 numpy.ndarray[n, 1]
     The gradient of the (unnormalized) log-likelihood
 )pbdoc";
-        
+
 
 const char* hopsy::doc::Mixture::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
 
-This method is not implemented, as there exists no closed-form solution to 
+This method is not implemented, as there exists no closed-form solution to
 computing the expected Fisher information of a general mixture model.
 
 Parameters
@@ -337,9 +337,9 @@ x : numpy.ndarray[n, 1]
 Returns
 -------
 None
-    
+
 )pbdoc";
-        
+
 
 
 /*
@@ -358,21 +358,21 @@ hops, given that the ``model`` object you pass implements the required functions
 
 **Methods:**
 )pbdoc";
-        
+
 
 const char* hopsy::doc::PyModel::__init__ = R"pbdoc(__init__(self, model)
 
 :param model:
 :type model: object
 
-Wraps the passed object such that it can be correctly called from hops. 
+Wraps the passed object such that it can be correctly called from hops.
 )pbdoc";
-        
+
 
 const char* hopsy::doc::PyModel::model = R"pbdoc(
 The wrapped user-defined model.
 )pbdoc";
-        
+
 
 const char* hopsy::doc::PyModel::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
 
@@ -382,7 +382,7 @@ const char* hopsy::doc::PyModel::computeNegativeLogLikelihood = R"pbdoc(compute_
 :return: The value of ``model.compute_negative_log_likelihod(x)``
 :rtype: float
 )pbdoc";
-        
+
 
 const char* hopsy::doc::PyModel::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
 
@@ -390,9 +390,9 @@ const char* hopsy::doc::PyModel::computeLogLikelihoodGradient = R"pbdoc(compute_
 :type x: numpy.ndarray[float64[n,1]]
 
 :return: The value of ``model.compute_log_likelihood_gradient(x)``
-:rtype: numpy.ndarray[float64[n,1]] 
+:rtype: numpy.ndarray[float64[n,1]]
 )pbdoc";
-        
+
 
 const char* hopsy::doc::PyModel::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
 
@@ -400,10 +400,10 @@ const char* hopsy::doc::PyModel::computeExpectedFisherInformation = R"pbdoc(comp
 :type x: numpy.ndarray[float64[n,1]]
 
 :return: The value of ``model.compute_expected_fisher_information(x)``
-:rtype: numpy.ndarray[float64[n,n]] 
+:rtype: numpy.ndarray[float64[n,n]]
 )pbdoc";
 
-        
+
 
 /*
  *  Rosenbrock
@@ -417,25 +417,25 @@ Reference: https://doi.org/10.1162/evco.2009.17.3.437
 
 **Methods:**
 )pbdoc";
-        
+
 
 const char* hopsy::doc::Rosenbrock::__init__ = R"pbdoc(__init__(self, scale = 1, shift = [0])
 
-:param scale: 
+:param scale:
 :type scale: float
 
-:param shift: 
+:param shift:
 :type shift: numpy.ndarray[float64[n,1]]
 )pbdoc";
-        
+
 
 const char* hopsy::doc::Rosenbrock::scale = R"pbdoc(
 )pbdoc";
-        
+
 
 const char* hopsy::doc::Rosenbrock::shift = R"pbdoc(
 )pbdoc";
-        
+
 
 const char* hopsy::doc::Rosenbrock::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
 
@@ -445,7 +445,7 @@ const char* hopsy::doc::Rosenbrock::computeNegativeLogLikelihood = R"pbdoc(compu
 :return: The (unnormalized) negative log-likelihood
 :rtype: float
 )pbdoc";
-        
+
 
 const char* hopsy::doc::Rosenbrock::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
 
@@ -453,9 +453,9 @@ const char* hopsy::doc::Rosenbrock::computeLogLikelihoodGradient = R"pbdoc(compu
 :type x: numpy.ndarray[float64[2n,1]]
 
 :return: The gradient of the (unnormalized) log-likelihood
-:rtype: numpy.ndarray[float64[2n,1]] 
+:rtype: numpy.ndarray[float64[2n,1]]
 )pbdoc";
-        
+
 
 const char* hopsy::doc::Rosenbrock::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
 
@@ -463,10 +463,10 @@ const char* hopsy::doc::Rosenbrock::computeExpectedFisherInformation = R"pbdoc(c
 :type x: numpy.ndarray[float64[2n,1]]
 
 :return: The expected Fisher information matrix
-:rtype: numpy.ndarray[float64[2n,2n]] 
+:rtype: numpy.ndarray[float64[2n,2n]]
 )pbdoc";
 
-        
+
 
 /*
  *  UniformModel
@@ -484,7 +484,7 @@ where
    Z = \int_{\mathcal{P}} \mathbf{1}_{\mathcal{P}}(x) \mathrm{d}x
 
 Note that the uniform distribution is only well-defined, if the volume of the polytope is finite and
-thus if the polytope is bounded in all dimensions. So for example, :math:`A = 1` and :math:`b = 0` 
+thus if the polytope is bounded in all dimensions. So for example, :math:`A = 1` and :math:`b = 0`
 define the the inequality :math:`Ax = x \leq 0 = b` which defines the negative real line. This can be
 seen as an unbounded one-dimensional polytope and the uniform distribution is thus not well defined on it.
 
@@ -493,19 +493,19 @@ that guarantee your polytope to be bounded. For more details, please refer :doc:
 
 **Methods:**
 )pbdoc";
-        
+
 
 const char* hopsy::doc::UniformModel::__init__ = R"pbdoc(__init__(self)
 )pbdoc";
-        
+
 
 const char* hopsy::doc::UniformModel::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
 
-The negative log-likelihood for the uniform model is the unknown constant :math:`\frac{1}{Z}`, 
-which depends on the volume of the support of the density. The volume is further only well-defined in 
+The negative log-likelihood for the uniform model is the unknown constant :math:`\frac{1}{Z}`,
+which depends on the volume of the support of the density. The volume is further only well-defined in
 dependence of the polytope, which is not known to the ``hopsy.UniformModel``.
-In the Metropolis-Hastings algorithm, this constant cancels out and is not needed for computing the 
-acceptance rate. Thus, this function is only available for technical reasons and **will always throw 
+In the Metropolis-Hastings algorithm, this constant cancels out and is not needed for computing the
+acceptance rate. Thus, this function is only available for technical reasons and **will always throw
 an exception, when being called.**
 
 :param x: Input vector
@@ -516,38 +516,38 @@ an exception, when being called.**
 
 :raises RuntimeError: always
 )pbdoc";
-        
+
 
 const char* hopsy::doc::UniformModel::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
 
-For similar reasons as with the ``compute_negative_log_likelihod``, this function **will always throw 
+For similar reasons as with the ``compute_negative_log_likelihod``, this function **will always throw
 an exception, when being called.**
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[n,1]]
 
 :return: The gradient of the (unnormalized) log-likelihood
-:rtype: numpy.ndarray[float64[n,1]] 
+:rtype: numpy.ndarray[float64[n,1]]
 
 :raises RuntimeError: always
 )pbdoc";
-        
+
 
 const char* hopsy::doc::UniformModel::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
 
-For similar reasons as with the ``compute_negative_log_likelihod``, this function **will always throw 
+For similar reasons as with the ``compute_negative_log_likelihod``, this function **will always throw
 an exception, when being called.**
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[n,1]]
 
 :return: The expected Fisher information matrix
-:rtype: numpy.ndarray[float64[n,n]] 
+:rtype: numpy.ndarray[float64[n,n]]
 
 :raises RuntimeError: always
 )pbdoc";
 
-        
+
 
 /*
  *  Problem
@@ -559,17 +559,17 @@ const char* hopsy::doc::Problem::base = R"pbdoc(
 
 const char* hopsy::doc::Problem::__init__ = R"pbdoc(Problem(A, b, model = hopsy.Uniform(), starting_point = numpy.ndarray[shape[0]], transformation = numpy.ndarray[shape[0,0]], shift = numpy.ndarray[shape[0]])
 
-Creates a Problem object of appropriate type using the passed ``model``. The actual return type depends on the type of ``model``. 
-If ``model`` is an arbitrary python object, it will be wrapped inside :class:`hopsy.PyModel`, 
-which works as an interface between HOPS and any Python-implemented model class. 
-Any calls from within HOPS to the model will be delegated by calling the appropriate Python function. 
+Creates a Problem object of appropriate type using the passed ``model``. The actual return type depends on the type of ``model``.
+If ``model`` is an arbitrary python object, it will be wrapped inside :class:`hopsy.PyModel`,
+which works as an interface between HOPS and any Python-implemented model class.
+Any calls from within HOPS to the model will be delegated by calling the appropriate Python function.
 
 :param numpy.ndarray[shape[m,n]] A: the left-hand side of the polytope inequality :math:`Ax \leq b`.
 
 :param numpy.ndarray[shape[m,1]] b: the right-hand side of the polytope inequality :math:`Ax \leq b`
 
-:param object model: defines the target distribution and may be any Python object. 
-:param numpy.ndarray[shape[n,1]] starting_point: the starting point. 
+:param object model: defines the target distribution and may be any Python object.
+:param numpy.ndarray[shape[n,1]] starting_point: the starting point.
 
 :param numpy.ndarray[shape[n,n]] transformation: the matrix :math:`T` in a linear transformation :math:`Tx + h`.
 
@@ -1729,8 +1729,8 @@ const char* hopsy::doc::tune = R"pbdoc(
 
 const char* hopsy::doc::computeAcceptanceRate = R"pbdoc(compute_acceptance_rate(data, sqrt_covariance = numpy.ndarray[float[0, 0]])
 
-Compute the average acceptance rate of the chains in ``data``. 
-Acceptance rates are returned in an ``m`` x ``1`` column vector, 
+Compute the average acceptance rate of the chains in ``data``.
+Acceptance rates are returned in an ``m`` x ``1`` column vector,
 where ``m`` is the number of chains stored in ``data``.
 
 The acceptance rate is
@@ -1743,9 +1743,9 @@ allows to discard the samples.
 
 const char* hopsy::doc::computeEffectiveSampleSize = R"pbdoc(compute_effective_sample_size(data)
 
-Compute the effective sample size of the chains in ``data``. 
+Compute the effective sample size of the chains in ``data``.
 The effective sample size is computed for every dimension individually and is then
-returned in an ``m`` x ``1`` column vector, 
+returned in an ``m`` x ``1`` column vector,
 where ``m`` is the dimension of the states.
 
 )pbdoc";
@@ -1753,27 +1753,27 @@ where ``m`` is the dimension of the states.
 
 const char* hopsy::doc::computeExpectedSquaredJumpDistance = R"pbdoc(compute_expected_squared_jump_distance(data)
 
-Compute the expected squared jump distance of the chains in ``data``. 
+Compute the expected squared jump distance of the chains in ``data``.
 The expected squared jump distance is computed for every chain individually and is then
-returned in an ``m`` x ``1`` column vector, 
+returned in an ``m`` x ``1`` column vector,
 where ``m`` is the number of chains stored in ``data``.
 )pbdoc";
 
 
 const char* hopsy::doc::computePotentialScaleReductionFactor = R"pbdoc(compute_potential_scale_reduction_factor(data)
 
-Compute the potential scale reduction factor (also known as R-hat) 
-of the chains in ``data``. 
+Compute the potential scale reduction factor (also known as R-hat)
+of the chains in ``data``.
 The potential scale reduction factor is computed for every dimension individually and is then
-returned in an ``m`` x ``1`` column vector, 
+returned in an ``m`` x ``1`` column vector,
 where ``m`` is the dimension of the states.
 )pbdoc";
 
 
 const char* hopsy::doc::computeTotalTimeTaken = R"pbdoc(compute_total_time_taken(data)
 
-Compute the total time taken of the chains in ``data``. 
-Times are returned in an ``m`` x ``1`` column vector, 
+Compute the total time taken of the chains in ``data``.
+Times are returned in an ``m`` x ``1`` column vector,
 where ``m`` is the number of chains stored in ``data``.
 
 Timestamps are actually also logged after every chain iteration and stored in the ChainData,
@@ -1781,6 +1781,3 @@ so this function just takes the difference of the last and first timestamp.
 It also initializes the total_time_taken field inside the Data object and thus
 allows to discard the samples.
 )pbdoc";
-
-
-

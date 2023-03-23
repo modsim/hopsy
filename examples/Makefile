@@ -8,4 +8,3 @@ test:
 	-python3 rosenbrock_test.py test
 	-python3 rounding_test.py test
 	-python3 test.py test
-	

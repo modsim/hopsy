@@ -36,4 +36,3 @@ namespace hopsy {
 } // namespace hopsy
 
 #endif // HOPSY_MISC_HPP
-
