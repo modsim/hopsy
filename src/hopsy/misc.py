@@ -32,7 +32,6 @@ class _submodules:
         from PolyRound.static_classes.lp_utils import ChebyshevFinder
 
     import abc
-    import copy
     import multiprocessing
     import typing
 
