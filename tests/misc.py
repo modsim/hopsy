@@ -196,8 +196,8 @@ class MiscTests(unittest.TestCase):
                 self.state_idx = []
                 self.meta = None
 
-            def setup(self, n_chains: int, n_samples: int, n_dims: int, meta_names: typing.List[str]) -> None:
-                super(TestBackend, self).setup(n_chains, n_samples, n_dims, meta_names)
+            def setup(self, n_chains: int, n_samples: int, n_dims: int, meta_names: typing.List[str], meta_shapes: typing.List[typing.List[int]]) -> None:
+                super(TestBackend, self).setup(n_chains, n_samples, n_dims, meta_names, meta_shapes)
                 self.states = np.zeros((self.n_chains, self.n_samples, self.n_dims))
                 self.state_idx = [0 for i in range(n_chains)]
                 self.meta = [None for i in range(n_chains)]
@@ -224,10 +224,12 @@ class MiscTests(unittest.TestCase):
         meta, states = sample(mcs, rngs, n_samples=100, record_meta=record_meta, backend=backend)
         self.assertTrue(np.all(states == backend.states))
         self.assertTrue(meta.keys() == backend.meta[0].keys())
+        self.assertTrue(backend.meta_shapes == [[], [2]])
         self.assertTrue(np.all([np.all([meta[name][i] == backend.meta[i][name] for i in range(2)]) for name in meta.keys()]))
 
         backend = TestBackend()
         record_meta = False
         meta, states = sample(mcs, rngs, n_samples=100, n_procs=3, record_meta=record_meta, backend=backend)
         self.assertTrue(np.all(states == backend.states))
+        self.assertTrue(backend.meta_shapes == [[]])
         self.assertTrue(np.all(meta == np.mean([backend.meta[i]["acceptance_rate"] for i in range(2)], axis=1)))

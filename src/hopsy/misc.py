@@ -270,9 +270,10 @@ class Backend(_s.abc.ABC):
         self.n_samples = -1
         self.n_dims = -1
         self.meta_names = None
+        self.meta_shapes = None
         self.name = name
 
-    def setup(self, n_chains: int, n_samples: int, n_dims: int, meta_names: _s.typing.List[str]) -> None:
+    def setup(self, n_chains: int, n_samples: int, n_dims: int, meta_names: _s.typing.List[str], meta_shapes: _s.typing.List[_s.typing.List[int]]) -> None:
         r"""
         Setup backend for a specific MCMC chain.
 
@@ -284,11 +285,14 @@ class Backend(_s.abc.ABC):
             Number of dimensions of the sampling problem
         :param meta_names: List[str]
             String identifiers for meta information
+        :param meta_shapes: List[List[int]]
+            Shapes of meta information (empty for scalars)
         """
         self.n_chains = n_chains
         self.n_samples = n_samples
         self.n_dims = n_dims
         self.meta_names = meta_names
+        self.meta_shapes = meta_shapes
 
     def record(self, chain_idx: int, state: _s.numpy.ndarray, meta: _s.typing.Dict[str, _s.typing.Union[float, _s.numpy.ndarray]]) -> None:
         r"""
@@ -424,7 +428,8 @@ def _sample_parallel_chain(markov_chain: _c.MarkovChain,
     return meta, _s.numpy.array(states), markov_chain.state, rng.state
 
 
-def _prune_record_meta(chain: MarkovChain, record_meta):
+def _process_record_meta(chain: MarkovChain, record_meta) -> _s.typing.Tuple[_s.typing.List[str], _s.typing.List[_s.typing.List[int]], _s.typing.Dict[str, None]]:
+    shapes = []
     missing_fields = {}
     if isinstance(record_meta, list):
         record_meta = record_meta.copy()
@@ -439,7 +444,15 @@ def _prune_record_meta(chain: MarkovChain, record_meta):
                     else:
                         record_meta.remove(field)
                         missing_fields[field] = None
-    return record_meta, missing_fields
+
+                if field not in missing_fields:
+                    shape = []
+                    if hasattr(base, "shape"):
+                        shape = [i for i in base.shape]
+                    shapes += [shape]
+    else:
+        shapes += [[]]
+    return record_meta, shapes, missing_fields
 
 
 def _parallel_sampling(args: _s.typing.List[_s.typing.Any], n_procs: int, backend: Backend):
@@ -543,11 +556,12 @@ def sample(markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.Mark
         rngs = [rngs]
 
     # remove invalid entries from record_meta
-    record_meta, missing_fields = _prune_record_meta(markov_chains[0], record_meta)
+    record_meta, shapes, missing_fields = _process_record_meta(markov_chains[0], record_meta)
 
     # initialize backend
     if backend is not None:
-        backend.setup(len(markov_chains), n_samples, len(markov_chains[0].state), record_meta if isinstance(record_meta, list) else ["acceptance_rate"])
+        meta_names = record_meta if isinstance(record_meta, list) else ["acceptance_rate"]
+        backend.setup(len(markov_chains), n_samples, len(markov_chains[0].state), meta_names, shapes)
 
     result = []
 
