@@ -396,7 +396,6 @@ def _sequential_sampling(
     states = []
 
     meta = None
-    missing_fields = []
     if record_meta is None or record_meta is False:
         meta = []
     else:
@@ -409,9 +408,6 @@ def _sequential_sampling(
             meta.append(accrate)
         else:
             for field in record_meta:
-                if field in missing_fields:
-                    continue
-
                 if field == "acceptance_rate":  # treat acceptance rate differently,
                     # as it is no attribute of the markov chain
                     meta[field].append(accrate)
@@ -456,7 +452,6 @@ def _sample_parallel_chain(
     states = []
 
     meta = None
-    missing_fields = []
     if record_meta is None or record_meta is False:
         meta = []
     else:
@@ -469,9 +464,6 @@ def _sample_parallel_chain(
             meta.append(accrate)
         else:
             for field in record_meta:
-                if field in missing_fields:
-                    continue
-
                 if field == "acceptance_rate":  # treat acceptance rate differently,
                     # as it is no attribute of the markov chain
                     meta[field].append(accrate)
