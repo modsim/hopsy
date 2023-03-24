@@ -33,6 +33,7 @@ class _submodules:
 
     import abc
     import multiprocessing
+    import tqdm
     import typing
 
     import numpy.typing
@@ -537,13 +538,16 @@ def _parallel_sampling(
     result = workers.starmap_async(_sample_parallel_chain, args)
 
     if backend is not None:
+        pbars = [_s.tqdm.tqdm(args[i][2]) for i in range(len(args))]
         finished = [False for i in range(len(args))]
         while not _s.numpy.all(finished):
             chain_idx, state, meta = result_queue.get()
             if state is not None:
                 backend.record(chain_idx, state, meta)
+                pbars[chain_idx].update()
             else:
                 finished[chain_idx] = True
+                pbars[chain_idx].close()
         backend.finish()
 
     workers.close()
