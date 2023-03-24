@@ -8,7 +8,8 @@ from PolyRound.settings import PolyRoundSettings
 
 class LP:
     """Singleton for controlling PolyRound parameters for Linear Programming.
-    Pattern from https://medium.com/analytics-vidhya/how-to-create-a-thread-safe-singleton-class-in-python-822e1170a7f6"""
+    Pattern from https://medium.com/analytics-vidhya/how-to-create-a-thread-safe-singleton-class-in-python-822e1170a7f6
+    """
 
     __instance = None
     settings = None
