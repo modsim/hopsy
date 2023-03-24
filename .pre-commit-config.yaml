@@ -1,0 +1,28 @@
+exclude: \.(ipynb|nblink)$
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.3.0
+  hooks:
+    - id: check-merge-conflict
+      exclude: docs
+    - id: check-toml
+      exclude: docs
+    - id: check-yaml
+      exclude: github/workflows/pipeline.yml
+    - id: trailing-whitespace
+      exclude: docs
+    - id: end-of-file-fixer
+      exclude: docs
+    - id: requirements-txt-fixer
+      exclude: docs
+- repo: https://github.com/PyCQA/isort
+  rev: 5.12.0
+  hooks:
+    - id: isort
+      name: isort
+      args: ["--profile", "black"]
+      exclude: ^docs\|^docs-sources
+- repo: https://github.com/psf/black
+  rev: 22.8.0
+  hooks:
+    - id: black

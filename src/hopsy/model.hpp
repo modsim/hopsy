@@ -517,4 +517,3 @@ namespace hopsy {
 }
 
 #endif // HOPSY_MODEL_HPP
-

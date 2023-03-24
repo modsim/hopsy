@@ -93,9 +93,15 @@ class MiscTests(unittest.TestCase):
         uniform_problem = add_box_constraints(uniform_problem, -2, 1)
 
         for ProposalType in ProposalTypes:
-            if ProposalType in [BilliardMALAProposal, CSmMALAProposal, TruncatedGaussianProposal]:
+            if ProposalType in [
+                BilliardMALAProposal,
+                CSmMALAProposal,
+                TruncatedGaussianProposal,
+            ]:
                 continue
-            chain = MarkovChain(uniform_problem, ProposalType, starting_point=[.1, .1])
+            chain = MarkovChain(
+                uniform_problem, ProposalType, starting_point=[0.1, 0.1]
+            )
 
         gaussian_problem = Problem([[1, 1, ]], [1], Gaussian())
         gaussian_problem = add_box_constraints(gaussian_problem, -1, 1)
@@ -116,6 +122,7 @@ class MiscTests(unittest.TestCase):
 
     def test_ess(self):
         states = [[[0, 1, 2, 3, 4]] * 100] * 4
+        states = [[[0, 1, 2, 3, 4]] * 100] * 4
         neff = ess(states)
         self.assertListEqual([1, 1, 1, 1, 1], neff[0].tolist())
 
@@ -130,31 +137,42 @@ class MiscTests(unittest.TestCase):
         rel_ess = 1 / 400
 
         states = [[[0, 1, 2, 3, 4]] * 100] * 4
+        states = [[[0, 1, 2, 3, 4]] * 100] * 4
         neff = ess(states, relative=True)
+        self.assertListEqual([rel_ess] * 5, neff[0].tolist())
         self.assertListEqual([rel_ess] * 5, neff[0].tolist())
 
         states = numpy.concatenate([[[[0, 1, 2, 3, 4]] * 100] * 4, numpy.random.rand(4, 100, 5)], axis=1)
         neff = ess(states, series=100, relative=True)
         self.assertListEqual([rel_ess] * 5, neff[0].tolist())
+        self.assertListEqual([rel_ess] * 5, neff[0].tolist())
 
         states = numpy.concatenate([[[[0, 1, 2, 3, 4]] * 100] * 4, numpy.random.rand(4, 100, 5)], axis=1)
         neff = ess(states, series=100, relative=True, n_procs=-1)
         self.assertListEqual([rel_ess] * 5, neff[0].tolist())
+        self.assertListEqual([rel_ess] * 5, neff[0].tolist())
 
     def test_recording_meta_data(self):
-        problem = Problem([[1, 0], [0, 1], [-1, 0], [0, -1]], [5, 5, 0, 0], Gaussian(dim=2))
-        mcs = [MarkovChain(problem, proposal=GaussianHitAndRunProposal, starting_point=[.5, .5]) for i in range(2)]
+        problem = Problem(
+            [[1, 0], [0, 1], [-1, 0], [0, -1]], [5, 5, 0, 0], Gaussian(dim=2)
+        )
+        mcs = [
+            MarkovChain(
+                problem, proposal=GaussianHitAndRunProposal, starting_point=[0.5, 0.5]
+            )
+            for i in range(2)
+        ]
         rngs = [RandomNumberGenerator(42, i) for i in range(2)]
 
         record_meta = ['state_negative_log_likelihood', 'proposal.proposal']
         meta, states = sample(mcs, rngs, n_samples=100, record_meta=record_meta)
         self.assertTrue(len(meta) == len(record_meta))
-        self.assertTrue(meta['proposal.proposal'].shape == (2, 100, 2))
+        self.assertTrue(meta["proposal.proposal"].shape == (2, 100, 2))
 
         record_meta = ['state_negative_log_likelihood', 'proposal.proposal']
         meta, states = sample(mcs, rngs, n_samples=100, n_procs=2, record_meta=record_meta)
         self.assertTrue(len(meta) == len(record_meta))
-        self.assertTrue(meta['proposal.proposal'].shape == (2, 100, 2))
+        self.assertTrue(meta["proposal.proposal"].shape == (2, 100, 2))
 
         record_meta = ['acceptance_rate']
         meta, states = sample(mcs, rngs, n_samples=100, record_meta=record_meta)
@@ -163,7 +181,7 @@ class MiscTests(unittest.TestCase):
         record_meta = ['foo']  # obviously not an attribute
         meta, states = sample(mcs, rngs, n_samples=100, record_meta=record_meta)
         self.assertTrue(len(meta) == len(record_meta))
-        self.assertTrue(meta['foo'] is None)
+        self.assertTrue(meta["foo"] is None)
 
         record_meta = False
         meta, states = sample(mcs, rngs, n_samples=100, record_meta=record_meta)

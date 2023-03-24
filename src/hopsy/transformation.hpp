@@ -77,4 +77,3 @@ namespace hopsy {
 //PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::LinearTransformation);
 
 #endif // HOPSY_TRANSFORMATION_HPP
-

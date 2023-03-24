@@ -1,15 +1,20 @@
-import docov
 import unittest
+
+import docov
+
 import hopsy
+
 
 class ExistingDocstring:
     def __call__(self, item):
         return item.__doc__ is not None
 
-class DocTests(unittest.TestCase):
 
+class DocTests(unittest.TestCase):
     def test_docstrings_exist(self):
-        good, bad, cond = docov.analyze(hopsy, condition=ExistingDocstring(), ignore = ["ProposalParameter"])
+        good, bad, cond = docov.analyze(
+            hopsy, condition=ExistingDocstring(), ignore=["ProposalParameter"]
+        )
 
         if len(bad) > 0:
             print()
@@ -17,5 +22,6 @@ class DocTests(unittest.TestCase):
             for name in sorted([name for name, _ in bad]):
                 print("  -- " + name)
 
-        self.assertEqual(len(bad), 0) # All symbols should have at least an empty docstring!
-
+        self.assertEqual(
+            len(bad), 0
+        )  # All symbols should have at least an empty docstring!

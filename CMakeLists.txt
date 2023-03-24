@@ -73,4 +73,3 @@ if (HOPSY_TESTS)
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:_hopsy> examples/${targetfile}
     )
 endif()
-

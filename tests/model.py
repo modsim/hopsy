@@ -1,7 +1,8 @@
-import unittest
 import pickle
+import unittest
 
 from hopsy import *
+
 
 class ModelTests(unittest.TestCase):
     def test_gaussian_pickling(self):
@@ -17,8 +18,13 @@ class ModelTests(unittest.TestCase):
         data = pickle.dumps(model)
         new = pickle.loads(data)
         self.assertListEqual(model.weights, new.weights)
-        self.assertListEqual(model.components[0].mean.tolist(), new.components[0].mean.tolist())
-        self.assertListEqual(model.components[0].covariance.tolist(), new.components[0].covariance.tolist())
+        self.assertListEqual(
+            model.components[0].mean.tolist(), new.components[0].mean.tolist()
+        )
+        self.assertListEqual(
+            model.components[0].covariance.tolist(),
+            new.components[0].covariance.tolist(),
+        )
         self.assertListEqual(model.components[0].inactives, new.components[0].inactives)
 
     def test_pymodel_pickling(self):
@@ -54,8 +60,12 @@ class ModelTests(unittest.TestCase):
         model.components[0].mean = [1, 2]
         self.assertListEqual(model.components[0].mean.tolist(), [1, 2])
 
-        self.assertIsNotNone(model.compute_log_likelihood_gradient(model.components[0].mean))
-        self.assertIsNone(model.compute_expected_fisher_information(model.components[0].mean))
+        self.assertIsNotNone(
+            model.compute_log_likelihood_gradient(model.components[0].mean)
+        )
+        self.assertIsNone(
+            model.compute_expected_fisher_information(model.components[0].mean)
+        )
 
     def test_implementing_model(self):
         class Uniform(Model):
@@ -76,13 +86,12 @@ class ModelTests(unittest.TestCase):
 
             def dimension_names(self):
                 # implementation could also return empty list theoretically, but then RJMCMC becomes less useful.
-                return ['x0', 'x1']
+                return ["x0", "x1"]
 
         model = Uniform()
         problem = Problem([[1, 1]], [1], model, starting_point=[0, 0])
         markovChain = MarkovChain(problem, GaussianProposal)
         state = markovChain.draw(RandomNumberGenerator())
-
 
     def test_py_model(self):
         class Uniform:
@@ -97,4 +106,3 @@ class ModelTests(unittest.TestCase):
         # tests switching models works
         problem.model = Gaussian()
         problem.model = Uniform()
-

@@ -45,7 +45,7 @@ namespace hopsy {
             seed(seed),
             stream(stream),
             rng(seed, stream) {
-            // 
+            //
         }
 
         unsigned int getSeed() const {
@@ -92,12 +92,12 @@ namespace hopsy {
     void addRandom(py::module& m) {
         py::class_<RandomNumberGenerator>(m, "RandomNumberGenerator", doc::RandomNumberGenerator::base)
             .def(py::init<>(), doc::RandomNumberGenerator::__init__)
-            .def(py::init<unsigned int>(), 
-                    doc::RandomNumberGenerator::__init__, 
+            .def(py::init<unsigned int>(),
+                    doc::RandomNumberGenerator::__init__,
                     py::arg("seed"))
-            .def(py::init<unsigned int, unsigned int>(), 
-                    doc::RandomNumberGenerator::__init__, 
-                    py::arg("seed"), 
+            .def(py::init<unsigned int, unsigned int>(),
+                    doc::RandomNumberGenerator::__init__,
+                    py::arg("seed"),
                     py::arg("stream"))
             .def_property("seed", &RandomNumberGenerator::getSeed, &RandomNumberGenerator::setSeed)
             .def_property("stream", &RandomNumberGenerator::getStream, &RandomNumberGenerator::setStream)
@@ -165,4 +165,3 @@ namespace hopsy {
 } // namespace hopsy
 
 #endif // HOPSY_RANDOM_HPP
-

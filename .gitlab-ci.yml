@@ -7,6 +7,15 @@ stages:
   - build
   - test
 
+pre-commit:
+  image: python:3.10
+  stage: build
+  script:
+    - pip install pre-commit
+    - pre-commit install
+    - pre-commit run --all
+
+
 build-release:
   stage: build
   script:
@@ -42,7 +51,7 @@ test-release:
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m unittest -v tests; done
     - /opt/python/cp39-cp39/bin/docov hopsy --output docs/; cat docs/docov.txt
   artifacts:
-    paths: 
+    paths:
       - docs
     expire_in: 7 days
 
@@ -54,6 +63,6 @@ test-debug:
     - VERSION="$(cat .version).dev0"; for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
     - VERSION="$(cat .version).dev0"; for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m unittest -v tests; done
   artifacts:
-    paths: 
+    paths:
       - docs
     expire_in: 7 days
