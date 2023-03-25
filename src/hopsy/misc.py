@@ -33,7 +33,11 @@ class _submodules:
 
     import abc
     import multiprocessing
-    import tqdm
+    import os
+    if "JPY_PARENT_PID" in os.environ:
+        import tqdm.notebook as tqdm
+    else:
+        import tqdm
     import typing
 
     import numpy.typing
