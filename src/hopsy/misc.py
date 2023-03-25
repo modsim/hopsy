@@ -34,6 +34,7 @@ class _submodules:
     import abc
     import multiprocessing
     import os
+
     if "JPY_PARENT_PID" in os.environ:
         import tqdm.notebook as tqdm
     else:
@@ -406,7 +407,11 @@ def _sequential_sampling(
     else:
         meta = {field: [] for field in record_meta}
 
-    sample_range = _s.tqdm.trange(n_samples, desc="chain {}".format(chain_idx)) if progress_bar else range(n_samples)
+    sample_range = (
+        _s.tqdm.trange(n_samples, desc="chain {}".format(chain_idx))
+        if progress_bar
+        else range(n_samples)
+    )
     for i in sample_range:
         accrate, state = markov_chain.draw(rng, thinning)
 
@@ -534,9 +539,16 @@ def _process_record_meta(
 
 
 def _parallel_sampling(
-    args: _s.typing.List[_s.typing.Any], n_procs: int, backend: Backend, progress_bar: bool,
+    args: _s.typing.List[_s.typing.Any],
+    n_procs: int,
+    backend: Backend,
+    progress_bar: bool,
 ):
-    result_queue = _s.multiprocessing.Manager().Queue() if backend is not None or progress_bar else None
+    result_queue = (
+        _s.multiprocessing.Manager().Queue()
+        if backend is not None or progress_bar
+        else None
+    )
     for i in range(len(args)):
         args[i] += (result_queue,)
 
@@ -544,7 +556,14 @@ def _parallel_sampling(
     result = workers.starmap_async(_sample_parallel_chain, args)
 
     if backend is not None or progress_bar:
-        pbars = [_s.tqdm.trange(args[i][2], desc="chain {}".format(i)) for i in range(len(args))] if progress_bar else None
+        pbars = (
+            [
+                _s.tqdm.trange(args[i][2], desc="chain {}".format(i))
+                for i in range(len(args))
+            ]
+            if progress_bar
+            else None
+        )
         finished = [False for i in range(len(args))]
         while not _s.numpy.all(finished):
             chain_idx, state, meta = result_queue.get()
@@ -557,7 +576,7 @@ def _parallel_sampling(
                 finished[chain_idx] = True
                 if progress_bar:
                     pbars[chain_idx].close()
-        
+
         if backend is not None:
             backend.finish()
 
@@ -705,7 +724,14 @@ def sample(
     else:
         for i in range(len(markov_chains)):
             _accrates, _states, _, _ = _sequential_sampling(
-                markov_chains[i], rngs[i], n_samples, thinning, record_meta, i, backend, progress_bar,
+                markov_chains[i],
+                rngs[i],
+                n_samples,
+                thinning,
+                record_meta,
+                i,
+                backend,
+                progress_bar,
             )
             result.append((_accrates, _states))
 

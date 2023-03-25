@@ -330,7 +330,9 @@ class MiscTests(unittest.TestCase):
         chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
         rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
 
-        accrates, states = sample(chains, rngs, n_samples, thinning, n_procs, progress_bar=True)
+        accrates, states = sample(
+            chains, rngs, n_samples, thinning, n_procs, progress_bar=True
+        )
 
         self.assertListEqual(list(states.shape), [n_chains, n_samples, 2])
 
