@@ -532,7 +532,7 @@ def _process_record_meta(
 def _parallel_sampling(
     args: _s.typing.List[_s.typing.Any], n_procs: int, backend: Backend, progress_bar: bool,
 ):
-    result_queue = _s.multiprocessing.Manager().Queue() if backend is not None else None
+    result_queue = _s.multiprocessing.Manager().Queue() if backend is not None or progress_bar else None
     for i in range(len(args)):
         args[i] += (result_queue,)
 
