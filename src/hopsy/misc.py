@@ -401,7 +401,7 @@ def _sequential_sampling(
     else:
         meta = {field: [] for field in record_meta}
 
-    for i in range(n_samples):
+    for i in _s.tqdm.trange(n_samples, desc="chain {}".format(chain_idx)):
         accrate, state = markov_chain.draw(rng, thinning)
 
         if record_meta is None or record_meta is False:
