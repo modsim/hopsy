@@ -323,3 +323,20 @@ class MiscTests(unittest.TestCase):
                 )
             )
         )
+
+    def test_progress_bar(self):
+        n_procs = 4
+
+        chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
+        rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
+
+        accrates, states = sample(chains, rngs, n_samples, thinning, n_procs, progress_bar=True)
+
+        self.assertListEqual(list(states.shape), [n_chains, n_samples, 2])
+
+        chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
+        rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
+
+        accrates, states = sample(chains, rngs, n_samples, thinning, progress_bar=True)
+
+        self.assertListEqual(list(states.shape), [n_chains, n_samples, 2])
