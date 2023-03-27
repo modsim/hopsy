@@ -32,8 +32,13 @@ class _submodules:
         from PolyRound.static_classes.lp_utils import ChebyshevFinder
 
     import abc
-    import copy
     import multiprocessing
+    import os
+
+    if "JPY_PARENT_PID" in os.environ:
+        import tqdm.notebook as tqdm
+    else:
+        import tqdm
     import typing
 
     import numpy.typing
@@ -392,6 +397,7 @@ def _sequential_sampling(
     record_meta=None,
     chain_idx: int = -1,
     backend: Backend = None,
+    progress_bar: bool = False,
 ):
     states = []
 
@@ -401,7 +407,12 @@ def _sequential_sampling(
     else:
         meta = {field: [] for field in record_meta}
 
-    for i in range(n_samples):
+    sample_range = (
+        _s.tqdm.trange(n_samples, desc="chain {}".format(chain_idx))
+        if progress_bar
+        else range(n_samples)
+    )
+    for i in sample_range:
         accrate, state = markov_chain.draw(rng, thinning)
 
         if record_meta is None or record_meta is False:
@@ -528,24 +539,46 @@ def _process_record_meta(
 
 
 def _parallel_sampling(
-    args: _s.typing.List[_s.typing.Any], n_procs: int, backend: Backend
+    args: _s.typing.List[_s.typing.Any],
+    n_procs: int,
+    backend: Backend,
+    progress_bar: bool,
 ):
-    result_queue = _s.multiprocessing.Manager().Queue() if backend is not None else None
+    result_queue = (
+        _s.multiprocessing.Manager().Queue()
+        if backend is not None or progress_bar
+        else None
+    )
     for i in range(len(args)):
         args[i] += (result_queue,)
 
     workers = _s.multiprocessing.Pool(n_procs - 1)
     result = workers.starmap_async(_sample_parallel_chain, args)
 
-    if backend is not None:
+    if backend is not None or progress_bar:
+        pbars = (
+            [
+                _s.tqdm.trange(args[i][2], desc="chain {}".format(i))
+                for i in range(len(args))
+            ]
+            if progress_bar
+            else None
+        )
         finished = [False for i in range(len(args))]
         while not _s.numpy.all(finished):
             chain_idx, state, meta = result_queue.get()
             if state is not None:
-                backend.record(chain_idx, state, meta)
+                if progress_bar:
+                    pbars[chain_idx].update()
+                if backend is not None:
+                    backend.record(chain_idx, state, meta)
             else:
                 finished[chain_idx] = True
-        backend.finish()
+                if progress_bar:
+                    pbars[chain_idx].close()
+
+        if backend is not None:
+            backend.finish()
 
     workers.close()
     workers.join()
@@ -563,6 +596,7 @@ def sample(
     n_procs: int = 1,
     record_meta=None,
     backend: Backend = None,
+    progress_bar: bool = False,
 ):
     r"""sample(markov_chains, rngs, n_samples, thinning=1, n_procs=1)
 
@@ -681,6 +715,7 @@ def sample(
             ],
             n_procs,
             backend,
+            progress_bar,
         )
         for i, chain_result in enumerate(result_states):
             result.append((chain_result[0], chain_result[1]))
@@ -689,7 +724,14 @@ def sample(
     else:
         for i in range(len(markov_chains)):
             _accrates, _states, _, _ = _sequential_sampling(
-                markov_chains[i], rngs[i], n_samples, thinning, record_meta, i, backend
+                markov_chains[i],
+                rngs[i],
+                n_samples,
+                thinning,
+                record_meta,
+                i,
+                backend,
+                progress_bar,
             )
             result.append((_accrates, _states))
 
