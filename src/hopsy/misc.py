@@ -4,6 +4,7 @@
 
 
 class _core:
+    from .backend import Backend
     from .core import (
         GaussianHitAndRunProposal,
         MarkovChain,
@@ -31,7 +32,6 @@ class _submodules:
         from PolyRound.mutable_classes import polytope
         from PolyRound.static_classes.lp_utils import ChebyshevFinder
 
-    import abc
     import multiprocessing
     import os
 
@@ -321,74 +321,6 @@ def transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
     return transformed_points
 
 
-class Backend(_s.abc.ABC):
-    r"""Abstract base class for observing states and metadata"""
-
-    def __init__(self, name: str = None):
-        r"""
-        Construct backend.
-
-        :param name : str
-            Name of the backend
-        """
-        self.n_chain = -1
-        self.n_samples = -1
-        self.n_dims = -1
-        self.meta_names = None
-        self.meta_shapes = None
-        self.name = name
-
-    def setup(
-        self,
-        n_chains: int,
-        n_samples: int,
-        n_dims: int,
-        meta_names: _s.typing.List[str],
-        meta_shapes: _s.typing.List[_s.typing.List[int]],
-    ) -> None:
-        r"""
-        Setup backend for a specific MCMC chain.
-
-        :param n_chains : int
-            Number of chains
-        :param n_samples: int
-            Number of samples to produce
-        :param n_dims: int
-            Number of dimensions of the sampling problem
-        :param meta_names: List[str]
-            String identifiers for meta information
-        :param meta_shapes: List[List[int]]
-            Shapes of meta information (empty for scalars)
-        """
-        self.n_chains = n_chains
-        self.n_samples = n_samples
-        self.n_dims = n_dims
-        self.meta_names = meta_names
-        self.meta_shapes = meta_shapes
-
-    def record(
-        self,
-        chain_idx: int,
-        state: _s.numpy.ndarray,
-        meta: _s.typing.Dict[str, _s.typing.Union[float, _s.numpy.ndarray]],
-    ) -> None:
-        r"""
-        Record new MCMC state and metadata.
-
-        :param state : numpy.ndarray
-            New MCMC state
-        :param meta: Dict[str, Union[float, numpy.ndarray]]
-            Recorded metadata of the step
-        """
-        raise NotImplementedError()
-
-    def finish(self) -> None:
-        r"""
-        Finish recording (e.g. close connection to database).
-        """
-        pass
-
-
 def _sequential_sampling(
     markov_chain: _c.MarkovChain,
     rng: _c.RandomNumberGenerator,
@@ -396,7 +328,7 @@ def _sequential_sampling(
     thinning: int,
     record_meta=None,
     chain_idx: int = -1,
-    backend: Backend = None,
+    backend: _c.Backend = None,
     progress_bar: bool = False,
 ):
     states = []
@@ -541,7 +473,7 @@ def _process_record_meta(
 def _parallel_sampling(
     args: _s.typing.List[_s.typing.Any],
     n_procs: int,
-    backend: Backend,
+    backend: _c.Backend,
     progress_bar: bool,
 ):
     result_queue = (
@@ -595,7 +527,7 @@ def sample(
     n_threads: int = 1,
     n_procs: int = 1,
     record_meta=None,
-    backend: Backend = None,
+    backend: _c.Backend = None,
     progress_bar: bool = False,
 ):
     r"""sample(markov_chains, rngs, n_samples, thinning=1, n_procs=1)
