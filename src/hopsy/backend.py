@@ -4,10 +4,10 @@
 import abc
 from typing import Dict, List, Optional, Sequence, Union
 
-import hagelkorn
 import numpy as np
 
 try:
+    import hagelkorn
     import mcbackend
 except ImportError:
     _has_mcbackend = False
