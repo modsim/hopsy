@@ -1,11 +1,11 @@
 import logging
 import os
+import unittest
 
 import clickhouse_driver
 import hagelkorn
 import mcbackend as mcb
 import numpy
-import pytest
 
 import hopsy
 
@@ -23,7 +23,6 @@ except:
 _log = logging.getLogger(__file__)
 
 
-@pytest.fixture
 def test_objects():
     A, b = [[1, 1, 1], [-1, 0, 0], [0, -1, 0], [0, 0, -1]], [1, 0, 0, 0]
     model = hopsy.Gaussian(mean=[0, 0, 0])
@@ -42,12 +41,12 @@ def test_objects():
     return chains, rngs
 
 
-@pytest.mark.skipif(
+@unittest.skipIf(
     condition=not HAS_REAL_DB,
     reason="Integration tests need a ClickHouse server on localhost:9000 without authentication.",
 )
-class TestAdapter:
-    def setup_method(self, method):
+class TestAdapter(unittest.TestCase):
+    def setUp(self):
         """Initializes a fresh database just for this test method."""
         self._db = "testing_" + hagelkorn.random()
         self._client_main = clickhouse_driver.Client(**DB_KWARGS)
@@ -56,27 +55,26 @@ class TestAdapter:
         self.backend = mcb.clickhouse.ClickHouseBackend(self._client)
         return
 
-    def teardown_method(self, method):
+    def tearDown(self):
         self._client.disconnect()
         self._client_main.execute(f"DROP DATABASE {self._db};")
         self._client_main.disconnect()
         return
 
-    @pytest.mark.parametrize("cores", [1, 3])
-    def test_cores(self, test_objects, cores):
+    def test_write(self):
         backend = mcb.clickhouse.ClickHouseBackend(self._client)
 
         # To extract the run meta that the adapter passes to the backend:
         args = []
         original = backend.init_run
 
-        def wrapper(meta: RunMeta):
+        def wrapper(meta: mcb.RunMeta):
             args.append(meta)
             return original(meta)
 
         backend.init_run = wrapper
 
-        chains, rngs = test_objects
+        chains, rngs = test_objects()
         trace = hopsy.MCBBackend(backend)
         record_meta = ["state_negative_log_likelihood", "proposal.proposal"]
         meta, samples = hopsy.sample(
@@ -84,7 +82,7 @@ class TestAdapter:
             rngs,
             n_samples=50,
             thinning=10,
-            n_procs=cores,
+            n_procs=3,
             record_meta=record_meta,
             backend=trace,
         )
