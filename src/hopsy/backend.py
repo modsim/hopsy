@@ -43,8 +43,8 @@ class Backend(_s.abc.ABC):
         n_chains: int,
         n_samples: int,
         n_dims: int,
-        meta_names: _s.List[str],
-        meta_shapes: _s.List[_s.List[int]],
+        meta_names: _s.Sequence[str],
+        meta_shapes: _s.Sequence[_s.Sequence[int]],
     ) -> None:
         r"""
         Setup backend for a specific MCMC chain.
