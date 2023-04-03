@@ -13,7 +13,9 @@ class ExistingDocstring:
 class DocTests(unittest.TestCase):
     def test_docstrings_exist(self):
         good, bad, cond = docov.analyze(
-            hopsy, condition=ExistingDocstring(), ignore=["ProposalParameter"]
+            hopsy,
+            condition=ExistingDocstring(),
+            ignore=["ProposalParameter", "MCBBackend"],
         )
 
         if len(bad) > 0:

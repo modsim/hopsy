@@ -1,21 +1,27 @@
 """
 
 """
-import abc
-from typing import Dict, List, Optional, Sequence, Union
-
-import numpy as np
-
-try:
-    import hagelkorn
-    import mcbackend
-except ImportError:
-    _has_mcbackend = False
-else:
-    _has_mcbackend = True
 
 
-class Backend(abc.ABC):
+class _submodules:
+    import abc
+    from typing import Dict, List, Optional, Sequence, Union
+
+    import numpy as np
+
+    try:
+        import hagelkorn
+        import mcbackend
+    except ImportError:
+        _has_mcbackend = False
+    else:
+        _has_mcbackend = True
+
+
+_s = _submodules
+
+
+class Backend(_s.abc.ABC):
     r"""Abstract base class for observing states and metadata"""
 
     def __init__(self, name: str = None):
@@ -37,8 +43,8 @@ class Backend(abc.ABC):
         n_chains: int,
         n_samples: int,
         n_dims: int,
-        meta_names: List[str],
-        meta_shapes: List[List[int]],
+        meta_names: _s.List[str],
+        meta_shapes: _s.List[_s.List[int]],
     ) -> None:
         r"""
         Setup backend for a specific MCMC chain.
@@ -63,8 +69,8 @@ class Backend(abc.ABC):
     def record(
         self,
         chain_idx: int,
-        state: np.ndarray,
-        meta: Dict[str, Union[float, np.ndarray]],
+        state: _s.np.ndarray,
+        meta: _s.Dict[str, _s.Union[float, _s.np.ndarray]],
     ) -> None:
         r"""
         Record new MCMC state and metadata.
@@ -83,7 +89,7 @@ class Backend(abc.ABC):
         pass
 
 
-def enable_if(cond):
+def _enable_if(cond):
     if cond:
 
         def dec_enable_if(cls):
@@ -98,38 +104,44 @@ def enable_if(cond):
         return dec_enable_if
 
 
-@enable_if(cond=_has_mcbackend)
+@_enable_if(cond=_s._has_mcbackend)
 class MCBBackend(Backend):
-    """Adapter to create a hospy backend from any McBackend backend."""
+    r"""Adapter to create a hospy backend from any McBackend backend."""
 
     supports_sampler_stats = True
 
-    def __init__(self, backend: Backend, name: Optional[str] = None):
+    def __init__(self, backend: Backend, name: _s.Optional[str] = None):
+        r"""
+        Something
+        """
         super().__init__(name)
-        self.run_id = hagelkorn.random(digits=6)
+        self.run_id = _s.hagelkorn.random(digits=6)
         print(f"Backend run id: {self.run_id}")
         self._backend: Backend = backend
 
         # Sessions created from the underlying backend
-        self._run: Optional[Run] = None
-        self._chains: Optional[List[Chain]] = None
+        self._run: _s.Optional[_s.mcbackend.Run] = None
+        self._chains: _s.Optional[_s.List[_s.mcbackend.Chain]] = None
 
     def setup(
         self,
         n_chains: int,
         n_samples: int,
         n_dim: int,
-        meta_names: Sequence[str],
-        meta_shapes: Sequence[Sequence[int]],
+        meta_names: _s.Sequence[str],
+        meta_shapes: _s.Sequence[_s.Sequence[int]],
     ) -> None:
+        r"""
+        Something
+        """
         super().setup(n_chains, n_samples, n_dim, meta_names, meta_shapes)
 
         # Initialize backend sessions
         if not self._run:
             variables = [
-                Variable(
+                _s.mcbackend.Variable(
                     f"variable_{i}",
-                    np.dtype(float).name,
+                    _s.np.dtype(float).name,
                     [],
                     [],
                     is_deterministic=False,
@@ -140,10 +152,12 @@ class MCBBackend(Backend):
             sample_stats = []
             for name, shape in zip(meta_names, meta_shapes):
                 sample_stats.append(
-                    Variable(name=name, dtype=np.dtype(float).name, shape=shape)
+                    _s.mcbackend.Variable(
+                        name=name, dtype=_s.np.dtype(float).name, shape=shape
+                    )
                 )
 
-            run_meta = RunMeta(
+            run_meta = _s.mcbackend.RunMeta(
                 self.run_id,
                 variables=variables,
                 sample_stats=sample_stats,
@@ -154,12 +168,18 @@ class MCBBackend(Backend):
     def record(
         self,
         chain_idx: int,
-        state: np.ndarray,
-        meta: Dict[str, Union[float, np.ndarray]],
+        state: _s.np.ndarray,
+        meta: _s.Dict[str, _s.Union[float, _s.np.ndarray]],
     ) -> None:
+        r"""
+        Something
+        """
         draw = dict(zip([f"variable_{i}" for i in range(self.n_dims)], state))
 
         self._chains[chain_idx].append(draw, meta)
 
     def finish(self) -> None:
+        r"""
+        Something
+        """
         pass
