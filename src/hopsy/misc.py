@@ -390,7 +390,7 @@ def _sequential_sampling(
     if backend is not None:
         backend.finish()
 
-    return meta, _s.numpy.array(states), markov_chain.state, rng.state
+    return meta, _s.numpy.array(states)
 
 
 def _sample_parallel_chain(
@@ -682,7 +682,7 @@ def sample(
             rngs[i].state = chain_result[3]
     else:
         for chain_idx in range(len(markov_chains)):
-            _accrates, _states, _, _ = _sequential_sampling(
+            _accrates, _states = _sequential_sampling(
                 markov_chains[chain_idx],
                 rngs[chain_idx],
                 n_samples,
