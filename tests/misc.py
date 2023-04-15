@@ -342,3 +342,20 @@ class MiscTests(unittest.TestCase):
         accrates, states = sample(chains, rngs, n_samples, thinning, progress_bar=True)
 
         self.assertListEqual(list(states.shape), [n_chains, n_samples, 2])
+
+    def test_not_in_memory(self):
+        n_procs = 4
+
+        chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
+        rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
+
+        ret = sample(chains, rngs, n_samples, thinning, n_procs, in_memory=False)
+
+        self.assertEqual(ret, None)
+
+        chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
+        rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
+
+        ret = sample(chains, rngs, n_samples, thinning, in_memory=False)
+
+        self.assertEqual(ret, None)
