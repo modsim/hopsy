@@ -384,7 +384,7 @@ def _sequential_sampling(
                 else {"acceptance_rate": curr_meta},
             )
 
-    if record_meta is None or record_meta is False:
+    if (record_meta is None or record_meta is False) and in_memory:
         meta = _s.numpy.mean(meta)
 
     if backend is not None:
@@ -444,7 +444,7 @@ def _sample_parallel_chain(
         if queue is not None:
             queue.put((chain_idx, state, curr_meta))
 
-    if record_meta is None or record_meta is False:
+    if (record_meta is None or record_meta is False) and in_memory:
         meta = _s.numpy.mean(meta)
 
     if queue is not None:
