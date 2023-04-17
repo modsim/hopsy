@@ -581,6 +581,8 @@ def sample(
         Strings defining :class:`hopsy.MarkovChain` attributes or ``acceptance_rate``, which will
         then be recorded and returned. All attributes of :class:`hopsy.MarkovChain` can be used here,
         e.g. ``record_meta=['state_negative_log_likelihood', 'proposal.proposal']``.
+    in_memory : bool
+        Flag for enabling or disabling in-memory saving of states and metadata.
     backend : derived from hopsy.Backend
         Observer backend to which states and metadata are passed during the run. The backend is e.g. used
         to write the obtained information online to permanent storage. This enables online analysis of the
