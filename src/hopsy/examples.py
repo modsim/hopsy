@@ -21,31 +21,67 @@ class _submodules:
 _s = _submodules
 
 
-def generate_birkhoff_polytope(
-    n: int,
-) -> _s.typing.Tuple[_s.numpy.ndarray, _s.numpy.ndarray]:
+class BirkhoffPolytope:
     r"""
-    Generate Birkhoff polytope
-
-    :param n : int
-        Number of rows/columns of squared matrices (n x n).
+    Birkhoff polytope helper that manages transformation of states and constraints
     """
-    N = n * n
 
-    A = _s.numpy.column_stack((_s.numpy.eye(N), -_s.numpy.eye(N)))
-    b = _s.numpy.column_stack((_s.numpy.ones(N), _s.numpy.zeros(N)))
+    def __init__(self, size: int):
+        r"""
+        Construct Birkhoff polytope class.
 
-    row_sums_mat, row_sums_rhs = _s.numpy.zeros((n, N)), _s.numpy.ones(n)
-    for i in range(n):
-        row_sums_mat[i, i * n : (i + 1) * n] = 1.0
-    col_sums_mat, col_sums_rhs = _s.numpy.zeros((n, N)), _s.numpy.ones(n)
-    for i in range(n):
-        col_sums_mat[i, [i + j * n for j in range(n)]] = 1.0
+        :param size : int
+            Number of rows/columns of the matrices that the Birkhof polytope is constructed for
+        """
 
-    C = _s.numpy.column_stack((row_sums_mat, col_sums_mat))
-    d = _s.numpy.column_stack((row_sums_rhs, col_sums_rhs))
+        self.size = size
+        self.size_squared = size * size
 
-    kernel_basis = _s.scipy.null_space(C)
-    particular_sol = _s.numpy.linalg.lstsq(C, d)
+        self.ineq_matrix_full = _s.numpy.row_stack(
+            (_s.numpy.eye(self.size_squared), -_s.numpy.eye(self.size_squared))
+        )
+        self.ineq_bounds_full = _s.numpy.concatenate(
+            (_s.numpy.ones(self.size_squared), _s.numpy.zeros(self.size_squared))
+        )
 
-    return A @ kernel_basis, b - A.dot(particular_sol)
+        row_sums_mat, row_sums_rhs = _s.numpy.zeros(
+            (self.size, self.size_squared)
+        ), _s.numpy.ones(self.size)
+        for i in range(size):
+            row_sums_mat[i, i * self.size : (i + 1) * self.size] = 1.0
+        col_sums_mat, col_sums_rhs = _s.numpy.zeros(
+            (self.size, self.size_squared)
+        ), _s.numpy.ones(self.size)
+        for i in range(size):
+            col_sums_mat[i, [i + j * self.size for j in range(self.size)]] = 1.0
+
+        self.eq_matrix = _s.numpy.row_stack((row_sums_mat, col_sums_mat))
+        self.eq_rhs = _s.numpy.concatenate((row_sums_rhs, col_sums_rhs))
+
+        self.kernel_basis = _s.scipy.linalg.null_space(self.eq_matrix, rcond=None)
+        self.particular_sol = _s.numpy.linalg.lstsq(
+            self.eq_matrix, self.eq_rhs, rcond=None
+        )[0]
+
+        self.ineq_matrix_reduced = self.ineq_matrix_full @ self.kernel_basis
+        self.ineq_bounds_reduced = self.ineq_bounds_full - self.ineq_matrix_full.dot(
+            self.particular_sol
+        )
+
+    @property
+    def A(self):
+        return self.ineq_matrix_reduced
+
+    @property
+    def b(self):
+        return self.ineq_bounds_reduced
+
+    def convert_to_full_space(self, samples: _s.numpy.ndarray) -> _s.numpy.ndarray:
+        r"""
+        Convert reduced space samples to full space samples.
+
+        :param samples : numpy.ndarray
+            (N, D) array where N is the number of samples and D the number of dimensions
+        """
+
+        return self.kernel_basis @ samples.T + self.particular_sol.reshape((-1, 1))
