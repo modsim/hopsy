@@ -11,6 +11,7 @@ Examples
 
    notebooks/SamplingAdvice.ipynb
    notebooks/ConstrainedSampling.ipynb
+   notebooks/BirkhoffPolytope.ipynb
 
 .. raw:: html
 

@@ -12,7 +12,6 @@
    .. autosummary::
    
       ~GaussianProposal.has_negative_log_likelihood
-      ~GaussianProposal.has_stepsize
       ~GaussianProposal.log_acceptance_probability
       ~GaussianProposal.name
       ~GaussianProposal.proposal

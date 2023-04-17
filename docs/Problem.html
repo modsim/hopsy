@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Problem &mdash; hopsy 0.2.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/hopsy.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Run" href="Run.html" />
+    <link rel="prev" title="Models" href="Model.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            hopsy
+          </a>
+              <div class="version">
+                0.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Model.html">Model</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Problem</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#linear-transformations">Linear Transformations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reference">Reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#hopsy.Problem"><code class="docutils literal notranslate"><span class="pre">Problem()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">Problem()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">Problem</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#miscellaneous-functions">Miscellaneous functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#hopsy.add_box_constraints"><code class="docutils literal notranslate"><span class="pre">add_box_constraints()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id4"><code class="docutils literal notranslate"><span class="pre">add_box_constraints()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hopsy.compute_chebyshev_center"><code class="docutils literal notranslate"><span class="pre">compute_chebyshev_center()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hopsy.round"><code class="docutils literal notranslate"><span class="pre">round()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#possible-problem-types">Possible Problem-types</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Run.html">Run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Proposal.html">Proposal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Data.html">Data</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">hopsy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Problem</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Problem.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="problem">
+<h1>Problem<a class="headerlink" href="#problem" title="Permalink to this heading"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">hopsy.Problem</span></code> classes contain the full description of the problem, we aim to sample.
+A problem consists mainly of the domain, that is the inequality <span class="math notranslate nohighlight">\(Ax \leq b\)</span>, and the target distribution, the <code class="docutils literal notranslate"><span class="pre">hopsy.Model</span></code> object.</p>
+<section id="linear-transformations">
+<h2>Linear Transformations<a class="headerlink" href="#linear-transformations" title="Permalink to this heading"></a></h2>
+<p>Often, it is desirable to apply linear transformations on the polytope to precondition the problem.
+However, the states and the space of interest, may be the untransformed space.
+For polytopes, the most common transformation is a “rounding” transformation.
+Thus, it is possible to set unrounding transformations and shifts for the problem,
+such the produced states lie in the correct space.
+This assumes, that the transformation was already applied to the <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span> matrix,
+which are passed to the model.
+In order to compute rounding transformations, we recommend to use the PolyRound<a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> toolbox.
+For more details about rounding, please refer to xyz.</p>
+</section>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hopsy.Problem">
+<span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">Problem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">hopsy.UniformModel()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.Problem" title="Permalink to this definition"></a></dt>
+<dd><blockquote>
+<div><p>Creates a Problem object of appropriate type using the passed <code class="docutils literal notranslate"><span class="pre">model</span></code>. The actual return type depends on the type of <code class="docutils literal notranslate"><span class="pre">model</span></code>.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<em>numpy.ndarray</em><em>[</em><em>shape</em><em>[</em><em>m</em><em>,</em><em>n</em><em>]</em><em>]</em>) – the left-hand side of the polytope inequality <span class="math notranslate nohighlight">\(Ax \leq b\)</span>.</p></li>
+<li><p><strong>b</strong> (<em>numpy.ndarray</em><em>[</em><em>shape</em><em>[</em><em>m</em><em>,</em><em>1</em><em>]</em><em>]</em>) – the right-hand side of the polytope inequality <span class="math notranslate nohighlight">\(Ax \leq b\)</span></p></li>
+<li><p><strong>model</strong> (<em>hopsy.Model</em>) – defines the target distribution and may be any <code class="docutils literal notranslate"><span class="pre">hopsy.Model</span></code>. If none is passed, then it is assumed to be a uniform model.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">Problem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
+<dd><blockquote>
+<div><p>Creates a Problem object of appropriate type using the passed <code class="docutils literal notranslate"><span class="pre">model</span></code>. The actual return type depends on the type of <code class="docutils literal notranslate"><span class="pre">model</span></code>.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<em>numpy.ndarray</em><em>[</em><em>shape</em><em>[</em><em>m</em><em>,</em><em>n</em><em>]</em><em>]</em>) – the left-hand side of the polytope inequality <span class="math notranslate nohighlight">\(Ax \leq b\)</span>.</p></li>
+<li><p><strong>b</strong> (<em>numpy.ndarray</em><em>[</em><em>shape</em><em>[</em><em>m</em><em>,</em><em>1</em><em>]</em><em>]</em>) – the right-hand side of the polytope inequality <span class="math notranslate nohighlight">\(Ax \leq b\)</span></p></li>
+<li><p><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – defines the target distribution and may be any Python object. Internally, <code class="docutils literal notranslate"><span class="pre">model</span></code>
+will be wrapped inside <code class="docutils literal notranslate"><span class="pre">hopsy.PyModel</span></code>, which works as an interface between HOPS and any Python-implemented model class. Any calls
+from within HOPS to the model will be delegated by calling the appropriate Python function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The following class reference refers to the non-existent class <code class="docutils literal notranslate"><span class="pre">hopsy.Problem</span></code>.
+It applies to any of the available problem classes, which are listed at the end of this page.</p>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="id2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">Problem</span></span><a class="headerlink" href="#id2" title="Permalink to this definition"></a></dt>
+<dd><p><strong>Attributes:</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">A:</span> <span class="pre">numpy.ndarray[float64[m,n]]</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">b:</span> <span class="pre">numpy.ndarray[float64[m,1]]</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">starting_point:</span> <span class="pre">numpy.ndarray[float64[n,1]]</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">unrounding_transformation:</span> <span class="pre">numpy.ndarray[float64[m,n]]</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">unrounding_shift:</span> <span class="pre">numpy.ndarray[float64[m,1]]</span></span></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<section id="miscellaneous-functions">
+<h3>Miscellaneous functions<a class="headerlink" href="#miscellaneous-functions" title="Permalink to this heading"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="hopsy.add_box_constraints">
+<span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">add_box_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_bound</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_bound</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.add_box_constraints" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>m</em><em>,</em><em>n</em><em>]</em><em>]</em>) – Left hand-side of the inequality <span class="math notranslate nohighlight">\(Ax \leq b\)</span>.</p></li>
+<li><p><strong>b</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>m</em><em>,</em><em>1</em><em>]</em><em>]</em>) – Right hand-side of the inequality <span class="math notranslate nohighlight">\(Ax \leq b\)</span>.</p></li>
+<li><p><strong>lower_bound</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>] or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – Specifies the lower bound(s).</p></li>
+<li><p><strong>upper_bound</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>] or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – Specifies the upper bound(s).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(numpy.ndarray[float64[m,n]], numpy.ndarray[float64[m,1]])</p>
+</dd>
+</dl>
+<p>Adds box constraints to all dimensions. This will extend <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> to have <span class="math notranslate nohighlight">\(m+2n\)</span> rows.
+Box constraints are added naively, meaning that we do neither check whether the dimension may be already
+somehow bound nor check whether the very same constraint already exists. You can remove unnecessary constraints
+efficiently using the PolyRound<a class="footnote-reference brackets" href="#f1" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> toolbox or by using the <code class="docutils literal notranslate"><span class="pre">hopsy.round</span></code> function, which however will also round
+the polytope.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">lower_bound</span></code> and <code class="docutils literal notranslate"><span class="pre">upper_bound</span></code> are both <code class="docutils literal notranslate"><span class="pre">float</span></code>, then every dimension <span class="math notranslate nohighlight">\(i\)</span> will be bound as
+<span class="math notranslate nohighlight">\(lb \leq x_i \leq ub\)</span>. If <cite>lower_bound`</cite> and <code class="docutils literal notranslate"><span class="pre">upper_bound</span></code> are both <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> with
+appropriate length, then every dimension <span class="math notranslate nohighlight">\(i\)</span> will be bound as <span class="math notranslate nohighlight">\(lb_i \leq x_i \leq ub_i\)</span>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">add_box_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_bound</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_bound</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id4" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>problem</strong> (<a class="reference internal" href="#id2" title="hopsy.Problem"><em>hopsy.Problem</em></a>) – Problem which contains the matrix <span class="math notranslate nohighlight">\(A\)</span> and vector <span class="math notranslate nohighlight">\(b\)</span> in <span class="math notranslate nohighlight">\(Ax \leq b\)</span>.</p></li>
+<li><p><strong>lower_bound</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>] or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – Specifies the lower bound(s).</p></li>
+<li><p><strong>upper_bound</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>] or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – Specifies the upper bound(s).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#id2" title="hopsy.Problem">hopsy.Problem</a></p>
+</dd>
+</dl>
+<p>Adds box constraints to all dimensions. This will extend <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> of the returned <code class="docutils literal notranslate"><span class="pre">hopsy.Problem</span></code> to have <span class="math notranslate nohighlight">\(m+2n\)</span> rows.
+Box constraints are added naively, meaning that we do neither check whether the dimension may be already
+somehow bound nor check whether the very same constraint already exists. You can remove unnecessary constraints
+efficiently using the PolyRound<a class="footnote-reference brackets" href="#f1" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> toolbox or by using the <code class="docutils literal notranslate"><span class="pre">hopsy.round</span></code> function, which however will also round
+the polytope.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">lower_bound</span></code> and <code class="docutils literal notranslate"><span class="pre">upper_bound</span></code> are both <code class="docutils literal notranslate"><span class="pre">float</span></code>, then every dimension <span class="math notranslate nohighlight">\(i\)</span> will be bound as
+<span class="math notranslate nohighlight">\(lb \leq x_i \leq ub\)</span>. If <cite>lower_bound`</cite> and <code class="docutils literal notranslate"><span class="pre">upper_bound</span></code> are both <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> with
+appropriate length, then every dimension <span class="math notranslate nohighlight">\(i\)</span> will be bound as <span class="math notranslate nohighlight">\(lb_i \leq x_i \leq ub_i\)</span>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hopsy.compute_chebyshev_center">
+<span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">compute_chebyshev_center</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.compute_chebyshev_center" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>problem</strong> (<a class="reference internal" href="#id2" title="hopsy.Problem"><em>hopsy.Problem</em></a>) – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray[float64[n,1]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hopsy.round">
+<span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">round</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.round" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>problem</strong> (<a class="reference internal" href="#id2" title="hopsy.Problem"><em>hopsy.Problem</em></a>) – The problem, which should be rounded.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#id2" title="hopsy.Problem">hopsy.Problem</a></p>
+</dd>
+</dl>
+<p>Rounds the polytope defined by the inequality <span class="math notranslate nohighlight">\(Ax \leq b\)</span> using PolyRound<a class="footnote-reference brackets" href="#f1" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.
+This also strips unnecessary constraints, that is constraints, which can never be active.
+The unrounding transformation and shift will be stored in <code class="docutils literal notranslate"><span class="pre">problem.unrounding_transformation</span></code>
+and <code class="docutils literal notranslate"><span class="pre">problem.unrounding_shift</span></code>.</p>
+</dd></dl>
+
+</section>
+<section id="possible-problem-types">
+<h3>Possible Problem-types<a class="headerlink" href="#possible-problem-types" title="Permalink to this heading"></a></h3>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="f1" role="note">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id3">2</a>,<a role="doc-backlink" href="#id5">3</a>,<a role="doc-backlink" href="#id6">4</a>)</span>
+<p><a class="reference external" href="https://pypi.org/project/PolyRound/">https://pypi.org/project/PolyRound/</a></p>
+</aside>
+</aside>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Model.html" class="btn btn-neutral float-left" title="Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Run.html" class="btn btn-neutral float-right" title="Run" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Richard D. Paul.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

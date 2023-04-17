@@ -12,7 +12,6 @@
    .. autosummary::
    
       ~BallWalkProposal.has_negative_log_likelihood
-      ~BallWalkProposal.has_stepsize
       ~BallWalkProposal.log_acceptance_probability
       ~BallWalkProposal.name
       ~BallWalkProposal.proposal

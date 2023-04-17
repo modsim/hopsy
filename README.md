@@ -124,7 +124,19 @@ plt.show()
 
 ## Development
 
+The development of hopsy primarily takes place on (JuGit)[https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy], where we have access to powerful continuous integration and a Docker registry. The GitHub repository is only a mirror, so please report issues and make pull requests on JuGit.
 Please install pre-commit before commiting to our repository, see pre-commit step in .gitlab-ci.yml.
+
+
+### Building docs & updading docs
+ 
+```
+docs-sources$ make html  # make will tell you which python packages you might be missing
+docs-sources$ rm ../docs/* -r
+docs-sources$ cp _build/html/* ../docs/ -r
+docs-sources$ git add ../ docs && git commit -m "updated docs" && git push  # and so on...
+```
+
 
 ## Links
 - Source Code & CI: https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy

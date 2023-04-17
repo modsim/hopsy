@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Run &mdash; hopsy 0.2.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/hopsy.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Proposals" href="Proposal.html" />
+    <link rel="prev" title="Problem" href="Problem.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            hopsy
+          </a>
+              <div class="version">
+                0.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Model.html">Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Problem.html">Problem</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Run</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#reference">Reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#hopsy.Run"><code class="docutils literal notranslate"><span class="pre">Run()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">Run()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">Run()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">Run</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#hopsy.Run.init"><code class="docutils literal notranslate"><span class="pre">Run.init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hopsy.Run.sample"><code class="docutils literal notranslate"><span class="pre">Run.sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">Run.sample()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#possible-run-types">Possible Run-types</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Proposal.html">Proposal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Data.html">Data</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">hopsy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Run</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Run.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="run">
+<h1>Run<a class="headerlink" href="#run" title="Permalink to this heading"></a></h1>
+<blockquote>
+<div><p>The <code class="docutils literal notranslate"><span class="pre">hopsy.Run</span></code> classes encapsulate the actual Markov chains and allow to sample a <code class="docutils literal notranslate"><span class="pre">hopsy.Problem</span></code>.
+Further, they provide methods to control the sampling process.
+Note, that there does not actually exist a class <code class="docutils literal notranslate"><span class="pre">hopsy.Run</span></code>.
+Instead there exists a number of <code class="docutils literal notranslate"><span class="pre">hopsy.Run</span></code>-classes, which all share the same methods, but are in fact different instantiations of
+the hops template class <code class="docutils literal notranslate"><span class="pre">hopsy.Run</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">hopsy.Run()</span></code> method, which aims to simulate the look and feel of a constructor, which automatically deduces the correct template
+parameters, acts as a factory for the different <code class="docutils literal notranslate"><span class="pre">hopsy.Run</span></code> classes.
+At the end of this page, the existing <code class="docutils literal notranslate"><span class="pre">hopsy.Run</span></code> classes are listed for completeness.
+However, since they all share the same methods and in fact only differ in the type of the <code class="docutils literal notranslate"><span class="pre">hopsy.Problem</span></code> instance, they store,
+their methods will be listed and described here.</p>
+<p>A noteworthy feature of hopsy is the possibility to implement proposal algorithms in Python and then let the Markov chains run with them.
+This is realized by wrapping the Python proposal into a <code class="docutils literal notranslate"><span class="pre">hopsy.PyProposal</span></code> class which acts as an interface for hops by simply delegating
+the calls to its function to the respective Python methods. For more details on how to use this, refer to <code class="docutils literal notranslate"><span class="pre">hopsy.PyProposal</span></code>.</p>
+</div></blockquote>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="hopsy.Run">
+<span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">Run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="Problem.html#id2" title="hopsy.Problem"><span class="pre">hopsy.Problem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'HitAndRun'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_chains</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.Run" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a run object of appropriate type using the passed <code class="docutils literal notranslate"><span class="pre">problem</span></code>. The actual return type depends on the type of <code class="docutils literal notranslate"><span class="pre">problem</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>problem</strong> (<a class="reference internal" href="Problem.html#id2" title="hopsy.Problem"><em>hopsy.Problem</em></a>) – the problem which we aim to sample.</p></li>
+<li><p><strong>proposal_string</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – <p>may be any string identifier of propsals included in hops. Valid identifiers are:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;BallWalk&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;CoordinateHitAndRun&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;CSmMALA&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;CSmMALANoGradient&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;DikinWalk&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;Gaussian&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;HitAndRun&quot;</span></code></p></li>
+</ul>
+<p>For more information on the proposal algorithms available, please refer to the Proposals section.</p>
+</p></li>
+<li><p><strong>number_of_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – sets the number of samples which will be drawn when calling <code class="docutils literal notranslate"><span class="pre">run.sample()</span></code>.</p></li>
+<li><p><strong>number_of_chains</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – sets the number of chains which will be run.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Note that the total number of samples generated will be <code class="docutils literal notranslate"><span class="pre">number_of_samples</span> <span class="pre">*</span> <span class="pre">number_of_chains</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">Run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="Problem.html#id2" title="hopsy.Problem"><span class="pre">hopsy.Problem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><span class="pre">object</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_chains</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a run object of appropriate type using the passed <code class="docutils literal notranslate"><span class="pre">problem</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>problem</strong> (<a class="reference internal" href="Problem.html#id2" title="hopsy.Problem"><em>hopsy.Problem</em></a>) – the problem which we aim to sample.</p></li>
+<li><p><strong>proposal</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – may be any Python object. Internally, <code class="docutils literal notranslate"><span class="pre">proposal</span></code>
+will be wrapped inside <code class="docutils literal notranslate"><span class="pre">hopsy.PyProposal</span></code>, which works as an interface between hops and any Python-implemented proposal class. Any calls
+from within hops to the proposal will be delegated by calling the appropriate Python function.</p></li>
+<li><p><strong>number_of_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – sets the number of samples which will be drawn when calling <code class="docutils literal notranslate"><span class="pre">run.sample()</span></code>.</p></li>
+<li><p><strong>number_of_chains</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – sets the number of chains which will be run.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Note that the total number of samples generated will be <code class="docutils literal notranslate"><span class="pre">number_of_samples</span> <span class="pre">*</span> <span class="pre">number_of_chains</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">Run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="Problem.html#id2" title="hopsy.Problem"><span class="pre">hopsy.Problem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="Proposal.html#hopsy.PyProposal" title="hopsy.PyProposal"><span class="pre">hopsy.PyProposal</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_chains</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id1" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a run object of appropriate type using the passed <code class="docutils literal notranslate"><span class="pre">problem</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>problem</strong> (<a class="reference internal" href="Problem.html#id2" title="hopsy.Problem"><em>hopsy.Problem</em></a>) – the problem which we aim to sample.</p></li>
+<li><p><strong>proposal</strong> (<a class="reference internal" href="Proposal.html#hopsy.PyProposal" title="hopsy.PyProposal"><em>hopsy.PyProposal</em></a>) – the proposal class wrapping the actual proposal object. This method is just a more explicit version of the above.</p></li>
+<li><p><strong>number_of_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – sets the number of samples which will be drawn when calling <code class="docutils literal notranslate"><span class="pre">run.sample()</span></code>.</p></li>
+<li><p><strong>number_of_chains</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – sets the number of chains which will be run.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Note that the total number of samples generated will be <code class="docutils literal notranslate"><span class="pre">number_of_samples</span> <span class="pre">*</span> <span class="pre">number_of_chains</span></code>.</p>
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The following class reference refers to the non-existent class <code class="docutils literal notranslate"><span class="pre">hopsy.Run</span></code>.
+It applies to any of the available run classes, which are listed at the end of this page.</p>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="id2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">Run</span></span><a class="headerlink" href="#id2" title="Permalink to this definition"></a></dt>
+<dd><p><strong>Attributes:</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">data:</span> <span class="pre">hopsy.Data</span></span></dt>
+<dd><p>A <code class="docutils literal notranslate"><span class="pre">hopsy.Data</span></code> object containing most prominently the states, as well as other data, that the chain produced.
+Read-only access.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">problem:</span> <span class="pre">hopsy.Problem</span></span></dt>
+<dd><p>A``hopsy.Problem`` object that contains the problem formulation. This consists most prominently of the polytope inequality <span class="math notranslate nohighlight">\(Ax \leq b\)</span>
+and the target function, a <code class="docutils literal notranslate"><span class="pre">hopsy.Model</span></code>.
+Read-only access.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">starting_points:</span> <span class="pre">List[numpy.ndarray[float64[m,1]]]</span></span></dt>
+<dd><p>The chains’ starting points.
+Changing the chains starting points will lead to a reinitialization of the run object.
+Note that <code class="docutils literal notranslate"><span class="pre">len(starting_points)</span></code> should match <code class="docutils literal notranslate"><span class="pre">number_of_chains</span></code>.
+If not enough starting points are supplied and no default starting point was set in <code class="docutils literal notranslate"><span class="pre">problem</span></code>, then you will receive an exception.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">proposal_name:</span> <span class="pre">str</span></span></dt>
+<dd><p>The name of the used proposal. May not be defined, if a <code class="docutils literal notranslate"><span class="pre">hopsy.PyProposal</span></code> is used, which does not implement the <code class="docutils literal notranslate"><span class="pre">get_name</span></code> method.
+Changing the <code class="docutils literal notranslate"><span class="pre">proposal_name</span></code> to one of the supplied ones above, will change the chains type, if it was not using a self-implemented proposal
+algorithm before.
+In the latter case, changing the name will have no effect in changing the chains proposal, but will lead to a reinitialization of the run object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">number_of_chains:</span> <span class="pre">int</span></span></dt>
+<dd><p>The number of chains.
+Changing <code class="docutils literal notranslate"><span class="pre">number_of_chains</span></code> will lead to a reinitialization of the run object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">number_of_samples:</span> <span class="pre">int</span></span></dt>
+<dd><p>The number of samples, each call to <code class="docutils literal notranslate"><span class="pre">sample()</span></code> will produce.
+If <code class="docutils literal notranslate"><span class="pre">sample_until_convergence</span> <span class="pre">==</span> <span class="pre">True</span></code>, then <code class="docutils literal notranslate"><span class="pre">number_of_samples</span></code> samples will be produced each round before computing the
+convergence diagnostics.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">thinning:</span> <span class="pre">int</span></span></dt>
+<dd><p>Only every <code class="docutils literal notranslate"><span class="pre">thinning</span></code>-th sample will be kept.
+If <code class="docutils literal notranslate"><span class="pre">problem</span></code> has a unrounding transformation, this transformation will be applied only on the samples being kept.
+This may speed up some chains in comparison to applying thinning only afterwards.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">stepsize:</span> <span class="pre">float</span></span></dt>
+<dd><p>The stepsize parameter of the proposal algorithms. Note that not all proposal algorithms, especially self-implemented ones, may actually have
+a stepsize.
+Changing <code class="docutils literal notranslate"><span class="pre">stepsize</span></code> will lead to a reinitialization of the run object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">fisher_weight:</span> <span class="pre">float</span></span></dt>
+<dd><p>The Fisher weight of the <code class="docutils literal notranslate"><span class="pre">CSmMALA</span></code> algorithm.
+Changing <code class="docutils literal notranslate"><span class="pre">fisher_weight</span></code> will lead to a reinitialization of the run object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">random_seed:</span> <span class="pre">float</span></span></dt>
+<dd><p>Random seed of the hops random number generators. Note that for self-implemented proposal algorithms, this seed has no effect.
+Changing <code class="docutils literal notranslate"><span class="pre">random_seed</span></code> will lead to a reinitialization of the run object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">sample_until_convergence:</span> <span class="pre">bool</span></span></dt>
+<dd><p>Flag, whether <code class="docutils literal notranslate"><span class="pre">sample()</span></code> should try to sample until convergence is diagnosed.
+Convergence is diagnosed, if the potential scale reduction factor is below <code class="docutils literal notranslate"><span class="pre">diagnostics_threshold</span></code>, which by default is set to 1.05.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">diagnostics_threshold:</span> <span class="pre">float</span></span></dt>
+<dd><p>The threshold, below which convergence is diagnosed using the potential scale reduction factor.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">max_repetitions:</span> <span class="pre">int</span></span></dt>
+<dd><p>The maximal number of repetitions when sampling until convergence. This prevents endless loops when convergence is not reached.</p>
+</dd></dl>
+
+<p><strong>Methods:</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.Run.init">
+<span class="sig-name descname"><span class="pre">init</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#hopsy.Run.init" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes the run object. This initializes the <code class="docutils literal notranslate"><span class="pre">data</span></code> object, if it was not initialized before and <strong>erases all of its content.</strong>
+It initializes the random number generators and initializes missing starting points, if a default starting point was set in problem.
+Further, it sets up the chains and preallocates memory for the samples.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.Run.sample">
+<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#hopsy.Run.sample" title="Permalink to this definition"></a></dt>
+<dd><p>Draws samples from the given problem using the passed settings. If the run object is uninitialized, then it will be initialized first.
+If <code class="docutils literal notranslate"><span class="pre">sample_until_convergence</span> <span class="pre">==</span> <span class="pre">True</span></code>, then the run will repeatedly draw samples and compute the potential scale reduction factor,
+to determine whether convergence has been reached or not.
+This may produce up to <code class="docutils literal notranslate"><span class="pre">max_repetitions</span> <span class="pre">*</span> <span class="pre">number_of_samples</span></code> samples.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number_of_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">thinning</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#id3" title="Permalink to this definition"></a></dt>
+<dd><p>Draws samples from the given problem using the passed settings, except using the passed <code class="docutils literal notranslate"><span class="pre">number_of_samples</span></code> and <code class="docutils literal notranslate"><span class="pre">thinning</span></code>, instead
+of the settings stored in the run object.
+If the run object is uninitialized, then it will be initialized first.
+If <code class="docutils literal notranslate"><span class="pre">sample_until_convergence</span> <span class="pre">==</span> <span class="pre">True</span></code>, then the run will repeatedly draw samples and compute the potential scale reduction factor,
+to determine whether convergence has been reached or not.
+This may produce up to <code class="docutils literal notranslate"><span class="pre">max_repetitions</span> <span class="pre">*</span> <span class="pre">number_of_samples</span></code> samples.</p>
+</dd></dl>
+
+</dd></dl>
+
+<section id="possible-run-types">
+<h3>Possible Run-types<a class="headerlink" href="#possible-run-types" title="Permalink to this heading"></a></h3>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Problem.html" class="btn btn-neutral float-left" title="Problem" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Proposal.html" class="btn btn-neutral float-right" title="Proposals" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Richard D. Paul.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

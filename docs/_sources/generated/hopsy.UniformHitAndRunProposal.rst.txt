@@ -12,7 +12,6 @@
    .. autosummary::
    
       ~UniformHitAndRunProposal.has_negative_log_likelihood
-      ~UniformHitAndRunProposal.has_stepsize
       ~UniformHitAndRunProposal.log_acceptance_probability
       ~UniformHitAndRunProposal.name
       ~UniformHitAndRunProposal.proposal

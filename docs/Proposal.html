@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposals &mdash; hopsy 0.2.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="shortcut icon" href="_static/hopsy.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Data" href="Data.html" />
+    <link rel="prev" title="Run" href="Run.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            hopsy
+          </a>
+              <div class="version">
+                0.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Model.html">Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Problem.html">Problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Run.html">Run</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Proposal</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#custom-python-proposals">Custom Python proposals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-code">Example code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reference">Reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#hopsy.PyProposal"><code class="docutils literal notranslate"><span class="pre">PyProposal</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#hopsy.PyProposal.PyProposal"><code class="docutils literal notranslate"><span class="pre">PyProposal.PyProposal()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Data.html">Data</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">hopsy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Proposals</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Proposal.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="proposals">
+<h1>Proposals<a class="headerlink" href="#proposals" title="Permalink to this heading"></a></h1>
+<p>hopsy is not particulary designed for development of polytope samplers, but instead aims at making the proposals available in hops
+easily usable to solve the practitioner’s problems at hand.
+Also, the proposal - together with the Metropolis filter and the models likelihood function - form the core of any Markov chain Monte Carlo algorithm.
+Thus, we believe that for sake of performance, proposals should be optimized and implemented in C++ and hops itself.
+For more informations on the proposal distributions implemented in hops, please refer to xyz.</p>
+<section id="custom-python-proposals">
+<h2>Custom Python proposals<a class="headerlink" href="#custom-python-proposals" title="Permalink to this heading"></a></h2>
+<p>Nevertheless, sometimes it might be desirable to do some rapid prototyping to test promising ideas.
+For this case, it is possible to implement Python proposals and to instruct hopsy (and ultimately hops) to use those.</p>
+<p>Similarily to the custom Python models, this works by wrapping the Python proposal in the <code class="docutils literal notranslate"><span class="pre">hopsy.PyProposal</span></code> class.
+<code class="docutils literal notranslate"><span class="pre">hopsy.PyProposal</span></code> implements all functions necessary for the proposal class to be usable in hops by delegating the function
+calls to the store Python proposal.
+Thus, it is obviously needed, that the Python proposal implements the corresponding functions.</p>
+<p>The functions are</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">propose()</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code> generates a new proposal and store it internally</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">accept_proposal()</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code> sets the current state, which also has to be stored internally, to the current proposal</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">calculate_log_acceptance_probability()</span> <span class="pre">-&gt;</span> <span class="pre">float</span></code> compute the logarithm of <span class="math notranslate nohighlight">\(\frac{P(x|y)}{P(y|x)}\)</span>,
+if <span class="math notranslate nohighlight">\(x\)</span> is the current state and <span class="math notranslate nohighlight">\(y\)</span> the proposal.
+For symmetric proposals this is e.g. 0. For infeasible proposals, which e.g. lie outside the polytope, it is <span class="math notranslate nohighlight">\(-\infty\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_state()</span> <span class="pre">-&gt;</span> <span class="pre">numpy.ndarray[shape[d,1]]</span></code> returns the current state.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">set_state(new_state:</span> <span class="pre">numpy.ndarray[shape[d,1]])</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code> sets the current state.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_proposal()</span> <span class="pre">-&gt;</span> <span class="pre">numpy.ndarray[shape[d,1]]</span></code> returns the current proposal.</p></li>
+<li><p>(optional) <code class="docutils literal notranslate"><span class="pre">get_stepsize()</span> <span class="pre">-&gt;</span> <span class="pre">float</span></code> sets the stepsize, if it is available.</p></li>
+<li><p>(optional) <code class="docutils literal notranslate"><span class="pre">set_stepsize(new_stepsize:</span> <span class="pre">float)</span></code> gets the stepsize, if it is available.</p></li>
+<li><p>(optional) <code class="docutils literal notranslate"><span class="pre">get_name()</span> <span class="pre">-&gt;</span> <span class="pre">str</span></code> gets the algorithms name, if it is available.</p></li>
+</ul>
+</section>
+<section id="example-code">
+<h2>Example code<a class="headerlink" href="#example-code" title="Permalink to this heading"></a></h2>
+<p>The following example implements the constraint Gaussian random walk and a constraint adaptive Metropolis
+algorithm, following the original idea of Haario et al., 2001.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hopsy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">class</span> <span class="nc">GaussianProposal</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">cov</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">A</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cov</span> <span class="o">=</span> <span class="n">cov</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proposal</span> <span class="o">=</span> <span class="n">x</span>
+
+    <span class="k">def</span> <span class="nf">propose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">),))</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proposal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">*</span> <span class="n">y</span>
+
+    <span class="k">def</span> <span class="nf">accept_proposal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proposal</span>
+
+    <span class="k">def</span> <span class="nf">calculate_log_acceptance_probability</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">proposal</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+
+    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_state</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">new_state</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_proposal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">proposal</span>
+
+    <span class="k">def</span> <span class="nf">get_stepsize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span>
+
+    <span class="k">def</span> <span class="nf">set_stepsize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_stepsize</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">new_stepsize</span>
+
+    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;PyGaussianProposal&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">AdaptiveGaussianProposal</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">eps</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">A</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="n">eps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proposal</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">propose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">new_mean</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cov</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">new_mean</span><span class="p">,</span> <span class="n">new_mean</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)))</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">proposal_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">),))</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">proposal_mean</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cov</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proposal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">*</span> <span class="n">y</span>
+
+    <span class="k">def</span> <span class="nf">accept_proposal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proposal</span>
+
+    <span class="k">def</span> <span class="nf">calculate_log_acceptance_probability</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">proposal</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+
+    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_state</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">new_state</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_proposal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">proposal</span>
+
+    <span class="k">def</span> <span class="nf">get_stepsize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span>
+
+    <span class="k">def</span> <span class="nf">set_stepsize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_stepsize</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">new_stepsize</span>
+
+    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;AdaptiveGaussianPyProposal&quot;</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]]);</span>
+
+<span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">]])</span>
+
+<span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">cov</span> <span class="o">=</span> <span class="mf">0.1</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">gaussian_proposal</span> <span class="o">=</span> <span class="n">GaussianProposal</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">adaptive_proposal</span> <span class="o">=</span> <span class="n">AdaptiveGaussianProposal</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">x0</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">MultivariateGaussianModel</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">cov</span><span class="p">)</span>
+<span class="n">problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+
+<span class="n">gaussian_run</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">Run</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">gaussian_proposal</span><span class="p">)</span>
+<span class="n">adaptive_run</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">Run</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">adaptive_proposal</span><span class="p">)</span>
+
+<span class="n">gaussian_run</span><span class="o">.</span><span class="n">starting_points</span> <span class="o">=</span> <span class="p">[</span><span class="n">x0</span><span class="p">]</span>
+<span class="n">adaptive_run</span><span class="o">.</span><span class="n">starting_points</span> <span class="o">=</span> <span class="p">[</span><span class="n">x0</span><span class="p">]</span>
+
+<span class="n">gaussian_run</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">adaptive_run</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="n">gaussian_stepsize</span> <span class="o">=</span> <span class="n">gaussian_run</span><span class="o">.</span><span class="n">stepsize</span>
+<span class="n">adaptive_stepsize</span> <span class="o">=</span> <span class="n">adaptive_run</span><span class="o">.</span><span class="n">stepsize</span>
+
+<span class="n">gaussian_acc_rate</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">compute_acceptance_rate</span><span class="p">(</span><span class="n">gaussian_run</span><span class="o">.</span><span class="n">data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">adaptive_acc_rate</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">compute_acceptance_rate</span><span class="p">(</span><span class="n">adaptive_run</span><span class="o">.</span><span class="n">data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">gaussian_esjd</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">compute_expected_squared_jump_distance</span><span class="p">(</span><span class="n">gaussian_run</span><span class="o">.</span><span class="n">data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">adaptive_esjd</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">compute_expected_squared_jump_distance</span><span class="p">(</span><span class="n">adaptive_run</span><span class="o">.</span><span class="n">data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;         | Gaussian proposal&quot;</span>                         <span class="o">+</span> <span class="s2">&quot; | Adaptive proposal&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---------+------------------&quot;</span>                         <span class="o">+</span> <span class="s2">&quot;-+------------------&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Stepsize |               &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">gaussian_stepsize</span><span class="p">)</span>   <span class="o">+</span> <span class="s2">&quot; |               &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">adaptive_stepsize</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Acc Rate |             &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">gaussian_acc_rate</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; |             &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">adaptive_acc_rate</span><span class="p">)[:</span><span class="mi">5</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ESJD     |             &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">gaussian_esjd</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>     <span class="o">+</span> <span class="s2">&quot; |             &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">adaptive_esjd</span><span class="p">)[:</span><span class="mi">5</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>(Approximate) output:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">         | Gaussian proposal | Adaptive proposal</span>
+<span class="go">---------+-------------------+------------------</span>
+<span class="go">Stepsize |               1.0 |               1.0</span>
+<span class="go">Acc Rate |             0.046 |             0.293</span>
+<span class="go">ESJD     |             0.006 |             0.018</span>
+</pre></div>
+</div>
+</section>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="hopsy.PyProposal">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">PyProposal</span></span><a class="headerlink" href="#hopsy.PyProposal" title="Permalink to this definition"></a></dt>
+<dd><p>Wraps any Python object as a valid C++-proposal, making it usable in hops.
+This works by simply delegating calls to its methods to the wrapped Python object.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hopsy.PyProposal.PyProposal">
+<span class="sig-name descname"><span class="pre">PyProposal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proposal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><span class="pre">object</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.PyProposal.PyProposal" title="Permalink to this definition"></a></dt>
+<dd><p>Constructs the <code class="docutils literal notranslate"><span class="pre">hopsy.PyProposal</span></code> by wrapping the passed Python object.
+For the proposal to work correctly together with hops, it should provide the methods</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">propose()</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">accept_proposal()</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">calculate_log_acceptance_probability()</span> <span class="pre">-&gt;</span> <span class="pre">float</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_state()</span> <span class="pre">-&gt;</span> <span class="pre">numpy.ndarray[shape[d,1]]</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">set_state(new_state:</span> <span class="pre">numpy.ndarray[shape[d,1]])</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_proposal()</span> <span class="pre">-&gt;</span> <span class="pre">numpy.ndarray[shape[d,1]]</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_stepsize()</span> <span class="pre">-&gt;</span> <span class="pre">float</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">set_stepsize(new_stepsize:</span> <span class="pre">float)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_name()</span> <span class="pre">-&gt;</span> <span class="pre">str</span></code></p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>proposal</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – The Python-implemented proposal distribution, which should implement the above mentioned methods.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the hopsy.PyProposal object wrapping <code class="docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#hopsy.PyProposal" title="hopsy.PyProposal">hopsy.PyProposal</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Run.html" class="btn btn-neutral float-left" title="Run" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Data.html" class="btn btn-neutral float-right" title="Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Richard D. Paul.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
