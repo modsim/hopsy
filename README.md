@@ -129,7 +129,7 @@ Please install pre-commit before commiting to our repository, see pre-commit ste
 
 
 ### Building docs & updading docs
- 
+
 ```
 docs-sources$ make html  # make will tell you which python packages you might be missing
 docs-sources$ rm ../docs/* -r
