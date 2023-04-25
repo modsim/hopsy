@@ -590,15 +590,17 @@ def sample(
 
     Returns
     -------
-    list or dict
-        Meta information about the states. Without using ``record_meta``,
+    optional[tuple[list or dict, numpy.ndarray]]
+        First value of the tuple holds meta information about the states. Without using ``record_meta``,
         this is a list containing the acceptance rates of each chain.
         If ``record_meta`` is used, then this is a dict containing the values of the :class:`hopsy.MarkovChain`
         attributes defined in ``record_meta``.
-        If the attribute was not found (e.g. because of a typo), then it will have value ``None``.
-    numpy.ndarray
-        The produced states. Will have shape ``(n_chains, n_draws, dim)``. For single chains, it will
-        thus be ``(1, n_draws, dim)``.
+        If the attribute was not found (e.g. because of a typo), it will have value ``None``.
+
+        Second value of the tuple holds produced states. Will have shape ``(n_chains, n_draws, dim)``. For single chains, it will
+        thus be ``(1, n_draws, dim)``. 
+        
+        If ``in_memory=False``, ``None`` will be returned.
 
     """
 
