@@ -58,7 +58,7 @@ build-docs:
     - cp _build/* ../docs -r
     - cd ..
     - git add docs
-    - git commit -m "$CI_COMMIT_DESCRIPTION + docs" --no-verify
+    - git commit -m `${CI_COMMIT_DESCRIPTION} + docs` --no-verify
     - git remote remove origin
     - git remote add origin https://oauth2:${CI_BOT}@jugit.fz-juelich.de/IBG-1/ModSim/hopsy.git
     - git push origin HEAD:$CI_COMMIT_BRANCH -o ci.skip # prevent triggering pipeline again
