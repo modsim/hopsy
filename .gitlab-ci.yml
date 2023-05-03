@@ -48,7 +48,6 @@ build-docs:
     # upload docs
     - git config user.email $GITLAB_USER_EMAIL
     - git config user.name "ci-bot"
-    - git remote add gitlab_origin https://oauth2:$CI_JOB_TOKEN@$CI_REPOSITORY_URL
     - cd docs-sources
     - python -m pip install sphinx-build
     - make html
@@ -58,7 +57,7 @@ build-docs:
     - cd ..
     - git add docs
     - git commit -m "${CI_COMMIT_DESCRIPTION} + docs"
-    - git push gitlab_origin HEAD:$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME -o ci.skip # prevent triggering pipeline again
+    - git push origin HEAD:$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME -o ci.skip # prevent triggering pipeline again
 
       
 test-release:
