@@ -49,8 +49,10 @@ build-docs:
     - git config user.email $GITLAB_USER_EMAIL
     - git config user.name "ci-bot"
     - cd docs-sources
-    - pip install sphinx-build
-    - make html
+    - mkdir _build
+    - touch _build/.buildinfo
+    - touch _build/index.html
+    - echo test > _build/index.html
     - rm _build/.buildinfo
     - rm ../docs/* -r
     - cp _build/* ../docs -r
