@@ -49,7 +49,7 @@ build-docs:
     - git config user.email $GITLAB_USER_EMAIL
     - git config user.name "ci-bot"
     - cd docs-sources
-    - python -m pip install sphinx-build
+    - python3 -m pip install sphinx-build
     - make html
     - rm _build/.buildinfo
     - rm ../docs/* -r
