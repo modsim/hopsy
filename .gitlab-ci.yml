@@ -55,7 +55,8 @@ build-docs:
     - echo test > _build/index.html
     - rm _build/.buildinfo
     - git rm ../docs/* -rf
-    - cp _build/* ../docs -r
+    - mkdir ../docs
+    - cp _build/* ../docs/* -r
     - cd ..
     - git add docs
     - git commit -m `${CI_COMMIT_DESCRIPTION} + docs` --no-verify
