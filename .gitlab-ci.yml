@@ -58,7 +58,8 @@ build-docs:
     - cp _build/* ../docs -r
     - cd ..
     - git add docs
-    - git commit -m "${CI_COMMIT_DESCRIPTION} + docs"
+    - "/opt/python/"$py"/bin/pip wheel --no-deps /io -w /io/dist/"
+    - git commit -m "${CI_COMMIT_DESCRIPTION} + docs" --no-verify
     - git push origin HEAD:$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME -o ci.skip # prevent triggering pipeline again
 
       
