@@ -50,6 +50,7 @@ build-docs:
     - git config user.name "ci-bot"
     - git remote add gitlab_origin https://oauth2:$CI_JOB_TOKEN@$CI_REPOSITORY_URL
     - cd docs-sources
+    - python -m pip install sphinx-build
     - make html
     - rm _build/.buildinfo
     - rm ../docs/* -r
