@@ -43,7 +43,7 @@ build-debug:
     expire_in: 7 days
 
 
-      
+
 test-release:
   stage: test
   before_script:
