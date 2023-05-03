@@ -54,12 +54,12 @@ build-docs:
     - touch _build/index.html
     - echo test > _build/index.html
     - rm _build/.buildinfo
-    - rm ../docs/* -r
+    - git rm ../docs/* -rf
     - cp _build/* ../docs -r
     - cd ..
     - git add docs
     - git commit -m "${CI_COMMIT_DESCRIPTION} + docs" --no-verify
-    - git push origin HEAD:$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME -o ci.skip # prevent triggering pipeline again
+    - git push origin -o ci.skip # prevent triggering pipeline again
 
       
 test-release:
