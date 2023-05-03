@@ -598,8 +598,8 @@ def sample(
         If the attribute was not found (e.g. because of a typo), it will have value ``None``.
 
         Second value of the tuple holds produced states. Will have shape ``(n_chains, n_draws, dim)``. For single chains, it will
-        thus be ``(1, n_draws, dim)``. 
-        
+        thus be ``(1, n_draws, dim)``.
+
         If ``in_memory=False``, ``None`` will be returned.
 
     """
