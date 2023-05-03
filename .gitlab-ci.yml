@@ -58,8 +58,8 @@ build-docs:
     - cp _build/* ../docs -r
     - cd ..
     - git add docs
-    - git commit -m "${CI_COMMIT_DESCRIPTION} + docs" --no-verify
-    - git push origin -o ci.skip # prevent triggering pipeline again
+    - git commit -m "$CI_COMMIT_DESCRIPTION + docs" --no-verify
+    - git push origin HEAD:$CI_COMMIT_BRANCH -o ci.skip # prevent triggering pipeline again
 
       
 test-release:
