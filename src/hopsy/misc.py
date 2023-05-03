@@ -326,8 +326,9 @@ def _sequential_sampling(
     rng: _c.RandomNumberGenerator,
     n_samples: int,
     thinning: int,
+    chain_idx: int,
+    in_memory: bool,
     record_meta=None,
-    chain_idx: int = -1,
     backend: _c.Backend = None,
     progress_bar: bool = False,
 ):
@@ -347,13 +348,15 @@ def _sequential_sampling(
     for i in sample_range:
         accrate, state = markov_chain.draw(rng, thinning)
 
+        curr_meta = None
         if record_meta is None or record_meta is False:
-            meta.append(accrate)
+            curr_meta = accrate
         else:
+            curr_meta = {}
             for field in record_meta:
                 if field == "acceptance_rate":  # treat acceptance rate differently,
                     # as it is no attribute of the markov chain
-                    meta[field].append(accrate)
+                    curr_meta[field] = accrate
                 else:
                     # recurse through the attribute name and record the final value
                     attrs = field.split(".")
@@ -361,26 +364,33 @@ def _sequential_sampling(
                     for attr in attrs:
                         base = getattr(base, attr)
 
-                    meta[field].append(base)
+                    curr_meta[field] = base
 
-        states.append(state)
+        if in_memory:
+            states.append(state)
+
+            if record_meta is None or record_meta is False:
+                meta.append(curr_meta)
+            else:
+                for field in record_meta:
+                    meta[field].append(curr_meta[field])
 
         if backend is not None:
-            step_meta = None
-            if record_meta is None or record_meta is False:
-                step_meta = {"acceptance_rate": accrate}
-            else:
-                step_meta = {key: meta[key][-1] for key in meta}
+            backend.record(
+                chain_idx,
+                state,
+                curr_meta
+                if isinstance(curr_meta, dict)
+                else {"acceptance_rate": curr_meta},
+            )
 
-            backend.record(chain_idx, state, step_meta)
-
-    if record_meta is None or record_meta is False:
+    if (record_meta is None or record_meta is False) and in_memory:
         meta = _s.numpy.mean(meta)
 
     if backend is not None:
         backend.finish()
 
-    return meta, _s.numpy.array(states), markov_chain.state, rng.state
+    return meta, _s.numpy.array(states)
 
 
 def _sample_parallel_chain(
@@ -388,8 +398,9 @@ def _sample_parallel_chain(
     rng: _c.RandomNumberGenerator,
     n_samples: int,
     thinning: int,
+    chain_idx: int,
+    in_memory: bool,
     record_meta=None,
-    chain_idx: int = -1,
     queue: _s.multiprocessing.Queue = None,
 ):
     states = []
@@ -403,13 +414,15 @@ def _sample_parallel_chain(
     for i in range(n_samples):
         accrate, state = markov_chain.draw(rng, thinning)
 
+        curr_meta = None
         if record_meta is None or record_meta is False:
-            meta.append(accrate)
+            curr_meta = accrate
         else:
+            curr_meta = {}
             for field in record_meta:
                 if field == "acceptance_rate":  # treat acceptance rate differently,
                     # as it is no attribute of the markov chain
-                    meta[field].append(accrate)
+                    curr_meta[field] = accrate
                 else:
                     # recurse through the attribute name and record the final value
                     attrs = field.split(".")
@@ -417,20 +430,21 @@ def _sample_parallel_chain(
                     for attr in attrs:
                         base = getattr(base, attr)
 
-                    meta[field].append(base)
+                    curr_meta[field] = base
 
-        states.append(state)
+        if in_memory:
+            states.append(state)
+
+            if record_meta is None or record_meta is False:
+                meta.append(curr_meta)
+            else:
+                for field in record_meta:
+                    meta[field].append(curr_meta[field])
 
         if queue is not None:
-            step_meta = None
-            if record_meta is None or record_meta is False:
-                step_meta = {"acceptance_rate": accrate}
-            else:
-                step_meta = {key: meta[key][-1] for key in meta}
+            queue.put((chain_idx, state, curr_meta))
 
-            queue.put((chain_idx, state, step_meta))
-
-    if record_meta is None or record_meta is False:
+    if (record_meta is None or record_meta is False) and in_memory:
         meta = _s.numpy.mean(meta)
 
     if queue is not None:
@@ -503,7 +517,11 @@ def _parallel_sampling(
                 if progress_bar:
                     pbars[chain_idx].update()
                 if backend is not None:
-                    backend.record(chain_idx, state, meta)
+                    backend.record(
+                        chain_idx,
+                        state,
+                        meta if isinstance(meta, dict) else {"acceptance_rate": meta},
+                    )
             else:
                 finished[chain_idx] = True
                 if progress_bar:
@@ -527,6 +545,7 @@ def sample(
     n_threads: int = 1,
     n_procs: int = 1,
     record_meta=None,
+    in_memory: bool = True,
     backend: _c.Backend = None,
     progress_bar: bool = False,
 ):
@@ -562,6 +581,8 @@ def sample(
         Strings defining :class:`hopsy.MarkovChain` attributes or ``acceptance_rate``, which will
         then be recorded and returned. All attributes of :class:`hopsy.MarkovChain` can be used here,
         e.g. ``record_meta=['state_negative_log_likelihood', 'proposal.proposal']``.
+    in_memory : bool
+        Flag for enabling or disabling in-memory saving of states and metadata.
     backend : derived from hopsy.Backend
         Observer backend to which states and metadata are passed during the run. The backend is e.g. used
         to write the obtained information online to permanent storage. This enables online analysis of the
@@ -569,15 +590,17 @@ def sample(
 
     Returns
     -------
-    list or dict
-        Meta information about the states. Without using ``record_meta``,
+    optional[tuple[list or dict, numpy.ndarray]]
+        First value of the tuple holds meta information about the states. Without using ``record_meta``,
         this is a list containing the acceptance rates of each chain.
         If ``record_meta`` is used, then this is a dict containing the values of the :class:`hopsy.MarkovChain`
         attributes defined in ``record_meta``.
-        If the attribute was not found (e.g. because of a typo), then it will have value ``None``.
-    numpy.ndarray
-        The produced states. Will have shape ``(n_chains, n_draws, dim)``. For single chains, it will
+        If the attribute was not found (e.g. because of a typo), it will have value ``None``.
+
+        Second value of the tuple holds produced states. Will have shape ``(n_chains, n_draws, dim)``. For single chains, it will
         thus be ``(1, n_draws, dim)``.
+
+        If ``in_memory=False``, ``None`` will be returned.
 
     """
 
@@ -642,8 +665,16 @@ def sample(
             )  # do not use more procs than available cpus
         result_states = _parallel_sampling(
             [
-                (markov_chains[i], rngs[i], n_samples, thinning, record_meta, i)
-                for i in range(len(markov_chains))
+                (
+                    markov_chains[chain_idx],
+                    rngs[chain_idx],
+                    n_samples,
+                    thinning,
+                    chain_idx,
+                    in_memory,
+                    record_meta,
+                )
+                for chain_idx in range(len(markov_chains))
             ],
             n_procs,
             backend,
@@ -654,41 +685,43 @@ def sample(
             markov_chains[i].state = chain_result[2]
             rngs[i].state = chain_result[3]
     else:
-        for i in range(len(markov_chains)):
-            _accrates, _states, _, _ = _sequential_sampling(
-                markov_chains[i],
-                rngs[i],
+        for chain_idx in range(len(markov_chains)):
+            _accrates, _states = _sequential_sampling(
+                markov_chains[chain_idx],
+                rngs[chain_idx],
                 n_samples,
                 thinning,
+                chain_idx,
+                in_memory,
                 record_meta,
-                i,
                 backend,
                 progress_bar,
             )
             result.append((_accrates, _states))
 
-    states = []
-    meta = (
-        []
-        if record_meta is None or record_meta is False
-        else {field: [] for field in record_meta}
-    )
+    if in_memory:
+        states = []
+        meta = (
+            []
+            if record_meta is None or record_meta is False
+            else {field: [] for field in record_meta}
+        )
 
-    for _meta, _states in result:
-        states.append(_states)
+        for _meta, _states in result:
+            states.append(_states)
 
-        if record_meta is None or record_meta is False:
-            meta.append(_meta)
-        else:
+            if record_meta is None or record_meta is False:
+                meta.append(_meta)
+            else:
+                for field in meta:
+                    meta[field].append(_meta[field])
+
+        if record_meta is not None and record_meta is not False:
             for field in meta:
-                meta[field].append(_meta[field])
+                meta[field] = _s.numpy.array(meta[field])
+            meta.update(missing_fields)
 
-    if record_meta is not None and record_meta is not False:
-        for field in meta:
-            meta[field] = _s.numpy.array(meta[field])
-        meta.update(missing_fields)
-
-    return meta, _s.numpy.array(states)
+        return meta, _s.numpy.array(states)
 
 
 def _parallel_execution(
