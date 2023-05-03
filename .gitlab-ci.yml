@@ -52,7 +52,7 @@ test-release:
     - /opt/python/cp39-cp39/bin/docov hopsy --output docs/; cat docs/docov.txt
     # upload docs
     - git config user.email $GITLAB_USER_EMAIL
-    - git config user.name $GITLAB_USER_NAME
+    - git config user.name "ci-bot"
     - git remote add gitlab_origin https://oauth2:$ACCESS_TOKEN@$CI_REPOSITORY_URL
     - git add docs
     - git commit -m "${CI_COMMIT_DESCRIPTION} + docs"
