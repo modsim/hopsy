@@ -21,7 +21,7 @@ class _submodules:
 _s = _submodules
 
 
-class Backend(_s.abc.ABC):
+class Callback(_s.abc.ABC):
     r"""Abstract base class for observing states and metadata"""
 
     def __init__(self, name: str = None):
@@ -55,9 +55,9 @@ class Backend(_s.abc.ABC):
             Number of samples to produce
         :param n_dims: int
             Number of dimensions of the sampling problem
-        :param meta_names: List[str]
+        :param meta_names: Sequence[str]
             String identifiers for meta information
-        :param meta_shapes: List[List[int]]
+        :param meta_shapes: Sequence[Sequence[int]]
             Shapes of meta information (empty for scalars)
         """
         self.n_chains = n_chains
@@ -75,6 +75,8 @@ class Backend(_s.abc.ABC):
         r"""
         Record new MCMC state and metadata.
 
+        :param chain_idx : int
+            Index of the recording chain
         :param state : numpy.ndarray
             New MCMC state
         :param meta: Dict[str, Union[float, numpy.ndarray]]
@@ -105,19 +107,24 @@ def _enable_if(cond):
 
 
 @_enable_if(cond=_s._has_mcbackend)
-class MCBBackend(Backend):
+class MCBackendCallback(Callback):
     r"""Adapter to create a hospy backend from any McBackend backend."""
 
     supports_sampler_stats = True
 
-    def __init__(self, backend: Backend, name: _s.Optional[str] = None):
+    def __init__(self, backend: _s.mcbackend.Backend, name: _s.Optional[str] = None):
         r"""
-        Something
+        Construct mcbackend callback.
+
+        :param backend : mcbackend.Backend
+            Backend implementation from mcbackend
+        :param name : typing.Optional
+            Name of the run
         """
         super().__init__(name)
         self.run_id = _s.hagelkorn.random(digits=6)
         print(f"Backend run id: {self.run_id}")
-        self._backend: Backend = backend
+        self._backend: _s.mcbackend.Backend = backend
 
         # Sessions created from the underlying backend
         self._run: _s.Optional[_s.mcbackend.Run] = None
@@ -132,7 +139,18 @@ class MCBBackend(Backend):
         meta_shapes: _s.Sequence[_s.Sequence[int]],
     ) -> None:
         r"""
-        Something
+        Setup backend for a specific MCMC chain.
+
+        :param n_chains : int
+            Number of chains
+        :param n_samples: int
+            Number of samples to produce
+        :param n_dims: int
+            Number of dimensions of the sampling problem
+        :param meta_names: Sequence[str]
+            String identifiers for meta information
+        :param meta_shapes: Sequence[Sequence[int]]
+            Shapes of meta information (empty for scalars)
         """
         super().setup(n_chains, n_samples, n_dim, meta_names, meta_shapes)
 
@@ -172,7 +190,14 @@ class MCBBackend(Backend):
         meta: _s.Dict[str, _s.Union[float, _s.np.ndarray]],
     ) -> None:
         r"""
-        Something
+        Record new MCMC state and metadata.
+
+        :param chain_idx : int
+            Index of the recording chain
+        :param state : numpy.ndarray
+            New MCMC state
+        :param meta: Dict[str, Union[float, numpy.ndarray]]
+            Recorded metadata of the step
         """
         draw = dict(zip([f"variable_{i}" for i in range(self.n_dims)], state))
 
@@ -180,6 +205,6 @@ class MCBBackend(Backend):
 
     def finish(self) -> None:
         r"""
-        Something
+        Finish recording (e.g. close connection to database).
         """
         pass

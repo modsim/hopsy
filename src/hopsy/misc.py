@@ -4,7 +4,7 @@
 
 
 class _core:
-    from .backend import Backend
+    from .callback import Callback
     from .core import (
         GaussianHitAndRunProposal,
         MarkovChain,
@@ -344,7 +344,7 @@ def _sequential_sampling(
     chain_idx: int,
     in_memory: bool,
     record_meta=None,
-    backend: _c.Backend = None,
+    callback: _c.Callback = None,
     progress_bar: bool = False,
 ):
     states = []
@@ -390,8 +390,8 @@ def _sequential_sampling(
                 for field in record_meta:
                     meta[field].append(curr_meta[field])
 
-        if backend is not None:
-            backend.record(
+        if callback is not None:
+            callback.record(
                 chain_idx,
                 state,
                 curr_meta
@@ -402,8 +402,8 @@ def _sequential_sampling(
     if (record_meta is None or record_meta is False) and in_memory:
         meta = _s.numpy.mean(meta)
 
-    if backend is not None:
-        backend.finish()
+    if callback is not None:
+        callback.finish()
 
     return meta, _s.numpy.array(states)
 
@@ -502,12 +502,12 @@ def _process_record_meta(
 def _parallel_sampling(
     args: _s.typing.List[_s.typing.Any],
     n_procs: int,
-    backend: _c.Backend,
+    callback: _c.Callback,
     progress_bar: bool,
 ):
     result_queue = (
         _s.multiprocessing.Manager().Queue()
-        if backend is not None or progress_bar
+        if callback is not None or progress_bar
         else None
     )
     for i in range(len(args)):
@@ -516,7 +516,7 @@ def _parallel_sampling(
     workers = _s.multiprocessing.Pool(n_procs - 1)
     result = workers.starmap_async(_sample_parallel_chain, args)
 
-    if backend is not None or progress_bar:
+    if callback is not None or progress_bar:
         pbars = (
             [
                 _s.tqdm.trange(args[i][2], desc="chain {}".format(i))
@@ -531,8 +531,8 @@ def _parallel_sampling(
             if state is not None:
                 if progress_bar:
                     pbars[chain_idx].update()
-                if backend is not None:
-                    backend.record(
+                if callback is not None:
+                    callback.record(
                         chain_idx,
                         state,
                         meta if isinstance(meta, dict) else {"acceptance_rate": meta},
@@ -542,8 +542,8 @@ def _parallel_sampling(
                 if progress_bar:
                     pbars[chain_idx].close()
 
-        if backend is not None:
-            backend.finish()
+        if callback is not None:
+            callback.finish()
 
     workers.close()
     workers.join()
@@ -561,7 +561,7 @@ def sample(
     n_procs: int = 1,
     record_meta=None,
     in_memory: bool = True,
-    backend: _c.Backend = None,
+    callback: _c.Callback = None,
     progress_bar: bool = False,
 ):
     r"""sample(markov_chains, rngs, n_samples, thinning=1, n_procs=1)
@@ -598,8 +598,8 @@ def sample(
         e.g. ``record_meta=['state_negative_log_likelihood', 'proposal.proposal']``.
     in_memory : bool
         Flag for enabling or disabling in-memory saving of states and metadata.
-    backend : derived from hopsy.Backend
-        Observer backend to which states and metadata are passed during the run. The backend is e.g. used
+    callback : derived from hopsy.Callback
+        Observer callback to which states and metadata are passed during the run. The callback is e.g. used
         to write the obtained information online to permanent storage. This enables online analysis of the
         MCMC run.
 
@@ -656,11 +656,11 @@ def sample(
     )
 
     # initialize backend
-    if backend is not None:
+    if callback is not None:
         meta_names = (
             record_meta if isinstance(record_meta, list) else ["acceptance_rate"]
         )
-        backend.setup(
+        callback.setup(
             len(markov_chains),
             n_samples,
             len(markov_chains[0].state),
@@ -692,7 +692,7 @@ def sample(
                 for chain_idx in range(len(markov_chains))
             ],
             n_procs,
-            backend,
+            callback,
             progress_bar,
         )
         for i, chain_result in enumerate(result_states):
@@ -709,7 +709,7 @@ def sample(
                 chain_idx,
                 in_memory,
                 record_meta,
-                backend,
+                callback,
                 progress_bar,
             )
             result.append((_accrates, _states))
