@@ -48,6 +48,7 @@ test-release:
   stage: test
   before_script:
     - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install docov; done
+    - apt-get update -qq && apt-get install -y -qq pandoc
   script:
     - git rm docs/* -rf # remove old docs so no stales files remain
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
@@ -66,6 +67,7 @@ test-debug:
   stage: test
   before_script:
     - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install docov; done
+
   script:
     - VERSION="$(cat .version).dev0"; for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
     - VERSION="$(cat .version).dev0"; for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m unittest -v tests; done
