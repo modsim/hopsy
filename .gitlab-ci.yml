@@ -53,7 +53,7 @@ test-release:
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m unittest -v tests; done
     # build docs
-    - /opt/python/cp310-cp310/bin/python -m pip install sphinx pybind11 numpy pandas matplotlib  sphinx-rtd-theme  nbsphinx pydata_sphinx_theme --force-reinstall
+    - /opt/python/cp310-cp310/bin/python -m pip install sphinx pybind11 numpy pandas matplotlib  sphinx-rtd-theme  nbsphinx pydata_sphinx_theme ipython --force-reinstall
     - cd docs-sources && /opt/python/cp310-cp310/bin/python -m sphinx -b html -d _build/doctrees   . _build/html && cp _build/* ../docs/* && cd -
     - /opt/python/cp39-cp39/bin/docov hopsy --output docs/; cat docs/docov.txt
   artifacts:
