@@ -196,7 +196,22 @@ def _compute_maximum_volume_ellipsoid(problem: _c.Problem):
 
 
 def simplify(problem: _c.Problem):
-    """ """
+    r"""simplify(problem)
+
+    Simplifies the polytope defined in the ``problem`` by removing redundant constraints and refunction inequality constraints to equality constraints in case of dimension width less than thresh.
+    Thresh is defined in the LP settings singleton and refers to `PolyRound <https://pypi.org/project/PolyRound/>`_ settings.
+    Simplification is typically the first step before sampling. It is called automatically when round is called, because it is required for efficient and effective rounding.
+
+    Parameters
+    ----------
+    problem: hopsy.Problem for which the polytope should be simplified
+
+    Returns
+    -------
+    hopsy.Problem
+        Problem with simplified polytope.
+    """
+
     with _s.warnings.catch_warnings():
         _s.warnings.simplefilter("ignore")
 

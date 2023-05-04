@@ -6,6 +6,7 @@ variables:
 stages:
   - build
   - test
+  - upload-artifacts
 
 pre-commit:
   image: python:3.10
@@ -43,27 +44,22 @@ build-debug:
     expire_in: 7 days
 
 
-
 test-release:
   stage: test
   before_script:
     - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install docov; done
   script:
+    - git rm docs/* -rf # remove old docs so no stales files remain
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m unittest -v tests; done
+    # build docs
+    - cd docs-sources && make html && cp _build/* ../docs/*
     - /opt/python/cp39-cp39/bin/docov hopsy --output docs/; cat docs/docov.txt
-    # upload docs
-    - git config user.email $GITLAB_USER_EMAIL
-    - git config user.name "CI_BOT"
-    - git add docs
-    - git commit -m "${CI_COMMIT_DESCRIPTION} + docs" --no-verify
-    - git remote remove origin
-    - git remote add origin https://oauth2:${CI_BOT}@jugit.fz-juelich.de/IBG-1/ModSim/hopsy.git
-    - git push origin HEAD:$CI_COMMIT_BRANCH -o ci.skip # prevent triggering pipeline again
   artifacts:
     paths:
       - docs
     expire_in: 7 days
+
 
 test-debug:
   stage: test
@@ -77,3 +73,22 @@ test-debug:
     paths:
       - docs
     expire_in: 7 days
+
+
+upload-docs:
+  stage: upload-artifacts
+  only:
+    - develop
+    - main
+    - master
+  dependencies:
+    - test-release
+  script:
+    # upload docs
+    - git config user.email $GITLAB_USER_EMAIL
+    - git config user.name "CI_BOT"
+    - git add docs
+    - git commit -m "${CI_COMMIT_DESCRIPTION} + docs" --no-verify
+    - git remote remove origin
+    - git remote add origin https://oauth2:${CI_BOT}@jugit.fz-juelich.de/IBG-1/ModSim/hopsy.git
+    - git push origin HEAD:$CI_COMMIT_BRANCH -o ci.skip # prevent triggering pipeline again
