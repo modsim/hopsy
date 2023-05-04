@@ -42,8 +42,6 @@ build-debug:
       - dist/*manylinux*
     expire_in: 7 days
 
-
-
 test-release:
   stage: test
   before_script:
@@ -52,14 +50,6 @@ test-release:
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m unittest -v tests; done
     - /opt/python/cp39-cp39/bin/docov hopsy --output docs/; cat docs/docov.txt
-    # upload docs
-    - git config user.email $GITLAB_USER_EMAIL
-    - git config user.name "CI_BOT"
-    - git add docs
-    - git commit -m "${CI_COMMIT_DESCRIPTION} + docs" --no-verify
-    - git remote remove origin
-    - git remote add origin https://oauth2:${CI_BOT}@jugit.fz-juelich.de/IBG-1/ModSim/hopsy.git
-    - git push origin HEAD:$CI_COMMIT_BRANCH -o ci.skip # prevent triggering pipeline again
   artifacts:
     paths:
       - docs
@@ -72,7 +62,6 @@ test-debug:
   script:
     - VERSION="$(cat .version).dev0"; for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
     - VERSION="$(cat .version).dev0"; for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m unittest -v tests; done
-
   artifacts:
     paths:
       - docs
