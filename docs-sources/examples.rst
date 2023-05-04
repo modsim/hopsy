@@ -12,6 +12,7 @@ Examples
    notebooks/SamplingAdvice.ipynb
    notebooks/ConstrainedSampling.ipynb
    notebooks/BirkhoffPolytope.ipynb
+   notebooks/ParallelTempering.ipynb
 
 .. raw:: html
 
