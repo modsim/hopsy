@@ -91,120 +91,110 @@ class Callback(_s.abc.ABC):
         pass
 
 
-def _enable_if(cond):
-    if cond:
+if _s._has_mcbackend:
 
-        def dec_enable_if(cls):
-            return cls
+    class MCBackendCallback(Callback):
+        r"""Adapter to create a hospy backend from any McBackend backend."""
 
-        return dec_enable_if
-    else:
+        supports_sampler_stats = True
 
-        def dec_enable_if(cls):
-            return
+        def __init__(
+            self, backend: _s.mcbackend.Backend, name: _s.Optional[str] = None
+        ):
+            r"""
+            Construct mcbackend callback.
 
-        return dec_enable_if
+            :param backend : mcbackend.Backend
+                Backend implementation from mcbackend
+            :param name : typing.Optional
+                Name of the run
+            """
+            super().__init__(name)
+            self.run_id = _s.hagelkorn.random(digits=6)
+            print(f"Backend run id: {self.run_id}")
+            self._backend: _s.mcbackend.Backend = backend
 
+            # Sessions created from the underlying backend
+            self._run: _s.Optional[_s.mcbackend.Run] = None
+            self._chains: _s.Optional[_s.List[_s.mcbackend.Chain]] = None
 
-@_enable_if(cond=_s._has_mcbackend)
-class MCBackendCallback(Callback):
-    r"""Adapter to create a hospy backend from any McBackend backend."""
+        def setup(
+            self,
+            n_chains: int,
+            n_samples: int,
+            n_dim: int,
+            meta_names: _s.Sequence[str],
+            meta_shapes: _s.Sequence[_s.Sequence[int]],
+        ) -> None:
+            r"""
+            Setup backend for a specific MCMC chain.
 
-    supports_sampler_stats = True
+            :param n_chains : int
+                Number of chains
+            :param n_samples: int
+                Number of samples to produce
+            :param n_dims: int
+                Number of dimensions of the sampling problem
+            :param meta_names: Sequence[str]
+                String identifiers for meta information
+            :param meta_shapes: Sequence[Sequence[int]]
+                Shapes of meta information (empty for scalars)
+            """
+            super().setup(n_chains, n_samples, n_dim, meta_names, meta_shapes)
 
-    def __init__(self, backend: _s.mcbackend.Backend, name: _s.Optional[str] = None):
-        r"""
-        Construct mcbackend callback.
+            # Initialize backend sessions
+            if not self._run:
+                variables = [
+                    _s.mcbackend.Variable(
+                        f"variable_{i}",
+                        _s.np.dtype(float).name,
+                        [],
+                        [],
+                        is_deterministic=False,
+                    )
+                    for i in range(n_dim)
+                ]
 
-        :param backend : mcbackend.Backend
-            Backend implementation from mcbackend
-        :param name : typing.Optional
-            Name of the run
-        """
-        super().__init__(name)
-        self.run_id = _s.hagelkorn.random(digits=6)
-        print(f"Backend run id: {self.run_id}")
-        self._backend: _s.mcbackend.Backend = backend
+                sample_stats = []
+                for name, shape in zip(meta_names, meta_shapes):
+                    sample_stats.append(
+                        _s.mcbackend.Variable(
+                            name=name, dtype=_s.np.dtype(float).name, shape=shape
+                        )
+                    )
 
-        # Sessions created from the underlying backend
-        self._run: _s.Optional[_s.mcbackend.Run] = None
-        self._chains: _s.Optional[_s.List[_s.mcbackend.Chain]] = None
-
-    def setup(
-        self,
-        n_chains: int,
-        n_samples: int,
-        n_dim: int,
-        meta_names: _s.Sequence[str],
-        meta_shapes: _s.Sequence[_s.Sequence[int]],
-    ) -> None:
-        r"""
-        Setup backend for a specific MCMC chain.
-
-        :param n_chains : int
-            Number of chains
-        :param n_samples: int
-            Number of samples to produce
-        :param n_dims: int
-            Number of dimensions of the sampling problem
-        :param meta_names: Sequence[str]
-            String identifiers for meta information
-        :param meta_shapes: Sequence[Sequence[int]]
-            Shapes of meta information (empty for scalars)
-        """
-        super().setup(n_chains, n_samples, n_dim, meta_names, meta_shapes)
-
-        # Initialize backend sessions
-        if not self._run:
-            variables = [
-                _s.mcbackend.Variable(
-                    f"variable_{i}",
-                    _s.np.dtype(float).name,
-                    [],
-                    [],
-                    is_deterministic=False,
+                run_meta = _s.mcbackend.RunMeta(
+                    self.run_id,
+                    variables=variables,
+                    sample_stats=sample_stats,
                 )
-                for i in range(n_dim)
+                self._run = self._backend.init_run(run_meta)
+            self._chains = [
+                self._run.init_chain(chain_number=i) for i in range(n_chains)
             ]
 
-            sample_stats = []
-            for name, shape in zip(meta_names, meta_shapes):
-                sample_stats.append(
-                    _s.mcbackend.Variable(
-                        name=name, dtype=_s.np.dtype(float).name, shape=shape
-                    )
-                )
+        def record(
+            self,
+            chain_idx: int,
+            state: _s.np.ndarray,
+            meta: _s.Dict[str, _s.Union[float, _s.np.ndarray]],
+        ) -> None:
+            r"""
+            Record new MCMC state and metadata.
 
-            run_meta = _s.mcbackend.RunMeta(
-                self.run_id,
-                variables=variables,
-                sample_stats=sample_stats,
-            )
-            self._run = self._backend.init_run(run_meta)
-        self._chains = [self._run.init_chain(chain_number=i) for i in range(n_chains)]
+            :param chain_idx : int
+                Index of the recording chain
+            :param state : numpy.ndarray
+                New MCMC state
+            :param meta: Dict[str, Union[float, numpy.ndarray]]
+                Recorded metadata of the step
+            """
+            draw = dict(zip([f"variable_{i}" for i in range(self.n_dims)], state))
 
-    def record(
-        self,
-        chain_idx: int,
-        state: _s.np.ndarray,
-        meta: _s.Dict[str, _s.Union[float, _s.np.ndarray]],
-    ) -> None:
-        r"""
-        Record new MCMC state and metadata.
+            self._chains[chain_idx].append(draw, meta)
 
-        :param chain_idx : int
-            Index of the recording chain
-        :param state : numpy.ndarray
-            New MCMC state
-        :param meta: Dict[str, Union[float, numpy.ndarray]]
-            Recorded metadata of the step
-        """
-        draw = dict(zip([f"variable_{i}" for i in range(self.n_dims)], state))
-
-        self._chains[chain_idx].append(draw, meta)
-
-    def finish(self) -> None:
-        r"""
-        Finish recording (e.g. close connection to database).
-        """
-        pass
+        def finish(self) -> None:
+            r"""
+            Finish recording (e.g. close connection to database).
+            """
+            pass
