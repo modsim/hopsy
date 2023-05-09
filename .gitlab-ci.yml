@@ -6,6 +6,7 @@ variables:
 stages:
   - build
   - test
+  - build-docs
   - upload-artifacts
 
 pre-commit:
@@ -54,7 +55,6 @@ test-release:
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m unittest -v tests; done
   artifacts:
     paths:
-      - docs
       - dist
     expire_in: 7 days
 
@@ -70,17 +70,12 @@ test-debug:
 
   artifacts:
     paths:
-      - docs
+      - dist
     expire_in: 7 days
 
-
 build-docs:
-  stage: upload-artifacts
+  stage: build-docs
   image: ubuntu:22.04
-  only:
-    - develop
-    - main
-    - master
   dependencies:
     - test-release
   before_script:
@@ -92,6 +87,23 @@ build-docs:
     - VERSION="$(cat .verison); python3 -m pip install dist/hopsy-$VERSION-cp310-cp310-manylinux*.whl
     - python3 -m sphinx -b html -d _build/doctrees   . _build/html && cp _build/* ../docs/* && cd -
     - python3 -m docov hopsy --output docs/; cat docs/docov.txt
+  artifacts:
+    paths:
+      - docs
+    expire_in: 7 days
+
+upload-docs:
+  stage: upload-artifacts
+  #only:
+  #- develop
+  #- main
+  #- master
+  dependencies:
+    - build-docs
+  before_script:
+    - apt update -y
+    - apt install -y python3-dev pandoc
+  script:
     - git config user.email $GITLAB_USER_EMAIL
     - git config user.name "CI_BOT"
     - git add docs
