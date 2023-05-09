@@ -50,16 +50,12 @@ test-release:
     - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install docov; done
     - apt-get update -qq && apt-get install -y -qq pandoc
   script:
-    - git rm docs/* -rf # remove old docs so no stales files remain
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m unittest -v tests; done
-    # build docs
-    - /opt/python/cp310-cp310/bin/python -m pip install sphinx pybind11 numpy pandas matplotlib  sphinx-rtd-theme  nbsphinx pydata_sphinx_theme ipython --force-reinstall
-    - cd docs-sources && /opt/python/cp310-cp310/bin/python -m sphinx -b html -d _build/doctrees   . _build/html && cp _build/* ../docs/* && cd -
-    - /opt/python/cp39-cp39/bin/docov hopsy --output docs/; cat docs/docov.txt
   artifacts:
     paths:
       - docs
+      - dist
     expire_in: 7 days
 
 
@@ -78,15 +74,24 @@ test-debug:
     expire_in: 7 days
 
 
-upload-docs:
+build-docs:
   stage: upload-artifacts
+  image: ubuntu:22.04
   only:
     - develop
     - main
     - master
   dependencies:
     - test-release
+  before_script:
+    - apt update -y
+    - apt install -y python3-dev pandoc
   script:
+    - git rm docs/* -rf # remove old docs so no stales files remain
+    - python3 -m pip install docov sphinx pybind11 numpy pandas matplotlib  sphinx-rtd-theme  nbsphinx pydata_sphinx_theme ipython --force-reinstall
+    - VERSION="$(cat .verison); python3 -m pip install dist/hopsy-$VERSION-cp310-cp310-manylinux*.whl
+    - python3 -m sphinx -b html -d _build/doctrees   . _build/html && cp _build/* ../docs/* && cd -
+    - python3 -m docov hopsy --output docs/; cat docs/docov.txt
     - git config user.email $GITLAB_USER_EMAIL
     - git config user.name "CI_BOT"
     - git add docs
