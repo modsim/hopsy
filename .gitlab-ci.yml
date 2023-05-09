@@ -82,10 +82,11 @@ build-docs:
     - apt update -y
     - apt install -y python3-dev pandoc git python3-pip
   script:
-    - git rm docs/* -rf # remove old docs so no stales files remain
+    - git rm docs -rf # remove old docs so no stales files remain
     - python3 -m pip install docov sphinx pybind11 numpy pandas matplotlib  sphinx-rtd-theme  nbsphinx pydata_sphinx_theme ipython --force-reinstall
     - ls -la dist/
     - VERSION="$(cat .version)"; python3 -m pip install dist/hopsy-$VERSION-cp310-cp310-manylinux*.whl
+    - mkdir docs
     - cd docs-sources && python3 -m sphinx -b html -d _build/doctrees   . _build/html && cp _build/* ../docs/* && cd -
     - python3 -m docov hopsy --output docs/; cat docs/docov.txt
   artifacts:
