@@ -80,7 +80,7 @@ build-docs:
     - test-release
   before_script:
     - apt update -y
-    - apt install -y python3-dev pandoc
+    - apt install -y python3-dev pandoc git python3-pip
   script:
     - git rm docs/* -rf # remove old docs so no stales files remain
     - python3 -m pip install docov sphinx pybind11 numpy pandas matplotlib  sphinx-rtd-theme  nbsphinx pydata_sphinx_theme ipython --force-reinstall
@@ -102,7 +102,7 @@ upload-docs:
     - build-docs
   before_script:
     - apt update -y
-    - apt install -y python3-dev pandoc
+    - apt install -y python3-dev pandoc git
   script:
     - git config user.email $GITLAB_USER_EMAIL
     - git config user.name "CI_BOT"
