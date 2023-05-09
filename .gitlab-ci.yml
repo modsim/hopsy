@@ -86,7 +86,7 @@ build-docs:
     - python3 -m pip install docov sphinx pybind11 numpy pandas matplotlib  sphinx-rtd-theme  nbsphinx pydata_sphinx_theme ipython --force-reinstall
     - ls -la dist/
     - VERSION="$(cat .version)"; python3 -m pip install dist/hopsy-$VERSION-cp310-cp310-manylinux*.whl
-    - python3 -m sphinx -b html -d _build/doctrees   . _build/html && cp _build/* ../docs/* && cd -
+    - cd docs-sources && python3 -m sphinx -b html -d _build/doctrees   . _build/html && cp _build/* ../docs/* && cd -
     - python3 -m docov hopsy --output docs/; cat docs/docov.txt
   artifacts:
     paths:
