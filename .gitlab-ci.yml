@@ -88,7 +88,11 @@ build-docs:
     - VERSION="$(cat .version)"; python3 -m pip install dist/hopsy-$VERSION-cp310-cp310-manylinux*.whl
     - mkdir docs
     - ls -la
-    - cd docs-sources && python3 -m sphinx -b html -d _build/doctrees   . _build/html && cp _build/* ../docs/* && cd -
+    - cd docs-sources
+    - ls -la
+    - python3 -m sphinx -b html -d _build/doctrees   . _build/html
+    - cp _build/* ../docs/*
+    - cd -
     - ls -la
     - ls -la docs*
     - python3 -m docov hopsy --output docs/; cat docs/docov.txt
