@@ -91,7 +91,8 @@ build-docs:
     - cd docs-sources
     - ls -la
     - python3 -m sphinx -b html -d _build/doctrees   . _build/html
-    - cp _build/* ../docs/*
+    - ls -la ..
+    - cp _build/* ../docs/
     - cd -
     - ls -la
     - ls -la docs*
