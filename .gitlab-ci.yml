@@ -98,10 +98,10 @@ build-docs:
 
 upload-docs:
   stage: upload-artifacts
-  #only:
-  #- develop
-  #- main
-  #- master
+  only:
+    - develop
+    - main
+    - master
   dependencies:
     - build-docs
   script:
