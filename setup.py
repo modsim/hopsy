@@ -155,7 +155,7 @@ setup(
     package_dir={"": "src"},
     install_requires=[
         "PolyRound==0.2.10",
-        "sympy==1.11.1",
+        "sympy<=1.12.0",
         "arviz",
         "numpy<1.24.0",
         "pandas",
