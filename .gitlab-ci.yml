@@ -82,7 +82,6 @@ build-docs:
   before_script:
     - apt update -y
     - apt install -y python3-dev pandoc git python3-pip
-    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install docov; done
   script:
     - git rm docs -rf # remove old docs so no stales files remain
     - python3 -m pip install docov sphinx pybind11 numpy pandas matplotlib  sphinx-rtd-theme  nbsphinx pydata_sphinx_theme ipython --force-reinstall
