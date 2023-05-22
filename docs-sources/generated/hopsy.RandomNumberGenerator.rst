@@ -7,6 +7,14 @@
 
    
    
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~RandomNumberGenerator.seed
+      ~RandomNumberGenerator.state
+      ~RandomNumberGenerator.stream
+   
    
 
    

@@ -234,10 +234,10 @@ class MiscTests(unittest.TestCase):
         self.assertTrue(len(meta) == 2)  # just usual acceptance rates
         self.assertTrue(type(meta) is list)  # just usual acceptance rates
 
-    def test_backend(self):
-        class TestBackend(Backend):
+    def test_callback(self):
+        class TestCallback(Callback):
             def __init__(self, name: str = None):
-                super(TestBackend, self).__init__()
+                super(TestCallback, self).__init__()
                 self.states = None
                 self.state_idx = []
                 self.meta = None
@@ -250,7 +250,7 @@ class MiscTests(unittest.TestCase):
                 meta_names: typing.List[str],
                 meta_shapes: typing.List[typing.List[int]],
             ) -> None:
-                super(TestBackend, self).setup(
+                super(TestCallback, self).setup(
                     n_chains, n_samples, n_dims, meta_names, meta_shapes
                 )
                 self.states = np.zeros((self.n_chains, self.n_samples, self.n_dims))
@@ -286,24 +286,24 @@ class MiscTests(unittest.TestCase):
             for i in range(2)
         ]
         rngs = [RandomNumberGenerator(42, i) for i in range(2)]
-        backend = TestBackend()
+        callback = TestCallback()
         record_meta = ["state_negative_log_likelihood", "proposal.proposal"]
         meta, states = sample(
-            mcs, rngs, n_samples=100, record_meta=record_meta, backend=backend
+            mcs, rngs, n_samples=100, record_meta=record_meta, callback=callback
         )
-        self.assertTrue(np.all(states == backend.states))
-        self.assertTrue(meta.keys() == backend.meta[0].keys())
-        self.assertTrue(backend.meta_shapes == [[], [2]])
+        self.assertTrue(np.all(states == callback.states))
+        self.assertTrue(meta.keys() == callback.meta[0].keys())
+        self.assertTrue(callback.meta_shapes == [[], [2]])
         self.assertTrue(
             np.all(
                 [
-                    np.all([meta[name][i] == backend.meta[i][name] for i in range(2)])
+                    np.all([meta[name][i] == callback.meta[i][name] for i in range(2)])
                     for name in meta.keys()
                 ]
             )
         )
 
-        backend = TestBackend()
+        callback = TestCallback()
         record_meta = False
         meta, states = sample(
             mcs,
@@ -311,15 +311,15 @@ class MiscTests(unittest.TestCase):
             n_samples=100,
             n_procs=3,
             record_meta=record_meta,
-            backend=backend,
+            callback=callback,
         )
-        self.assertTrue(np.all(states == backend.states))
-        self.assertTrue(backend.meta_shapes == [[]])
+        self.assertTrue(np.all(states == callback.states))
+        self.assertTrue(callback.meta_shapes == [[]])
         self.assertTrue(
             np.all(
                 meta
                 == np.mean(
-                    [backend.meta[i]["acceptance_rate"] for i in range(2)], axis=1
+                    [callback.meta[i]["acceptance_rate"] for i in range(2)], axis=1
                 )
             )
         )

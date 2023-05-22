@@ -12,7 +12,6 @@
    .. autosummary::
    
       ~GaussianHitAndRunProposal.has_negative_log_likelihood
-      ~GaussianHitAndRunProposal.has_stepsize
       ~GaussianHitAndRunProposal.log_acceptance_probability
       ~GaussianHitAndRunProposal.name
       ~GaussianHitAndRunProposal.proposal

@@ -13,7 +13,6 @@
    
       ~CSmMALAProposal.fisher_weight
       ~CSmMALAProposal.has_negative_log_likelihood
-      ~CSmMALAProposal.has_stepsize
       ~CSmMALAProposal.log_acceptance_probability
       ~CSmMALAProposal.name
       ~CSmMALAProposal.proposal

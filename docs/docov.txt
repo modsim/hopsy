@@ -122,7 +122,6 @@ Found insufficient docstring for the following items:
   -- hopsy.GaussianProposal.state
   -- hopsy.GaussianProposal.state_negative_log_likelihood
   -- hopsy.GaussianProposal.stepsize
-  -- hopsy.MCBBackend
   -- hopsy.Normal
   -- hopsy.Normal.mean
   -- hopsy.Normal.stddev
@@ -206,7 +205,7 @@ Found insufficient docstring for the following items:
   -- hopsy.UniformHitAndRunProposal.propose
   -- hopsy.UniformHitAndRunProposal.state
   -- hopsy.UniformHitAndRunProposal.state_negative_log_likelihood
-  -- hopsy.backend
+  -- hopsy.callback
   -- hopsy.core
   -- hopsy.core.MarkovChain.exchangeAttemptProbability
   -- hopsy.core.MarkovChain.model
@@ -217,7 +216,6 @@ Found insufficient docstring for the following items:
   -- hopsy.examples
   -- hopsy.lp
   -- hopsy.misc
-  -- hopsy.simplify
   -- hopsy.tune
-Found 302 items of which 82 have suffcient docstring.
-Coverage: 27.2%
+Found 301 items of which 83 have suffcient docstring.
+Coverage: 27.6%
