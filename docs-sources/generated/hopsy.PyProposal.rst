@@ -12,7 +12,6 @@
    .. autosummary::
    
       ~PyProposal.has_negative_log_likelihood
-      ~PyProposal.has_stepsize
       ~PyProposal.log_acceptance_probability
       ~PyProposal.name
       ~PyProposal.proposal

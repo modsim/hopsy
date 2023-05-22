@@ -14,14 +14,12 @@
       ~AdaptiveMetropolisProposal.boundary_cushion
       ~AdaptiveMetropolisProposal.eps
       ~AdaptiveMetropolisProposal.has_negative_log_likelihood
-      ~AdaptiveMetropolisProposal.has_stepsize
       ~AdaptiveMetropolisProposal.log_acceptance_probability
       ~AdaptiveMetropolisProposal.name
       ~AdaptiveMetropolisProposal.proposal
       ~AdaptiveMetropolisProposal.proposal_negative_log_likelihood
       ~AdaptiveMetropolisProposal.state
       ~AdaptiveMetropolisProposal.state_negative_log_likelihood
-      ~AdaptiveMetropolisProposal.stepsize
       ~AdaptiveMetropolisProposal.warm_up
    
    

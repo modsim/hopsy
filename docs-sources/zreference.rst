@@ -27,6 +27,7 @@ Problem
    hopsy.add_box_constraints
    hopsy.compute_chebyshev_center
    hopsy.round
+   hopsy.simplify
 
 Proposals
 """""""""

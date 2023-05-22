@@ -13,7 +13,6 @@
    
       ~DikinWalkProposal.boundary_cushion
       ~DikinWalkProposal.has_negative_log_likelihood
-      ~DikinWalkProposal.has_stepsize
       ~DikinWalkProposal.log_acceptance_probability
       ~DikinWalkProposal.name
       ~DikinWalkProposal.proposal

@@ -13,6 +13,7 @@
    
       ~ThompsonSamplingTuning.grid_size
       ~ThompsonSamplingTuning.lower_bound
+      ~ThompsonSamplingTuning.n_converged
       ~ThompsonSamplingTuning.n_convergence
       ~ThompsonSamplingTuning.n_posterior_updates
       ~ThompsonSamplingTuning.n_pure_sampling
