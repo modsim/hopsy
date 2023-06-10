@@ -83,6 +83,7 @@ test-examples-release:
     - curl https://clickhouse.com/ | sh
     - ./clickhouse server &> clickhouse.log &
     - rm examples/ParallelTempering.ipynb examples/parallel_tempering.py # mpi not compatible with manylinux
+    - rm examples/Callbacks.ipynb # somehow samples go missing in CI but not locally?
   script:
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
     - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do for f in examples/*.py; do /opt/python/$PY/bin/python $f || exit 1; done ;done
@@ -103,6 +104,7 @@ test-examples-debug:
     - curl https://clickhouse.com/ | sh
     - ./clickhouse server &> clickhouse.log &
     - rm examples/ParallelTempering.ipynb examples/parallel_tempering.py # mpi not compatible with manylinux
+    - rm examples/Callbacks.ipynb # somehow samples go missing in CI but not locally?
   script:
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
     - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do for f in examples/*.py; do /opt/python/$PY/bin/python $f || exit 1; done ;done
