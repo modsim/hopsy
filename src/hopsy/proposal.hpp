@@ -99,7 +99,7 @@ namespace hopsy {
 				std::vector<std::string>,
 				ProposalBase,
                 "dimension_names",
-				getDimension
+				getDimensionNames
 			);
         }
 
@@ -224,7 +224,7 @@ namespace hopsy {
 		PyProposal(py::object pyObj) : pyObj(std::move(pyObj)) {};
 
         VectorType& propose(hops::RandomNumberGenerator& rng) override {
-            proposal = pyObj.attr("propose")(rng).cast<VectorType>();
+            proposal = pyObj.attr("propose")(hopsy::RandomNumberGenerator(rng)).cast<VectorType>();
             return proposal;
         }
 
@@ -250,11 +250,21 @@ namespace hopsy {
         }
 
         std::vector<std::string> getDimensionNames() const override {
-            return pyObj.attr("dimension_names")().cast<std::vector<std::string>>();
+            try {
+              return pyObj.attr("dimension_names").cast<std::vector<std::string>>();
+            }
+            catch(...) {
+               return {};
+            }
         }
 
         void setDimensionNames(const std::vector<std::string>& newDimensionNames) override {
-            pyObj.attr("dimension_names")(newDimensionNames);
+            try {
+              pyObj.attr("dimension_names")(newDimensionNames);
+            }
+            catch(...) {
+                return;
+            }
         }
 
         std::vector<std::string> getParameterNames() const override {
