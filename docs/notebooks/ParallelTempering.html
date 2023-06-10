@@ -371,7 +371,7 @@ convergence of the cold chain to the target distribution.</p>
 <p><em>hopsy</em> implements parallel tempering. This notebook illustrates it by sampling a mixture of Gaussians that has two distinct modes. Depending on the starting point, vanilla MCMC approaches have trouble capturing the multi-modality. This is because once the chain has found a mode, Metropolis-Hastings proposal are very unlikely to propose high-density points in the other mode. With parallel tempering, the hotter chains are less effected by this and can better sample broadly. By passing these
 states on to the colder chains, other modes can be explored.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -386,7 +386,7 @@ states on to the colder chains, other modes can be explored.</p>
 <p>The sampling code with all imports must be defined within a file or function like here. The code is later called by an MPI process, enabling communication of the tempered chains in <em>HOPS</em>. Notice, that for the definition of the Markov chain, a synchronized <code class="docutils literal notranslate"><span class="pre">RandomNumberGenerator</span></code> (must have the same seed for each process!) and an exchange probability must be given.</p>
 <p>Important: For technical reasons it is not possible to use multiple chains from each MPI process. A different way of generating replica chains for computing statistics is shown below.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_tempered_chain</span><span class="p">(</span><span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">chain_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
@@ -434,7 +434,7 @@ states on to the colder chains, other modes can be explored.</p>
 </div>
 <p>The following function implements running MPI processes from within notebooks using <code class="docutils literal notranslate"><span class="pre">ipyparallel</span></code>. An different strategy would be to place your code in a Python file and invoking the processes using <code class="docutils literal notranslate"><span class="pre">mpiexec</span></code> from the command line.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">run_tempered_chains</span><span class="p">(</span><span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_temps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">chain_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
@@ -449,41 +449,29 @@ states on to the colder chains, other modes can be explored.</p>
 </div>
 <p>Because this approach is hard to debug, it is generally a good idea to run a single instance of tempered chains for a short time before running large numbers of samples.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">run_tempered_chains</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Starting 5 engines with &lt;class &#39;ipyparallel.cluster.launcher.MPIEngineSetLauncher&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "3beceb6322d845c7bc11428f1d8c5816", "version_major": 2, "version_minor": 0}</script></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Stopping engine(s): 1681682310
-engine set stopped 1681682310: {&#39;exit_code&#39;: 1, &#39;pid&#39;: 1183903, &#39;identifier&#39;: &#39;ipengine-1681682309-k14h-1681682310-1183823&#39;}
+Starting 5 engines with &lt;class &#39;ipyparallel.cluster.launcher.MPIEngineSetLauncher&#39;&gt;
+100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5/5 [00:05&lt;00:00,  1.09s/engine]
+Stopping engine(s): 1686395190
+engine set stopped 1686395190: {&#39;exit_code&#39;: 1, &#39;pid&#39;: 15143, &#39;identifier&#39;: &#39;ipengine-1686395189-mxy1-1686395190-13460&#39;}
 Stopping controller
-Controller stopped: {&#39;exit_code&#39;: 0, &#39;pid&#39;: 1183869, &#39;identifier&#39;: &#39;ipcontroller-1681682309-k14h-1183823&#39;}
+Controller stopped: {&#39;exit_code&#39;: 0, &#39;pid&#39;: 15084, &#39;identifier&#39;: &#39;ipcontroller-1686395189-mxy1-13460&#39;}
 </pre></div></div>
 </div>
 <p>Using multiprocessing, multiple replicas of tempered chains can be run in parallel. This is simply done by using the <code class="docutils literal notranslate"><span class="pre">multiprocessing</span></code> module and calling the spawning function from before in different subprocesses.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_samples</span> <span class="o">=</span> <span class="mi">550000</span>
@@ -495,59 +483,32 @@ Controller stopped: {&#39;exit_code&#39;: 0, &#39;pid&#39;: 1183869, &#39;identi
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Starting 5 engines with &lt;class &#39;ipyparallel.cluster.launcher.MPIEngineSetLauncher&#39;&gt;
-Starting 5 engines with &lt;class &#39;ipyparallel.cluster.launcher.MPIEngineSetLauncher&#39;&gt;
-Starting 5 engines with &lt;class &#39;ipyparallel.cluster.launcher.MPIEngineSetLauncher&#39;&gt;
-Starting 5 engines with &lt;class &#39;ipyparallel.cluster.launcher.MPIEngineSetLauncher&#39;&gt;
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "cb1c73c32cfc41978202b58f5658340a", "version_major": 2, "version_minor": 0}</script></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "a650d2918eb2491cac4215dcdab64637", "version_major": 2, "version_minor": 0}</script></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "84401e84fa514ce6923cae775e886229", "version_major": 2, "version_minor": 0}</script></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "b972a44f6da049aa8184afabe0687077", "version_major": 2, "version_minor": 0}</script></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Stopping engine(s): 1681682321
+Starting 5 engines with &lt;class &#39;ipyparallel.cluster.launcher.MPIEngineSetLauncher&#39;&gt;
+Starting 5 engines with &lt;class &#39;ipyparallel.cluster.launcher.MPIEngineSetLauncher&#39;&gt;
+Starting 5 engines with &lt;class &#39;ipyparallel.cluster.launcher.MPIEngineSetLauncher&#39;&gt;
+Starting 5 engines with &lt;class &#39;ipyparallel.cluster.launcher.MPIEngineSetLauncher&#39;&gt;
+100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5/5 [00:05&lt;00:00,  1.11s/engine]
+100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5/5 [00:05&lt;00:00,  1.12s/engine]
+100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5/5 [00:05&lt;00:00,  1.12s/engine]
+100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5/5 [00:05&lt;00:00,  1.12s/engine]
+Stopping engine(s): 1686395200
 Stopping controller
-Stopping engine(s): 1681682321
-Stopping engine(s): 1681682321
-Stopping engine(s): 1681682321
+Stopping engine(s): 1686395200
 Stopping controller
+Stopping engine(s): 1686395200
+Stopping engine(s): 1686395200
 Stopping controller
 Stopping controller
 </pre></div></div>
 </div>
 <p>Assemble cold-chain samples and compute statistics:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_replicas</span><span class="p">)])</span>
@@ -556,7 +517,7 @@ Stopping controller
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -566,7 +527,7 @@ Stopping controller
 </div>
 <p>The cold chains seem to have converged. The following plot illustrates posteriors of all tempered distributions. The multi-modality is very well captured by all replicas.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_replicas</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
@@ -586,6 +547,14 @@ Stopping controller
 </div>
 <div class="output_area docutils container">
 <img alt="../_images/notebooks_ParallelTempering_14_0.png" src="../_images/notebooks_ParallelTempering_14_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
 </div>
 </div>
 </section>

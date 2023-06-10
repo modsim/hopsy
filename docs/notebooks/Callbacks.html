@@ -358,14 +358,22 @@ document.write(`
 </pre></div>
 </div>
 </div>
+<section id="Setting-up-Clickhouse">
+<h2>Setting up Clickhouse<a class="headerlink" href="#Setting-up-Clickhouse" title="Permalink to this heading">#</a></h2>
+<p>Clickhouse is a fast database, perfect for storing mcmc samples on the fly. hopsy can directly write samples to a clickhouse database. In order to run this example a clickhouse server is required. In order to quickly set up a server for testing purposes, two commands are required.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span># curl https://clickhouse.com/ | sh
+# clickhouse server # starts server blocking ports 8123 and 9000 by default
+</pre></div>
+</div>
+<p>Caution: This way of running clickhouse is only for testing. For production settings, please follow the clickhouse docs in order to set up a robust environment</p>
 <p>Establish connection to the database server and create a database to store samples. Then establish a connection to that database to be used during sampling.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DB_HOST</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span>
 <span class="n">DB_PASS</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<span class="n">DB_PORT</span> <span class="o">=</span> <span class="s2">&quot;8000&quot;</span>
+<span class="n">DB_PORT</span> <span class="o">=</span> <span class="s2">&quot;9000&quot;</span>
 <span class="n">DB_KWARGS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="n">DB_HOST</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">DB_PORT</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">DB_PASS</span><span class="p">)</span>
 
 <span class="n">client_main</span> <span class="o">=</span> <span class="n">clickhouse_driver</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="o">**</span><span class="n">DB_KWARGS</span><span class="p">)</span>
@@ -375,9 +383,85 @@ document.write(`
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Failed to connect to localhost:9000
+Traceback (most recent call last):
+  File &#34;/home/jadebeck/.local/lib/python3.10/site-packages/clickhouse_driver/connection.py&#34;, line 395, in connect
+    return self._init_connection(host, port)
+  File &#34;/home/jadebeck/.local/lib/python3.10/site-packages/clickhouse_driver/connection.py&#34;, line 325, in _init_connection
+    self.socket = self._create_socket(host, port)
+  File &#34;/home/jadebeck/.local/lib/python3.10/site-packages/clickhouse_driver/connection.py&#34;, line 297, in _create_socket
+    raise err
+  File &#34;/home/jadebeck/.local/lib/python3.10/site-packages/clickhouse_driver/connection.py&#34;, line 288, in _create_socket
+    sock.connect(sa)
+ConnectionRefusedError: [Errno 111] Connection refused
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NetworkError</span>                              Traceback (most recent call last)
+<span class="ansi-green-fg">/tmp/ipykernel_19928/577530699.py</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-intense-fg ansi-bold">      6</span> client_main <span class="ansi-blue-fg">=</span> clickhouse_driver<span class="ansi-blue-fg">.</span>Client<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">**</span>DB_KWARGS<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">      7</span> db_name <span class="ansi-blue-fg">=</span> <span class="ansi-blue-fg">f&#34;testing_{hagelkorn.random()}&#34;</span>
+<span class="ansi-green-fg">----&gt; 8</span><span class="ansi-red-fg"> </span>client_main<span class="ansi-blue-fg">.</span>execute<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">f&#34;CREATE DATABASE {db_name};&#34;</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">      9</span> client_sampler <span class="ansi-blue-fg">=</span> clickhouse_driver<span class="ansi-blue-fg">.</span>Client<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">**</span>DB_KWARGS<span class="ansi-blue-fg">,</span> database<span class="ansi-blue-fg">=</span>db_name<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">~/.local/lib/python3.10/site-packages/clickhouse_driver/client.py</span> in <span class="ansi-cyan-fg">execute</span><span class="ansi-blue-fg">(self, query, params, with_column_types, external_tables, query_id, settings, types_check, columnar)</span>
+<span class="ansi-green-intense-fg ansi-bold">    359</span>         start_time <span class="ansi-blue-fg">=</span> time<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    360</span>
+<span class="ansi-green-fg">--&gt; 361</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">with</span> self<span class="ansi-blue-fg">.</span>disconnect_on_error<span class="ansi-blue-fg">(</span>query<span class="ansi-blue-fg">,</span> settings<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    362</span>             <span class="ansi-red-fg"># INSERT queries can use list/tuple/generator of list/tuples/dicts.</span>
+<span class="ansi-green-intense-fg ansi-bold">    363</span>             <span class="ansi-red-fg"># For SELECT parameters can be passed in only in dict right now.</span>
+
+<span class="ansi-green-fg">/usr/lib/python3.10/contextlib.py</span> in <span class="ansi-cyan-fg">__enter__</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">    133</span>         <span class="ansi-green-fg">del</span> self<span class="ansi-blue-fg">.</span>args<span class="ansi-blue-fg">,</span> self<span class="ansi-blue-fg">.</span>kwds<span class="ansi-blue-fg">,</span> self<span class="ansi-blue-fg">.</span>func
+<span class="ansi-green-intense-fg ansi-bold">    134</span>         <span class="ansi-green-fg">try</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 135</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">return</span> next<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">.</span>gen<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    136</span>         <span class="ansi-green-fg">except</span> StopIteration<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    137</span>             <span class="ansi-green-fg">raise</span> RuntimeError<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#34;generator didn&#39;t yield&#34;</span><span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">from</span> <span class="ansi-green-fg">None</span>
+
+<span class="ansi-green-fg">~/.local/lib/python3.10/site-packages/clickhouse_driver/client.py</span> in <span class="ansi-cyan-fg">disconnect_on_error</span><span class="ansi-blue-fg">(self, query, settings)</span>
+<span class="ansi-green-intense-fg ansi-bold">    303</span>     <span class="ansi-green-fg">def</span> disconnect_on_error<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> query<span class="ansi-blue-fg">,</span> settings<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    304</span>         <span class="ansi-green-fg">try</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 305</span><span class="ansi-red-fg">             </span>self<span class="ansi-blue-fg">.</span>establish_connection<span class="ansi-blue-fg">(</span>settings<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    306</span>
+<span class="ansi-green-intense-fg ansi-bold">    307</span>             <span class="ansi-green-fg">yield</span>
+
+<span class="ansi-green-fg">~/.local/lib/python3.10/site-packages/clickhouse_driver/client.py</span> in <span class="ansi-cyan-fg">establish_connection</span><span class="ansi-blue-fg">(self, settings)</span>
+<span class="ansi-green-intense-fg ansi-bold">    290</span>                 self<span class="ansi-blue-fg">.</span>connection <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>get_connection<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    291</span>                 self<span class="ansi-blue-fg">.</span>make_query_settings<span class="ansi-blue-fg">(</span>settings<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 292</span><span class="ansi-red-fg">                 </span>self<span class="ansi-blue-fg">.</span>connection<span class="ansi-blue-fg">.</span>force_connect<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    293</span>                 self<span class="ansi-blue-fg">.</span>last_query <span class="ansi-blue-fg">=</span> QueryInfo<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    294</span>
+
+<span class="ansi-green-fg">~/.local/lib/python3.10/site-packages/clickhouse_driver/connection.py</span> in <span class="ansi-cyan-fg">force_connect</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">    252</span>
+<span class="ansi-green-intense-fg ansi-bold">    253</span>         <span class="ansi-green-fg">if</span> <span class="ansi-green-fg">not</span> self<span class="ansi-blue-fg">.</span>connected<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 254</span><span class="ansi-red-fg">             </span>self<span class="ansi-blue-fg">.</span>connect<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    255</span>
+<span class="ansi-green-intense-fg ansi-bold">    256</span>         <span class="ansi-green-fg">elif</span> <span class="ansi-green-fg">not</span> self<span class="ansi-blue-fg">.</span>ping<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/.local/lib/python3.10/site-packages/clickhouse_driver/connection.py</span> in <span class="ansi-cyan-fg">connect</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">    414</span>
+<span class="ansi-green-intense-fg ansi-bold">    415</span>         <span class="ansi-green-fg">if</span> err <span class="ansi-green-fg">is</span> <span class="ansi-green-fg">not</span> <span class="ansi-green-fg">None</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 416</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">raise</span> err
+<span class="ansi-green-intense-fg ansi-bold">    417</span>
+<span class="ansi-green-intense-fg ansi-bold">    418</span>     <span class="ansi-green-fg">def</span> reset_state<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-red-fg">NetworkError</span>: Code: 210. Connection refused (localhost:9000)
+</pre></div></div>
+</div>
 <p>Using <code class="docutils literal notranslate"><span class="pre">mcbackend</span></code>, create a callback that <em>hopsy</em> passes samples and metadata into.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">backend</span> <span class="o">=</span> <span class="n">mcbackend</span><span class="o">.</span><span class="n">clickhouse</span><span class="o">.</span><span class="n">ClickHouseBackend</span><span class="p">(</span><span class="n">client_sampler</span><span class="p">)</span>
@@ -390,12 +474,12 @@ document.write(`
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Backend run id: XDW4BZ
+Backend run id: TEY6CF
 </pre></div></div>
 </div>
 <p>Sample a simple 3-dimensional Gaussian target. Notice that the callback is passed as <code class="docutils literal notranslate"><span class="pre">callback=callback</span></code>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
@@ -428,7 +512,7 @@ Backend run id: XDW4BZ
 </div>
 <p>Due to <code class="docutils literal notranslate"><span class="pre">in_memory=False</span></code>, samples and metadata are not stored in memory.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span>
@@ -437,7 +521,7 @@ Backend run id: XDW4BZ
 </div>
 <p>Retrieve samples from the database by using the <code class="docutils literal notranslate"><span class="pre">mcbackend.clickhouse.ClickhouseBackend</span></code>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_chains</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
@@ -458,7 +542,7 @@ Backend run id: XDW4BZ
 </div>
 <p>Compute acceptance rates and plot resulting posterior distribution:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hopsy</span><span class="o">.</span><span class="n">rhat</span><span class="p">(</span><span class="n">samples</span><span class="p">),</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">ess</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
@@ -466,7 +550,7 @@ Backend run id: XDW4BZ
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -476,7 +560,7 @@ Backend run id: XDW4BZ
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">arviz</span><span class="o">.</span><span class="n">plot_pair</span><span class="p">(</span><span class="n">arviz</span><span class="o">.</span><span class="n">dict_to_dataset</span><span class="p">({</span><span class="sa">f</span><span class="s2">&quot;x</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">samples</span><span class="p">[:,:,</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)}),</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;kde&quot;</span><span class="p">,</span> <span class="n">marginals</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -488,12 +572,12 @@ Backend run id: XDW4BZ
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_Callbacks_15_0.png" src="../_images/notebooks_Callbacks_15_0.png" />
+<img alt="../_images/notebooks_Callbacks_16_0.png" src="../_images/notebooks_Callbacks_16_0.png" />
 </div>
 </div>
 <p>Remove testing database and close connections.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">client_sampler</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
@@ -502,6 +586,15 @@ Backend run id: XDW4BZ
 </pre></div>
 </div>
 </div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
 </section>
 
 
@@ -528,6 +621,16 @@ Backend run id: XDW4BZ
     
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Setting-up-Clickhouse">Setting up Clickhouse</a></li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
   <div class="tocsection sourcelink">
