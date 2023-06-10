@@ -224,7 +224,6 @@ namespace hopsy {
 		PyProposal(py::object pyObj) : pyObj(std::move(pyObj)) {};
 
         VectorType& propose(hops::RandomNumberGenerator& rng) override {
-            // Import all the functions from scripts by file name in the working directory
             proposal = pyObj.attr("propose")(hopsy::RandomNumberGenerator(rng)).cast<VectorType>();
             return proposal;
         }
