@@ -74,6 +74,36 @@ test-debug:
       - dist
     expire_in: 7 days
 
+test-examples-release:
+  stage: test
+  dependencies:
+    - build-release
+  before_script:
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install docov jupyter nbconvert; done
+  script:
+    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do for f in examples/*.py; do /opt/python/$PY/bin/python $f || exit 1; done ;done
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do for f in examples/*.ipynb; do /opt/python/$PY/bin/python -m jupyter nbconvert --to notebook --execute $f || exit 1; done;done
+  artifacts:
+    paths:
+      - dist
+    expire_in: 7 days
+
+test-examples-debug:
+  stage: test
+  dependencies:
+    - build-release
+  before_script:
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install docov jupyter nbconvert; done
+  script:
+    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do for f in examples/*.py; do /opt/python/$PY/bin/python $f || exit 1; done ;done
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do for f in examples/*.ipynb; do /opt/python/$PY/bin/python -m jupyter nbconvert --to notebook --execute $f || exit 1; done;done
+  artifacts:
+    paths:
+      - dist
+    expire_in: 7 days
+
 build-docs:
   stage: build-docs
   image: ubuntu:22.04

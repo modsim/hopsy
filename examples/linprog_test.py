@@ -9,16 +9,10 @@ if __name__ == "__main__":
     mu = np.zeros((2, 1))
     cov = np.identity(2)
 
-    model = hopsy.MultivariateGaussianModel(mu, cov)
+    model = hopsy.Gaussian(mu, cov)
     problem = hopsy.Problem(A, b, model)
-    run = hopsy.Run(problem)
+
 
     x0 = hopsy.compute_chebyshev_center(problem)
+    asdfasdf
 
-    run.starting_points = [x0]
-
-    # this computes the chebyshev center as no other starting point has been
-    # previously set
-    run.init()
-
-    run.sample()

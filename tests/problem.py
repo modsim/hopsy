@@ -55,6 +55,52 @@ class ProblemTests(unittest.TestCase):
         except:
             self.fail("Rounding box created from np.zeros unexpectedly raised error.")
 
+    def test_add_box_constraints(self):
+        A = np.array([[1, 1, 1]])
+        b = np.array([[1000]])
+
+        old_A = np.array([[1, 1, 1]])
+        old_b = np.array([[1000.]])
+
+        expected_A = np.array(
+            [
+                [1.0, 1.0, 1.0],
+                [-1.0, -0.0, -0.0],
+                [-0.0, -1.0, -0.0],
+                [-0.0, -0.0, -1.0],
+                [1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0],
+                [0.0, 0.0, 1.0],
+            ]
+        )
+        expected_b = np.array([1000.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0])
+        expected_b2 = np.array([1000.0, 1, 2, 3, 4, 5, 6])
+        problem = Problem(A, b)
+
+        new_problem = add_box_constraints(problem, -5, 5, simplify=False)
+
+        assert (new_problem.A == expected_A).all()
+        assert (new_problem.A == expected_A).all()
+        assert (new_problem.b == expected_b).all()
+        assert (problem.A == old_A).all()
+        assert (problem.b == old_b).all()
+
+        new_problem = add_box_constraints(
+            problem,
+            [
+                -1,
+                -2,
+                -3,
+            ],
+            [4, 5, 6],
+            simplify=False
+        )
+
+        assert (new_problem.A == expected_A).all()
+        assert (new_problem.b == expected_b2).all()
+        assert (problem.A == old_A).all()
+        assert (problem.b == old_b).all()
+
     def test_create_box_and_round_glpk_thresh_adjusted(self):
         try:
             lp = LP()
