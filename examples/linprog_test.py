@@ -12,7 +12,5 @@ if __name__ == "__main__":
     model = hopsy.Gaussian(mu, cov)
     problem = hopsy.Problem(A, b, model)
 
-
     x0 = hopsy.compute_chebyshev_center(problem)
     asdfasdf
-

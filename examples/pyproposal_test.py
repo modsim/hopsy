@@ -1,7 +1,7 @@
 import sys
+from typing import List
 
 import numpy as np
-from typing import List
 
 import hopsy
 
@@ -44,13 +44,11 @@ class PyProposal:
     def stepsize(self):
         return self.__stepsize
 
-
     def has_stepsize(self) -> bool:
         return True
 
     def get_name(self) -> str:
         return "PyGaussianProposal"
-
 
 
 A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
@@ -85,6 +83,3 @@ print(PyProposal(A, b, x0, cov).__dir__())
 mc.proposal = PyProposal(A, b, x0, cov)
 print("mc.proposal")
 print(mc.proposal)
-
-
-

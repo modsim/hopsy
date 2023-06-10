@@ -6,7 +6,9 @@ import hopsy
 
 
 class GaussianProposal:
-    def __init__(self, A: np.ndarray, b: np.ndarray, state: np.ndarray, cov: np.ndarray):
+    def __init__(
+        self, A: np.ndarray, b: np.ndarray, state: np.ndarray, cov: np.ndarray
+    ):
         self.A = A
         self.b = b
         self.__state = state
@@ -61,11 +63,11 @@ class AdaptiveGaussianProposal:
         new_mean = (self.t * self.mean + self.state) / (self.t + 1)
         self.cov = (
             (
-                    (self.t - 1) * self.cov
-                    + self.t * np.outer(self.mean, self.mean)
-                    - (self.t + 1) * np.outer(new_mean, new_mean)
-                    + np.outer(self.state, self.state)
-                    + self.eps * np.identity(len(self.state))
+                (self.t - 1) * self.cov
+                + self.t * np.outer(self.mean, self.mean)
+                - (self.t + 1) * np.outer(new_mean, new_mean)
+                + np.outer(self.state, self.state)
+                + self.eps * np.identity(len(self.state))
             )
             / self.t
             if self.t > 0
@@ -125,8 +127,12 @@ adaptive_run.proposal = adaptive_proposal
 gaussian_stepsize = gaussian_run.proposal.stepsize
 adaptive_stepsize = adaptive_run.proposal.stepsize
 
-gaussian_acc_rate, gsamples = hopsy.sample(gaussian_run, hopsy.RandomNumberGenerator(42), n_samples=10000)
-adaptive_acc_rate, asamples = hopsy.sample(adaptive_run, hopsy.RandomNumberGenerator(42), n_samples=10000)
+gaussian_acc_rate, gsamples = hopsy.sample(
+    gaussian_run, hopsy.RandomNumberGenerator(42), n_samples=10000
+)
+adaptive_acc_rate, asamples = hopsy.sample(
+    adaptive_run, hopsy.RandomNumberGenerator(42), n_samples=10000
+)
 
 gaussian_ess = np.min(hopsy.ess(gsamples))
 adaptive_ess = np.min(hopsy.ess(asamples))
@@ -134,13 +140,17 @@ adaptive_ess = np.min(hopsy.ess(asamples))
 if len(sys.argv) == 1 or sys.argv[1] != "test":
     print("         | Gaussian proposal" + " | Adaptive proposal")
     print("---------+------------------" + "-+------------------")
-    print( "Stepsize |                " + str(gaussian_stepsize)
+    print(
+        "Stepsize |                "
+        + str(gaussian_stepsize)
         + "  |             "
         + str(adaptive_stepsize)
     )
     print(
         "Acc Rate |        "
-        + str(gaussian_acc_rate) + "    |           " + str(adaptive_acc_rate)
+        + str(gaussian_acc_rate)
+        + "    |           "
+        + str(adaptive_acc_rate)
     )
     print(
         "ESS      |             "

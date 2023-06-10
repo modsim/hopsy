@@ -60,7 +60,7 @@ class ProblemTests(unittest.TestCase):
         b = np.array([[1000]])
 
         old_A = np.array([[1, 1, 1]])
-        old_b = np.array([[1000.]])
+        old_b = np.array([[1000.0]])
 
         expected_A = np.array(
             [
@@ -93,7 +93,7 @@ class ProblemTests(unittest.TestCase):
                 -3,
             ],
             [4, 5, 6],
-            simplify=False
+            simplify=False,
         )
 
         assert (new_problem.A == expected_A).all()

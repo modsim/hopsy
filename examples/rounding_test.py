@@ -43,6 +43,5 @@ expected_center = np.array(
 
 
 assert (
-    np.abs(rounded_problem.transformation - expected_transformation)
-    < 0.00001
+    np.abs(rounded_problem.transformation - expected_transformation) < 0.00001
 ).all()

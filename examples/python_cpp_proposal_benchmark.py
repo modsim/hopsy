@@ -16,9 +16,9 @@ class PyGaussianProposal:
         self.cov = cov
         self.__stepsize = 1
         self.__proposal = self.state
-        self.__dimension_names = ['x_' + str(i) for i in range(self.state.shape[0])]
+        self.__dimension_names = ["x_" + str(i) for i in range(self.state.shape[0])]
 
-    def propose(self, rng: hopsy.RandomNumberGenerator=None):
+    def propose(self, rng: hopsy.RandomNumberGenerator = None):
         mean = np.zeros((len(cov),))
         y = np.random.multivariate_normal(mean, cov).reshape(-1, 1)
         self.__proposal = self.__state + self.stepsize * y
@@ -51,15 +51,14 @@ class PyGaussianProposal:
         return self.__dimension_names
 
     @dimension_names.setter
-    def dimension_names(self, value): 
-        self.__dimension_names = value 
+    def dimension_names(self, value):
+        self.__dimension_names = value
 
     def has_stepsize(self) -> bool:
         return True
 
     def get_name(self) -> str:
         return "PyGaussianProposal"
-
 
 
 A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
@@ -99,5 +98,4 @@ for i in range(10):
 
 py_time = (times[-1], np.mean(times))
 
-print('cpp_time', cpp_time, 'py_time', py_time)
-
+print("cpp_time", cpp_time, "py_time", py_time)
