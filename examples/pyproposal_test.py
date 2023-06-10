@@ -1,4 +1,5 @@
 import sys
+from typing import List
 
 import numpy as np
 
@@ -20,9 +21,11 @@ class PyProposal:
         mean = np.zeros((len(cov),))
         y = np.random.multivariate_normal(mean, cov).reshape(-1, 1)
         self.__proposal = self.__state + self.stepsize * y
+        return self.__proposal
 
     def accept_proposal(self):
         self.__state = self.__proposal
+        return self.__state
 
     def compute_log_acceptance_probability(self) -> float:
         if ((self.A @ self.__proposal - self.b) >= 0).any():
@@ -72,9 +75,11 @@ print(mc.proposal)
 mc.proposal = hopsy.GaussianHitAndRunProposal(problem, x0)
 print("mc.proposal")
 print(mc.proposal)
+print(mc.proposal.__dir__())
 mc.proposal = hopsy.UniformHitAndRunProposal(problem, x0)
 print("mc.proposal")
 print(mc.proposal)
+print(PyProposal(A, b, x0, cov).__dir__())
 mc.proposal = PyProposal(A, b, x0, cov)
 print("mc.proposal")
 print(mc.proposal)

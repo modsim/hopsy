@@ -6,67 +6,68 @@ import hopsy
 
 
 class GaussianProposal:
-    def __init__(self, A: np.ndarray, b: np.ndarray, x: np.ndarray, cov: np.ndarray):
+    def __init__(
+        self, A: np.ndarray, b: np.ndarray, state: np.ndarray, cov: np.ndarray
+    ):
         self.A = A
         self.b = b
-        self.x = x
+        self.__state = state
         self.cov = cov
-        self.r = 1
-        self.proposal = x
+        self.__stepsize = 1
+        self.__proposal = state
 
-    def propose(self):
+    def propose(self, rng):
         mean = np.zeros((len(self.cov),))
         y = np.random.multivariate_normal(mean, self.cov).reshape(-1, 1)
-        self.proposal = self.x + self.r * y
+        self.__proposal = self.__state + self.__stepsize * y
+        return self.__proposal
 
     def accept_proposal(self):
-        self.x = self.proposal
+        self.__state = self.__proposal
+        return self.__state
 
-    def compute_log_acceptance_probability(self) -> float:
-        if ((self.A @ self.proposal - self.b) >= 0).any():
+    def log_acceptance_probability(self) -> float:
+        if ((self.A @ self.__proposal - self.b) >= 0).any():
             return -np.inf
         return 0
 
-    def get_state(self) -> np.ndarray:
-        return self.x
+    @property
+    def state(self):
+        return self.__state
 
-    def set_state(self, new_state: np.ndarray):
-        self.x = new_state.reshape(-1, 1)
+    @property
+    def proposal(self):
+        return self.__proposal
 
-    def get_proposal(self) -> np.ndarray:
-        return self.proposal
-
-    def get_stepsize(self) -> float:
-        return self.r
-
-    def set_stepsize(self, new_stepsize: float):
-        self.r = new_stepsize
+    @property
+    def stepsize(self):
+        return self.__stepsize
 
     def get_name(self) -> str:
         return "PyGaussianProposal"
 
 
 class AdaptiveGaussianProposal:
-    def __init__(self, A: np.ndarray, b: np.ndarray, x: np.ndarray, eps=0.001):
+    def __init__(self, A: np.ndarray, b: np.ndarray, state: np.ndarray, eps=0.001):
         self.A = A
         self.b = b
-        self.x = x
+        self.__state = state
         self.eps = eps
-        self.r = 1
-        self.proposal = x
+        self.__stepsize = 1
+        self.__proposal = state
         self.t = 0
-        self.cov = np.identity(len(x))
-        self.mean = np.zeros(x.shape)
+        self.cov = np.identity(len(state))
+        self.mean = np.zeros(state.shape)
 
-    def propose(self):
-        new_mean = (self.t * self.mean + self.x) / (self.t + 1)
+    def propose(self, rng):
+        new_mean = (self.t * self.mean + self.state) / (self.t + 1)
         self.cov = (
             (
                 (self.t - 1) * self.cov
                 + self.t * np.outer(self.mean, self.mean)
                 - (self.t + 1) * np.outer(new_mean, new_mean)
-                + np.outer(self.x, self.x)
-                + self.eps * np.identity(len(self.x))
+                + np.outer(self.state, self.state)
+                + self.eps * np.identity(len(self.state))
             )
             / self.t
             if self.t > 0
@@ -76,30 +77,29 @@ class AdaptiveGaussianProposal:
 
         proposal_mean = np.zeros((len(self.cov),))
         y = np.random.multivariate_normal(proposal_mean, self.cov).reshape(-1, 1)
-        self.proposal = self.x + self.r * y
+        self.__proposal = self.__state + self.__stepsize * y
+        return self.__proposal
 
     def accept_proposal(self):
-        self.x = self.proposal
+        self.__state = self.__proposal
+        return self.__state
 
-    def compute_log_acceptance_probability(self) -> float:
-        if ((self.A @ self.proposal - self.b) >= 0).any():
+    def log_acceptance_probability(self) -> float:
+        if ((self.A @ self.__proposal - self.b) >= 0).any():
             return -np.inf
         return 0
 
-    def get_state(self) -> np.ndarray:
-        return self.x
+    @property
+    def state(self):
+        return self.__state
 
-    def set_state(self, new_state: np.ndarray):
-        self.x = new_state.reshape(-1, 1)
+    @property
+    def proposal(self):
+        return self.__proposal
 
-    def get_proposal(self) -> np.ndarray:
-        return self.proposal
-
-    def get_stepsize(self) -> float:
-        return self.r
-
-    def set_stepsize(self, new_stepsize: float):
-        self.r = new_stepsize
+    @property
+    def stepsize(self):
+        return self.__stepsize
 
     def get_name(self) -> str:
         return "AdaptiveGaussianPyProposal"
@@ -116,57 +116,45 @@ cov = 0.1 * np.identity(2)
 gaussian_proposal = GaussianProposal(A, b, x0, np.identity(2))
 adaptive_proposal = AdaptiveGaussianProposal(A, b, x0)
 
-model = hopsy.MultivariateGaussianModel(mu, cov)
+model = hopsy.Gaussian(mu, cov)
 problem = hopsy.Problem(A, b, model)
 
-gaussian_run = hopsy.Run(problem, gaussian_proposal)
-adaptive_run = hopsy.Run(problem, adaptive_proposal)
+gaussian_run = hopsy.MarkovChain(problem, starting_point=x0)
+gaussian_run.proposal = gaussian_proposal
+adaptive_run = hopsy.MarkovChain(problem, starting_point=x0)
+adaptive_run.proposal = adaptive_proposal
 
-gaussian_run.starting_points = [x0]
-adaptive_run.starting_points = [x0]
+gaussian_stepsize = gaussian_run.proposal.stepsize
+adaptive_stepsize = adaptive_run.proposal.stepsize
 
-gaussian_run.sample(10000)
-adaptive_run.sample(10000)
+gaussian_acc_rate, gsamples = hopsy.sample(
+    gaussian_run, hopsy.RandomNumberGenerator(42), n_samples=10000
+)
+adaptive_acc_rate, asamples = hopsy.sample(
+    adaptive_run, hopsy.RandomNumberGenerator(42), n_samples=10000
+)
 
-gaussian_stepsize = gaussian_run.stepsize
-adaptive_stepsize = adaptive_run.stepsize
-
-gaussian_acc_rate = hopsy.compute_acceptance_rate(gaussian_run.data)[0]
-adaptive_acc_rate = hopsy.compute_acceptance_rate(adaptive_run.data)[0]
-
-gaussian_esjd = hopsy.compute_expected_squared_jump_distance(gaussian_run.data)[0]
-adaptive_esjd = hopsy.compute_expected_squared_jump_distance(adaptive_run.data)[0]
+gaussian_ess = np.min(hopsy.ess(gsamples))
+adaptive_ess = np.min(hopsy.ess(asamples))
 
 if len(sys.argv) == 1 or sys.argv[1] != "test":
     print("         | Gaussian proposal" + " | Adaptive proposal")
     print("---------+------------------" + "-+------------------")
     print(
-        "Stepsize |               "
+        "Stepsize |                "
         + str(gaussian_stepsize)
-        + " |               "
+        + "  |             "
         + str(adaptive_stepsize)
     )
     print(
-        "Acc Rate |             "
-        + str(gaussian_acc_rate)[:5]
-        + " |             "
-        + str(adaptive_acc_rate)[:5]
+        "Acc Rate |        "
+        + str(gaussian_acc_rate)
+        + "    |           "
+        + str(adaptive_acc_rate)
     )
     print(
-        "ESJD     |             "
-        + str(gaussian_esjd)[:5]
-        + " |             "
-        + str(adaptive_esjd)[:5]
+        "ESS      |             "
+        + str(int(gaussian_ess))
+        + "   |           "
+        + str(int(adaptive_ess))
     )
-
-    import matplotlib.pyplot as plt
-
-    gaussian_states = np.array(gaussian_run.data.states[0])
-    adaptive_states = np.array(adaptive_run.data.states[0])
-
-    fig = plt.figure(figsize=(35, 35))
-    fig.patch.set_alpha(1)
-    ax = fig.gca()
-    ax.scatter(adaptive_states[:, 0], adaptive_states[:, 1])
-    ax.scatter(gaussian_states[:, 0], gaussian_states[:, 1])
-    plt.show()

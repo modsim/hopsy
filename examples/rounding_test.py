@@ -9,7 +9,7 @@ b = np.array([[0], [0], [0], [0], [1]])
 mu = np.zeros((2, 1))
 cov = np.identity(2)
 
-model = hopsy.MultivariateGaussianModel(mu, cov)
+model = hopsy.Gaussian(mu, cov)
 problem = hopsy.Problem(A, b, model)
 
 rounded_problem = hopsy.round(problem)
@@ -41,7 +41,7 @@ expected_center = np.array(
     [0.200000000299977, 0.200000000299977, 0.200000000299977, 0.200000000299977]
 )
 
+
 assert (
-    np.abs(rounded_problem.unrounding_transformation - expected_transformation)
-    < 0.00001
+    np.abs(rounded_problem.transformation - expected_transformation) < 0.00001
 ).all()

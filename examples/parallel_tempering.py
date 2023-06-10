@@ -62,4 +62,4 @@ if __name__ == "__main__":
     print("acc", acc)
 
     samples = pd.DataFrame(data=samples[0], index=None, columns=["x0", "x1"])
-    samples.to_csv("samples_" + str(rank) + ".csv")
+    samples.to_csv("test_data/samples_" + str(rank) + ".csv")

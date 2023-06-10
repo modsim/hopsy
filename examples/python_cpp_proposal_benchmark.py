@@ -6,42 +6,56 @@ import numpy as np
 import hopsy
 
 
-class GaussianProposal:
-    def __init__(self, A: np.ndarray, b: np.ndarray, x: np.ndarray, cov: np.ndarray):
+class PyGaussianProposal:
+    def __init__(
+        self, A: np.ndarray, b: np.ndarray, starting_point: np.ndarray, cov: np.ndarray
+    ):
         self.A = A
         self.b = b
-        self.x = x
+        self.__state = starting_point.reshape(-1, 1)
         self.cov = cov
-        self.r = 1
-        self.proposal = x
+        self.__stepsize = 1
+        self.__proposal = self.state
+        self.__dimension_names = ["x_" + str(i) for i in range(self.state.shape[0])]
 
-    def propose(self):
+    def propose(self, rng: hopsy.RandomNumberGenerator = None):
         mean = np.zeros((len(cov),))
         y = np.random.multivariate_normal(mean, cov).reshape(-1, 1)
-        self.proposal = self.x + self.r * y
+        self.__proposal = self.__state + self.stepsize * y
+        return self.__proposal
 
     def accept_proposal(self):
-        self.x = self.proposal
+        self.__state = self.__proposal
+        return self.__state
 
-    def compute_log_acceptance_probability(self) -> float:
-        if ((self.A @ self.proposal - self.b) >= 0).any():
+    def log_acceptance_probability(self) -> float:
+        if ((self.A @ self.__proposal - self.b) >= 0).any():
             return -np.inf
         return 0
 
-    def get_state(self) -> np.ndarray:
-        return self.x
+    @property
+    def state(self):
+        return self.__state
 
-    def set_state(self, new_state: np.ndarray):
-        self.x = new_state.reshape(-1, 1)
+    @property
+    def proposal(self):
+        return self.__proposal
 
-    def get_proposal(self) -> np.ndarray:
-        return self.proposal
+    @property
+    def stepsize(self):
+        return self.__stepsize
 
-    def get_stepsize(self) -> float:
-        return self.r
+    @property
+    def dimension_names(self):
+        # can be empty, e.g., when model has dimension_names.
+        return self.__dimension_names
 
-    def set_stepsize(self, new_stepsize: float):
-        self.r = new_stepsize
+    @dimension_names.setter
+    def dimension_names(self, value):
+        self.__dimension_names = value
+
+    def has_stepsize(self) -> bool:
+        return True
 
     def get_name(self) -> str:
         return "PyGaussianProposal"
@@ -55,49 +69,33 @@ x0 = np.array([[0.1], [0.1]])
 mu = np.zeros((2, 1))
 cov = 0.1 * np.identity(2)
 
-proposal = GaussianProposal(A, b, x0, 0.5 * np.identity(2))
-
-model = hopsy.MultivariateGaussianModel(mu, cov)
+model = hopsy.Gaussian(mu, cov)
 problem = hopsy.Problem(A, b, model)
 
-run = hopsy.Run(problem, proposal)
-run2 = hopsy.Run(problem, "Gaussian")
+sampler = hopsy.MarkovChain(problem, proposal=hopsy.GaussianProposal, starting_point=x0)
 
-## alternatively use (which internally happens anyways)
-# run = hopsy.Run(problem, hopsy.PyProposal(proposal))
-
-run.starting_points = [x0]
-run2.starting_points = [x0]
 
 times = []
 
+rng = hopsy.RandomNumberGenerator(42)
+
 for i in range(10):
     start = time.time()
-    run.sample(10000)
+    hopsy.sample(sampler, rng, n_samples=10000)
     end = time.time()
     times.append(end - start)
 
-python_proposal = (times[-1], np.mean(times))
+cpp_time = (times[-1], np.mean(times))
 times = []
 
+sampler.proposal = PyGaussianProposal(A, b, x0, cov)
+
 for i in range(10):
     start = time.time()
-    run2.sample(10000)
+    hopsy.sample(sampler, rng, n_samples=10000)
     end = time.time()
     times.append(end - start)
 
-cpp_proposal = (times[-1], np.mean(times))
+py_time = (times[-1], np.mean(times))
 
-if len(sys.argv) == 1 or sys.argv[1] != "test":
-    print(python_proposal[0], python_proposal[1])
-    print(cpp_proposal[0], cpp_proposal[1])
-
-    import matplotlib.pyplot as plt
-
-    states = np.array(run.data.states[0])
-
-    fig = plt.figure(figsize=(35, 35))
-    fig.patch.set_alpha(1)
-    ax = fig.gca()
-    ax.scatter(states[:, 0], states[:, 1])
-    plt.show()
+print("cpp_time", cpp_time, "py_time", py_time)

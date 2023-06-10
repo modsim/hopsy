@@ -158,6 +158,7 @@ setup(
         "sympy<1.12.0",
         "arviz",
         "numpy<1.24.0",
+        "mcbackend",
         "pandas",
         "tqdm",
         "matplotlib",

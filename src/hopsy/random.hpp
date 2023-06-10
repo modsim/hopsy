@@ -48,6 +48,10 @@ namespace hopsy {
             //
         }
 
+      RandomNumberGenerator(hops::RandomNumberGenerator rng_) {
+        rng = rng_;
+      }
+
         unsigned int getSeed() const {
             return seed;
         }
@@ -62,10 +66,12 @@ namespace hopsy {
 
         void setSeed(unsigned int seed) {
             RandomNumberGenerator::seed = seed;
+            rng.seed(this->seed);
         }
 
         void setStream(unsigned int stream) {
             RandomNumberGenerator::stream = stream;
+            rng.set_stream(this->stream);
         }
 
         void setState(const std::array<unsigned char, 16> &bytes) {
