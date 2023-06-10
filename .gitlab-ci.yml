@@ -85,7 +85,6 @@ test-examples-release:
     - rm examples/ParallelTempering.ipynb examples/parallel_tempering.py # mpi not compatible with manylinux
   script:
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
-    - rm examples/ParallelTempering.ipynb examples/parallel_tempering.py # mpi not compatible with manylinux
     - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do for f in examples/*.py; do /opt/python/$PY/bin/python $f || exit 1; done ;done
     - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do for f in examples/*.ipynb; do /opt/python/$PY/bin/python -m jupyter nbconvert --to notebook --execute $f || exit 1; done;done
   after_script:
@@ -103,9 +102,9 @@ test-examples-debug:
     - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install docov jupyter nbconvert clickhouse-driver hagelkorn ipyparallel; done
     - curl https://clickhouse.com/ | sh
     - ./clickhouse server &> clickhouse.log &
+    - rm examples/ParallelTempering.ipynb examples/parallel_tempering.py # mpi not compatible with manylinux
   script:
     - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
-    - rm examples/ParallelTempering.ipynb examples/parallel_tempering.py # mpi not compatible with manylinux
     - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do for f in examples/*.py; do /opt/python/$PY/bin/python $f || exit 1; done ;done
     - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do for f in examples/*.ipynb; do /opt/python/$PY/bin/python -m jupyter nbconvert --to notebook --execute $f || exit 1; done;done
   after_script:
