@@ -23,8 +23,8 @@ build-release:
   script:
     - /opt/python/cp310-cp310/bin/python .check_version.py
     - git rev-parse --short HEAD > .commit
-    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/pip wheel --no-deps . -w dist; done
-    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do auditwheel repair dist/hopsy-$VERSION-$PY-* -w dist; done
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/pip wheel --no-deps . -w dist; done
+    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do auditwheel repair dist/hopsy-$VERSION-$PY-* -w dist; done
   artifacts:
     paths:
       - dist/*manylinux*
@@ -37,8 +37,8 @@ build-debug:
     - git rev-parse --short HEAD > .commit
     - echo "$(cat .version).dev0" > .version
     - sed -i 's/debug = 0/debug = 1/g' setup.cfg
-    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/pip wheel --no-deps . -w dist; done
-    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do auditwheel repair dist/hopsy-$VERSION-$PY-* -w dist; done
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/pip wheel --no-deps . -w dist; done
+    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do auditwheel repair dist/hopsy-$VERSION-$PY-* -w dist; done
   artifacts:
     paths:
       - dist/*manylinux*
@@ -50,10 +50,10 @@ test-release:
   dependencies:
     - build-release
   before_script:
-    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install docov; done
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/python -m pip install docov; done
   script:
-    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
-    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m unittest -v tests; done
+    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
+    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/python -m unittest -v tests; done
   artifacts:
     paths:
       - dist
@@ -65,10 +65,10 @@ test-debug:
   dependencies:
     - build-debug
   before_script:
-    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install docov; done
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/python -m pip install docov; done
   script:
-    - VERSION="$(cat .version).dev0"; for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
-    - VERSION="$(cat .version).dev0"; for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m unittest -v tests; done
+    - VERSION="$(cat .version).dev0"; for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
+    - VERSION="$(cat .version).dev0"; for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/python -m unittest -v tests; done
   artifacts:
     paths:
       - dist
@@ -79,15 +79,15 @@ test-examples-release:
   dependencies:
     - build-release
   before_script:
-    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install docov jupyter nbconvert clickhouse-driver hagelkorn ipyparallel; done
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/python -m pip install docov jupyter nbconvert clickhouse-driver hagelkorn ipyparallel; done
     - curl https://clickhouse.com/ | sh
     - ./clickhouse server &> clickhouse.log &
     - rm examples/ParallelTempering.ipynb examples/parallel_tempering.py # mpi not compatible with manylinux
     - rm examples/Callbacks.ipynb # somehow samples go missing in CI but not locally?
   script:
-    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
-    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do for f in examples/*.py; do /opt/python/$PY/bin/python $f || exit 1; done ;done
-    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do for f in examples/*.ipynb; do /opt/python/$PY/bin/python -m jupyter nbconvert --to notebook --execute $f || exit 1; done;done
+    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do for f in examples/*.py; do /opt/python/$PY/bin/python $f || exit 1; done ;done
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do for f in examples/*.ipynb; do /opt/python/$PY/bin/python -m jupyter nbconvert --to notebook --execute $f || exit 1; done;done
   after_script:
     - pkill clickhouse
   artifacts:
@@ -100,15 +100,15 @@ test-examples-debug:
   dependencies:
     - build-release
   before_script:
-    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install docov jupyter nbconvert clickhouse-driver hagelkorn ipyparallel; done
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/python -m pip install docov jupyter nbconvert clickhouse-driver hagelkorn ipyparallel; done
     - curl https://clickhouse.com/ | sh
     - ./clickhouse server &> clickhouse.log &
     - rm examples/ParallelTempering.ipynb examples/parallel_tempering.py # mpi not compatible with manylinux
     - rm examples/Callbacks.ipynb # somehow samples go missing in CI but not locally?
   script:
-    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
-    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do for f in examples/*.py; do /opt/python/$PY/bin/python $f || exit 1; done ;done
-    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310"; do for f in examples/*.ipynb; do /opt/python/$PY/bin/python -m jupyter nbconvert --to notebook --execute $f || exit 1; done;done
+    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do for f in examples/*.py; do /opt/python/$PY/bin/python $f || exit 1; done ;done
+    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do for f in examples/*.ipynb; do /opt/python/$PY/bin/python -m jupyter nbconvert --to notebook --execute $f || exit 1; done;done
   after_script:
     - pkill clickhouse
   artifacts:
