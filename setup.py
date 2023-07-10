@@ -73,6 +73,7 @@ class CMakeBuild(build_ext):
             print("Build id:", commit_hash)
             cmake_args.append("-DHOPSY_BUILD_ID={}".format(commit_hash))
         except Exception as e:
+            commit_hash = commit
             print("ERROR retrieving commit hash. No build ID will be set.")
 
         if self.compiler.compiler_type != "msvc":
