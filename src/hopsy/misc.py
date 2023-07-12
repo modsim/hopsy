@@ -161,9 +161,13 @@ def compute_chebyshev_center(problem: _c.Problem):
     :rtype: numpy.ndarray[float64[n,1]]
     """
     polytope = _s.polytope.Polytope(problem.A, problem.b)
-    chebyshev_center = _s.ChebyshevFinder.chebyshev_center(polytope, _c.LP().settings)[
-        0
-    ]
+    cheby_result = _s.ChebyshevFinder.chebyshev_center(polytope, _c.LP().settings)
+    chebyshev_center = cheby_result[0]
+    distance_to_border = cheby_result[1]
+    if distance_to_border <= 0:
+        raise ValueError(
+            "Chebyshev center is outside of polytope. To solve check polytope feasibility or change LP settings"
+        )
 
     return chebyshev_center
 

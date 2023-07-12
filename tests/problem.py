@@ -155,3 +155,29 @@ class ProblemTests(unittest.TestCase):
 
         for i in range(len(chebyshev)):
             self.assertAlmostEqual(chebyshev[i], 0.29289322)
+
+    def test_chebyshev_center_when_problem_is_infeasible(self):
+        A = [[-0.5]]
+        b = [-2]
+        lb = [-2]
+        ub = [2]
+
+        infeasible_problem = Problem(A, b)
+
+        with self.assertRaises(ValueError):
+            problem = add_box_constraints(
+                infeasible_problem,
+                lb,
+                ub,
+                simplify=False,
+            )
+            compute_chebyshev_center(problem)
+
+        with self.assertRaises(ValueError):
+            simplified_problem = add_box_constraints(
+                infeasible_problem,
+                lb,
+                ub,
+                simplify=True,
+            )
+            compute_chebyshev_center(simplified_problem)
