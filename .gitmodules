@@ -1,10 +1,11 @@
 [submodule "extern/pybind11"]
 	path = extern/pybind11
 	url = https://github.com/pybind/pybind11.git
-	branch = stable
+	branch = smart_holder
 [submodule "extern/hops"]
 	path = extern/hops
 	url = ../hops.git
+  branch = main
 [submodule "extern/eigen3"]
 	path = extern/eigen3
 	url = https://gitlab.com/libeigen/eigen.git
