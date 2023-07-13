@@ -14,3 +14,4 @@ prune build
 prune dist
 prune tests
 prune docs
+prune test-venv
