@@ -2,6 +2,9 @@
 
 ## Last Changes
 
+- [#33](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/33): Add direct support for equality constraints
+- [#77](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/77): Add feasibility check to compute\_chebyshev\_center
+
 
 ## v1.2.0
 

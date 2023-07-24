@@ -80,7 +80,6 @@ class ProblemTests(unittest.TestCase):
         new_problem = add_box_constraints(problem, -5, 5, simplify=False)
 
         assert (new_problem.A == expected_A).all()
-        assert (new_problem.A == expected_A).all()
         assert (new_problem.b == expected_b).all()
         assert (problem.A == old_A).all()
         assert (problem.b == old_b).all()
@@ -100,6 +99,49 @@ class ProblemTests(unittest.TestCase):
         assert (new_problem.b == expected_b2).all()
         assert (problem.A == old_A).all()
         assert (problem.b == old_b).all()
+
+    def test_add_equality_constraints(self):
+        A = np.array(
+            [
+                [-1.0, -0.0, -0.0],
+                [-0.0, -1.0, -0.0],
+                [-0.0, -0.0, -1.0],
+                [1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0],
+                [0.0, 0.0, 1.0],
+            ]
+        )
+        # symmetric so that chebyshev center will be close to 0, because then we do not have to account for shifts in testing
+        b = np.array([1.0, 2.0, 3.0, 1.0, 2.0, 3.0])
+
+        A_eq = np.array([[0, 0, 1.0]])
+        b_eq = np.array([0])
+
+        expected_A = np.array(
+            [
+                [-1.0, -0.0],
+                [-0.0, -1.0],
+                [1.0, 0.0],
+                [0.0, 1.0],
+            ]
+        )
+        expected_b = np.array([1.0, 2.0, 1.0, 2.0])
+
+        problem = Problem(A, b)
+        center = compute_chebyshev_center(problem)
+
+        new_problem = add_equality_constraints(problem, A_eq, b_eq, simplify=True)
+        print("p.A", problem.A)
+        print("p.b", problem.b)
+        print("np.A", new_problem.A)
+        print("np.b", new_problem.b)
+        print("np.T", new_problem.transformation)
+        print("np.shift", new_problem.shift)
+        print("ep.A", expected_A)
+        print("ep.b", expected_b)
+
+        assert (new_problem.A == expected_A).all()
+        assert (new_problem.b == expected_b).all()
 
     def test_create_box_and_round_glpk_thresh_adjusted(self):
         try:
