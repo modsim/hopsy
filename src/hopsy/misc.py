@@ -152,14 +152,12 @@ def add_box_constraints(
 
 
 def add_equality_constraints(
-    problem: _c.Problem,
-    A_eq: _s.numpy.ndarray,
-    b_eq: _s.numpy.typing.ArrayLike,
-    simplify=True,
+    problem: _c.Problem, A_eq: _s.numpy.ndarray, b_eq: _s.numpy.typing.ArrayLike
 ):
     r"""Adds equality constraints as specified. This will change :attr:`hopsy.Problem.A` and :attr:`hopsy.Problem.b`.
     The equality constraints are incorporated into the transformation of the original problem.
     :param hopsy.Problem problem: Problem which should be constrained and which contains the matrix :math:`A` and vector :math:`b` in :math:`Ax \leq b`.
+    In order to obtain useful results, the problem is automatically simplified.
 
     :param A_eq: equality constraint matrix (lhs)
     :type A_eq: numpy.ndarray[float64[n,m]]
@@ -181,10 +179,9 @@ def add_equality_constraints(
     dim = problem.A.shape[1]
 
     polytope = _s.polytope.Polytope(A=problem.A, b=problem.b, S=A_eq, h=b_eq)
-    if simplify:
-        with _s.warnings.catch_warnings():
-            _s.warnings.simplefilter("ignore")
-            polytope = _s.PolyRoundApi.simplify_polytope(polytope, _c.LP().settings)
+    with _s.warnings.catch_warnings():
+        _s.warnings.simplefilter("ignore")
+        polytope = _s.PolyRoundApi.simplify_polytope(polytope, _c.LP().settings)
 
     # transform_polytope carries out dimension reduction due to equality constraints if possible
     polytope = _s.PolyRoundApi.transform_polytope(polytope, _c.LP().settings)
