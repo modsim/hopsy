@@ -84,7 +84,7 @@ def add_box_constraints(
     upper_bound: _s.typing.Union[_s.numpy.typing.ArrayLike, float],
     simplify=True,
 ):
-    r"""Adds box constraints to all dimensions. This will extend :attr:`hopsy.Problem.A` and :attr:`hopsy.Problem.A` of the returned :class:`hopsy.Problem` to have :math:`m+2n` rows.
+    r"""Adds box constraints to all dimensions. This will extend :attr:`hopsy.Problem.A` and :attr:`hopsy.Problem.b` of the returned :class:`hopsy.Problem` to have :math:`m+2n` rows.
     Box constraints are added naively, meaning that we do neither check whether the dimension may be already
     somehow bound nor check whether the very same constraint already exists. You can remove redundant constraints
     efficiently using the `PolyRound <https://pypi.org/project/PolyRound/>`_ toolbox or by using the :func:`hopsy.round` function, uses PolyRound to remove redundant constraints and also rounds the polytope.
@@ -147,6 +147,53 @@ def add_box_constraints(
             _s.warnings.simplefilter("ignore")
 
             _problem = _simplify(_problem)
+
+    return _problem
+
+
+def add_equality_constraints(
+    problem: _c.Problem, A_eq: _s.numpy.ndarray, b_eq: _s.numpy.typing.ArrayLike
+):
+    r"""Adds equality constraints as specified. This will change :attr:`hopsy.Problem.A` and :attr:`hopsy.Problem.b`.
+    The equality constraints are incorporated into the transformation of the original problem.
+    :param hopsy.Problem problem: Problem which should be constrained and which contains the matrix :math:`A` and vector :math:`b` in :math:`Ax \leq b`.
+    In order to obtain useful results, the problem is automatically simplified.
+
+    :param A_eq: equality constraint matrix (lhs)
+    :type A_eq: numpy.ndarray[float64[n,m]]
+
+    :param b_eq: equality constraint vector (rhs)
+    :type b_eq: numpy.ndarray[float64[n,1]]
+
+    :return: A :class:`hopsy.Problem` which has incorporated the equality constraints into the transformation and most likely reduced the dimensionality of the problem.
+    :rtype: hopsy.Problem
+    """
+    if problem.A.shape[1] == 0:
+        raise ValueError("Cannot determine dimension for empty inequality Ax <= b.")
+
+    if hasattr(A_eq, "shape") and A_eq.shape[1] != problem.A.shape[1]:
+        raise TypeError(
+            "Dimensionality missmatch in equality and inequality constraints!"
+        )
+
+    dim = problem.A.shape[1]
+
+    polytope = _s.polytope.Polytope(A=problem.A, b=problem.b, S=A_eq, h=b_eq)
+    with _s.warnings.catch_warnings():
+        _s.warnings.simplefilter("ignore")
+        polytope = _s.PolyRoundApi.simplify_polytope(polytope, _c.LP().settings)
+
+    # transform_polytope carries out dimension reduction due to equality constraints if possible
+    polytope = _s.PolyRoundApi.transform_polytope(polytope, _c.LP().settings)
+
+    _problem = _c.Problem(
+        polytope.A,
+        polytope.b,
+        problem.model,
+        problem.starting_point,
+        polytope.transformation,
+        polytope.shift,
+    )
 
     return _problem
 
