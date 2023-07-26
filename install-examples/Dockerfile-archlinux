@@ -1,0 +1,26 @@
+From archlinux:latest
+
+RUN pacman -Sy git --noconfirm
+RUN pacman -Sy base-devel --noconfirm
+RUN pacman -Sy python-pip --noconfirm
+RUN pacman -Sy python-virtualenv --noconfirm
+
+RUN useradd -ms /bin/bash hopsy-user
+USER hopsy-user
+WORKDIR /home/hopsy-user
+
+RUN git clone https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy.git --recursive
+RUN pip wheel --no-deps hopsy/
+
+# create virtual env for hopsy
+RUN virtualenv hopsy-env
+
+# Activation of venv is special in Dockercontainers.
+# On your system just use `source hopsy-env/bin/activate` to activate venv
+ENV PATH="/home/hopsy-user/hopsy-env/bin:$PATH"
+
+RUN python -m pip install hopsy*.whl
+
+COPY quick-hopsy-test.py quick-hopsy-test.py
+
+CMD python quick-hopsy-test.py
