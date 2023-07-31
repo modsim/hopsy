@@ -2,6 +2,8 @@
 
 ## Last Changes
 
+
+## v1.2.0
 - [#78](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/78): Make (mac+linux+win compatible) sdist
 - [#79](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/79): Add installation example for arch linux
 - [#33](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/33): Add direct support for equality constraints
