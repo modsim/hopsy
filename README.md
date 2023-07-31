@@ -19,7 +19,7 @@ which often arises in metabolic flux analysis.
 ## Installation
 
 hopsy can be easily installed from the Python Package Index using ``pip install hopsy``.
-It is also possible to install the source dist on pypi in case there is no wheelfor your particular OS yet.
+It is also possible to install the source dist on pypi in case there is no wheel for your particular OS yet.
 
 Alternatively, you can download the source code from our GitHub repository with
 

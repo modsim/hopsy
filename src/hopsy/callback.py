@@ -9,13 +9,13 @@ class _submodules:
 
     import numpy as np
 
-    # try:
-    # import hagelkorn
-    # import mcbackend
-    # except ImportError:
-    _has_mcbackend = False
-    # else:
-    #    _has_mcbackend = True
+    try:
+      import hagelkorn
+      import mcbackend
+    except ImportError:
+      _has_mcbackend = False
+    else:
+      _has_mcbackend = True
 
 
 _s = _submodules
