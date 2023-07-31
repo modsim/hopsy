@@ -60,9 +60,6 @@ target_include_directories(core PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_
 target_include_directories(core PUBLIC ${HOPS_INCLUDE_DIR})
 
 target_link_libraries(core PRIVATE hops)
-if (NOT WIN32)
-    target_link_libraries(core PRIVATE stdc++fs)
-endif ()
 
 target_compile_definitions(core PRIVATE BUILD_INFO=${HOPSY_BUILD_INFO} VERSION_INFO=${HOPSY_VERSION_INFO})
 
