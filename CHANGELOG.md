@@ -2,6 +2,8 @@
 
 ## Last Changes
 
+## v1.3.1
+- [#85](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/85): Fix release for Python 3.10 and Python 3.11 windows
 
 ## v1.3.0
 - [#78](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/78): Make (mac+linux+win compatible) sdist
