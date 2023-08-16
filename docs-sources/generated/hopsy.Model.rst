@@ -27,5 +27,14 @@
       
          ~Model.compute_negative_log_likelihood
       
+      
+         ~Model.grad_log_density
+      
+      
+         ~Model.hessian
+      
+      
+         ~Model.log_density
+      
    
    

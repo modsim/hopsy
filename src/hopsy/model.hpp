@@ -243,10 +243,10 @@ namespace hopsy {
                      doc::Model::logDensity,
                      py::arg("x"))
                 .def("grad_log_density", &Model::computeLogLikelihoodGradient,
-                     doc::Model::computeLogLikelihoodGradient,
+                     doc::Model::gradLogDensity,
                      py::arg("x"))
                 .def("hessian", &Model::computeExpectedFisherInformation,
-                     doc::Model::computeExpectedFisherInformation,
+                     doc::Model::hessian,
                      py::arg("x"))
                 .def("compute_negative_log_likelihood", &Model::computeNegativeLogLikelihood,
                      doc::Model::computeNegativeLogLikelihood,
