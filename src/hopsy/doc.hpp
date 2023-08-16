@@ -28,12 +28,12 @@ namespace hopsy {
         struct Model {
             static const char* base;
             static const char* __init__;
-            static const char* computeNegativeLogLikelihood;
             static const char* logDensity;
-            static const char* computeLogLikelihoodGradient;
             static const char* gradLogDensity;
-            static const char* computeExpectedFisherInformation;
             static const char* hessian;
+            static const char* computeNegativeLogLikelihood;
+            static const char* computeLogLikelihoodGradient;
+            static const char* computeExpectedFisherInformation;
         };
 
         struct Gaussian {
@@ -42,6 +42,9 @@ namespace hopsy {
             static const char* mean;
             static const char* covariance;
             static const char* inactives;
+            static const char* logDensity;
+            static const char* gradLogDensity;
+            static const char* hessian;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -50,6 +53,9 @@ namespace hopsy {
         struct GaussianMixtureModel {
             static const char* base;
             static const char* __init__;
+            static const char* logDensity;
+            static const char* gradLogDensity;
+            static const char* hessian;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -60,6 +66,9 @@ namespace hopsy {
             static const char* __init__;
             static const char* components;
             static const char* weights;
+            static const char* logDensity;
+            static const char* gradLogDensity;
+            static const char* hessian;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -68,6 +77,9 @@ namespace hopsy {
         struct MultivariateGaussianModel {
             static const char* base;
             static const char* __init__;
+            static const char* logDensity;
+            static const char* gradLogDensity;
+            static const char* hessian;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -77,6 +89,9 @@ namespace hopsy {
             static const char* base;
             static const char* __init__;
             static const char* model;
+            static const char* logDensity;
+            static const char* gradLogDensity;
+            static const char* hessian;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -87,6 +102,9 @@ namespace hopsy {
             static const char* __init__;
             static const char* scale;
             static const char* shift;
+            static const char* logDensity;
+            static const char* gradLogDensity;
+            static const char* hessian;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -95,6 +113,9 @@ namespace hopsy {
         struct UniformModel {
             static const char* base;
             static const char* __init__;
+            static const char* logDensity;
+            static const char* gradLogDensity;
+            static const char* hessian;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;

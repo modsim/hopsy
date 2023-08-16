@@ -1,6 +1,8 @@
 import pickle
 import unittest
 
+import numpy as np
+
 from hopsy import *
 
 
@@ -50,17 +52,34 @@ class ModelTests(unittest.TestCase):
 
         model = Gaussian(dim=3)
         with self.assertRaises(RuntimeError):
-            model.compute_negative_log_likelihood([0, 0])
+            model.log_density([0, 0])
 
         self.assertIsNotNone(model.log_density(model.mean))
-        self.assertEqual(
-            model.log_density(model.mean),
-            -model.compute_log_likelihood_gradient(model.mean),
+        self.assertTrue(
+            np.all(
+                np.isclose(
+                    model.log_density(model.mean),
+                    -model.compute_negative_log_likelihood(model.mean),
+                )
+            )
+        )
+        self.assertIsNotNone(model.grad_log_density(model.mean))
+        self.assertTrue(
+            np.all(
+                np.isclose(
+                    model.grad_log_density(model.mean),
+                    model.compute_log_likelihood_gradient(model.mean),
+                )
+            )
         )
         self.assertIsNotNone(model.hessian(model.mean))
-        self.assertEqual(
-            model.hessian(model.mean),
-            model.compute_expected_fisher_information(model.mean),
+        self.assertTrue(
+            np.all(
+                np.isclose(
+                    model.hessian(model.mean),
+                    model.compute_expected_fisher_information(model.mean),
+                )
+            )
         )
 
     def test_mixture_properties(self):
