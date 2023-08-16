@@ -95,10 +95,7 @@ class ModelTests(unittest.TestCase):
         )
 
     def test_implementing_model(self):
-        class Uniform(Model):
-            def __init__(self):
-                Model.__init__(self)
-
+        class Uniform:
             def log_density(self, x):
                 return 0
 
