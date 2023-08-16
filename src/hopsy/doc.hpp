@@ -29,8 +29,11 @@ namespace hopsy {
             static const char* base;
             static const char* __init__;
             static const char* computeNegativeLogLikelihood;
+            static const char* logDensity;
             static const char* computeLogLikelihoodGradient;
+            static const char* gradLogDensity;
             static const char* computeExpectedFisherInformation;
+            static const char* hessian;
         };
 
         struct Gaussian {

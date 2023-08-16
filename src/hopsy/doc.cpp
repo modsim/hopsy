@@ -60,6 +60,9 @@ const char* hopsy::doc::Model::__init__ = R"pbdoc(
 
 
 const char* hopsy::doc::Model::computeNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use :func:`log_density` instead.
+
 This method is required for  any custom model and should be implemented for any custom models.
 
 Parameters
@@ -75,6 +78,8 @@ Returns
 
 
 const char* hopsy::doc::Model::computeLogLikelihoodGradient = R"pbdoc(
+deprecated:: 1.4
+   Use :func:`grad_log_density` instead.
 For some proposals, the gradient will help converging faster as long as the gradient computation is not too slow.
 If you can not compute a useful or fast enough gradient for your custom model, you can just return a zero vector with the correct dimensionality (number of rows equal to number of parameters).
 
@@ -91,6 +96,56 @@ numpy.ndarray[n, 1]
 
 
 const char* hopsy::doc::Model::computeExpectedFisherInformation = R"pbdoc(
+deprecated:: 1.4
+   Use :func:`hessian` instead.
+For some proposals, the expected fisher information will help converging faster as long as the gradient computation is not too slow.
+If you can not compute a useful or fast enough expected fisher information for your custom model, you can just return a zero matrix with the correct dimensionality (number of rows and cols each equal to number of parameters).
+
+Parameters
+----------
+:param x: Input vector
+:type x: numpy.ndarray[float64[n,1]]
+
+Returns
+-------
+:return: The value of ``model.compute_expected_fisher_information(x)``
+:rtype: numpy.ndarray[float64[n,n]]
+)pbdoc";
+
+
+const char* hopsy::doc::Model::logDensity = R"pbdoc(
+
+This method is required for  any custom model and should be implemented for any custom models.
+
+Parameters
+----------
+:param x: Input vector
+:type x: numpy.ndarray[float64[n,1]]
+
+Returns
+-------
+:return: The value of ``model.log_density(x)``
+:rtype: float
+)pbdoc";
+
+
+const char* hopsy::doc::Model::gradLogDensity = R"pbdoc(
+For some proposals, the gradient will help converging faster as long as the gradient computation is not too slow.
+If you can not compute a useful or fast enough gradient for your custom model, you can just return a zero vector with the correct dimensionality (number of rows equal to number of parameters).
+
+Parameters
+----------
+x : numpy.ndarray[n, 1]
+    Input vector
+
+Returns
+-------
+numpy.ndarray[n, 1]
+    The gradient of the (unnormalized) log_density
+)pbdoc";
+
+
+const char* hopsy::doc::Model::hessian = R"pbdoc(
 For some proposals, the expected fisher information will help converging faster as long as the gradient computation is not too slow.
 If you can not compute a useful or fast enough expected fisher information for your custom model, you can just return a zero matrix with the correct dimensionality (number of rows and cols each equal to number of parameters).
 

@@ -52,8 +52,16 @@ class ModelTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             model.compute_negative_log_likelihood([0, 0])
 
-        self.assertIsNotNone(model.compute_log_likelihood_gradient(model.mean))
-        self.assertIsNotNone(model.compute_expected_fisher_information(model.mean))
+        self.assertIsNotNone(model.log_density(model.mean))
+        self.assertEqual(
+            model.log_density(model.mean),
+            -model.compute_log_likelihood_gradient(model.mean),
+        )
+        self.assertIsNotNone(model.hessian(model.mean))
+        self.assertEqual(
+            model.hessian(model.mean),
+            model.compute_expected_fisher_information(model.mean),
+        )
 
     def test_mixture_properties(self):
         model = Mixture([Gaussian()])
@@ -72,13 +80,13 @@ class ModelTests(unittest.TestCase):
             def __init__(self):
                 Model.__init__(self)
 
-            def compute_negative_log_likelihood(self, x):
+            def log_density(self, x):
                 return 0
 
-            def compute_log_likelihood_gradient(self, x):
+            def grad_log_density(self, x):
                 raise RuntimeError("Method not implemented.")
 
-            def compute_expected_fisher_information(self, x):
+            def hessian(self, x):
                 raise RuntimeError("Method not implemented.")
 
             def __copy__(self):
@@ -95,7 +103,7 @@ class ModelTests(unittest.TestCase):
 
     def test_py_model(self):
         class Uniform:
-            def compute_negative_log_likelihood(self, x):
+            def log_density(self, x):
                 return 0
 
         model = Uniform()
