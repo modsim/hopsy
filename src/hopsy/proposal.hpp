@@ -162,7 +162,7 @@ namespace hopsy {
 			);
         }
 
-        double getStateNegativeLogLikelihood() const override {
+        double getStateNegativeLogLikelihood() override {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				double,
 				ProposalBase,
@@ -171,7 +171,7 @@ namespace hopsy {
 			);
         }
 
-        double getProposalNegativeLogLikelihood() const override {
+        double getProposalNegativeLogLikelihood() override {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				double,
 				ProposalBase,
@@ -187,6 +187,18 @@ namespace hopsy {
                 "has_negative_log_likelihood",
                 hasNegativeLogLikelihood
 			);
+        }
+
+        double getStateLogDensity() const {
+            return -this->getStateNegativeLogLikelihood();
+        }
+
+        double getProposalLogDensity() const {
+            return -this->getProposalNegativeLogLikelihood();
+        }
+
+        bool hasLogDensity() const {
+            return this->hasNegativeLogLikelihood();
         }
 
         //const MatrixType& getA() const override {
@@ -287,31 +299,34 @@ namespace hopsy {
             return pyObj.attr("get_name").cast<std::string>();
         }
 
-        double getStateNegativeLogLikelihood() const override {
-            try {
+        double getStateNegativeLogLikelihood() override {
+            if(hasattr(pyObj, "get_state_negative_log_likelihood")) {
                 return pyObj.attr("get_state_negative_log_likelihood")().cast<double>();
             }
-            catch(...) {
-                return 0;
+            else if(hasattr(pyObj, "state_log_density")) {
+                return pyObj.attr("state_log_density")().cast<double>();
             }
+            return 0;
         }
 
-        double getProposalNegativeLogLikelihood() const override {
-            try {
+        double getProposalNegativeLogLikelihood() override {
+            if(hasattr(pyObj, "get_proposal_negative_log_likelihood")) {
                 return pyObj.attr("get_proposal_negative_log_likelihood")().cast<double>();
             }
-            catch(...) {
-                return 0;
+            else if(hasattr(pyObj, "proposal_log_density")) {
+                return pyObj.attr("proposal_log_density")().cast<double>();
             }
+            return 0;
         }
 
         bool hasNegativeLogLikelihood() const override {
-            try {
+            if(hasattr(pyObj, "has_negative_log_likelihood")) {
                 return pyObj.attr("has_negative_log_likelihood")().cast<double>();
             }
-            catch(...) {
-                return false;
+            else if(hasattr(pyObj, "has_log_density")) {
+                return pyObj.attr("has_log_density")().cast<double>();
             }
+            return false;
         }
 
         const MatrixType& getA() const override {
@@ -399,11 +414,11 @@ namespace hopsy {
             return proposalPtr->getProposalName();
         }
 
-        double getStateNegativeLogLikelihood() const override {
+        double getStateNegativeLogLikelihood() override {
             return proposalPtr->getStateNegativeLogLikelihood();
         }
 
-        double getProposalNegativeLogLikelihood() const override {
+        double getProposalNegativeLogLikelihood() override {
             return proposalPtr->getProposalNegativeLogLikelihood();
         }
 
@@ -539,12 +554,12 @@ namespace hopsy {
             return proposal->getProposalName();
         }
 
-        double getStateNegativeLogLikelihood() const override {
+        double getStateNegativeLogLikelihood() override {
             if (!proposal) throw std::runtime_error(uninitializedMethod("state_negative_log_likelihood"));
             return proposal->getStateNegativeLogLikelihood();
         }
 
-        double getProposalNegativeLogLikelihood() const override {
+        double getProposalNegativeLogLikelihood() override {
             if (!proposal) throw std::runtime_error(uninitializedMethod("proposal_negative_log_likelihood"));
             return proposal->getProposalNegativeLogLikelihood();
         }
@@ -666,6 +681,16 @@ namespace hopsy {
                         Docs::proposalNegativeLogLikelihood)
                 .def_property_readonly("has_negative_log_likelihood", &ProposalType::hasNegativeLogLikelihood,
                         Docs::hasNegativeLogLikelihood)
+                .def_property_readonly("state_log_density", [](ProposalType &self) {
+                            return -self.getStateNegativeLogLikelihood();
+                        },
+                        Docs::stateLogDensity)
+                .def_property_readonly("proposal_log_density", [](ProposalType &self) {
+                            return -self.getProposalNegativeLogLikelihood();
+                        },
+                        Docs::proposalLogDensity)
+                .def_property_readonly("has_log_density", &ProposalType::hasNegativeLogLikelihood,
+                        Docs::hasLogDensity)
                 .def("deepcopy", &ProposalType::copyProposal, Docs::copyProposal)
             ;
         }

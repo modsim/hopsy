@@ -34,5 +34,14 @@
       
          ~Rosenbrock.compute_negative_log_likelihood
       
+      
+         ~Rosenbrock.grad_log_density
+      
+      
+         ~Rosenbrock.hessian
+      
+      
+         ~Rosenbrock.log_density
+      
    
    

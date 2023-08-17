@@ -11,12 +11,15 @@
 
    .. autosummary::
    
+      ~GaussianHitAndRunProposal.has_log_density
       ~GaussianHitAndRunProposal.has_negative_log_likelihood
       ~GaussianHitAndRunProposal.log_acceptance_probability
       ~GaussianHitAndRunProposal.name
       ~GaussianHitAndRunProposal.proposal
+      ~GaussianHitAndRunProposal.proposal_log_density
       ~GaussianHitAndRunProposal.proposal_negative_log_likelihood
       ~GaussianHitAndRunProposal.state
+      ~GaussianHitAndRunProposal.state_log_density
       ~GaussianHitAndRunProposal.state_negative_log_likelihood
       ~GaussianHitAndRunProposal.stepsize
    

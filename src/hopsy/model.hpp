@@ -32,6 +32,18 @@ namespace hopsy {
         /* Inherit the constructors */
         using ModelBase::ModelBase;
 
+        double logDensity(const VectorType &x) {
+            return -this->computeNegativeLogLikelihood(x);
+        }
+
+        std::optional<VectorType> gradLogDensity(const VectorType &x) {
+            return this->compute_log_likelihood_gradient(x);
+        }
+
+        std::optional<MatrixType> hessian(const VectorType &x) {
+            return this->computeExpectedFisherInformation(x);
+        }
+
         double computeNegativeLogLikelihood(const VectorType &x) override {
             PYBIND11_OVERRIDE_PURE_NAME(
                     double,     /* Return type */

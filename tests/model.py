@@ -117,6 +117,29 @@ class ModelTests(unittest.TestCase):
         markovChain = MarkovChain(problem, GaussianProposal)
         state = markovChain.draw(RandomNumberGenerator())
 
+    def test_implementing_derived_model(self):
+        class Uniform:
+            def log_density(self, x):
+                return 0
+
+            def grad_log_density(self, x):
+                raise RuntimeError("Method not implemented.")
+
+            def hessian(self, x):
+                raise RuntimeError("Method not implemented.")
+
+            def __copy__(self):
+                return Uniform()
+
+            def dimension_names(self):
+                # implementation could also return empty list theoretically, but then RJMCMC becomes less useful.
+                return ["x0", "x1"]
+
+        model = Uniform()
+        problem = Problem([[1, 1]], [1], model, starting_point=[0, 0])
+        markovChain = MarkovChain(problem, GaussianProposal)
+        state = markovChain.draw(RandomNumberGenerator())
+
     def test_py_model(self):
         class Uniform:
             def log_density(self, x):

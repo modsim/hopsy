@@ -29,6 +29,24 @@ class MarkovChainTests(unittest.TestCase):
             mc = MarkovChain(problem, proposal)
             self.assertIsInstance(mc.proposal, ProposalType)
 
+    def test_state_log_density(self):
+        model = Gaussian()
+        start = [0, 0]
+        problem = Problem(
+            [[1, 1], [-1, 0], [0, -1]], [1, 0, 0], model, starting_point=start
+        )
+
+        for ProposalType in ProposalTypes:
+            proposal = ProposalType(problem)
+            mc = MarkovChain(problem, proposal)
+            self.assertAlmostEqual(
+                mc.state_log_density, -mc.state_negative_log_likelihood
+            )
+            self.assertAlmostEqual(mc.state_log_density, model.log_density(start))
+            self.assertAlmostEqual(
+                mc.state_negative_log_likelihood, -model.log_density(start)
+            )
+
     def test_empty_proposal_initialization(self):
         problem = Problem(
             [[1, 1], [-1, 0], [0, -1]], [1, 0, 0], Gaussian(), starting_point=[0, 0]

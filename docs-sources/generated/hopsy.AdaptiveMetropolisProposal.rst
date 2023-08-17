@@ -13,12 +13,15 @@
    
       ~AdaptiveMetropolisProposal.boundary_cushion
       ~AdaptiveMetropolisProposal.eps
+      ~AdaptiveMetropolisProposal.has_log_density
       ~AdaptiveMetropolisProposal.has_negative_log_likelihood
       ~AdaptiveMetropolisProposal.log_acceptance_probability
       ~AdaptiveMetropolisProposal.name
       ~AdaptiveMetropolisProposal.proposal
+      ~AdaptiveMetropolisProposal.proposal_log_density
       ~AdaptiveMetropolisProposal.proposal_negative_log_likelihood
       ~AdaptiveMetropolisProposal.state
+      ~AdaptiveMetropolisProposal.state_log_density
       ~AdaptiveMetropolisProposal.state_negative_log_likelihood
       ~AdaptiveMetropolisProposal.warm_up
    
