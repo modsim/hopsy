@@ -243,3 +243,48 @@ class ProposalTests(unittest.TestCase):
         _, samples = sample(mc, rng, 1000)
 
         self.assertFalse(np.isnan(samples).any())
+
+    def test_log_density_of_proposals(self):
+        A = np.array(
+            [
+                [-1.0, 0.0],
+                [0.0, -1.0],
+                [1.0, 0.0],
+                [0.0, 1.0],
+                [1.0, -1.0],
+                [1.0, -1.0],
+                [1.0, -1.0],
+                [1.0, -1.0],
+            ]
+        )
+        b = np.array([[0.0, 0.0, 5.0, 5.0, 0.0, 0.0, 0.0, -0.0]]).T
+        mean = np.array([[0.6, 1.0]]).T
+        cov = np.array([[1, 0.0], [0.0, 1]])
+
+        model = Gaussian(mean, cov)
+        problem = Problem(A, b, model)
+        start = np.array([[1.46446609], [3.53553391]])
+
+        proposal_without_log_density = DikinWalkProposal(problem, starting_point=start)
+        self.assertFalse(proposal_without_log_density.has_log_density)
+        self.assertEqual(proposal_without_log_density.state_log_density, 0)
+        self.assertEqual(proposal_without_log_density.proposal_log_density, 0)
+        self.assertFalse(proposal_without_log_density.has_negative_log_likelihood)
+        self.assertEqual(proposal_without_log_density.state_negative_log_likelihood, 0)
+        self.assertEqual(
+            proposal_without_log_density.proposal_negative_log_likelihood, 0
+        )
+
+        proposal_with_log_density = CSmMALAProposal(problem, starting_point=start)
+        self.assertTrue(proposal_with_log_density.has_log_density)
+        self.assertEqual(
+            proposal_with_log_density.state_log_density, model.log_density(start)
+        )
+        self.assertEqual(proposal_with_log_density.proposal_log_density, 0)
+        self.assertTrue(proposal_with_log_density.has_negative_log_likelihood)
+        self.assertEqual(
+            proposal_with_log_density.state_negative_log_likelihood,
+            -model.log_density(start),
+        )
+        # for fresh proposals the log likelihood is still unitialized at 0
+        self.assertEqual(proposal_with_log_density.proposal_negative_log_likelihood, 0)

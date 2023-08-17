@@ -124,6 +124,10 @@ namespace hopsy {
             return markovChain->getStateNegativeLogLikelihood();
         }
 
+        double getStateLogDensity() {
+            return -markovChain->getStateNegativeLogLikelihood();
+        }
+
         std::any getParameter(const hops::ProposalParameter &parameter) const override {
             return markovChain->getParameter(parameter);
         }
@@ -471,6 +475,10 @@ namespace hopsy {
                               doc::MarkovChain::exchangeAttemptProbability)
                 .def_property_readonly("state_negative_log_likelihood", &MarkovChain::getStateNegativeLogLikelihood,
                                        doc::MarkovChain::stateNegativeLogLikelihood)
+                .def_property_readonly("state_log_density", [](MarkovChain &self) {
+                                           return -self.getStateNegativeLogLikelihood();
+                                       },
+                                       doc::MarkovChain::stateLogDensity)
                 .def(py::pickle([](const MarkovChain &self) {
                                     return py::make_tuple(self.proposal->copyProposal().release(), self.getProblem(), self.getState(),
                                                           self.parallelTemperingSyncRng, self.exchangeAttemptProbability);

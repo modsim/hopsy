@@ -14,9 +14,7 @@
 #include <pybind11/stl.h>
 #include <pybind11/trampoline_self_life_support.h>
 
-#include "../../extern/hops/src/hops/hops.hpp"
-
-#include "hops/Model/Gaussian.hpp"
+#include "hops/hops.hpp"
 #include "misc.hpp"
 
 namespace py = pybind11;
@@ -33,6 +31,18 @@ namespace hopsy {
     public:
         /* Inherit the constructors */
         using ModelBase::ModelBase;
+
+        double logDensity(const VectorType &x) {
+            return -this->computeNegativeLogLikelihood(x);
+        }
+
+        std::optional<VectorType> gradLogDensity(const VectorType &x) {
+            return this->compute_log_likelihood_gradient(x);
+        }
+
+        std::optional<MatrixType> hessian(const VectorType &x) {
+            return this->computeExpectedFisherInformation(x);
+        }
 
         double computeNegativeLogLikelihood(const VectorType &x) override {
             PYBIND11_OVERRIDE_PURE_NAME(
@@ -88,16 +98,38 @@ namespace hopsy {
         PyModel(py::object pyObj) : pyObj(std::move(pyObj)) {};
 
         double computeNegativeLogLikelihood(const VectorType &x) override {
-            return pyObj.attr("compute_negative_log_likelihood")(x).cast<double>();
-        }
+            if(hasattr(pyObj, "log_density")) {
+                return -pyObj.attr("log_density")(x).cast<double>();
+            }
+            else if(hasattr(pyObj, "compute_negative_log_likelihood")) {
+                return pyObj.attr("compute_negative_log_likelihood")(x).cast<double>();
+            }
 
-        std::optional<MatrixType> computeExpectedFisherInformation(const VectorType &x) override {
-            return pyObj.attr("compute_expected_fisher_information")(x).cast<std::optional<MatrixType>>();
+            throw std::runtime_error("Please implement the log_density function for your model");
         }
 
         std::optional<VectorType> computeLogLikelihoodGradient(const VectorType &x) override {
-            return pyObj.attr("compute_log_likelihood_gradient")(x).cast<std::optional<VectorType>>();
+            if (hasattr(pyObj, "grad_log_density")) {
+                return pyObj.attr("grad_log_density")(x).cast<std::optional<VectorType>>();
+            }
+            else if(hasattr(pyObj, "compute_negative_log_likelihood")) {
+                return pyObj.attr("compute_log_likelihood_gradient")(x).cast<std::optional<VectorType>>();
+            }
+
+            return std::nullopt;
         }
+
+        std::optional<MatrixType> computeExpectedFisherInformation(const VectorType &x) override {
+            if(hasattr(pyObj, "hessian")) {
+               return pyObj.attr("hessian")(x).cast<std::optional<MatrixType>>();
+            }
+            else if(hasattr(pyObj, "compute_expected_fisher_information")) {
+               return pyObj.attr("compute_expected_fisher_information")(x).cast<std::optional<MatrixType>>();
+            }
+
+            return std::nullopt;
+        }
+
 
         std::vector<std::string> getDimensionNames() const override {
             try {
@@ -217,6 +249,17 @@ namespace hopsy {
         py::classh<Model, ModelTrampoline<>>(m, "Model",
                                              doc::Model::base)
                 .def(py::init<>(), doc::Model::__init__)
+                .def("log_density", [](Model &self, const VectorType& x)  {
+                         return -self.computeNegativeLogLikelihood(x);
+                     },
+                     doc::Model::logDensity,
+                     py::arg("x"))
+                .def("grad_log_density", &Model::computeLogLikelihoodGradient,
+                     doc::Model::gradLogDensity,
+                     py::arg("x"))
+                .def("hessian", &Model::computeExpectedFisherInformation,
+                     doc::Model::hessian,
+                     py::arg("x"))
                 .def("compute_negative_log_likelihood", &Model::computeNegativeLogLikelihood,
                      doc::Model::computeNegativeLogLikelihood,
                      py::arg("x"))
@@ -283,6 +326,17 @@ namespace hopsy {
                                                                       const std::vector<long> &inactives) {
                     self = Gaussian(self.getMean(), self.getCovariance(), inactives);
                 }, doc::Gaussian::inactives)
+                .def("log_density", [](Model &self, const VectorType& x)  {
+                         return -self.computeNegativeLogLikelihood(x);
+                     },
+                     doc::Model::logDensity,
+                     py::arg("x"))
+                .def("grad_log_density", &Model::computeLogLikelihoodGradient,
+                     doc::Model::computeLogLikelihoodGradient,
+                     py::arg("x"))
+                .def("hessian", &Model::computeExpectedFisherInformation,
+                     doc::Model::computeExpectedFisherInformation,
+                     py::arg("x"))
                 .def("compute_negative_log_likelihood", [](Gaussian &self, const VectorType &x) {
                          if (self.getMean().rows() != self.getCovariance().rows() ||
                              self.getMean().rows() != self.getCovariance().cols()) {
@@ -380,6 +434,17 @@ namespace hopsy {
                                                                   std::vector<double> weights) {
                     self = Mixture(self.getComponents(), weights);
                 }, doc::Mixture::components)
+                .def("log_density", [](Model &self, const VectorType& x)  {
+                         return -self.computeNegativeLogLikelihood(x);
+                     },
+                     doc::Model::logDensity,
+                     py::arg("x"))
+                .def("grad_log_density", &Model::computeLogLikelihoodGradient,
+                     doc::Model::computeLogLikelihoodGradient,
+                     py::arg("x"))
+                .def("hessian", &Model::computeExpectedFisherInformation,
+                     doc::Model::computeExpectedFisherInformation,
+                     py::arg("x"))
                 .def("compute_negative_log_likelihood", &Mixture::computeNegativeLogLikelihood,
                      doc::Mixture::computeNegativeLogLikelihood,
                      py::arg("x"))
@@ -440,6 +505,17 @@ namespace hopsy {
                      doc::PyModel::__init__,
                      py::arg("model"))
                 .def_readwrite("model", &PyModel::pyObj, doc::PyModel::model)
+                .def("log_density", [](Model &self, const VectorType& x)  {
+                         return -self.computeNegativeLogLikelihood(x);
+                     },
+                     doc::Model::logDensity,
+                     py::arg("x"))
+                .def("grad_log_density", &Model::computeLogLikelihoodGradient,
+                     doc::Model::computeLogLikelihoodGradient,
+                     py::arg("x"))
+                .def("hessian", &Model::computeExpectedFisherInformation,
+                     doc::Model::computeExpectedFisherInformation,
+                     py::arg("x"))
                 .def("compute_negative_log_likelihood", &PyModel::computeNegativeLogLikelihood,
                      doc::PyModel::computeNegativeLogLikelihood,
                      py::arg("x"))
@@ -483,6 +559,17 @@ namespace hopsy {
                                                                           VectorType shift) {
                     self = Rosenbrock(self.getScaleParameter(), shift);
                 }, doc::Rosenbrock::shift)
+                .def("log_density", [](Model &self, const VectorType& x)  {
+                         return -self.computeNegativeLogLikelihood(x);
+                     },
+                     doc::Model::logDensity,
+                     py::arg("x"))
+                .def("grad_log_density", &Model::computeLogLikelihoodGradient,
+                     doc::Model::computeLogLikelihoodGradient,
+                     py::arg("x"))
+                .def("hessian", &Model::computeExpectedFisherInformation,
+                     doc::Model::computeExpectedFisherInformation,
+                     py::arg("x"))
                 .def("compute_negative_log_likelihood", &Rosenbrock::computeNegativeLogLikelihood,
                      doc::Rosenbrock::computeNegativeLogLikelihood,
                      py::arg("x"))

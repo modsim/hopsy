@@ -34,5 +34,14 @@
       
          ~Mixture.compute_negative_log_likelihood
       
+      
+         ~Mixture.grad_log_density
+      
+      
+         ~Mixture.hessian
+      
+      
+         ~Mixture.log_density
+      
    
    

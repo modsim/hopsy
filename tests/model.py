@@ -1,6 +1,8 @@
 import pickle
 import unittest
 
+import numpy as np
+
 from hopsy import *
 
 
@@ -50,10 +52,35 @@ class ModelTests(unittest.TestCase):
 
         model = Gaussian(dim=3)
         with self.assertRaises(RuntimeError):
-            model.compute_negative_log_likelihood([0, 0])
+            model.log_density([0, 0])
 
-        self.assertIsNotNone(model.compute_log_likelihood_gradient(model.mean))
-        self.assertIsNotNone(model.compute_expected_fisher_information(model.mean))
+        self.assertIsNotNone(model.log_density(model.mean))
+        self.assertTrue(
+            np.all(
+                np.isclose(
+                    model.log_density(model.mean),
+                    -model.compute_negative_log_likelihood(model.mean),
+                )
+            )
+        )
+        self.assertIsNotNone(model.grad_log_density(model.mean))
+        self.assertTrue(
+            np.all(
+                np.isclose(
+                    model.grad_log_density(model.mean),
+                    model.compute_log_likelihood_gradient(model.mean),
+                )
+            )
+        )
+        self.assertIsNotNone(model.hessian(model.mean))
+        self.assertTrue(
+            np.all(
+                np.isclose(
+                    model.hessian(model.mean),
+                    model.compute_expected_fisher_information(model.mean),
+                )
+            )
+        )
 
     def test_mixture_properties(self):
         model = Mixture([Gaussian()])
@@ -68,17 +95,37 @@ class ModelTests(unittest.TestCase):
         )
 
     def test_implementing_model(self):
-        class Uniform(Model):
-            def __init__(self):
-                Model.__init__(self)
-
-            def compute_negative_log_likelihood(self, x):
+        class Uniform:
+            def log_density(self, x):
                 return 0
 
-            def compute_log_likelihood_gradient(self, x):
+            def grad_log_density(self, x):
                 raise RuntimeError("Method not implemented.")
 
-            def compute_expected_fisher_information(self, x):
+            def hessian(self, x):
+                raise RuntimeError("Method not implemented.")
+
+            def __copy__(self):
+                return Uniform()
+
+            def dimension_names(self):
+                # implementation could also return empty list theoretically, but then RJMCMC becomes less useful.
+                return ["x0", "x1"]
+
+        model = Uniform()
+        problem = Problem([[1, 1]], [1], model, starting_point=[0, 0])
+        markovChain = MarkovChain(problem, GaussianProposal)
+        state = markovChain.draw(RandomNumberGenerator())
+
+    def test_implementing_derived_model(self):
+        class Uniform:
+            def log_density(self, x):
+                return 0
+
+            def grad_log_density(self, x):
+                raise RuntimeError("Method not implemented.")
+
+            def hessian(self, x):
                 raise RuntimeError("Method not implemented.")
 
             def __copy__(self):
@@ -95,7 +142,7 @@ class ModelTests(unittest.TestCase):
 
     def test_py_model(self):
         class Uniform:
-            def compute_negative_log_likelihood(self, x):
+            def log_density(self, x):
                 return 0
 
         model = Uniform()

@@ -28,6 +28,9 @@ namespace hopsy {
         struct Model {
             static const char* base;
             static const char* __init__;
+            static const char* logDensity;
+            static const char* gradLogDensity;
+            static const char* hessian;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -39,6 +42,9 @@ namespace hopsy {
             static const char* mean;
             static const char* covariance;
             static const char* inactives;
+            static const char* logDensity;
+            static const char* gradLogDensity;
+            static const char* hessian;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -47,6 +53,9 @@ namespace hopsy {
         struct GaussianMixtureModel {
             static const char* base;
             static const char* __init__;
+            static const char* logDensity;
+            static const char* gradLogDensity;
+            static const char* hessian;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -57,6 +66,9 @@ namespace hopsy {
             static const char* __init__;
             static const char* components;
             static const char* weights;
+            static const char* logDensity;
+            static const char* gradLogDensity;
+            static const char* hessian;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -65,6 +77,9 @@ namespace hopsy {
         struct MultivariateGaussianModel {
             static const char* base;
             static const char* __init__;
+            static const char* logDensity;
+            static const char* gradLogDensity;
+            static const char* hessian;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -74,6 +89,9 @@ namespace hopsy {
             static const char* base;
             static const char* __init__;
             static const char* model;
+            static const char* logDensity;
+            static const char* gradLogDensity;
+            static const char* hessian;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -84,6 +102,9 @@ namespace hopsy {
             static const char* __init__;
             static const char* scale;
             static const char* shift;
+            static const char* logDensity;
+            static const char* gradLogDensity;
+            static const char* hessian;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -92,6 +113,9 @@ namespace hopsy {
         struct UniformModel {
             static const char* base;
             static const char* __init__;
+            static const char* logDensity;
+            static const char* gradLogDensity;
+            static const char* hessian;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -124,6 +148,9 @@ namespace hopsy {
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
             static const char* hasNegativeLogLikelihood;
+            static const char* stateLogDensity;
+            static const char* proposalLogDensity;
+            static const char* hasLogDensity;
             static const char* copyProposal;
 
             static const char* boundaryCushion;
@@ -148,6 +175,9 @@ namespace hopsy {
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
             static const char* hasNegativeLogLikelihood;
+            static const char* stateLogDensity;
+            static const char* proposalLogDensity;
+            static const char* hasLogDensity;
             static const char* copyProposal;
 
             static const char* boundaryCushion;
@@ -171,6 +201,9 @@ namespace hopsy {
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
             static const char* hasNegativeLogLikelihood;
+            static const char* stateLogDensity;
+            static const char* proposalLogDensity;
+            static const char* hasLogDensity;
             static const char* copyProposal;
 
             static const char* stepSize;
@@ -192,6 +225,9 @@ namespace hopsy {
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
             static const char* hasNegativeLogLikelihood;
+            static const char* stateLogDensity;
+            static const char* proposalLogDensity;
+            static const char* hasLogDensity;
             static const char* copyProposal;
 
             static const char* maxReflections;
@@ -217,6 +253,9 @@ namespace hopsy {
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
             static const char* hasNegativeLogLikelihood;
+            static const char* stateLogDensity;
+            static const char* proposalLogDensity;
+            static const char* hasLogDensity;
             static const char* copyProposal;
 
             static const char* maxReflections;
@@ -239,6 +278,9 @@ namespace hopsy {
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
             static const char* hasNegativeLogLikelihood;
+            static const char* stateLogDensity;
+            static const char* proposalLogDensity;
+            static const char* hasLogDensity;
             static const char* copyProposal;
 
             static const char* fisherWeight;
@@ -261,6 +303,9 @@ namespace hopsy {
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
             static const char* hasNegativeLogLikelihood;
+            static const char* stateLogDensity;
+            static const char* proposalLogDensity;
+            static const char* hasLogDensity;
             static const char* copyProposal;
 
             static const char* boundaryCushion;
@@ -283,6 +328,9 @@ namespace hopsy {
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
             static const char* hasNegativeLogLikelihood;
+            static const char* stateLogDensity;
+            static const char* proposalLogDensity;
+            static const char* hasLogDensity;
             static const char* copyProposal;
 
             static const char* stepSize;
@@ -304,6 +352,9 @@ namespace hopsy {
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
             static const char* hasNegativeLogLikelihood;
+            static const char* stateLogDensity;
+            static const char* proposalLogDensity;
+            static const char* hasLogDensity;
             static const char* copyProposal;
 
             static const char* stepSize;
@@ -325,6 +376,9 @@ namespace hopsy {
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
             static const char* hasNegativeLogLikelihood;
+            static const char* stateLogDensity;
+            static const char* proposalLogDensity;
+            static const char* hasLogDensity;
             static const char* copyProposal;
 
             static const char* stepSize;
@@ -346,6 +400,9 @@ namespace hopsy {
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
             static const char* hasNegativeLogLikelihood;
+            static const char* stateLogDensity;
+            static const char* proposalLogDensity;
+            static const char* hasLogDensity;
             static const char* copyProposal;
         };
 
@@ -365,6 +422,9 @@ namespace hopsy {
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
             static const char* hasNegativeLogLikelihood;
+            static const char* stateLogDensity;
+            static const char* proposalLogDensity;
+            static const char* hasLogDensity;
             static const char* copyProposal;
         };
 
@@ -384,6 +444,9 @@ namespace hopsy {
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
             static const char* hasNegativeLogLikelihood;
+            static const char* stateLogDensity;
+            static const char* proposalLogDensity;
+            static const char* hasLogDensity;
             static const char* copyProposal;
         };
 
@@ -403,6 +466,9 @@ namespace hopsy {
             static const char* stateNegativeLogLikelihood;
             static const char* proposalNegativeLogLikelihood;
             static const char* hasNegativeLogLikelihood;
+            static const char* stateLogDensity;
+            static const char* proposalLogDensity;
+            static const char* hasLogDensity;
             static const char* copyProposal;
         };
 
@@ -414,6 +480,7 @@ namespace hopsy {
             static const char* model;
             static const char* proposal;
             static const char* stateNegativeLogLikelihood;
+            static const char* stateLogDensity;
             static const char* exchangeAttemptProbability;
         };
 
