@@ -35,5 +35,14 @@
       
          ~Gaussian.compute_negative_log_likelihood
       
+      
+         ~Gaussian.grad_log_density
+      
+      
+         ~Gaussian.hessian
+      
+      
+         ~Gaussian.log_density
+      
    
    

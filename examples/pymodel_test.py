@@ -10,18 +10,18 @@ class GaussianModel2:
         self.mu = mu
         self.cov = cov
 
-    def compute_negative_log_likelihood(self, x):
-        return (
+    def log_density(self, x):
+        return -(
             0.5
             * (x.reshape(-1, 1) - self.mu).T
             @ np.linalg.inv(self.cov)
             @ (x.reshape(-1, 1) - self.mu)
         )[0, 0]
 
-    def compute_expected_fisher_information(self, x):
+    def hessian(self, x):
         return np.linalg.inv(self.cov)
 
-    def compute_log_likelihood_gradient(self, x):
+    def grad_log_density(self, x):
         return -np.linalg.inv(self.cov) @ (x - self.mu)
 
 

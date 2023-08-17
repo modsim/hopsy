@@ -59,7 +59,10 @@ const char* hopsy::doc::Model::__init__ = R"pbdoc(
 )pbdoc";
 
 
-const char* hopsy::doc::Model::computeNegativeLogLikelihood = R"pbdoc(
+const char* hopsy::doc::Model::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
+deprecated:: 1.4
+   Use :func:`log_density` instead.
+
 This method is required for  any custom model and should be implemented for any custom models.
 
 Parameters
@@ -74,7 +77,9 @@ Returns
 )pbdoc";
 
 
-const char* hopsy::doc::Model::computeLogLikelihoodGradient = R"pbdoc(
+const char* hopsy::doc::Model::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
+deprecated:: 1.4
+   Use :func:`grad_log_density` instead.
 For some proposals, the gradient will help converging faster as long as the gradient computation is not too slow.
 If you can not compute a useful or fast enough gradient for your custom model, you can just return a zero vector with the correct dimensionality (number of rows equal to number of parameters).
 
@@ -91,6 +96,9 @@ numpy.ndarray[n, 1]
 
 
 const char* hopsy::doc::Model::computeExpectedFisherInformation = R"pbdoc(
+deprecated:: 1.4
+   Use :func:`hessian` instead.
+
 For some proposals, the expected fisher information will help converging faster as long as the gradient computation is not too slow.
 If you can not compute a useful or fast enough expected fisher information for your custom model, you can just return a zero matrix with the correct dimensionality (number of rows and cols each equal to number of parameters).
 
@@ -102,6 +110,56 @@ Parameters
 Returns
 -------
 :return: The value of ``model.compute_expected_fisher_information(x)``
+:rtype: numpy.ndarray[float64[n,n]]
+)pbdoc";
+
+
+const char* hopsy::doc::Model::logDensity = R"pbdoc(log_density(self, x)
+
+This method is required for  any custom model and should be implemented for any custom models.
+
+Parameters
+----------
+:param x: Input vector
+:type x: numpy.ndarray[float64[n,1]]
+
+Returns
+-------
+:return: The value of ``model.log_density(x)``
+:rtype: float
+)pbdoc";
+
+
+const char* hopsy::doc::Model::gradLogDensity = R"pbdoc(grad_log_density(self, x)
+
+For some proposals, the gradient will help converging faster as long as the gradient computation is not too slow.
+If you can not compute a useful or fast enough gradient for your custom model, you can just return a zero vector with the correct dimensionality (number of rows equal to number of parameters).
+
+Parameters
+----------
+x : numpy.ndarray[n, 1]
+    Input vector
+
+Returns
+-------
+numpy.ndarray[n, 1]
+    The gradient of the (unnormalized) log_density
+)pbdoc";
+
+
+const char* hopsy::doc::Model::hessian = R"pbdoc(hessian(self, x)
+
+For some proposals, the expected fisher information will help converging faster as long as the gradient computation is not too slow.
+If you can not compute a useful or fast enough expected fisher information for your custom model, you can just return a zero matrix with the correct dimensionality (number of rows and cols each equal to number of parameters).
+
+Parameters
+----------
+:param x: Input vector
+:type x: numpy.ndarray[float64[n,1]]
+
+Returns
+-------
+:return: The value of ``model.hessian(x)``
 :rtype: numpy.ndarray[float64[n,n]]
 )pbdoc";
 
@@ -179,6 +237,8 @@ List of indices of the inactive dimensions. E.g. ``inactives = [0, 1]`` will ren
 
 
 const char* hopsy::doc::Gaussian::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
+deprecated:: 1.4
+   Use :func:`log_density` instead.
 
 Computes the negative logarithm of the probability density function of a multivariate Gaussian model in
 :math:`m-k` dimensions at ``x``. Note that `x` still has to have dimension :math:`n`.
@@ -197,6 +257,8 @@ float
 
 
 const char* hopsy::doc::Gaussian::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
+deprecated:: 1.4
+   Use :func:`grad_log_density` instead.
 
 Computes the gradient of the logarithm of the probability density function of a multivariate Gaussian
 model in :math:`n-k` dimensions at ``x``. Note that `x` still has to have dimension :math:`n`.
@@ -215,6 +277,8 @@ numpy.ndarray[n, 1]
 
 
 const char* hopsy::doc::Gaussian::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
+deprecated:: 1.4
+   Use :func:`hessian` instead.
 
 Computes the expected fisher information of a multivariate Gaussian model
 in :math:`n-k` dimensions at ``x``. This turns out to be just the reduced covariance matrix.
@@ -232,6 +296,59 @@ numpy.narray[n, n]
 
 )pbdoc";
 
+const char* hopsy::doc::Gaussian::logDensity = R"pbdoc(log_density(self, x)
+
+Computes the probability density function of a multivariate Gaussian model in
+:math:`m-k` dimensions at ``x``. Note that `x` still has to have dimension :math:`n`.
+
+Parameters
+----------
+x : numpy.ndarray[n, 1]
+    Input vector
+
+Returns
+-------
+float
+    The (unnormalized) density
+
+)pbdoc";
+
+
+
+const char* hopsy::doc::Gaussian::gradLogDensity = R"pbdoc(grad_log_density(self, x)
+
+Computes the gradient of the logarithm of the probability density function of a multivariate Gaussian
+model in :math:`n-k` dimensions at ``x``. Note that `x` still has to have dimension :math:`n`.
+
+Parameters
+----------
+x : numpy.ndarray[n, 1]
+    Input vector
+
+Returns
+-------
+numpy.ndarray[n, 1]
+    The gradient of the (unnormalized) log_density
+
+)pbdoc";
+
+
+const char* hopsy::doc::Gaussian::hessian = R"pbdoc(hessian(self, x)
+
+Computes the expected fisher information of a multivariate Gaussian model
+in :math:`n-k` dimensions at ``x``. This turns out to be just the reduced covariance matrix.
+Note that `x` still has to have dimension :math:`n`.
+
+Parameters
+----------
+x : numpy.ndarray[n, 1]
+    Input vector
+
+Returns
+-------
+numpy.narray[n, n]
+    The expected Fisher information matrix, which we call hessian in this context.
+)pbdoc";
 
 
 /*
@@ -284,6 +401,8 @@ weights : list[float]
 
 
 const char* hopsy::doc::Mixture::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
+deprecated:: 1.4
+   Use :func:`log_density` instead.
 
 Computes the negative logarithm of the weighted sum of the probability density functions of the model
 components
@@ -305,6 +424,8 @@ float
 
 
 const char* hopsy::doc::Mixture::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
+deprecated:: 1.4
+   Use :func:`grad_log_density` instead.
 
 Computes the gradient of the logarithm of the weighted sum of the probability density functions of the model
 components
@@ -325,9 +446,69 @@ numpy.ndarray[n, 1]
 
 
 const char* hopsy::doc::Mixture::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
+deprecated:: 1.4
+   Use :func:`hessian` instead.
 
 This method is not implemented, as there exists no closed-form solution to
 computing the expected Fisher information of a general mixture model.
+
+Parameters
+----------
+x : numpy.ndarray[n, 1]
+    Input vector
+
+Returns
+-------
+None
+
+)pbdoc";
+
+
+const char* hopsy::doc::Mixture::logDensity = R"pbdoc(log_density(self, x)
+
+Computes the log probability density of the model
+components
+
+.. math::
+  \log f(x) = \log \sum_{i=1}^n w_i f_i(x).
+
+Parameters
+----------
+x : numpy.ndarray[n, 1]
+    Input vector
+
+Returns
+-------
+float
+    The (unnormalized) log_density
+
+)pbdoc";
+
+
+const char* hopsy::doc::Mixture::gradLogDensity = R"pbdoc(grad_log_density(self, x)
+
+Computes the gradient of the logarithm of the weighted sum of the probability density functions of the model
+components
+
+.. math::
+  \nabla \log f(x) = \nabla \log \sum_{i=1}^n w_i f_i(x).
+
+Parameters
+----------
+x : numpy.ndarray[n, 1]
+    Input vector
+
+Returns
+-------
+numpy.ndarray[n, 1]
+    The gradient of the (unnormalized) log_density
+)pbdoc";
+
+
+const char* hopsy::doc::Mixture::hessian = R"pbdoc(hessian(self, x)
+
+This method is not implemented, as there exists no closed-form solution to
+computing the hessian (typically defined as the expected Fisher information) of a general mixture model.
 
 Parameters
 ----------
@@ -375,6 +556,8 @@ The wrapped user-defined model.
 
 
 const char* hopsy::doc::PyModel::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
+deprecated:: 1.4
+   Use :func:`log_density` instead.
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[n,1]]
@@ -385,6 +568,8 @@ const char* hopsy::doc::PyModel::computeNegativeLogLikelihood = R"pbdoc(compute_
 
 
 const char* hopsy::doc::PyModel::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
+deprecated:: 1.4
+   Use :func:`grad_log_density` instead.
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[n,1]]
@@ -395,11 +580,43 @@ const char* hopsy::doc::PyModel::computeLogLikelihoodGradient = R"pbdoc(compute_
 
 
 const char* hopsy::doc::PyModel::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
+deprecated:: 1.4
+   Use :func:`hessian` instead.
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[n,1]]
 
 :return: The value of ``model.compute_expected_fisher_information(x)``
+:rtype: numpy.ndarray[float64[n,n]]
+)pbdoc";
+
+
+const char* hopsy::doc::PyModel::logDensity = R"pbdoc(log_density(self, x)
+
+:param x: Input vector
+:type x: numpy.ndarray[float64[n,1]]
+
+:return: The value of ``model.log_density(x)``
+:rtype: float
+)pbdoc";
+
+
+const char* hopsy::doc::PyModel::gradLogDensity = R"pbdoc(grad_log_density(self, x)
+
+:param x: Input vector
+:type x: numpy.ndarray[float64[n,1]]
+
+:return: The value of ``model.grad_log_density(x)``
+:rtype: numpy.ndarray[float64[n,1]]
+)pbdoc";
+
+
+const char* hopsy::doc::PyModel::hessian = R"pbdoc(hessian(self, x)
+
+:param x: Input vector
+:type x: numpy.ndarray[float64[n,1]]
+
+:return: The value of ``model.hessian(x)``
 :rtype: numpy.ndarray[float64[n,n]]
 )pbdoc";
 
@@ -438,6 +655,8 @@ const char* hopsy::doc::Rosenbrock::shift = R"pbdoc(
 
 
 const char* hopsy::doc::Rosenbrock::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
+deprecated:: 1.4
+   Use :func:`log_density` instead.
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[2n,1]]
@@ -448,6 +667,8 @@ const char* hopsy::doc::Rosenbrock::computeNegativeLogLikelihood = R"pbdoc(compu
 
 
 const char* hopsy::doc::Rosenbrock::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
+deprecated:: 1.4
+   Use :func:`grad_log_density` instead.
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[2n,1]]
@@ -458,11 +679,43 @@ const char* hopsy::doc::Rosenbrock::computeLogLikelihoodGradient = R"pbdoc(compu
 
 
 const char* hopsy::doc::Rosenbrock::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
+deprecated:: 1.4
+   Use :func:`hessian` instead.
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[2n,1]]
 
 :return: The expected Fisher information matrix
+:rtype: numpy.ndarray[float64[2n,2n]]
+)pbdoc";
+
+
+const char* hopsy::doc::Rosenbrock::logDensity = R"pbdoc(log_density(self, x)
+
+:param x: Input vector
+:type x: numpy.ndarray[float64[2n,1]]
+
+:return: The (unnormalized) log_density
+:rtype: float
+)pbdoc";
+
+
+const char* hopsy::doc::Rosenbrock::gradLogDensity = R"pbdoc(grad_log_density(self, x)
+
+:param x: Input vector
+:type x: numpy.ndarray[float64[2n,1]]
+
+:return: The gradient of the (unnormalized) log_density
+:rtype: numpy.ndarray[float64[2n,1]]
+)pbdoc";
+
+
+const char* hopsy::doc::Rosenbrock::hessian = R"pbdoc(hessian(self, x)
+
+:param x: Input vector
+:type x: numpy.ndarray[float64[2n,1]]
+
+:return: The hessian (in this case the expected Fisher information matrix)
 :rtype: numpy.ndarray[float64[2n,2n]]
 )pbdoc";
 
@@ -500,6 +753,8 @@ const char* hopsy::doc::UniformModel::__init__ = R"pbdoc(__init__(self)
 
 
 const char* hopsy::doc::UniformModel::computeNegativeLogLikelihood = R"pbdoc(compute_negative_log_likelihood(self, x)
+deprecated:: 1.4
+   Use :func:`log_density` instead.
 
 The negative log-likelihood for the uniform model is the unknown constant :math:`\frac{1}{Z}`,
 which depends on the volume of the support of the density. The volume is further only well-defined in
@@ -519,6 +774,8 @@ an exception, when being called.**
 
 
 const char* hopsy::doc::UniformModel::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
+deprecated:: 1.4
+   Use :func:`grad_log_density` instead.
 
 For similar reasons as with the ``compute_negative_log_likelihod``, this function **will always throw
 an exception, when being called.**
@@ -534,6 +791,8 @@ an exception, when being called.**
 
 
 const char* hopsy::doc::UniformModel::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
+deprecated:: 1.4
+   Use :func:`hessian` instead.
 
 For similar reasons as with the ``compute_negative_log_likelihod``, this function **will always throw
 an exception, when being called.**
@@ -546,6 +805,56 @@ an exception, when being called.**
 
 :raises RuntimeError: always
 )pbdoc";
+
+
+const char* hopsy::doc::UniformModel::logDensity = R"pbdoc(log_density(self, x)
+
+The log density for the uniform model is the unknown constant :math:`\frac{1}{Z}`,
+which depends on the volume of the support of the density. The volume is further only well-defined in
+dependence of the polytope, which is not known to the ``hopsy.UniformModel``.
+In the Metropolis-Hastings algorithm, this constant cancels out and is not needed for computing the
+acceptance rate. Thus, this function is only available for technical reasons and **will always throw
+an exception, when being called.**
+
+:param x: Input vector
+:type x: numpy.ndarray[float64[n,1]]
+
+:return: The (unnormalized) log density
+:rtype: float
+
+:raises RuntimeError: always
+)pbdoc";
+
+
+const char* hopsy::doc::UniformModel::gradLogDensity = R"pbdoc(grad_log_density(self, x)
+
+For similar reasons as with the ``log_density``, this function **will always throw
+an exception, when being called.**
+
+:param x: Input vector
+:type x: numpy.ndarray[float64[n,1]]
+
+:return: The gradient of the (unnormalized) log_density
+:rtype: numpy.ndarray[float64[n,1]]
+
+:raises RuntimeError: always
+)pbdoc";
+
+
+const char* hopsy::doc::UniformModel::hessian = R"pbdoc(hessian(self, x)
+
+For similar reasons as with the ``log_density``, this function **will always throw
+an exception, when being called.**
+
+:param x: Input vector
+:type x: numpy.ndarray[float64[n,1]]
+
+:return: The hessian
+:rtype: numpy.ndarray[float64[n,n]]
+
+:raises RuntimeError: always
+)pbdoc";
+
 
 
 
@@ -649,14 +958,52 @@ const char* hopsy::doc::Proposal::name = R"pbdoc(
 
 
 const char* hopsy::doc::Proposal::stateNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`state_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::Proposal::proposalNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`proposal_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::Proposal::hasNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use :attr:`has_log_density` instead.
+)pbdoc";
+
+const char* hopsy::doc::Proposal::stateLogDensity = R"pbdoc(state_log_density()
+
+Returns the log density of the current state of the proposal.
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::Proposal::proposalLogDensity = R"pbdoc(proposal_log_density()
+Returns the log density of the proposal. If no proposal has been porposed, it returns 0
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::Proposal::hasLogDensity = R"pbdoc(has_log_density()
+
+Returns whether the proposal knows about the log density or not.
+Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+
+Returns
+-------
+bool
+    whether proposal knows log density
 )pbdoc";
 
 
@@ -710,14 +1057,52 @@ const char* hopsy::doc::AdaptiveMetropolisProposal::name = R"pbdoc(
 
 
 const char* hopsy::doc::AdaptiveMetropolisProposal::stateNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`state_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::AdaptiveMetropolisProposal::proposalNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`proposal_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::AdaptiveMetropolisProposal::hasNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use :attr:`has_log_density` instead.
+)pbdoc";
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::stateLogDensity = R"pbdoc(state_log_density()
+
+Returns the log density of the current state of the proposal.
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::proposalLogDensity = R"pbdoc(proposal_log_density()
+Returns the log density of the proposal. If no proposal has been porposed, it returns 0
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::AdaptiveMetropolisProposal::hasLogDensity = R"pbdoc(has_log_density()
+
+Returns whether the proposal knows about the log density or not.
+Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+
+Returns
+-------
+bool
+    whether proposal knows log density
 )pbdoc";
 
 
@@ -782,14 +1167,52 @@ const char* hopsy::doc::BilliardAdaptiveMetropolisProposal::name = R"pbdoc(
 
 
 const char* hopsy::doc::BilliardAdaptiveMetropolisProposal::stateNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`state_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::BilliardAdaptiveMetropolisProposal::proposalNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`proposal_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::BilliardAdaptiveMetropolisProposal::hasNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use :attr:`has_log_density` instead.
+)pbdoc";
+
+const char* hopsy::doc::BilliardAdaptiveMetropolisProposal::stateLogDensity = R"pbdoc(state_log_density()
+
+Returns the log density of the current state of the proposal.
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardAdaptiveMetropolisProposal::proposalLogDensity = R"pbdoc(proposal_log_density()
+Returns the log density of the proposal. If no proposal has been porposed, it returns 0
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardAdaptiveMetropolisProposal::hasLogDensity = R"pbdoc(has_log_density()
+
+Returns whether the proposal knows about the log density or not.
+Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+
+Returns
+-------
+bool
+    whether proposal knows log density
 )pbdoc";
 
 
@@ -858,16 +1281,53 @@ const char* hopsy::doc::BallWalkProposal::name = R"pbdoc(
 
 
 const char* hopsy::doc::BallWalkProposal::stateNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`state_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::BallWalkProposal::proposalNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`proposal_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::BallWalkProposal::hasNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use :attr:`has_log_density` instead.
 )pbdoc";
 
+const char* hopsy::doc::BallWalkProposal::stateLogDensity = R"pbdoc(state_log_density()
+
+Returns the log density of the current state of the proposal.
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::BallWalkProposal::proposalLogDensity = R"pbdoc(proposal_log_density()
+Returns the log density of the proposal. If no proposal has been porposed, it returns 0
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::BallWalkProposal::hasLogDensity = R"pbdoc(has_log_density()
+
+Returns whether the proposal knows about the log density or not.
+Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+
+Returns
+-------
+bool
+    whether proposal knows log density
+)pbdoc";
 
 const char* hopsy::doc::BallWalkProposal::copyProposal = R"pbdoc(
 )pbdoc";
@@ -922,16 +1382,53 @@ const char* hopsy::doc::BilliardMALAProposal::name = R"pbdoc(
 
 
 const char* hopsy::doc::BilliardMALAProposal::stateNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`state_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::BilliardMALAProposal::proposalNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`proposal_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::BilliardMALAProposal::hasNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use :attr:`has_log_density` instead.
 )pbdoc";
 
+const char* hopsy::doc::BilliardMALAProposal::stateLogDensity = R"pbdoc(state_log_density()
+
+Returns the log density of the current state of the proposal.
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardMALAProposal::proposalLogDensity = R"pbdoc(proposal_log_density()
+Returns the log density of the proposal. If no proposal has been porposed, it returns 0
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardMALAProposal::hasLogDensity = R"pbdoc(has_log_density()
+
+Returns whether the proposal knows about the log density or not.
+Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+
+Returns
+-------
+bool
+    whether proposal knows log density
+)pbdoc";
 
 const char* hopsy::doc::BilliardMALAProposal::copyProposal = R"pbdoc(
 )pbdoc";
@@ -989,16 +1486,53 @@ const char* hopsy::doc::CSmMALAProposal::name = R"pbdoc(
 
 
 const char* hopsy::doc::CSmMALAProposal::stateNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`state_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::CSmMALAProposal::proposalNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`proposal_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::CSmMALAProposal::hasNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use :attr:`has_log_density` instead.
 )pbdoc";
 
+const char* hopsy::doc::CSmMALAProposal::stateLogDensity = R"pbdoc(state_log_density()
+
+Returns the log density of the current state of the proposal.
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::CSmMALAProposal::proposalLogDensity = R"pbdoc(proposal_log_density()
+Returns the log density of the proposal. If no proposal has been porposed, it returns 0
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::CSmMALAProposal::hasLogDensity = R"pbdoc(has_log_density()
+
+Returns whether the proposal knows about the log density or not.
+Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+
+Returns
+-------
+bool
+    whether proposal knows log density
+)pbdoc";
 
 const char* hopsy::doc::CSmMALAProposal::copyProposal = R"pbdoc(
 )pbdoc";
@@ -1058,16 +1592,53 @@ const char* hopsy::doc::DikinWalkProposal::name = R"pbdoc(
 
 
 const char* hopsy::doc::DikinWalkProposal::stateNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`state_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::DikinWalkProposal::proposalNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`proposal_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::DikinWalkProposal::hasNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use :attr:`has_log_density` instead.
 )pbdoc";
 
+const char* hopsy::doc::DikinWalkProposal::stateLogDensity = R"pbdoc(state_log_density()
+
+Returns the log density of the current state of the proposal.
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::DikinWalkProposal::proposalLogDensity = R"pbdoc(proposal_log_density()
+Returns the log density of the proposal. If no proposal has been porposed, it returns 0
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::DikinWalkProposal::hasLogDensity = R"pbdoc(has_log_density()
+
+Returns whether the proposal knows about the log density or not.
+Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+
+Returns
+-------
+bool
+    whether proposal knows log density
+)pbdoc";
 
 const char* hopsy::doc::DikinWalkProposal::copyProposal = R"pbdoc(
 )pbdoc";
@@ -1128,16 +1699,53 @@ const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::name = R"pbdoc(
 
 
 const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::stateNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`state_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::proposalNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`proposal_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::hasNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use :attr:`has_log_density` instead.
 )pbdoc";
 
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::stateLogDensity = R"pbdoc(state_log_density()
+
+Returns the log density of the current state of the proposal.
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::proposalLogDensity = R"pbdoc(proposal_log_density()
+Returns the log density of the proposal. If no proposal has been porposed, it returns 0
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::hasLogDensity = R"pbdoc(has_log_density()
+
+Returns whether the proposal knows about the log density or not.
+Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+
+Returns
+-------
+bool
+    whether proposal knows log density
+)pbdoc";
 
 const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::copyProposal = R"pbdoc(
 )pbdoc";
@@ -1193,16 +1801,53 @@ const char* hopsy::doc::GaussianHitAndRunProposal::name = R"pbdoc(
 
 
 const char* hopsy::doc::GaussianHitAndRunProposal::stateNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`state_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::GaussianHitAndRunProposal::proposalNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`proposal_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::GaussianHitAndRunProposal::hasNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use :attr:`has_log_density` instead.
 )pbdoc";
 
+const char* hopsy::doc::GaussianHitAndRunProposal::stateLogDensity = R"pbdoc(state_log_density()
+
+Returns the log density of the current state of the proposal.
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianHitAndRunProposal::proposalLogDensity = R"pbdoc(proposal_log_density()
+Returns the log density of the proposal. If no proposal has been porposed, it returns 0
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianHitAndRunProposal::hasLogDensity = R"pbdoc(has_log_density()
+
+Returns whether the proposal knows about the log density or not.
+Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+
+Returns
+-------
+bool
+    whether proposal knows log density
+)pbdoc";
 
 const char* hopsy::doc::GaussianHitAndRunProposal::copyProposal = R"pbdoc(
 )pbdoc";
@@ -1258,16 +1903,53 @@ const char* hopsy::doc::GaussianProposal::name = R"pbdoc(
 
 
 const char* hopsy::doc::GaussianProposal::stateNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`state_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::GaussianProposal::proposalNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`proposal_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::GaussianProposal::hasNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use :attr:`has_log_density` instead.
 )pbdoc";
 
+const char* hopsy::doc::GaussianProposal::stateLogDensity = R"pbdoc(state_log_density()
+
+Returns the log density of the current state of the proposal.
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianProposal::proposalLogDensity = R"pbdoc(proposal_log_density()
+Returns the log density of the proposal. If no proposal has been porposed, it returns 0
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::GaussianProposal::hasLogDensity = R"pbdoc(has_log_density()
+
+Returns whether the proposal knows about the log density or not.
+Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+
+Returns
+-------
+bool
+    whether proposal knows log density
+)pbdoc";
 
 const char* hopsy::doc::GaussianProposal::copyProposal = R"pbdoc(
 )pbdoc";
@@ -1323,16 +2005,53 @@ const char* hopsy::doc::PyProposal::name = R"pbdoc(
 
 
 const char* hopsy::doc::PyProposal::stateNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`state_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::PyProposal::proposalNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`proposal_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::PyProposal::hasNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use :attr:`has_log_density` instead.
 )pbdoc";
 
+const char* hopsy::doc::PyProposal::stateLogDensity = R"pbdoc(state_log_density()
+
+Returns the log density of the current state of the proposal.
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::PyProposal::proposalLogDensity = R"pbdoc(proposal_log_density()
+Returns the log density of the proposal. If no proposal has been porposed, it returns 0
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::PyProposal::hasLogDensity = R"pbdoc(has_log_density()
+
+Returns whether the proposal knows about the log density or not.
+Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+
+Returns
+-------
+bool
+    whether proposal knows log density
+)pbdoc";
 
 const char* hopsy::doc::PyProposal::copyProposal = R"pbdoc(
 )pbdoc";
@@ -1382,16 +2101,53 @@ const char* hopsy::doc::TruncatedGaussianProposal::name = R"pbdoc(
 
 
 const char* hopsy::doc::TruncatedGaussianProposal::stateNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`state_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::TruncatedGaussianProposal::proposalNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`proposal_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::TruncatedGaussianProposal::hasNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use :attr:`has_log_density` instead.
 )pbdoc";
 
+const char* hopsy::doc::TruncatedGaussianProposal::stateLogDensity = R"pbdoc(state_log_density()
+
+Returns the log density of the current state of the proposal.
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::TruncatedGaussianProposal::proposalLogDensity = R"pbdoc(proposal_log_density()
+Returns the log density of the proposal. If no proposal has been porposed, it returns 0
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::TruncatedGaussianProposal::hasLogDensity = R"pbdoc(has_log_density()
+
+Returns whether the proposal knows about the log density or not.
+Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+
+Returns
+-------
+bool
+    whether proposal knows log density
+)pbdoc";
 
 const char* hopsy::doc::TruncatedGaussianProposal::copyProposal = R"pbdoc(
 )pbdoc";
@@ -1442,16 +2198,53 @@ const char* hopsy::doc::UniformCoordinateHitAndRunProposal::name = R"pbdoc(
 
 
 const char* hopsy::doc::UniformCoordinateHitAndRunProposal::stateNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`state_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::UniformCoordinateHitAndRunProposal::proposalNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`proposal_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::UniformCoordinateHitAndRunProposal::hasNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use :attr:`has_log_density` instead.
 )pbdoc";
 
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::stateLogDensity = R"pbdoc(state_log_density()
+
+Returns the log density of the current state of the proposal.
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::proposalLogDensity = R"pbdoc(proposal_log_density()
+Returns the log density of the proposal. If no proposal has been porposed, it returns 0
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::UniformCoordinateHitAndRunProposal::hasLogDensity = R"pbdoc(has_log_density()
+
+Returns whether the proposal knows about the log density or not.
+Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+
+Returns
+-------
+bool
+    whether proposal knows log density
+)pbdoc";
 
 const char* hopsy::doc::UniformCoordinateHitAndRunProposal::copyProposal = R"pbdoc(
 )pbdoc";
@@ -1503,16 +2296,53 @@ const char* hopsy::doc::UniformHitAndRunProposal::name = R"pbdoc(
 
 
 const char* hopsy::doc::UniformHitAndRunProposal::stateNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`state_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::UniformHitAndRunProposal::proposalNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`proposal_log_density` instead.
 )pbdoc";
 
 
 const char* hopsy::doc::UniformHitAndRunProposal::hasNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use :attr:`has_log_density` instead.
 )pbdoc";
 
+const char* hopsy::doc::UniformHitAndRunProposal::stateLogDensity = R"pbdoc(state_log_density()
+
+Returns the log density of the current state of the proposal.
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::UniformHitAndRunProposal::proposalLogDensity = R"pbdoc(proposal_log_density()
+Returns the log density of the proposal. If no proposal has been porposed, it returns 0
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::UniformHitAndRunProposal::hasLogDensity = R"pbdoc(has_log_density()
+
+Returns whether the proposal knows about the log density or not.
+Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+
+Returns
+-------
+bool
+    whether proposal knows log density
+)pbdoc";
 
 const char* hopsy::doc::UniformHitAndRunProposal::copyProposal = R"pbdoc(
 )pbdoc";
@@ -1569,6 +2399,17 @@ const char* hopsy::doc::MarkovChain::proposal = R"pbdoc(
 
 
 const char* hopsy::doc::MarkovChain::stateNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`state_log_density` instead.
+)pbdoc";
+
+const char* hopsy::doc::MarkovChain::stateLogDensity = R"pbdoc(state_log_density()
+Returns the log density of the current state of the markov chain.
+
+Returns
+-------
+float
+    the log density
 )pbdoc";
 
 
