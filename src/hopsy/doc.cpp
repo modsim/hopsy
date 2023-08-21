@@ -1441,6 +1441,110 @@ const char* hopsy::doc::BilliardMALAProposal::maxReflections = R"pbdoc(
 const char* hopsy::doc::BilliardMALAProposal::stepSize = R"pbdoc(
 )pbdoc";
 
+const char* hopsy::doc::BilliardWalkProposal::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardWalkProposal::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardWalkProposal::propose = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardWalkProposal::acceptProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardWalkProposal::logAcceptanceProbability = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardWalkProposal::proposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardWalkProposal::state = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardWalkProposal::getParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardWalkProposal::setParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardWalkProposal::getStepSize = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardWalkProposal::name = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardWalkProposal::stateNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`state_log_density` instead.
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardWalkProposal::proposalNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`proposal_log_density` instead.
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardWalkProposal::hasNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use :attr:`has_log_density` instead.
+)pbdoc";
+
+const char* hopsy::doc::BilliardWalkProposal::stateLogDensity = R"pbdoc(state_log_density()
+
+Returns the log density of the current state of the proposal.
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardWalkProposal::proposalLogDensity = R"pbdoc(proposal_log_density()
+Returns the log density of the proposal. If no proposal has been porposed, it returns 0
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardWalkProposal::hasLogDensity = R"pbdoc(has_log_density()
+
+Returns whether the proposal knows about the log density or not.
+Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+
+Returns
+-------
+bool
+    whether proposal knows log density
+)pbdoc";
+
+const char* hopsy::doc::BilliardWalkProposal::copyProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardWalkProposal::maxReflections = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::BilliardWalkProposal::stepSize = R"pbdoc(
+)pbdoc";
+
 const char* hopsy::doc::CSmMALAProposal::base = R"pbdoc(
 )pbdoc";
 

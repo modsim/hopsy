@@ -10,6 +10,7 @@ ProposalTypes = [
     BilliardAdaptiveMetropolisProposal,
     BallWalkProposal,
     BilliardMALAProposal,
+    BilliardWalkProposal,
     CSmMALAProposal,
     DikinWalkProposal,
     GaussianCoordinateHitAndRunProposal,
@@ -183,6 +184,7 @@ class ProposalTests(unittest.TestCase):
                 )
                 # checks sample std is close to real std of 1
                 self.assertTrue(np.abs(np.std(samples, ddof=1) - true_std) < 1e-1)
+                pass
 
     def test_gaussian_sampling_shifted(self):
         model = Gaussian(np.ones(1) * 5, 0.25 * np.identity(1))
