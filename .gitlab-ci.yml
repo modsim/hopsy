@@ -28,7 +28,7 @@ build-release:
     - /opt/python/cp310-cp310/bin/python .check_version.py
     - git rev-parse --short HEAD > .commit
     - /opt/python/$PYTHON_VERSION/bin/pip wheel --no-deps . -w dist; done
-    - VERSION=$(cat .version); auditwheel repair dist/hopsy-$VERSION-$PY-* -w dist; done
+    - VERSION=$(cat .version); auditwheel repair dist/hopsy-$VERSION-$PY-* -w dist;
   artifacts:
     paths:
       - dist/*manylinux*
