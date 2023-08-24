@@ -722,7 +722,6 @@ namespace hopsy {
                 .def_property_readonly("log_acceptance_probability", &ProposalType::computeLogAcceptanceProbability, Docs::logAcceptanceProbability)
                 .def_property_readonly("proposal", &ProposalType::getProposal, Docs::proposal)
                 .def_property("state", &ProposalType::getState, &ProposalType::setState, Docs::state)
-                .def_property("stepsize", &ProposalType::getStepSize, &ProposalType::setStepSize, Docs::state)
                 .def("_get_parameter", [] (const ProposalType& self,
                                            const ProposalParameter& parameter) {
                             return std::any_cast<double>(self.getParameter(parameter));

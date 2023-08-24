@@ -98,6 +98,7 @@ class ProposalTests(unittest.TestCase):
                 self.assertEqual(proposal.fisher_weight, 1.0e-2)
 
             if hasattr(proposal, "stepsize"):
+                print(ProposalType)
                 proposal = ProposalType(problem, stepsize=1.0e3)
                 self.assertEqual(proposal.stepsize, 1.0e3)
 
