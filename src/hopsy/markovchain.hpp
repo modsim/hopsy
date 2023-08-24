@@ -140,11 +140,9 @@ namespace hopsy {
             if (proposal) {
                 std::shared_ptr <PyProposal> pyProposalPtr = std::dynamic_pointer_cast<PyProposal>(proposal);
                 if (pyProposalPtr) {
-                    std::cout << "c++ returning  pyObj" << std::endl;
                     return pyProposalPtr;
                     }
             }
-            std::cout << "c++ returning proposal pointer" << std::endl;
             return proposal;
         }
 
