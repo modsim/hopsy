@@ -2,6 +2,9 @@
 
 ## Last Changes
 
+- [#87](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/87): Reduce boilerplate for custom pyproposals
+- [#71](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/71): Rename functions and deprecate old variants
+
 ## v1.3.1
 - [#85](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/85): Fix release for Python 3.10 and Python 3.11 windows
 

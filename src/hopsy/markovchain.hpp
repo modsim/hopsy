@@ -136,17 +136,16 @@ namespace hopsy {
             return markovChain->setParameter(parameter, value);
         }
 
-        std::variant <std::shared_ptr<Proposal>, py::object> getProposal() {
+        std::variant <std::shared_ptr<Proposal>, std::shared_ptr<PyProposal>> getProposal() {
             if (proposal) {
                 std::shared_ptr <PyProposal> pyProposalPtr = std::dynamic_pointer_cast<PyProposal>(proposal);
                 if (pyProposalPtr) {
-                    return pyProposalPtr->pyObj;
-                } else {
-                    return proposal;
-                }
-            } else {
-                return nullptr;
+                    std::cout << "c++ returning  pyObj" << std::endl;
+                    return pyProposalPtr;
+                    }
             }
+            std::cout << "c++ returning proposal pointer" << std::endl;
+            return proposal;
         }
 
         void setProposal(std::variant<Proposal *, py::object> proposal) {
@@ -467,8 +466,7 @@ namespace hopsy {
                      py::arg("thinning") = 1)
                 .def_property("state", &MarkovChain::getState, &MarkovChain::setState, doc::MarkovChain::state)
                 .def_property("model", &MarkovChain::getModel, &MarkovChain::setModel, doc::MarkovChain::model)
-                .def_property("proposal", &MarkovChain::getProposal, &MarkovChain::setProposal,
-                              doc::MarkovChain::proposal)
+                .def_property("proposal", &MarkovChain::getProposal, &MarkovChain::setProposal, doc::MarkovChain::proposal)
                 .def_readwrite("parallelTemperingSyncRng", &MarkovChain::parallelTemperingSyncRng)
                 .def_property("exchangeAttemptProbability", &MarkovChain::getExchangeAttemptProbability,
                               &MarkovChain::setExchangeAttemptProbability,

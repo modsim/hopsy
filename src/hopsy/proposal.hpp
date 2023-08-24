@@ -241,7 +241,13 @@ namespace hopsy {
         }
 
         VectorType& acceptProposal() override {
-            state = pyObj.attr("accept_proposal")().cast<VectorType>();
+            if(hasattr(pyObj, "accept_proposal")) {
+                state = pyObj.attr("accept_proposal")().cast<VectorType>();
+            }
+            else {
+                // default implementation
+                state.swap(proposal);
+            }
             return state;
         }
 
@@ -250,15 +256,27 @@ namespace hopsy {
         }
 
         VectorType getProposal() const override {
-            return pyObj.attr("proposal").cast<VectorType>();
+            if(hasattr(pyObj, "proposal")) {
+                return pyObj.attr("proposal").cast<VectorType>();
+            }
+            // default implementation
+            return proposal;
         }
 
         VectorType getState() const override {
-            return pyObj.attr("state").cast<VectorType>();
+            if(hasattr(pyObj, "state")) {
+                return pyObj.attr("state").cast<VectorType>();
+            }
+            // default implementation
+            return state;
         }
 
         void setState(const VectorType& newState) override {
-            pyObj.attr("state")(newState);
+            if(hasattr(pyObj, "state")) {
+                pyObj.attr("state")(newState);
+            }
+            // always track state
+            state = newState;
         }
 
         std::vector<std::string> getDimensionNames() const override {
@@ -280,7 +298,11 @@ namespace hopsy {
         }
 
         std::vector<std::string> getParameterNames() const override {
-            return pyObj.attr("parameter_names")().cast<std::vector<std::string>>();
+            if(hasattr(pyObj, "parameter_names")) {
+                return pyObj.attr("parameter_names")().cast<std::vector<std::string>>();
+            }
+            // default implementation
+            return {};
         }
 
         std::any getParameter(const ProposalParameter& parameter) const override {
@@ -296,7 +318,19 @@ namespace hopsy {
         }
 
         std::string getProposalName() const override {
-            return pyObj.attr("get_name").cast<std::string>();
+            if(hasattr(pyObj, "name")) {
+                return pyObj.attr("name")().cast<std::string>();
+            }
+            // default implementation
+            return pyObj.attr("__class__").attr("__name__").cast<std::string>();
+        }
+
+        std::optional<double> getStepSize() const override {
+            if(hasattr(pyObj, "stepsize")) {
+                return pyObj.attr("stepsize").cast<double>();
+            }
+            // default implementation
+            return  std::nullopt;
         }
 
         double getStateNegativeLogLikelihood() override {
@@ -330,15 +364,23 @@ namespace hopsy {
         }
 
         const MatrixType& getA() const override {
+            if(hasattr(pyObj, "A")) {
+                this->A = pyObj.attr("A")().cast<MatrixType>();
+                return this->A;
+            }
             throw std::runtime_error("Function not implemented.");
         }
 
         const VectorType& getB() const override {
+            if(hasattr(pyObj, "b")) {
+                this->b = pyObj.attr("b")().cast<VectorType>();
+                return this->b;
+            }
             throw std::runtime_error("Function not implemented.");
         }
 
         std::unique_ptr<Proposal> copyProposal() const override {
-            return std::make_unique<PyProposal>(PyProposal(pyObj));
+            return std::make_unique<PyProposal>(pyObj);
         }
 
 		py::object pyObj;
@@ -346,6 +388,10 @@ namespace hopsy {
 	private:
         VectorType proposal;
         VectorType state;
+
+        // Required because getB and getA return references and references should not be returned to temporaries
+        mutable MatrixType A;
+        mutable VectorType b;
     };
 
     class ProposalWrapper : public Proposal {
