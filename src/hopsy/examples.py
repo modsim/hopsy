@@ -24,34 +24,24 @@ class _submodules:
 _s = _submodules
 
 
-def generate_hypercube(
-    dimension: int, edge_length: float = 1.0, origin: np.ndarray = None
-) -> typing.Tuple[np.ndarray, np.ndarray]:
+def generate_unit_hypercube(dimension: int) -> typing.Tuple[np.ndarray, np.ndarray]:
     r"""
-    Generate matrix A and vector b of a hypercube polytope.
+    Generate matrix A and vector b of the unit N-dimensional hypercube.
 
     Parameters
     ----------
     dimension : int
         Dimension N of the cube
-    edge_length: float
-        Length of each edge
-    origin: np.ndarray
-        Center of the hypercube (default: (0, ..., 0))
 
     Returns
     -------
     tuple[np.ndarray, np.ndarray]
         First value is the matrix A of shape (2*N, N) and vector b of shape (2*N,)
     """
+    assert 1 <= dimension
 
-    assert 0 <= edge_length and len(origin) == n
-
-    if not origin:
-        origin = np.zeros(n)
-
-    A = np.row_stack(np.identity(n), -np.identity(n))
-    b = np.row_stack(origin - edge_length / 2, origin + edge_length / 2)
+    A = np.row_stack(np.identity(dimension), -np.identity(dimension))
+    b = np.row_stack(np.repeat(1, dimension), np.repeat(0, dimension))
 
     return A, b
 
