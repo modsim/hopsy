@@ -1,6 +1,9 @@
 """
 
 """
+import typing
+
+import numpy as np
 
 
 class _core:
@@ -19,6 +22,38 @@ class _submodules:
 
 
 _s = _submodules
+
+
+def generate_hypercube(
+    dimension: int, edge_length: float = 1.0, origin: np.ndarray = None
+) -> typing.Tuple[np.ndarray, np.ndarray]:
+    r"""
+    Generate matrix A and vector b of a hypercube polytope.
+
+    Parameters
+    ----------
+    dimension : int
+        Dimension N of the cube
+    edge_length: float
+        Length of each edge
+    origin: np.ndarray
+        Center of the hypercube (default: (0, ..., 0))
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray]
+        First value is the matrix A of shape (2*N, N) and vector b of shape (2*N,)
+    """
+
+    assert 0 <= edge_length and len(origin) == n
+
+    if not origin:
+        origin = np.zeros(n)
+
+    A = np.row_stack(np.identity(n), -np.identity(n))
+    b = np.row_stack(origin - edge_length / 2, origin + edge_length / 2)
+
+    return A, b
 
 
 class BirkhoffPolytope:
