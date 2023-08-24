@@ -1297,7 +1297,9 @@ namespace hopsy {
         py::classh<PyProposal, Proposal, ProposalTrampoline<PyProposal>>
                 pyProposal(m, "PyProposal", doc::PyProposal::base);
         // constructor
-        pyProposal.def(py::init<py::object>(), doc::PyProposal::__init__, py::arg("proposal"));
+        pyProposal.def(py::init<py::object>(), doc::PyProposal::__init__, py::arg("proposal"))
+        .def_property("stepsize", &PyProposal::getStepSize, &PyProposal::setStepSize)
+        ;
         // common
         proposal::addCommon<PyProposal, doc::PyProposal>(pyProposal);
         // pickling
