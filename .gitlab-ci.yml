@@ -20,11 +20,15 @@ pre-commit:
 
 build-release:
   stage: build
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["cp37-cp37m", "cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311"]
+  environment: $PYTHON_VERSION
   script:
     - /opt/python/cp310-cp310/bin/python .check_version.py
     - git rev-parse --short HEAD > .commit
-    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/pip wheel --no-deps . -w dist; done
-    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do auditwheel repair dist/hopsy-$VERSION-$PY-* -w dist; done
+    - /opt/python/$PYTHON_VERSION/bin/pip wheel --no-deps . -w dist; done
+    - VERSION=$(cat .version); auditwheel repair dist/hopsy-$VERSION-$PY-* -w dist; done
   artifacts:
     paths:
       - dist/*manylinux*

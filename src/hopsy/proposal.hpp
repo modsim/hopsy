@@ -330,7 +330,13 @@ namespace hopsy {
                 return pyObj.attr("stepsize").cast<double>();
             }
             // default implementation
-            return  std::nullopt;
+            return std::nullopt;
+        }
+
+        void setStepSize(double stepSize) {
+            if(hasattr(pyObj, "stepsize")) {
+                pyObj.attr("stepsize") = stepSize;
+            }
         }
 
         double getStateNegativeLogLikelihood() override {
@@ -620,6 +626,16 @@ namespace hopsy {
             return proposal->getA();
         }
 
+        std::optional<double> getStepSize() const override {
+            if (!proposal) throw std::runtime_error(uninitializedMethod("getStepSize"));
+            return proposal->getStepSize();
+        }
+
+        void setStepSize(double stepSize) {
+            if (!proposal) throw std::runtime_error(uninitializedMethod("setStepSize"));
+            proposal->setParameter(hops::ProposalParameter::STEP_SIZE, stepSize);
+        }
+
         const VectorType& getB() const override {
             if (!proposal) throw std::runtime_error(uninitializedMethod("b"));
             return proposal->getB();
@@ -706,6 +722,7 @@ namespace hopsy {
                 .def_property_readonly("log_acceptance_probability", &ProposalType::computeLogAcceptanceProbability, Docs::logAcceptanceProbability)
                 .def_property_readonly("proposal", &ProposalType::getProposal, Docs::proposal)
                 .def_property("state", &ProposalType::getState, &ProposalType::setState, Docs::state)
+                .def_property("stepsize", &ProposalType::getStepSize, &ProposalType::setStepSize, Docs::state)
                 .def("_get_parameter", [] (const ProposalType& self,
                                            const ProposalParameter& parameter) {
                             return std::any_cast<double>(self.getParameter(parameter));
@@ -755,8 +772,6 @@ namespace hopsy {
     void addProposals(py::module &m) {
         // register abstract Proposal
         py::classh<Proposal, ProposalTrampoline<>> proposal(m, "Proposal", doc::Proposal::base);
-        // common
-        proposal::addCommon<Proposal, doc::Proposal>(proposal);
 
 
         // register AdaptiveMetropolisProposal

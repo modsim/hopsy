@@ -64,10 +64,6 @@ class PyProposalMinimalBoilerplate:
             return -np.inf
         return 0
 
-    def accept_proposal(self):
-        self.state = self.proposal
-        return self.state
-
 
 if __name__ == "__main__":
     A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
