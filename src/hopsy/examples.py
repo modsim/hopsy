@@ -40,8 +40,8 @@ def generate_unit_hypercube(dimension: int) -> typing.Tuple[np.ndarray, np.ndarr
     """
     assert 1 <= dimension
 
-    A = np.row_stack(np.identity(dimension), -np.identity(dimension))
-    b = np.row_stack(np.repeat(1, dimension), np.repeat(0, dimension))
+    A = np.row_stack((np.identity(dimension), -np.identity(dimension)))
+    b = np.concatenate((np.repeat(1, dimension), np.repeat(0, dimension)))
 
     return A, b
 
