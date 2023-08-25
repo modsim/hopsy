@@ -2,6 +2,7 @@
 
 """
 
+
 class _core:
     from .core import Problem
 
@@ -20,7 +21,9 @@ class _submodules:
 _s = _submodules
 
 
-def generate_unit_hypercube(dimension: int) -> _s.typing.Tuple[_s.numpy.ndarray, _s.numpy.ndarray]:
+def generate_unit_hypercube(
+    dimension: int,
+) -> _s.typing.Tuple[_s.numpy.ndarray, _s.numpy.ndarray]:
     r"""
     Generate matrix A and vector b of the unit N-dimensional hypercube.
 
@@ -42,7 +45,9 @@ def generate_unit_hypercube(dimension: int) -> _s.typing.Tuple[_s.numpy.ndarray,
     return A, b
 
 
-def generate_unit_simplex(dimension: int) -> _s.typing.Tuple[_s.numpy.ndarray, _s.numpy.ndarray]:
+def generate_unit_simplex(
+    dimension: int,
+) -> _s.typing.Tuple[_s.numpy.ndarray, _s.numpy.ndarray]:
     r"""
     Generate matrix A and vector b of the unit N-dimensional simplex.
 
