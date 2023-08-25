@@ -20,11 +20,15 @@ pre-commit:
 
 build-release:
   stage: build
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["cp37-cp37m", "cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311"]
+  environment: $PYTHON_VERSION
   script:
     - /opt/python/cp310-cp310/bin/python .check_version.py
     - git rev-parse --short HEAD > .commit
-    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/pip wheel --no-deps . -w dist; done
-    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do auditwheel repair dist/hopsy-$VERSION-$PY-* -w dist; done
+    - /opt/python/$PYTHON_VERSION/bin/pip wheel --no-deps . -w dist
+    - VERSION=$(cat .version); auditwheel repair dist/hopsy-$VERSION-$PYTHON_VERSION-* -w dist
   artifacts:
     paths:
       - dist/*manylinux*
@@ -32,13 +36,17 @@ build-release:
 
 build-debug:
   stage: build
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["cp37-cp37m", "cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311"]
+  environment: $PYTHON_VERSION
   script:
     - /opt/python/cp310-cp310/bin/python .check_version.py
     - git rev-parse --short HEAD > .commit
     - echo "$(cat .version).dev0" > .version
     - sed -i 's/debug = 0/debug = 1/g' setup.cfg
-    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/pip wheel --no-deps . -w dist; done
-    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do auditwheel repair dist/hopsy-$VERSION-$PY-* -w dist; done
+    - /opt/python/$PYTHON_VERSION/bin/pip wheel --no-deps . -w dist
+    - VERSION=$(cat .version); auditwheel repair dist/hopsy-$VERSION-$PYTHON_VERSION-* -w dist
   artifacts:
     paths:
       - dist/*manylinux*
@@ -49,11 +57,15 @@ test-release:
   stage: test
   dependencies:
     - build-release
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["cp37-cp37m", "cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311"]
+  environment: $PYTHON_VERSION
   before_script:
-    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/python -m pip install docov; done
+    - /opt/python/$PYTHON_VERSION/bin/python -m pip install docov
   script:
-    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
-    - VERSION=$(cat .version); for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/python -m unittest -v tests; done
+    - VERSION=$(cat .version); /opt/python/$PYTHON_VERSION/bin/python -m pip install dist/hopsy-$VERSION-$PYTHON_VERSION-manylinux*.whl
+    - VERSION=$(cat .version); /opt/python/$PYTHON_VERSION/bin/python -m unittest -v tests
   artifacts:
     paths:
       - dist
@@ -64,11 +76,15 @@ test-debug:
   stage: test
   dependencies:
     - build-debug
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["cp37-cp37m", "cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311"]
+  environment: $PYTHON_VERSION
   before_script:
-    - for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/python -m pip install docov; done
+    - /opt/python/$PYTHON_VERSION/bin/python -m pip install docov
   script:
-    - VERSION="$(cat .version).dev0"; for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
-    - VERSION="$(cat .version).dev0"; for PY in "cp37-cp37m" "cp38-cp38" "cp39-cp39" "cp310-cp310" "cp311-cp311"; do /opt/python/$PY/bin/python -m unittest -v tests; done
+    - VERSION="$(cat .version).dev0"; /opt/python/$PYTHON_VERSION/bin/python -m pip install dist/hopsy-$VERSION-$PYTHON_VERSION-manylinux*.whl
+    - VERSION="$(cat .version).dev0"; /opt/python/$PYTHON_VERSION/bin/python -m unittest -v tests
   artifacts:
     paths:
       - dist
