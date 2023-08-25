@@ -21,6 +21,54 @@ class _submodules:
 _s = _submodules
 
 
+def generate_unit_hypercube(
+    dimension: int,
+) -> _s.typing.Tuple[_s.numpy.ndarray, _s.numpy.ndarray]:
+    r"""
+    Generate matrix A and vector b of the unit N-dimensional hypercube.
+
+    Parameters
+    ----------
+    dimension : int
+        Dimension N of the cube
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray]
+        First value is the matrix A of shape (2*N, N), second the vector b of shape (2*N,)
+    """
+    assert 1 <= dimension
+
+    A = np.row_stack((np.identity(dimension), -np.identity(dimension)))
+    b = np.concatenate((np.repeat(1, dimension), np.repeat(0, dimension)))
+
+    return A, b
+
+
+def generate_unit_simplex(
+    dimension: int,
+) -> _s.typing.Tuple[_s.numpy.ndarray, _s.numpy.ndarray]:
+    r"""
+    Generate matrix A and vector b of the unit N-dimensional simplex.
+
+    Parameters
+    ----------
+    dimension : int
+        Dimension N of the cube
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray]
+        First value is the matrix A of shape (2*N, N), second the vector b of shape (2*N,)
+    """
+    assert 1 <= dimension
+
+    A = np.row_stack((np.ones(dimension), -np.identity(dimension)))
+    b = np.concatenate(([1], np.repeat(0, dimension)))
+
+    return A, b
+
+
 class BirkhoffPolytope:
     r"""
     Birkhoff polytope helper that manages transformation of states and constraints
