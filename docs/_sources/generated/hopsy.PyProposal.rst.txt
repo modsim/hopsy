@@ -21,6 +21,7 @@
       ~PyProposal.state
       ~PyProposal.state_log_density
       ~PyProposal.state_negative_log_likelihood
+      ~PyProposal.stepsize
    
    
 

@@ -100,13 +100,6 @@ Found insufficient docstring for the following items:
   -- hopsy.Normal.stddev
   -- hopsy.Problem
   -- hopsy.Proposal
-  -- hopsy.Proposal.accept_proposal
-  -- hopsy.Proposal.deepcopy
-  -- hopsy.Proposal.log_acceptance_probability
-  -- hopsy.Proposal.name
-  -- hopsy.Proposal.proposal
-  -- hopsy.Proposal.propose
-  -- hopsy.Proposal.state
   -- hopsy.ProposalParameter.name
   -- hopsy.ProposalParameter.value
   -- hopsy.PyProposal
@@ -117,6 +110,7 @@ Found insufficient docstring for the following items:
   -- hopsy.PyProposal.proposal
   -- hopsy.PyProposal.propose
   -- hopsy.PyProposal.state
+  -- hopsy.PyProposal.stepsize
   -- hopsy.PyTuningTarget
   -- hopsy.RandomNumberGenerator
   -- hopsy.RandomNumberGenerator.seed
@@ -174,5 +168,5 @@ Found insufficient docstring for the following items:
   -- hopsy.lp
   -- hopsy.misc
   -- hopsy.tune
-Found 365 items of which 190 have suffcient docstring.
+Found 353 items of which 184 have suffcient docstring.
 Coverage: 52.1%
