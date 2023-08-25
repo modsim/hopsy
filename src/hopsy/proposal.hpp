@@ -1083,7 +1083,7 @@ namespace hopsy {
                     py::arg("max_reflections") = 1000)
             ;
         // common
-        proposal::addCommon<BilliardWalkProposal, doc::BilliardWalkProposal>(billiardwalkProposal); of existing algorithms
+        proposal::addCommon<BilliardWalkProposal, doc::BilliardWalkProposal>(billiardwalkProposal);
         // parameters
         proposal::addParameter<BilliardWalkProposal>(
                 billiardwalkProposal, ProposalParameter::MAX_REFLECTIONS, "max_reflections", doc::BilliardWalkProposal::maxReflections);
