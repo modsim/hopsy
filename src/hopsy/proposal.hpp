@@ -247,12 +247,17 @@ namespace hopsy {
             else {
                 // default implementation
                 state.swap(proposal);
+                pyObj.attr("state") = pyObj.attr("proposal");
             }
             return state;
         }
 
         double computeLogAcceptanceProbability() override {
-            return pyObj.attr("log_acceptance_probability")().cast<double>();
+            if(hasattr(pyObj, "log_acceptance_probability")) {
+                return pyObj.attr("log_acceptance_probability")().cast<double>();
+            }
+            // default implementation: assumes the acceptance prob is 100%
+            return 1;
         }
 
         VectorType getProposal() const override {
@@ -1374,7 +1379,6 @@ namespace hopsy {
                     },
                     [] (py::tuple t) {
                         if (t.size() != 1) throw std::runtime_error("Invalid state!");
-
                         return PyProposal(t[0].cast<py::object>());
                     })
                 );
