@@ -247,12 +247,17 @@ namespace hopsy {
             else {
                 // default implementation
                 state.swap(proposal);
+                pyObj.attr("state") = pyObj.attr("proposal");
             }
             return state;
         }
 
         double computeLogAcceptanceProbability() override {
-            return pyObj.attr("log_acceptance_probability")().cast<double>();
+            if(hasattr(pyObj, "log_acceptance_probability")) {
+                return pyObj.attr("log_acceptance_probability")().cast<double>();
+            }
+            // default implementation: assumes the acceptance prob is 100%
+            return 1;
         }
 
         VectorType getProposal() const override {
@@ -662,6 +667,8 @@ namespace hopsy {
             hops::BilliardAdaptiveMetropolisProposal<MatrixType>, MatrixType, double, unsigned long, long>;
     using BilliardMALAProposal = UninitializedProposalWrapper<
             hops::BilliardMALAProposal<ModelWrapper, MatrixType>, ModelWrapper, long, double>;
+    using BilliardWalkProposal = UninitializedProposalWrapper<
+            hops::BilliardWalkProposal<MatrixType>, long, double>;
     using CSmMALAProposal = UninitializedProposalWrapper<
             hops::CSmMALAProposal<ModelWrapper, MatrixType>, ModelWrapper, double, double>;
     using DikinWalkProposal = UninitializedProposalWrapper<
@@ -684,6 +691,7 @@ PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::AdaptiveMetropolisProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::BallWalkProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::BilliardAdaptiveMetropolisProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::BilliardMALAProposal);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::BilliardWalkProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::CSmMALAProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::DikinWalkProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::GaussianCoordinateHitAndRunProposal);
@@ -1042,6 +1050,69 @@ namespace hopsy {
                     })
                 );
 
+        // register BilliardWalkProposal
+        py::classh<BilliardWalkProposal, Proposal, ProposalTrampoline<BilliardWalkProposal>> billiardwalkProposal(
+                m, "BilliardWalkProposal", doc::BilliardWalkProposal::base);
+        // constructor
+        billiardwalkProposal
+            //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
+            .def(py::init([] (const Problem* problem,
+                              double stepSize,
+                              long maximumNumberOfReflections) -> BilliardWalkProposal {
+                        if (problem) {
+                            return BilliardWalkProposal::createFromProblem(
+                                    problem, maximumNumberOfReflections, stepSize);
+                        } else {
+                            throw std::runtime_error(std::string("Internal error in ") +
+                                    std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
+                        }
+                    }),
+                    doc::BilliardWalkProposal::__init__,
+                    py::arg("problem"),
+                    py::arg("stepsize") = 1.,
+                    py::arg("max_reflections") = 1000)
+            .def(py::init([] (const Problem* problem,
+                              const VectorType* startingPoint,
+                              double stepSize,
+                              long maximumNumberOfReflections) -> BilliardWalkProposal {
+                        if (problem) {
+                            return BilliardWalkProposal::create(problem, startingPoint, maximumNumberOfReflections, stepSize);
+                        } else {
+                            throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
+                        }
+                    }),
+                    doc::BilliardWalkProposal::__init__,
+                    py::arg("problem"),
+                    py::arg("starting_point"),
+                    py::arg("stepsize") = 1.,
+                    py::arg("max_reflections") = 1000)
+            ;
+        // common
+        proposal::addCommon<BilliardWalkProposal, doc::BilliardWalkProposal>(billiardwalkProposal);
+        // parameters
+        proposal::addParameter<BilliardWalkProposal>(
+                billiardwalkProposal, ProposalParameter::MAX_REFLECTIONS, "max_reflections", doc::BilliardWalkProposal::maxReflections);
+        proposal::addParameter<BilliardWalkProposal>(
+                billiardwalkProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::BilliardWalkProposal::stepSize);
+        // pickling
+        billiardwalkProposal.def(py::pickle([] (const BilliardWalkProposal& self) {
+                        return py::make_tuple(self.proposal->getA(),
+                                              self.proposal->getB(),
+                                              self.proposal->getState(),
+                                              std::any_cast<long>(self.proposal->getParameter(ProposalParameter::MAX_REFLECTIONS)),
+                                              std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
+                    },
+                    [] (py::tuple t) {
+                        if (t.size() != 5) throw std::runtime_error("Invalid state!");
+
+                        return BilliardWalkProposal(t[0].cast<MatrixType>(),
+                                               t[1].cast<VectorType>(),
+                                               t[2].cast<VectorType>(),
+                                               t[3].cast<long>(),
+                                               t[4].cast<double>());
+                    })
+                );
+
         // register CSmMALAProposal
         py::classh<CSmMALAProposal, Proposal, ProposalTrampoline<CSmMALAProposal>> csmmalaProposal(
                 m, "CSmMALAProposal", doc::CSmMALAProposal::base);
@@ -1308,7 +1379,6 @@ namespace hopsy {
                     },
                     [] (py::tuple t) {
                         if (t.size() != 1) throw std::runtime_error("Invalid state!");
-
                         return PyProposal(t[0].cast<py::object>());
                     })
                 );

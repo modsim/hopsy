@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#91](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/91): Add benchmark example
 - [#90](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/90): Reduce ci build times
 - [#87](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/87): Reduce boilerplate for custom pyproposals
 - [#71](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/71): Rename functions and deprecate old variants

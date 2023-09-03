@@ -7,6 +7,7 @@ ProposalTypes = [
     AdaptiveMetropolisProposal,
     BallWalkProposal,
     BilliardMALAProposal,
+    BilliardWalkProposal,
     CSmMALAProposal,
     DikinWalkProposal,
     GaussianCoordinateHitAndRunProposal,

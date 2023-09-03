@@ -10,6 +10,7 @@ class _core:
         MarkovChain,
         Problem,
         Proposal,
+        PyProposal,
         RandomNumberGenerator,
     )
     from .lp import LP
