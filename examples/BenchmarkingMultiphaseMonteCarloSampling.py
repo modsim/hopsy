@@ -388,7 +388,6 @@ if __name__ == "__main__":
         plt.tight_layout()
 
         plt.legend(fontsize=legend_fs)
-        plt.savefig("Benchmarking_multiphase_mcmc.pdf")
         plt.show()
 
         plt.figure(figsize=(1.5 * 6.4, 8))
@@ -416,7 +415,6 @@ if __name__ == "__main__":
         plt.tight_layout()
 
         plt.legend(fontsize=legend_fs)
-        plt.savefig("Benchmarking_multiphase_mcmc.pdf")
         plt.show()
 
         n_dims = preprocessed_polytope.transformation.shape[0]
