@@ -44,6 +44,16 @@ Found insufficient docstring for the following items:
   -- hopsy.BilliardMALAProposal.propose
   -- hopsy.BilliardMALAProposal.state
   -- hopsy.BilliardMALAProposal.stepsize
+  -- hopsy.BilliardWalkProposal
+  -- hopsy.BilliardWalkProposal.accept_proposal
+  -- hopsy.BilliardWalkProposal.deepcopy
+  -- hopsy.BilliardWalkProposal.log_acceptance_probability
+  -- hopsy.BilliardWalkProposal.max_reflections
+  -- hopsy.BilliardWalkProposal.name
+  -- hopsy.BilliardWalkProposal.proposal
+  -- hopsy.BilliardWalkProposal.propose
+  -- hopsy.BilliardWalkProposal.state
+  -- hopsy.BilliardWalkProposal.stepsize
   -- hopsy.CSmMALAProposal
   -- hopsy.CSmMALAProposal.accept_proposal
   -- hopsy.CSmMALAProposal.deepcopy
@@ -168,5 +178,5 @@ Found insufficient docstring for the following items:
   -- hopsy.lp
   -- hopsy.misc
   -- hopsy.tune
-Found 355 items of which 186 have suffcient docstring.
-Coverage: 52.4%
+Found 371 items of which 192 have suffcient docstring.
+Coverage: 51.8%

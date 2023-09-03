@@ -1,0 +1,1728 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Benchmarking Multiphase Monte Carlo Sampling &#8212; hopsy 1.4.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script src="../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script src="../_static/documentation_options.js?v=06f1c677"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/BenchmarkingMultiphaseMonteCarloSampling';</script>
+    <link rel="icon" href="../_static/hopsy.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/hopsy.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/hopsy.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../firststeps.html">
+                        First Steps
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../userguide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../zreference.html">
+                        Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../firststeps.html">
+                        First Steps
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../userguide.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../zreference.html">
+                        Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+  
+    
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Benchmarking Multiphase Monte Carlo Sampling</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="Benchmarking-Multiphase-Monte-Carlo-Sampling">
+<h1>Benchmarking Multiphase Monte Carlo Sampling<a class="headerlink" href="#Benchmarking-Multiphase-Monte-Carlo-Sampling" title="Link to this heading">#</a></h1>
+</section>
+<section id="Motivation">
+<h1>Motivation<a class="headerlink" href="#Motivation" title="Link to this heading">#</a></h1>
+<p>As a methods researcher one is often interested in testing new methods and benchmarking them together with state-of-the-art algorithms. hopsy provides the framework for conducting such comparisons, because it allows the methods researcher to focus on the algorithms, while the scaffolding, i.e., I/O, convergence diagnostics, and state-of-the-art implementations of existing algorithms are provided.</p>
+<p>We show in this notebook how one can adapt build a multiphase monte carlo sampling plugin for hopsy</p>
+<section id="Background">
+<h2>Background<a class="headerlink" href="#Background" title="Link to this heading">#</a></h2>
+<p>Instead of rounding before sampling, multiphase monte carlo sampling rounds adaptively based on the samples of the Markov chain during a run. It has been reported to be an efficient strategy, if the underlying Markov chain is efficient enough.</p>
+<p>The Idea has found previous adaption in the artificially centered coordinate hit-and-run and the optGP sampler. However, Coordinate Hit-and-Run Rounded showed greater and more stable performance (<a class="reference external" href="https://pubmed.ncbi.nlm.nih.gov/28158334/">https://pubmed.ncbi.nlm.nih.gov/28158334/</a>) than both of those algorithms.</p>
+<p>The idea is resurrected and shown to be efficient given a better Markov chain implementation. See <a class="reference external" href="https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf">https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf</a></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hopsy</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">PolyRound</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Custom-proposals">
+<h1>Custom proposals<a class="headerlink" href="#Custom-proposals" title="Link to this heading">#</a></h1>
+<p>In case the proposal you want to benchmark is not already implemented, it is possible to implement it yourself in a small class. It is then possible to seamlessy integrate this proposal into existing workflows with hopsy. As an example, we implement Overrelaxed Hit-and-Run, see <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2015IJMPC..2650010D/abstract">https://ui.adsabs.harvard.edu/abs/2015IJMPC..2650010D/abstract</a></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">OverrelaxedHitAndRunProposal</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">problem</span><span class="p">:</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">,</span> <span class="n">starting_point</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">A</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">b</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">starting_point</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proposal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">=</span> <span class="n">epsilon</span>
+
+    <span class="k">def</span> <span class="nf">propose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This method is called by hopsy.MarkovChain. Returns the proposal&quot;&quot;&quot;</span>
+        <span class="n">direction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">direction</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">direction</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">inverse_distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">@</span> <span class="n">direction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">@</span> <span class="n">direction</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">forward_distance</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">inverse_distances</span><span class="p">)</span>
+        <span class="n">backward_distance</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">inverse_distances</span><span class="p">)</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="n">forward_distance</span> <span class="o">-</span> <span class="n">backward_distance</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">backward_distance</span><span class="p">)</span> <span class="o">/</span> <span class="n">L</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span>
+        <span class="n">t_1</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">L</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">a</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">a</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">()))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">a</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">t_0</span> <span class="o">=</span> <span class="o">-</span><span class="n">backward_distance</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">proposal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">+</span> <span class="p">(</span><span class="n">t_1</span> <span class="o">-</span> <span class="n">t_0</span><span class="p">)</span> <span class="o">*</span> <span class="n">direction</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">proposal</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="More-complex-custom-sampling-schemes">
+<h1>More complex custom sampling schemes<a class="headerlink" href="#More-complex-custom-sampling-schemes" title="Link to this heading">#</a></h1>
+<p>In addition to custom proposals, it is also possible to implement adaptive workflows. In this case we implement the adaptive rounding from <a class="reference external" href="https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf">https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf</a> using the Billiard walk that is already implemented in hopsy.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># rounding based on samples, as suggested in https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf</span>
+<span class="k">def</span> <span class="nf">svd_rounding</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">polytope</span><span class="p">):</span>
+    <span class="c1"># We concatenate them samples to [n_dim, n_iterations] for rounding</span>
+    <span class="n">stacked_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">samples</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">samples</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="n">samples</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:])</span>
+    <span class="p">)</span>
+
+    <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">stacked_samples</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">stacked_samples</span> <span class="o">=</span> <span class="n">stacked_samples</span> <span class="o">-</span> <span class="n">mean</span>
+    <span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">stacked_samples</span><span class="p">)</span>
+    <span class="c1"># Rescaling as mentioned in  https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf</span>
+    <span class="n">s_ratio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">S</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">S</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mf">2.0</span><span class="p">:</span>
+        <span class="n">S</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">S</span> <span class="o">&lt;</span> <span class="mf">2.0</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">Vh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">Vh</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">rounding_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">Vh</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">S</span><span class="p">))</span>
+
+    <span class="c1"># Transforms current last samples into new polytope</span>
+    <span class="n">sub_problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span>
+        <span class="n">polytope</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">polytope</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">transformation</span><span class="o">=</span><span class="n">rounding_matrix</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="n">mean</span>
+    <span class="p">)</span>
+    <span class="n">starting_points</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+        <span class="n">sub_problem</span><span class="p">,</span> <span class="p">[</span><span class="n">samples</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+    <span class="p">)</span>
+    <span class="n">polytope</span><span class="o">.</span><span class="n">apply_shift</span><span class="p">(</span><span class="n">mean</span><span class="p">)</span>
+    <span class="n">polytope</span><span class="o">.</span><span class="n">apply_transformation</span><span class="p">(</span><span class="n">rounding_matrix</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">s_ratio</span><span class="p">,</span> <span class="n">starting_points</span><span class="p">,</span> <span class="n">polytope</span><span class="p">,</span> <span class="n">sub_problem</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Helper-functions">
+<h1>Helper functions<a class="headerlink" href="#Helper-functions" title="Link to this heading">#</a></h1>
+<p>In this section we implement some helper functions for executing the benchmarks as well as a function which constructs our benchmark problems</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Helper functions for calling the sampling algorithms and defining the polytopes</span>
+<span class="k">def</span> <span class="nf">run_multiphase_sampling</span><span class="p">(</span>
+    <span class="n">proposal</span><span class="p">,</span>
+    <span class="n">polytope</span><span class="p">,</span>
+    <span class="n">seeds</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span>
+    <span class="n">target_ess</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">steps_per_phase</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">starting_points</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">limit_singular_ratio_value</span> <span class="o">=</span> <span class="mf">2.3</span>  <span class="c1"># from https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">starting_points</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">seeds</span><span class="p">)</span>
+    <span class="n">rngs</span> <span class="o">=</span> <span class="p">[</span><span class="n">hopsy</span><span class="o">.</span><span class="n">RandomNumberGenerator</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">seeds</span><span class="p">]</span>
+
+    <span class="n">ess</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">iterations</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">s_ratio</span> <span class="o">=</span> <span class="n">limit_singular_ratio_value</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">sampling_time</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">last_iteration_did_rounding</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">while</span> <span class="n">ess</span> <span class="o">&lt;</span> <span class="n">target_ess</span><span class="p">:</span>
+        <span class="n">iterations</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t</span><span class="s2">iter:&quot;</span><span class="p">,</span> <span class="n">iterations</span><span class="p">)</span>
+        <span class="n">internal_polytope</span> <span class="o">=</span> <span class="n">polytope</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">internal_polytope</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">internal_polytope</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
+        <span class="n">markov_chains</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">hopsy</span><span class="o">.</span><span class="n">MarkovChain</span><span class="p">(</span><span class="n">proposal</span><span class="o">=</span><span class="n">proposal</span><span class="p">,</span> <span class="n">problem</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">starting_point</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">starting_points</span>
+        <span class="p">]</span>
+
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">acceptance_rate</span><span class="p">,</span> <span class="n">_samples</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
+            <span class="n">markov_chains</span><span class="p">,</span> <span class="n">rngs</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="n">steps_per_phase</span><span class="p">,</span> <span class="n">thinning</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_procs</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">b</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">A</span> <span class="o">@</span> <span class="n">_samples</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
+        <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">b</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">A</span> <span class="o">@</span> <span class="n">_samples</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
+        <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">b</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">A</span> <span class="o">@</span> <span class="n">_samples</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
+        <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">b</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">A</span> <span class="o">@</span> <span class="n">_samples</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
+        <span class="n">sampling_time</span> <span class="o">+=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
+
+        <span class="k">if</span> <span class="n">s_ratio</span> <span class="o">&gt;</span> <span class="n">limit_singular_ratio_value</span><span class="p">:</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="n">_samples</span>
+            <span class="c1"># also measures the rounding time</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">s_ratio</span><span class="p">,</span> <span class="n">starting_points</span><span class="p">,</span> <span class="n">internal_polytope</span><span class="p">,</span> <span class="n">sub_problem</span> <span class="o">=</span> <span class="n">svd_rounding</span><span class="p">(</span>
+                <span class="n">samples</span><span class="p">,</span> <span class="n">internal_polytope</span>
+            <span class="p">)</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">sampling_time</span> <span class="o">+=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t</span><span class="s2">s_ratio:&quot;</span><span class="p">,</span> <span class="n">s_ratio</span><span class="p">)</span>
+            <span class="n">last_iteration_did_rounding</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">last_iteration_did_rounding</span><span class="p">:</span>
+                <span class="c1"># next operation transforms last samples to current space before concatenating</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                    <span class="n">samples</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+                        <span class="n">sub_problem</span><span class="p">,</span> <span class="p">[</span><span class="n">samples</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+                    <span class="p">)</span>
+                <span class="n">last_iteration_did_rounding</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">samples</span><span class="p">,</span> <span class="n">_samples</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">starting_points</span> <span class="o">=</span> <span class="p">[</span><span class="n">samples</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+        <span class="n">ess</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">hopsy</span><span class="o">.</span><span class="n">ess</span><span class="p">(</span><span class="n">samples</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t</span><span class="s2">ess&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ess</span><span class="p">))</span>
+        <span class="n">steps_per_phase</span> <span class="o">+=</span> <span class="mi">100</span>
+
+    <span class="c1"># transforms back to full space</span>
+    <span class="n">_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">polytope</span><span class="o">.</span><span class="n">transformation</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">_samples</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">back_transform</span><span class="p">(</span>
+            <span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span>
+                <span class="n">A</span><span class="o">=</span><span class="n">internal_polytope</span><span class="o">.</span><span class="n">A</span><span class="p">,</span>
+                <span class="n">b</span><span class="o">=</span><span class="n">internal_polytope</span><span class="o">.</span><span class="n">b</span><span class="p">,</span>
+                <span class="n">transformation</span><span class="o">=</span><span class="n">internal_polytope</span><span class="o">.</span><span class="n">transformation</span><span class="p">,</span>
+                <span class="n">shift</span><span class="o">=</span><span class="n">internal_polytope</span><span class="o">.</span><span class="n">shift</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="p">[</span><span class="n">samples</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])],</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_samples</span><span class="p">,</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">ess</span><span class="p">,</span> <span class="n">sampling_time</span>
+
+
+<span class="k">def</span> <span class="nf">run_sampling</span><span class="p">(</span>
+    <span class="n">proposal</span><span class="p">,</span>
+    <span class="n">polytope</span><span class="p">,</span>
+    <span class="n">seeds</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span>
+    <span class="n">target_ess</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">steps_per_phase</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">starting_points</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span>
+    <span class="n">thinning</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">rngs</span> <span class="o">=</span> <span class="p">[</span><span class="n">hopsy</span><span class="o">.</span><span class="n">RandomNumberGenerator</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">seeds</span><span class="p">]</span>
+
+    <span class="n">problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">polytope</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">polytope</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">thinning</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">thinning</span> <span class="k">if</span> <span class="n">thinning</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">6</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">ess</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">iterations</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># also measures the rounding time</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">rounded_problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">problem</span><span class="p">)</span>
+    <span class="c1"># transforms starting points into rounded space</span>
+    <span class="n">starting_points</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">rounded_problem</span><span class="p">,</span> <span class="n">starting_points</span><span class="p">)</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">sampling_time</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">markov_chains</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">hopsy</span><span class="o">.</span><span class="n">MarkovChain</span><span class="p">(</span><span class="n">problem</span><span class="o">=</span><span class="n">rounded_problem</span><span class="p">,</span> <span class="n">starting_point</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">starting_points</span>
+    <span class="p">]</span>
+    <span class="k">while</span> <span class="n">ess</span> <span class="o">&lt;</span> <span class="n">target_ess</span><span class="p">:</span>
+        <span class="n">iterations</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t</span><span class="s2">iter:&quot;</span><span class="p">,</span> <span class="n">iterations</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">starting_points</span><span class="p">)):</span>
+            <span class="n">markov_chains</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">proposal</span> <span class="o">=</span> <span class="n">proposal</span><span class="p">(</span>
+                <span class="n">rounded_problem</span><span class="p">,</span> <span class="n">starting_point</span><span class="o">=</span><span class="n">starting_points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="p">)</span>
+
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">acceptance_rate</span><span class="p">,</span> <span class="n">_samples</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
+            <span class="n">markov_chains</span><span class="p">,</span> <span class="n">rngs</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="n">steps_per_phase</span><span class="p">,</span> <span class="n">thinning</span><span class="o">=</span><span class="n">thinning</span><span class="p">,</span> <span class="n">n_procs</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">sampling_time</span> <span class="o">+=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
+
+        <span class="n">samples</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">_samples</span> <span class="k">if</span> <span class="n">samples</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">samples</span><span class="p">,</span> <span class="n">_samples</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">starting_points</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">rounded_problem</span><span class="p">,</span> <span class="n">samples</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
+
+        <span class="n">ess</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">hopsy</span><span class="o">.</span><span class="n">ess</span><span class="p">(</span><span class="n">samples</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t</span><span class="s2">ess&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ess</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;samples&quot;</span><span class="p">,</span> <span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># transforms back to full space</span>
+    <span class="n">_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">polytope</span><span class="o">.</span><span class="n">transformation</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">_samples</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">back_transform</span><span class="p">(</span>
+            <span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span>
+                <span class="n">A</span><span class="o">=</span><span class="n">polytope</span><span class="o">.</span><span class="n">A</span><span class="p">,</span>
+                <span class="n">b</span><span class="o">=</span><span class="n">polytope</span><span class="o">.</span><span class="n">b</span><span class="p">,</span>
+                <span class="n">transformation</span><span class="o">=</span><span class="n">polytope</span><span class="o">.</span><span class="n">transformation</span><span class="p">,</span>
+                <span class="n">shift</span><span class="o">=</span><span class="n">polytope</span><span class="o">.</span><span class="n">shift</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="p">[</span><span class="n">samples</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])],</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_samples</span><span class="p">,</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">ess</span><span class="p">,</span> <span class="n">sampling_time</span>
+
+
+<span class="k">def</span> <span class="nf">generate_polytope</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;BP5&quot;</span><span class="p">:</span>
+        <span class="n">bp</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">BirkhoffPolytope</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">polytope</span> <span class="o">=</span> <span class="n">PolyRound</span><span class="o">.</span><span class="n">mutable_classes</span><span class="o">.</span><span class="n">polytope</span><span class="o">.</span><span class="n">Polytope</span><span class="p">(</span><span class="n">A</span><span class="o">=</span><span class="n">bp</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">bp</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
+        <span class="n">polytope</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+        <span class="n">parameter_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">polytope</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">polytope</span><span class="p">,</span> <span class="s2">&quot;5D Birkhoff Polytope&quot;</span><span class="p">,</span> <span class="n">parameter_names</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;e_coli&quot;</span><span class="p">:</span>
+        <span class="n">original_polytope</span> <span class="o">=</span> <span class="n">PolyRound</span><span class="o">.</span><span class="n">static_classes</span><span class="o">.</span><span class="n">parse_sbml_stoichiometry</span><span class="o">.</span><span class="n">StoichiometryParser</span><span class="o">.</span><span class="n">parse_sbml_cobrapy</span><span class="p">(</span>
+            <span class="s2">&quot;../extern/hops/resources/e_coli_core/e_coli_core.xml&quot;</span>
+        <span class="p">)</span>
+        <span class="n">parameter_names</span> <span class="o">=</span> <span class="n">original_polytope</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">columns</span>
+        <span class="n">polytope</span> <span class="o">=</span> <span class="n">PolyRound</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">PolyRoundApi</span><span class="o">.</span><span class="n">simplify_polytope</span><span class="p">(</span><span class="n">original_polytope</span><span class="p">)</span>
+        <span class="n">polytope</span> <span class="o">=</span> <span class="n">PolyRound</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">PolyRoundApi</span><span class="o">.</span><span class="n">transform_polytope</span><span class="p">(</span><span class="n">polytope</span><span class="p">)</span>
+        <span class="n">polytope</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">polytope</span><span class="p">,</span> <span class="s2">&quot;e_coli_core&quot;</span><span class="p">,</span> <span class="n">parameter_names</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Benchmark-parameters">
+<h1>Benchmark parameters<a class="headerlink" href="#Benchmark-parameters" title="Link to this heading">#</a></h1>
+<p>Next set up the benchmark parameters</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">target_ess</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">proposalTypes</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Billiard walk&quot;</span><span class="p">:</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">BilliardWalkProposal</span><span class="p">,</span>
+    <span class="s2">&quot;CHRRT&quot;</span><span class="p">:</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">UniformCoordinateHitAndRunProposal</span><span class="p">,</span>
+    <span class="s2">&quot;OHRR&quot;</span><span class="p">:</span> <span class="n">OverrelaxedHitAndRunProposal</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">seeds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+
+<span class="n">problems_to_benchmark</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;BP5&quot;</span><span class="p">,</span> <span class="s2">&quot;e_coli&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Benchmarking">
+<h1>Benchmarking<a class="headerlink" href="#Benchmarking" title="Link to this heading">#</a></h1>
+<p>Sample all problems with all sampling schemes, i.e., two for loops.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">samples</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">iterations</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">ess</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">times</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">ess_t</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="k">for</span> <span class="n">problem_selection</span> <span class="ow">in</span> <span class="n">problems_to_benchmark</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Benchmarking </span><span class="si">{problem_selection}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">samples</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">iterations</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">ess</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">times</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">ess_t</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">proposalTypes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">proposal&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="c1"># resets problem and starting points</span>
+        <span class="n">preprocessed_polytope</span><span class="p">,</span> <span class="n">problem_name</span><span class="p">,</span> <span class="n">parameter_names</span> <span class="o">=</span> <span class="n">generate_polytope</span><span class="p">(</span>
+            <span class="n">problem_selection</span>
+        <span class="p">)</span>
+        <span class="n">steps_per_phase</span> <span class="o">=</span> <span class="n">preprocessed_polytope</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">20</span>
+        <span class="n">cheby</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">compute_chebyshev_center</span><span class="p">(</span>
+            <span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">A</span><span class="o">=</span><span class="n">preprocessed_polytope</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">preprocessed_polytope</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">starting_points</span> <span class="o">=</span> <span class="p">[</span><span class="n">cheby</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">seeds</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;Billiard walk&quot;</span><span class="p">:</span>
+            <span class="p">(</span>
+                <span class="n">samples</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">][</span><span class="n">name</span><span class="p">],</span>
+                <span class="n">iterations</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">][</span><span class="n">name</span><span class="p">],</span>
+                <span class="n">ess</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">][</span><span class="n">name</span><span class="p">],</span>
+                <span class="n">times</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">][</span><span class="n">name</span><span class="p">],</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="n">run_multiphase_sampling</span><span class="p">(</span>
+                <span class="n">proposal</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+                <span class="n">polytope</span><span class="o">=</span><span class="n">preprocessed_polytope</span><span class="p">,</span>
+                <span class="n">seeds</span><span class="o">=</span><span class="n">seeds</span><span class="p">,</span>
+                <span class="n">target_ess</span><span class="o">=</span><span class="n">target_ess</span><span class="p">,</span>
+                <span class="n">steps_per_phase</span><span class="o">=</span><span class="n">steps_per_phase</span><span class="p">,</span>
+                <span class="n">starting_points</span><span class="o">=</span><span class="n">starting_points</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">thinning</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;CHRRT&quot;</span>
+                <span class="k">else</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">preprocessed_polytope</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">6</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">samples</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">][</span><span class="n">name</span><span class="p">],</span> <span class="n">iterations</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">][</span><span class="n">name</span><span class="p">],</span> <span class="n">ess</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">][</span><span class="n">name</span><span class="p">],</span> <span class="n">times</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">run_sampling</span><span class="p">(</span>
+                <span class="n">proposal</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+                <span class="n">polytope</span><span class="o">=</span><span class="n">preprocessed_polytope</span><span class="p">,</span>
+                <span class="n">seeds</span><span class="o">=</span><span class="n">seeds</span><span class="p">,</span>
+                <span class="n">target_ess</span><span class="o">=</span><span class="n">target_ess</span><span class="p">,</span>
+                <span class="n">steps_per_phase</span><span class="o">=</span><span class="n">steps_per_phase</span><span class="p">,</span>
+                <span class="n">starting_points</span><span class="o">=</span><span class="n">starting_points</span><span class="p">,</span>
+                <span class="n">thinning</span><span class="o">=</span><span class="n">thinning</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">ess_t</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ess</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">/</span> <span class="n">times</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">][</span><span class="n">name</span><span class="p">]</span>
+
+    <span class="c1"># check convergence</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;rhat:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">hopsy</span><span class="o">.</span><span class="n">rhat</span><span class="p">(</span><span class="n">s</span><span class="p">)))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">ess&quot;</span><span class="p">,</span> <span class="n">ess</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">times&quot;</span><span class="p">,</span> <span class="n">times</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">ess/t&quot;</span><span class="p">,</span> <span class="n">ess_t</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Benchmarking {problem_selection}
+        proposal Billiard walk
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-11-30
+                iter: 1
+                s_ratio: 1.3847452299003389
+                ess 231.4835868364245
+                iter: 2
+                ess 627.6793244654275
+                iter: 3
+                ess 990.5612889618237
+                iter: 4
+                ess 1583.2881720652492
+        proposal CHRRT
+                iter: 1
+                ess 453.9004456107389, samples 320
+                iter: 2
+                ess 894.4609120329771, samples 640
+                iter: 3
+                ess 1321.6148361675992, samples 960
+        proposal OHRR
+                iter: 1
+                ess 7.625745323520432, samples 320
+                iter: 2
+                ess 7.6054662230477454, samples 640
+                iter: 3
+                ess 12.38432877661255, samples 960
+                iter: 4
+                ess 13.182005874239481, samples 1280
+                iter: 5
+                ess 12.401342018005563, samples 1600
+                iter: 6
+                ess 22.244281110746087, samples 1920
+                iter: 7
+                ess 25.62949774599076, samples 2240
+                iter: 8
+                ess 34.04845549392683, samples 2560
+                iter: 9
+                ess 45.30986010578385, samples 2880
+                iter: 10
+                ess 60.94902208036537, samples 3200
+                iter: 11
+                ess 80.49974823489278, samples 3520
+                iter: 12
+                ess 49.97771163146812, samples 3840
+                iter: 13
+                ess 71.80388733908671, samples 4160
+                iter: 14
+                ess 122.4001314499352, samples 4480
+                iter: 15
+                ess 133.78822579318992, samples 4800
+                iter: 16
+                ess 142.17921949774305, samples 5120
+                iter: 17
+                ess 149.61748340502388, samples 5440
+                iter: 18
+                ess 182.34634077280296, samples 5760
+                iter: 19
+                ess 178.68634332487036, samples 6080
+                iter: 20
+                ess 189.4045406530288, samples 6400
+                iter: 21
+                ess 189.17287087444478, samples 6720
+                iter: 22
+                ess 214.01648654224107, samples 7040
+                iter: 23
+                ess 203.17688287422175, samples 7360
+                iter: 24
+                ess 186.6080605897047, samples 7680
+                iter: 25
+                ess 207.50838526420483, samples 8000
+                iter: 26
+                ess 213.79453417004535, samples 8320
+                iter: 27
+                ess 219.96522885675455, samples 8640
+                iter: 28
+                ess 219.00320468397933, samples 8960
+                iter: 29
+                ess 229.17806011811587, samples 9280
+                iter: 30
+                ess 236.89728952606106, samples 9600
+                iter: 31
+                ess 251.53492550075143, samples 9920
+                iter: 32
+                ess 228.70971670541672, samples 10240
+                iter: 33
+                ess 232.14255820710176, samples 10560
+                iter: 34
+                ess 231.35035089363, samples 10880
+                iter: 35
+                ess 238.13227599749655, samples 11200
+                iter: 36
+                ess 252.40977955258555, samples 11520
+                iter: 37
+                ess 271.7049789684051, samples 11840
+                iter: 38
+                ess 271.43163776402827, samples 12160
+                iter: 39
+                ess 277.3145362821676, samples 12480
+                iter: 40
+                ess 288.70460644400725, samples 12800
+                iter: 41
+                ess 288.0138079421149, samples 13120
+                iter: 42
+                ess 291.24329556313114, samples 13440
+                iter: 43
+                ess 306.01256971648405, samples 13760
+                iter: 44
+                ess 347.4433073767895, samples 14080
+                iter: 45
+                ess 345.73058472149273, samples 14400
+                iter: 46
+                ess 402.2219867030997, samples 14720
+                iter: 47
+                ess 396.76500943644686, samples 15040
+                iter: 48
+                ess 368.76575241008146, samples 15360
+                iter: 49
+                ess 392.30164700619, samples 15680
+                iter: 50
+                ess 410.2366011190137, samples 16000
+                iter: 51
+                ess 441.6461313486626, samples 16320
+                iter: 52
+                ess 453.0733371644818, samples 16640
+                iter: 53
+                ess 468.732442074824, samples 16960
+                iter: 54
+                ess 486.4985515361956, samples 17280
+                iter: 55
+                ess 519.1807533773064, samples 17600
+                iter: 56
+                ess 526.0039144703743, samples 17920
+                iter: 57
+                ess 542.6627957629679, samples 18240
+                iter: 58
+                ess 564.6542865302788, samples 18560
+                iter: 59
+                ess 572.1605181538064, samples 18880
+                iter: 60
+                ess 582.9605183292837, samples 19200
+                iter: 61
+                ess 607.6319445348865, samples 19520
+                iter: 62
+                ess 617.7775496450698, samples 19840
+                iter: 63
+                ess 615.5620446086798, samples 20160
+                iter: 64
+                ess 621.7914271826387, samples 20480
+                iter: 65
+                ess 634.3810925490033, samples 20800
+                iter: 66
+                ess 652.7013511505703, samples 21120
+                iter: 67
+                ess 664.0200810675003, samples 21440
+                iter: 68
+                ess 685.1734889365622, samples 21760
+                iter: 69
+                ess 690.2429803532992, samples 22080
+                iter: 70
+                ess 700.5969984896539, samples 22400
+                iter: 71
+                ess 707.5300030315993, samples 22720
+                iter: 72
+                ess 712.0200695601641, samples 23040
+                iter: 73
+                ess 719.4777760952321, samples 23360
+                iter: 74
+                ess 726.6854100579153, samples 23680
+                iter: 75
+                ess 729.7764469907538, samples 24000
+                iter: 76
+                ess 749.9049885509074, samples 24320
+                iter: 77
+                ess 764.7278155614728, samples 24640
+                iter: 78
+                ess 772.4826595691761, samples 24960
+                iter: 79
+                ess 775.3396255287553, samples 25280
+                iter: 80
+                ess 785.3862092073803, samples 25600
+                iter: 81
+                ess 776.6369258349741, samples 25920
+                iter: 82
+                ess 807.3864377744391, samples 26240
+                iter: 83
+                ess 812.3774474945751, samples 26560
+                iter: 84
+                ess 810.6148666352443, samples 26880
+                iter: 85
+                ess 825.62219029761, samples 27200
+                iter: 86
+                ess 835.7092337458173, samples 27520
+                iter: 87
+                ess 850.0974246400841, samples 27840
+                iter: 88
+                ess 856.5489600687148, samples 28160
+                iter: 89
+                ess 885.8507476804983, samples 28480
+                iter: 90
+                ess 910.2524842863202, samples 28800
+                iter: 91
+                ess 927.415848100618, samples 29120
+                iter: 92
+                ess 931.8235433070624, samples 29440
+                iter: 93
+                ess 935.1144528214636, samples 29760
+                iter: 94
+                ess 968.5931352003619, samples 30080
+                iter: 95
+                ess 969.2722160601122, samples 30400
+                iter: 96
+                ess 986.7999600062252, samples 30720
+                iter: 97
+                ess 997.2739538863411, samples 31040
+                iter: 98
+                ess 997.305561805389, samples 31360
+                iter: 99
+                ess 1016.6394428035395, samples 31680
+        Billiard walk rhat: 1.0061219415504485
+        CHRRT rhat: 1.0038641732435272
+        OHRR rhat: 1.0094257854838848
+        ess {&#39;Billiard walk&#39;: 1583.2881720652492, &#39;CHRRT&#39;: 1321.6148361675992, &#39;OHRR&#39;: 1016.6394428035395}
+        times {&#39;Billiard walk&#39;: 0.06821775436401367, &#39;CHRRT&#39;: 0.9356920719146729, &#39;OHRR&#39;: 6.253354072570801}
+        ess/t {&#39;Billiard walk&#39;: 23209.32705607307, &#39;CHRRT&#39;: 1412.446333400289, &#39;OHRR&#39;: 162.57506467814503}
+Benchmarking {problem_selection}
+        proposal Billiard walk
+                iter: 1
+                s_ratio: 11.963156850679272
+                ess 4.872243577042705
+                iter: 2
+                s_ratio: 23.96780496221371
+                ess 5.133013163411473
+                iter: 3
+                s_ratio: 33.92514821626017
+                ess 7.03213882586069
+                iter: 4
+                s_ratio: 23.48072122188601
+                ess 21.114165738738418
+                iter: 5
+                s_ratio: 2.3472103713065406
+                ess 652.8113104108883
+                iter: 6
+                s_ratio: 2.1466424838886535
+                ess 952.7823528588415
+                iter: 7
+                ess 2089.437296408794
+        proposal CHRRT
+                iter: 1
+                ess 508.6356364335463, samples 480
+                iter: 2
+                ess 1079.4569141209104, samples 960
+        proposal OHRR
+                iter: 1
+                ess 9.776492135162716, samples 480
+                iter: 2
+                ess 11.167662736853401, samples 960
+                iter: 3
+                ess 12.056069168566689, samples 1440
+                iter: 4
+                ess 15.398902876392471, samples 1920
+                iter: 5
+                ess 20.245304042818685, samples 2400
+                iter: 6
+                ess 29.168726784213288, samples 2880
+                iter: 7
+                ess 19.73043196745499, samples 3360
+                iter: 8
+                ess 26.356181832325316, samples 3840
+                iter: 9
+                ess 48.42195274182534, samples 4320
+                iter: 10
+                ess 48.16850733314359, samples 4800
+                iter: 11
+                ess 61.57524465875833, samples 5280
+                iter: 12
+                ess 66.62612789837534, samples 5760
+                iter: 13
+                ess 73.93473816812214, samples 6240
+                iter: 14
+                ess 91.08798638997315, samples 6720
+                iter: 15
+                ess 100.27310498100584, samples 7200
+                iter: 16
+                ess 97.24442507446783, samples 7680
+                iter: 17
+                ess 110.4156099692275, samples 8160
+                iter: 18
+                ess 121.31426064888853, samples 8640
+                iter: 19
+                ess 132.61932128582418, samples 9120
+                iter: 20
+                ess 141.0655628782827, samples 9600
+                iter: 21
+                ess 146.60715889511573, samples 10080
+                iter: 22
+                ess 159.8040645277806, samples 10560
+                iter: 23
+                ess 170.26508887199415, samples 11040
+                iter: 24
+                ess 174.0608097706658, samples 11520
+                iter: 25
+                ess 181.4891482809182, samples 12000
+                iter: 26
+                ess 190.5787357308853, samples 12480
+                iter: 27
+                ess 212.05269870884433, samples 12960
+                iter: 28
+                ess 216.7154821077659, samples 13440
+                iter: 29
+                ess 154.16746586802677, samples 13920
+                iter: 30
+                ess 152.37333380523785, samples 14400
+                iter: 31
+                ess 173.66341302826484, samples 14880
+                iter: 32
+                ess 197.03570465163702, samples 15360
+                iter: 33
+                ess 149.8657968735399, samples 15840
+                iter: 34
+                ess 209.7315161765984, samples 16320
+                iter: 35
+                ess 131.55423339798966, samples 16800
+                iter: 36
+                ess 96.6167718486756, samples 17280
+                iter: 37
+                ess 71.26867746721672, samples 17760
+                iter: 38
+                ess 72.50259658714803, samples 18240
+                iter: 39
+                ess 66.2384974854968, samples 18720
+                iter: 40
+                ess 50.22793603309223, samples 19200
+                iter: 41
+                ess 49.696471880515105, samples 19680
+                iter: 42
+                ess 57.092345894314036, samples 20160
+                iter: 43
+                ess 67.85617007749494, samples 20640
+                iter: 44
+                ess 74.79057336510849, samples 21120
+                iter: 45
+                ess 90.75721729194993, samples 21600
+                iter: 46
+                ess 134.39499689992982, samples 22080
+                iter: 47
+                ess 151.95008105224895, samples 22560
+                iter: 48
+                ess 153.14369148253127, samples 23040
+                iter: 49
+                ess 156.006972943283, samples 23520
+                iter: 50
+                ess 146.28503347435532, samples 24000
+                iter: 51
+                ess 127.74100165220875, samples 24480
+                iter: 52
+                ess 121.71655320308433, samples 24960
+                iter: 53
+                ess 147.33104198243035, samples 25440
+                iter: 54
+                ess 137.9514676930531, samples 25920
+                iter: 55
+                ess 162.3453611877319, samples 26400
+                iter: 56
+                ess 170.25325873949635, samples 26880
+                iter: 57
+                ess 213.19066914216077, samples 27360
+                iter: 58
+                ess 230.51311453590304, samples 27840
+                iter: 59
+                ess 238.06411449329764, samples 28320
+                iter: 60
+                ess 243.1405245375716, samples 28800
+                iter: 61
+                ess 216.668916184032, samples 29280
+                iter: 62
+                ess 242.13494330385038, samples 29760
+                iter: 63
+                ess 248.11172742356032, samples 30240
+                iter: 64
+                ess 256.3323419653533, samples 30720
+                iter: 65
+                ess 266.2249489329944, samples 31200
+                iter: 66
+                ess 241.00698523153264, samples 31680
+                iter: 67
+                ess 236.34284794675355, samples 32160
+                iter: 68
+                ess 233.3626938734582, samples 32640
+                iter: 69
+                ess 234.9255844935538, samples 33120
+                iter: 70
+                ess 252.61212200492133, samples 33600
+                iter: 71
+                ess 270.5394203766128, samples 34080
+                iter: 72
+                ess 291.60335448589865, samples 34560
+                iter: 73
+                ess 309.3500892806769, samples 35040
+                iter: 74
+                ess 311.12182362135474, samples 35520
+                iter: 75
+                ess 320.12628315641666, samples 36000
+                iter: 76
+                ess 348.7925620643069, samples 36480
+                iter: 77
+                ess 361.6615823252901, samples 36960
+                iter: 78
+                ess 354.5376657353069, samples 37440
+                iter: 79
+                ess 311.4690816982753, samples 37920
+                iter: 80
+                ess 308.78208157119394, samples 38400
+                iter: 81
+                ess 282.2030283479515, samples 38880
+                iter: 82
+                ess 305.6157190415213, samples 39360
+                iter: 83
+                ess 357.943938467633, samples 39840
+                iter: 84
+                ess 364.694681811208, samples 40320
+                iter: 85
+                ess 365.8206848631206, samples 40800
+                iter: 86
+                ess 380.86201316902765, samples 41280
+                iter: 87
+                ess 394.2609444706249, samples 41760
+                iter: 88
+                ess 395.641061288681, samples 42240
+                iter: 89
+                ess 398.9979521266321, samples 42720
+                iter: 90
+                ess 393.15886380308433, samples 43200
+                iter: 91
+                ess 395.9086781978561, samples 43680
+                iter: 92
+                ess 394.4070361186469, samples 44160
+                iter: 93
+                ess 396.6467574974821, samples 44640
+                iter: 94
+                ess 413.63618561687514, samples 45120
+                iter: 95
+                ess 413.6841204910174, samples 45600
+                iter: 96
+                ess 403.5252280685143, samples 46080
+                iter: 97
+                ess 406.9465665057137, samples 46560
+                iter: 98
+                ess 414.2390898395199, samples 47040
+                iter: 99
+                ess 427.10909891829476, samples 47520
+                iter: 100
+                ess 431.77120184396534, samples 48000
+                iter: 101
+                ess 430.48343182059574, samples 48480
+                iter: 102
+                ess 445.5670372425206, samples 48960
+                iter: 103
+                ess 456.2252520593618, samples 49440
+                iter: 104
+                ess 461.8073730309261, samples 49920
+                iter: 105
+                ess 449.51563861796734, samples 50400
+                iter: 106
+                ess 451.2125184778504, samples 50880
+                iter: 107
+                ess 448.34735897941584, samples 51360
+                iter: 108
+                ess 467.54932042622636, samples 51840
+                iter: 109
+                ess 477.24564649210555, samples 52320
+                iter: 110
+                ess 485.90243495163713, samples 52800
+                iter: 111
+                ess 488.5346014571642, samples 53280
+                iter: 112
+                ess 497.74058989783674, samples 53760
+                iter: 113
+                ess 502.06771889721455, samples 54240
+                iter: 114
+                ess 504.2795752382087, samples 54720
+                iter: 115
+                ess 505.0741842859752, samples 55200
+                iter: 116
+                ess 513.4190058338743, samples 55680
+                iter: 117
+                ess 520.3964437744485, samples 56160
+                iter: 118
+                ess 527.0154600027546, samples 56640
+                iter: 119
+                ess 520.8240364046208, samples 57120
+                iter: 120
+                ess 522.9649235308951, samples 57600
+                iter: 121
+                ess 537.7889509188342, samples 58080
+                iter: 122
+                ess 538.263521252906, samples 58560
+                iter: 123
+                ess 548.296566485919, samples 59040
+                iter: 124
+                ess 550.5958656465868, samples 59520
+                iter: 125
+                ess 575.0410524675801, samples 60000
+                iter: 126
+                ess 581.0926810327787, samples 60480
+                iter: 127
+                ess 575.1841698676168, samples 60960
+                iter: 128
+                ess 567.4658416850558, samples 61440
+                iter: 129
+                ess 557.6083268019893, samples 61920
+                iter: 130
+                ess 547.0362688236758, samples 62400
+                iter: 131
+                ess 559.6885460444615, samples 62880
+                iter: 132
+                ess 570.3627161929511, samples 63360
+                iter: 133
+                ess 583.6928033131561, samples 63840
+                iter: 134
+                ess 603.0921748543786, samples 64320
+                iter: 135
+                ess 619.976201196154, samples 64800
+                iter: 136
+                ess 603.3629490349441, samples 65280
+                iter: 137
+                ess 604.880867411402, samples 65760
+                iter: 138
+                ess 612.0044266157959, samples 66240
+                iter: 139
+                ess 620.6843981200377, samples 66720
+                iter: 140
+                ess 623.336759218216, samples 67200
+                iter: 141
+                ess 636.3628799234094, samples 67680
+                iter: 142
+                ess 649.7697594130741, samples 68160
+                iter: 143
+                ess 650.5367049648278, samples 68640
+                iter: 144
+                ess 639.9466275638673, samples 69120
+                iter: 145
+                ess 640.2957466724021, samples 69600
+                iter: 146
+                ess 640.0153814658115, samples 70080
+                iter: 147
+                ess 626.9871491217674, samples 70560
+                iter: 148
+                ess 630.5099627978551, samples 71040
+                iter: 149
+                ess 641.475836513853, samples 71520
+                iter: 150
+                ess 647.0777591330285, samples 72000
+                iter: 151
+                ess 658.2180241625047, samples 72480
+                iter: 152
+                ess 664.4616871046815, samples 72960
+                iter: 153
+                ess 669.388023229061, samples 73440
+                iter: 154
+                ess 680.3659258749831, samples 73920
+                iter: 155
+                ess 687.1401822225786, samples 74400
+                iter: 156
+                ess 692.5701574201029, samples 74880
+                iter: 157
+                ess 696.9208505171567, samples 75360
+                iter: 158
+                ess 698.9831285938126, samples 75840
+                iter: 159
+                ess 701.7865933833568, samples 76320
+                iter: 160
+                ess 712.1668792764433, samples 76800
+                iter: 161
+                ess 717.8664150269951, samples 77280
+                iter: 162
+                ess 723.3685677781476, samples 77760
+                iter: 163
+                ess 726.6618355324545, samples 78240
+                iter: 164
+                ess 731.9046863723236, samples 78720
+                iter: 165
+                ess 734.6077846981581, samples 79200
+                iter: 166
+                ess 743.4587000835944, samples 79680
+                iter: 167
+                ess 749.5954998881085, samples 80160
+                iter: 168
+                ess 756.8026494121233, samples 80640
+                iter: 169
+                ess 748.2430131931433, samples 81120
+                iter: 170
+                ess 736.9373823565642, samples 81600
+                iter: 171
+                ess 738.7646863358979, samples 82080
+                iter: 172
+                ess 747.4466509312857, samples 82560
+                iter: 173
+                ess 759.2949604609098, samples 83040
+                iter: 174
+                ess 774.8756138451412, samples 83520
+                iter: 175
+                ess 783.7448844740625, samples 84000
+                iter: 176
+                ess 788.0867664178603, samples 84480
+                iter: 177
+                ess 811.3160190921128, samples 84960
+                iter: 178
+                ess 818.5318706982479, samples 85440
+                iter: 179
+                ess 815.8145301170484, samples 85920
+                iter: 180
+                ess 813.7085477182601, samples 86400
+                iter: 181
+                ess 815.645973893186, samples 86880
+                iter: 182
+                ess 829.759247582038, samples 87360
+                iter: 183
+                ess 840.9754865813895, samples 87840
+                iter: 184
+                ess 847.7761670199511, samples 88320
+                iter: 185
+                ess 849.3690799068195, samples 88800
+                iter: 186
+                ess 845.7500589106621, samples 89280
+                iter: 187
+                ess 841.9175659986442, samples 89760
+                iter: 188
+                ess 850.8926790802444, samples 90240
+                iter: 189
+                ess 862.8987969863543, samples 90720
+                iter: 190
+                ess 873.7681727158528, samples 91200
+                iter: 191
+                ess 878.1383620730409, samples 91680
+                iter: 192
+                ess 873.82537952647, samples 92160
+                iter: 193
+                ess 877.3322108327878, samples 92640
+                iter: 194
+                ess 879.344204024488, samples 93120
+                iter: 195
+                ess 882.487619738579, samples 93600
+                iter: 196
+                ess 891.3070115159609, samples 94080
+                iter: 197
+                ess 896.2654263339139, samples 94560
+                iter: 198
+                ess 901.6865332169081, samples 95040
+                iter: 199
+                ess 911.771093624819, samples 95520
+                iter: 200
+                ess 922.2760009235533, samples 96000
+                iter: 201
+                ess 922.4904575144362, samples 96480
+                iter: 202
+                ess 921.1875924603441, samples 96960
+                iter: 203
+                ess 922.0922740437478, samples 97440
+                iter: 204
+                ess 928.4435088190756, samples 97920
+                iter: 205
+                ess 934.2191465465089, samples 98400
+                iter: 206
+                ess 941.6035620608822, samples 98880
+                iter: 207
+                ess 941.7193125886082, samples 99360
+                iter: 208
+                ess 960.4504766392033, samples 99840
+                iter: 209
+                ess 968.507965036127, samples 100320
+                iter: 210
+                ess 981.167921221783, samples 100800
+                iter: 211
+                ess 983.7435303124782, samples 101280
+                iter: 212
+                ess 990.3398433232712, samples 101760
+                iter: 213
+                ess 993.2330647065727, samples 102240
+                iter: 214
+                ess 994.0147757822937, samples 102720
+                iter: 215
+                ess 1002.9918608020398, samples 103200
+        Billiard walk rhat: 1.002332053243373
+        CHRRT rhat: 1.0106888666904759
+        OHRR rhat: 1.0085877482689396
+        ess {&#39;Billiard walk&#39;: 2089.437296408794, &#39;CHRRT&#39;: 1079.4569141209104, &#39;OHRR&#39;: 1002.9918608020398}
+        times {&#39;Billiard walk&#39;: 1.1041920185089111, &#39;CHRRT&#39;: 0.9261925220489502, &#39;OHRR&#39;: 18.405820846557617}
+        ess/t {&#39;Billiard walk&#39;: 1892.2771233488422, &#39;CHRRT&#39;: 1165.4778984102616, &#39;OHRR&#39;: 54.49318827796948}
+</pre></div></div>
+</div>
+</section>
+<section id="Visualizing-the-results">
+<h1>Visualizing the results<a class="headerlink" href="#Visualizing-the-results" title="Link to this heading">#</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">title_fs</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">label_fs</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">tick_fs</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="n">legend_fs</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="n">img_format</span> <span class="o">=</span> <span class="s2">&quot;pdf&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">times_to_plot</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">ess_t_to_plot</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># restructure dicts for easier plotting</span>
+<span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">p</span> <span class="ow">in</span> <span class="n">proposalTypes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">times_to_plot</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">ess_t_to_plot</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">problem_selection</span> <span class="ow">in</span> <span class="n">problems_to_benchmark</span><span class="p">:</span>
+        <span class="n">times_to_plot</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">problem_selection</span><span class="p">]</span> <span class="o">=</span> <span class="n">times</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">][</span><span class="n">n</span><span class="p">]</span>
+        <span class="n">ess_t_to_plot</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">problem_selection</span><span class="p">]</span> <span class="o">=</span> <span class="n">ess_t</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">][</span><span class="n">n</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<section id="visualize-runtimes">
+<h2>visualize runtimes<a class="headerlink" href="#visualize-runtimes" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">1.5</span> <span class="o">*</span> <span class="mf">6.4</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">problem_selection</span> <span class="o">+</span> <span class="s2">&quot; runtime results&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">title_fs</span><span class="p">)</span>
+
+<span class="n">X_ticks</span> <span class="o">=</span> <span class="n">problems_to_benchmark</span>
+
+<span class="n">X_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X_ticks</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">X_axis</span> <span class="o">-</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">times_to_plot</span><span class="p">[</span><span class="s2">&quot;Billiard walk&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">hatch</span><span class="o">=</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Multiphase Billiard walk&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">X_axis</span> <span class="o">-</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">times_to_plot</span><span class="p">[</span><span class="s2">&quot;CHRRT&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">hatch</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;CHRRT&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">X_axis</span> <span class="o">+</span> <span class="mf">.3</span><span class="p">,</span> <span class="n">times_to_plot</span><span class="p">[</span><span class="s2">&quot;OHRR&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">hatch</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;OHRR&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$s$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">label_fs</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Benchmark Problem&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">label_fs</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">X_axis</span><span class="p">,</span> <span class="n">X_ticks</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">tick_fs</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="n">tick_fs</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="n">legend_fs</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;BenchmarkRuntimeResults.pdf&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_BenchmarkingMultiphaseMonteCarloSampling_18_0.png" src="../_images/notebooks_BenchmarkingMultiphaseMonteCarloSampling_18_0.png" />
+</div>
+</div>
+</section>
+<section id="visualize-ESS/t-[1/s]">
+<h2>visualize ESS/t [1/s]<a class="headerlink" href="#visualize-ESS/t-[1/s]" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">1.5</span> <span class="o">*</span> <span class="mf">6.4</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">problem_selection</span> <span class="o">+</span> <span class="s2">&quot; ESS/t results&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">title_fs</span><span class="p">)</span>
+
+<span class="n">X_ticks</span> <span class="o">=</span> <span class="n">problems_to_benchmark</span>
+
+<span class="n">X_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X_ticks</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">X_axis</span> <span class="o">-</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">ess_t_to_plot</span><span class="p">[</span><span class="s2">&quot;Billiard walk&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">hatch</span><span class="o">=</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Multiphase Billiard walk&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">X_axis</span> <span class="o">-</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">ess_t_to_plot</span><span class="p">[</span><span class="s2">&quot;CHRRT&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">hatch</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;CHRRT&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">X_axis</span> <span class="o">+</span> <span class="mf">.3</span><span class="p">,</span> <span class="n">ess_t_to_plot</span><span class="p">[</span><span class="s2">&quot;OHRR&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">hatch</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;OHRR&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\frac{\mathit</span><span class="si">{ESS}</span><span class="s2">}</span><span class="si">{t}</span><span class="s2"> [\frac</span><span class="si">{1}{s}</span><span class="s2">]$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">label_fs</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Benchmark Problem&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">label_fs</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">X_axis</span><span class="p">,</span> <span class="n">X_ticks</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">tick_fs</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="n">tick_fs</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="n">legend_fs</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;BenchmarkPerformanceResults.pdf&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_BenchmarkingMultiphaseMonteCarloSampling_20_0.png" src="../_images/notebooks_BenchmarkingMultiphaseMonteCarloSampling_20_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Conclusion">
+<h1>Conclusion<a class="headerlink" href="#Conclusion" title="Link to this heading">#</a></h1>
+<p>In this benchmark the overrelaxed hit and run does not perform well against modern sampling algorithms. Furthermore we can see, that the performance is problem dependendent.</p>
+<p>The values of the benchmark are not the main result of this script, however. Much more important is that hopsy is flexible enough to quickly construct fair benchmarks comparing novel algorithms with existing implementations. Furthermore all sampling algorithms access the models (polytopes) via the same interface, which reduces work for the methods researcher.</p>
+</section>
+<section id="Appendix">
+<h1>Appendix<a class="headerlink" href="#Appendix" title="Link to this heading">#</a></h1>
+<section id="Visualizing-the-samples">
+<h2>Visualizing the samples<a class="headerlink" href="#Visualizing-the-samples" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">problem_selection</span> <span class="ow">in</span> <span class="n">samples</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="n">n_dims</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">][</span><span class="s2">&quot;CHRRT&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">n_cols</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">n_rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_dims</span> <span class="o">/</span> <span class="n">n_cols</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">n_cols</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span> <span class="n">n_rows</span> <span class="o">*</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span>
+        <span class="s2">&quot;Marginal densities for &quot;</span> <span class="o">+</span> <span class="n">problem_selection</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">title_fs</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_dims</span><span class="p">):</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span><span class="p">,</span> <span class="n">dim</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Density for </span><span class="si">{</span><span class="n">parameter_names</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">title_fs</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">][</span><span class="s2">&quot;Billiard walk&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[:,</span> <span class="n">dim</span><span class="p">],</span>
+            <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Multiphase Billiard Walk&quot;</span> <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">][</span><span class="s2">&quot;CHRRT&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[:,</span> <span class="n">dim</span><span class="p">],</span>
+            <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;CHRRT&quot;</span> <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">problem_selection</span><span class="p">][</span><span class="s2">&quot;OHRR&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[:,</span> <span class="n">dim</span><span class="p">],</span>
+            <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;OHRR&quot;</span> <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C2&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="n">tick_fs</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="n">tick_fs</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figlegend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="n">legend_fs</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">rect</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_BenchmarkingMultiphaseMonteCarloSampling_24_0.png" src="../_images/notebooks_BenchmarkingMultiphaseMonteCarloSampling_24_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_BenchmarkingMultiphaseMonteCarloSampling_24_1.png" src="../_images/notebooks_BenchmarkingMultiphaseMonteCarloSampling_24_1.png" />
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+  
+    
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Benchmarking Multiphase Monte Carlo Sampling</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Motivation">Motivation</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Background">Background</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Custom-proposals">Custom proposals</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#More-complex-custom-sampling-schemes">More complex custom sampling schemes</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Helper-functions">Helper functions</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Benchmark-parameters">Benchmark parameters</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Benchmarking">Benchmarking</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Visualizing-the-results">Visualizing the results</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-runtimes">visualize runtimes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-ESS/t-[1/s]">visualize ESS/t [1/s]</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Conclusion">Conclusion</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Appendix">Appendix</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Visualizing-the-samples">Visualizing the samples</a></li>
+</ul>
+</li>
+</ul>
+
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div class="tocsection sourcelink">
+    <a href="../_sources/notebooks/BenchmarkingMultiphaseMonteCarloSampling.ipynb.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+  
+
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+  
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2021-2022, Forschungszentrum Jülich GmbH, authors: Richard D. Paul, Johann F. Jadebeck, Katharina Nöh.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
