@@ -27,7 +27,6 @@ from typing import List
 
 import arviz
 import numpy as np
-import pandas as pd
 import PolyRound
 from matplotlib import pyplot as plt
 
@@ -284,8 +283,14 @@ if __name__ == "__main__":
         "CHRRT": hopsy.UniformCoordinateHitAndRunProposal,
         # "OHRR": OverrelaxedHitAndRunProposal,
     }
-
     seeds = [1, 2, 3, 4]
+
+    # plot settings
+    title_fs = 32
+    label_fs = 20
+    tick_fs = 16
+    legend_fs = 16
+    img_format = "pdf"  # svg
 
     samples = {}
     iterations = {}
@@ -296,6 +301,11 @@ if __name__ == "__main__":
     problems_to_benchmark = ["BP5", "e_coli", "iAT_PLT_636"]
 
     for problem_selection in problems_to_benchmark:
+        samples[problem_selection] = {}
+        iterations[problem_selection] = {}
+        ess[problem_selection] = {}
+        times[problem_selection] = {}
+        ess_t[problem_selection] = {}
         for name, p in proposalTypes.items():
             print("running benchmark for", name)
             # resets problem and starting points
@@ -310,10 +320,10 @@ if __name__ == "__main__":
 
             if name == "Billiard walk":
                 (
-                    samples[name],
-                    iterations[name],
-                    ess[name],
-                    times[name],
+                    samples[problem_selection][name],
+                    iterations[problem_selection][name],
+                    ess[problem_selection][name],
+                    times[problem_selection][name],
                 ) = run_multiphase_sampling(
                     proposal=p,
                     polytope=preprocessed_polytope,
@@ -328,7 +338,12 @@ if __name__ == "__main__":
                     if name != "CHRRT"
                     else max(int(float(preprocessed_polytope.A.shape[1] ** 2) / 6), 1)
                 )
-                samples[name], iterations[name], ess[name], times[name] = run_sampling(
+                (
+                    samples[problem_selection][name],
+                    iterations[problem_selection][name],
+                    ess[problem_selection][name],
+                    times[problem_selection][name],
+                ) = run_sampling(
                     proposal=p,
                     polytope=preprocessed_polytope,
                     seeds=seeds,
@@ -337,22 +352,17 @@ if __name__ == "__main__":
                     starting_points=starting_points,
                     thinning=thinning,
                 )
-            ess_t[name] = ess[name] / times[name]
+            ess_t[problem_selection][name] = (
+                ess[problem_selection][name] / times[problem_selection][name]
+            )
 
         # check convergence
-        for name, s in samples.items():
+        for name, s in samples[problem_selection].items():
             print(name, "rhat:", np.max(hopsy.rhat(s)))
 
-        print("ess", ess)
-        print("times", times)
-        print("ess/t", ess_t)
-
-        # plot settings
-        title_fs = 32
-        label_fs = 20
-        tick_fs = 16
-        legend_fs = 16
-        img_format = "pdf"  # svg
+        print("ess", ess[problem_selection])
+        print("times", times[problem_selection])
+        print("ess/t", ess_t[problem_selection])
 
         plt.figure(figsize=(1.5 * 6.4, 8))
         plt.title(problem_selection + " benchmark results", fontsize=title_fs)
