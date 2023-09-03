@@ -65,7 +65,7 @@ def svd_rounding(samples, polytope):
     polytope.apply_shift(mean)
     polytope.apply_transformation(rounding_matrix)
 
-    return s_ratio, starting_points, polytope
+    return s_ratio, starting_points, polytope, sub_problem
 
 
 # creating a custom proposal to plug in to hopsy, in this case based on https://ui.adsabs.harvard.edu/abs/2015IJMPC..2650010D/abstract
@@ -113,7 +113,7 @@ def run_multiphase_sampling(
     steps_per_phase: int,
     starting_points: List,
 ):
-    limit_singular_ratio_value = 3  # from https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf
+    limit_singular_ratio_value = 2.3  # from https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf
     assert len(starting_points) == len(seeds)
     rngs = [hopsy.RandomNumberGenerator(s) for s in seeds]
 
@@ -122,6 +122,7 @@ def run_multiphase_sampling(
     s_ratio = limit_singular_ratio_value + 1
     sampling_time = 0
     samples = None
+    last_iteration_did_rounding = True
     while ess < target_ess:
         iterations += 1
         print("\titer:", iterations)
@@ -144,22 +145,30 @@ def run_multiphase_sampling(
         sampling_time += end - start
 
         if s_ratio > limit_singular_ratio_value:
+            samples = _samples
             # also measures the rounding time
             start = time.time()
-            samples = _samples
-            s_ratio, starting_points, internal_polytope = svd_rounding(
-                _samples, internal_polytope
+            s_ratio, starting_points, internal_polytope, sub_problem = svd_rounding(
+                samples, internal_polytope
             )
             end = time.time()
             sampling_time += end - start
             print("\ts_ratio:", s_ratio)
+            last_iteration_did_rounding = True
         else:
             print("\tno adaptive rounding")
+            if last_iteration_did_rounding:
+                # next operation transforms last samples to current space before concatenating
+                for j in range(samples.shape[0]):
+                    samples[j] = hopsy.transform(
+                        sub_problem, [samples[j, i, :] for i in range(samples.shape[1])]
+                    )
+                last_iteration_did_rounding = False
+
             samples = np.concatenate((samples, _samples), axis=1)
             starting_points = [samples[i, -1, :] for i in range(samples.shape[0])]
-
         ess = np.min(hopsy.ess(samples))
-        print("\tess", str(ess) + ",", "samples", samples.shape[1])
+        print("\tess", str(ess))
         steps_per_phase += 100
 
     # transforms back to full space
@@ -254,15 +263,17 @@ def generate_polytope(name):
         bp = hopsy.BirkhoffPolytope(5)
         polytope = PolyRound.mutable_classes.polytope.Polytope(A=bp.A, b=bp.b)
         polytope.normalize()
-        return polytope, polytope, "5D Birkhoff Polytope"
+        parameter_names = ["x" + str(c) for c in polytope.A.columns]
+        return polytope, "5D Birkhoff Polytope", parameter_names
     elif name == "e_coli":
         original_polytope = PolyRound.static_classes.parse_sbml_stoichiometry.StoichiometryParser.parse_sbml_cobrapy(
             "../extern/hops/resources/e_coli_core/e_coli_core.xml"
         )
+        parameter_names = original_polytope.A.columns
         polytope = PolyRound.api.PolyRoundApi.simplify_polytope(original_polytope)
         polytope = PolyRound.api.PolyRoundApi.transform_polytope(polytope)
         polytope.normalize()
-        return polytope, original_polytope, "e_coli_core"
+        return polytope, "e_coli_core", parameter_names
 
 
 if __name__ == "__main__":
@@ -282,165 +293,154 @@ if __name__ == "__main__":
     times = {}
     ess_t = {}
 
-    problem_selection = "e_coli"
-    for name, p in proposalTypes.items():
-        print("running benchmark for", name)
-        # resets problem and starting points
-        preprocessed_polytope, original_polytope, problem_name = generate_polytope(
-            problem_selection
-        )
-        steps_per_phase = preprocessed_polytope.A.shape[1] * 20
-        cheby = hopsy.compute_chebyshev_center(
-            hopsy.Problem(A=preprocessed_polytope.A, b=preprocessed_polytope.b)
-        ).flatten()
-        starting_points = [cheby for s in seeds]
+    problems_to_benchmark = ["BP5", "e_coli", "iAT_PLT_636"]
 
-        if name == "Billiard walk":
-            (
-                samples[name],
-                iterations[name],
-                ess[name],
-                times[name],
-            ) = run_multiphase_sampling(
-                proposal=p,
-                polytope=preprocessed_polytope,
-                seeds=seeds,
-                target_ess=target_ess,
-                steps_per_phase=steps_per_phase,
-                starting_points=starting_points,
+    for problem_selection in problems_to_benchmark:
+        for name, p in proposalTypes.items():
+            print("running benchmark for", name)
+            # resets problem and starting points
+            preprocessed_polytope, problem_name, parameter_names = generate_polytope(
+                problem_selection
             )
-            s = np.concatenate(samples[name], axis=0)
-            for i in range(s.shape[0]):
-                original_s = hopsy.back_transform(
-                    hopsy.Problem(
-                        A=preprocessed_polytope.A,
-                        b=preprocessed_polytope.b,
-                        transformation=preprocessed_polytope.transformation,
-                        shift=preprocessed_polytope.shift,
-                    ),
-                    [s[i, :]],
+            steps_per_phase = preprocessed_polytope.A.shape[1] * 20
+            cheby = hopsy.compute_chebyshev_center(
+                hopsy.Problem(A=preprocessed_polytope.A, b=preprocessed_polytope.b)
+            ).flatten()
+            starting_points = [cheby for s in seeds]
+
+            if name == "Billiard walk":
+                (
+                    samples[name],
+                    iterations[name],
+                    ess[name],
+                    times[name],
+                ) = run_multiphase_sampling(
+                    proposal=p,
+                    polytope=preprocessed_polytope,
+                    seeds=seeds,
+                    target_ess=target_ess,
+                    steps_per_phase=steps_per_phase,
+                    starting_points=starting_points,
                 )
+            else:
+                thinning = (
+                    1
+                    if name != "CHRRT"
+                    else max(int(float(preprocessed_polytope.A.shape[1] ** 2) / 6), 1)
+                )
+                samples[name], iterations[name], ess[name], times[name] = run_sampling(
+                    proposal=p,
+                    polytope=preprocessed_polytope,
+                    seeds=seeds,
+                    target_ess=target_ess,
+                    steps_per_phase=steps_per_phase,
+                    starting_points=starting_points,
+                    thinning=thinning,
+                )
+            ess_t[name] = ess[name] / times[name]
 
-                print(np.min(original_polytope.b - original_polytope.A @ original_s[0]))
-                # assert 0 < np.min(original_polytope.b - original_polytope.A @ s[i, :])
+        # check convergence
+        for name, s in samples.items():
+            print(name, "rhat:", np.max(hopsy.rhat(s)))
 
-        else:
-            thinning = (
-                1
-                if name != "CHRRT"
-                else max(int(float(polytope.A.shape[1] ** 2) / 6), 1)
-            )
-            samples[name], iterations[name], ess[name], times[name] = run_sampling(
-                proposal=p,
-                polytope=preprocessed_polytope,
-                seeds=seeds,
-                target_ess=target_ess,
-                steps_per_phase=steps_per_phase,
-                starting_points=starting_points,
-                thinning=thinning,
-            )
-        ess_t[name] = ess[name] / times[name]
+        print("ess", ess)
+        print("times", times)
+        print("ess/t", ess_t)
 
-    # check convergence
-    for name, s in samples.items():
-        print(name, "rhat:", np.max(hopsy.rhat(s)))
+        # plot settings
+        title_fs = 32
+        label_fs = 20
+        tick_fs = 16
+        legend_fs = 16
+        img_format = "pdf"  # svg
 
-    print("ess", ess)
-    print("times", times)
-    print("ess/t", ess_t)
+        plt.figure(figsize=(1.5 * 6.4, 8))
+        plt.title(problem_selection + " benchmark results", fontsize=title_fs)
 
-    # plot settings
-    title_fs = 32
-    label_fs = 20
-    tick_fs = 16
-    legend_fs = 16
-    img_format = "pdf"  # svg
+        X_ticks = [problem_name]
 
-    plt.figure(figsize=(1.5 * 6.4, 8))
-    plt.title("Benchmark results", fontsize=title_fs)
-
-    X_ticks = [problem_name]
-
-    X_axis = np.arange(len(X_ticks))
-    plt.bar(
-        X_axis - 0.2,
-        ess_t["Billiard walk"],
-        0.2,
-        hatch="/",
-        label="Multiphase Billiard walk",
-    )
-    plt.bar(X_axis - 0.0, ess_t["CHRRT"], 0.2, hatch="o", label="CHRRT")
-    # plt.bar(X_axis + .2, ess_t['OHRR'], 0.2, hatch='-', label='OHRR')
-
-    plt.ylabel(r"$\frac{\mathit{ESS}}{t} [\frac{1}{s}]$", fontsize=label_fs)
-    plt.xlabel(r"Benchmark Problem", fontsize=label_fs)
-    plt.xticks(X_axis, X_ticks, fontsize=tick_fs)
-    plt.yticks(fontsize=tick_fs)
-
-    plt.tight_layout()
-
-    plt.legend(fontsize=legend_fs)
-    plt.savefig("Benchmarking_multiphase_mcmc.pdf")
-    plt.show()
-
-    plt.figure(figsize=(1.5 * 6.4, 8))
-    plt.title("Runtime results", fontsize=title_fs)
-
-    X_ticks = [problem_name]
-
-    X_axis = np.arange(len(X_ticks))
-    plt.bar(
-        X_axis - 0.2,
-        times["Billiard walk"],
-        0.2,
-        hatch="/",
-        label="Multiphase Billiard walk",
-    )
-    plt.bar(X_axis - 0.0, times["CHRRT"], 0.2, hatch="o", label="CHRRT")
-    # plt.bar(X_axis + .2, times['OHRR'], 0.2, hatch='-', label='OHRR')
-
-    # plt.xticks(rotation=90)
-    plt.ylabel(r"$s$", fontsize=label_fs)
-    plt.xlabel(r"Benchmark Problem", fontsize=label_fs)
-    plt.xticks(X_axis, X_ticks, fontsize=tick_fs)
-    plt.yticks(fontsize=tick_fs)
-
-    plt.tight_layout()
-
-    plt.legend(fontsize=legend_fs)
-    plt.savefig("Benchmarking_multiphase_mcmc.pdf")
-    plt.show()
-
-    n_dims = polytope.transformation.shape[0]
-    n_cols = 5
-    n_rows = int(n_dims / n_cols) + 1
-    plt.figure(figsize=(16, 64))
-    plt.subplot(n_rows, n_cols, 1)
-    plt.suptitle(f"Marginal densities", y=1.01, fontsize=title_fs)
-    for dim in range(n_dims):
-        plt.subplot(n_rows, n_cols, dim + 1)
-        plt.title(f"Density for x{dim}", fontsize=title_fs - 2)
-        _, bins, _ = plt.hist(
-            np.concatenate(samples["Billiard walk"], axis=0)[:, dim],
-            bins=100,
-            density=True,
-            label="Multiphase Billiard Walk" if dim == 0 else None,
-            alpha=0.75,
-            color="C0",
+        X_axis = np.arange(len(X_ticks))
+        plt.bar(
+            X_axis - 0.2,
+            ess_t["Billiard walk"],
+            0.2,
+            hatch="/",
+            label="Multiphase Billiard walk",
         )
-        _ = plt.hist(
-            np.concatenate(samples["CHRRT"], axis=0)[:, dim],
-            bins=bins,
-            alpha=0.25,
-            density=True,
-            label="CHRRT" if dim == 0 else None,
-            color="C1",
-        )
-        # _ = plt.hist(np.concatenate(samples['OHRR'], axis=0)[:, dim], bins=bins, alpha=0.25, density=True,
-        #              label='OHRR' if dim == 0 else None, color='C2')
-        plt.xticks(fontsize=tick_fs)
+        plt.bar(X_axis - 0.0, ess_t["CHRRT"], 0.2, hatch="o", label="CHRRT")
+        # plt.bar(X_axis + .2, ess_t['OHRR'], 0.2, hatch='-', label='OHRR')
+
+        plt.ylabel(r"$\frac{\mathit{ESS}}{t} [\frac{1}{s}]$", fontsize=label_fs)
+        plt.xlabel(r"Benchmark Problem", fontsize=label_fs)
+        plt.xticks(X_axis, X_ticks, fontsize=tick_fs)
         plt.yticks(fontsize=tick_fs)
 
-    plt.figlegend(fontsize=legend_fs)
-    plt.tight_layout()
-    plt.show()
+        plt.tight_layout()
+
+        plt.legend(fontsize=legend_fs)
+        plt.savefig("Benchmarking_multiphase_mcmc.pdf")
+        plt.show()
+
+        plt.figure(figsize=(1.5 * 6.4, 8))
+        plt.title(problem_selection + " runtime results", fontsize=title_fs)
+
+        X_ticks = [problem_name]
+
+        X_axis = np.arange(len(X_ticks))
+        plt.bar(
+            X_axis - 0.2,
+            times["Billiard walk"],
+            0.2,
+            hatch="/",
+            label="Multiphase Billiard walk",
+        )
+        plt.bar(X_axis - 0.0, times["CHRRT"], 0.2, hatch="o", label="CHRRT")
+        # plt.bar(X_axis + .2, times['OHRR'], 0.2, hatch='-', label='OHRR')
+
+        # plt.xticks(rotation=90)
+        plt.ylabel(r"$s$", fontsize=label_fs)
+        plt.xlabel(r"Benchmark Problem", fontsize=label_fs)
+        plt.xticks(X_axis, X_ticks, fontsize=tick_fs)
+        plt.yticks(fontsize=tick_fs)
+
+        plt.tight_layout()
+
+        plt.legend(fontsize=legend_fs)
+        plt.savefig("Benchmarking_multiphase_mcmc.pdf")
+        plt.show()
+
+        n_dims = preprocessed_polytope.transformation.shape[0]
+        n_cols = 5
+        n_rows = int(n_dims / n_cols) + 1
+        plt.figure(figsize=(n_cols * 6, n_rows * 6))
+        plt.subplot(n_rows, n_cols, 1)
+        plt.suptitle(
+            "Marginal densities for " + problem_selection, y=1.0, fontsize=title_fs
+        )
+        for dim in range(n_dims):
+            plt.subplot(n_rows, n_cols, dim + 1)
+            plt.title(f"Density for {parameter_names[dim]}", fontsize=title_fs - 4)
+            _, bins, _ = plt.hist(
+                np.concatenate(samples["Billiard walk"], axis=0)[:, dim],
+                bins=100,
+                density=True,
+                label="Multiphase Billiard Walk" if dim == 0 else None,
+                alpha=0.75,
+                color="C0",
+            )
+            _ = plt.hist(
+                np.concatenate(samples["CHRRT"], axis=0)[:, dim],
+                bins=bins,
+                alpha=0.25,
+                density=True,
+                label="CHRRT" if dim == 0 else None,
+                color="C1",
+            )
+            # _ = plt.hist(np.concatenate(samples['OHRR'], axis=0)[:, dim], bins=bins, alpha=0.25, density=True,
+            #              label='OHRR' if dim == 0 else None, color='C2')
+            plt.xticks(fontsize=tick_fs)
+            plt.yticks(fontsize=tick_fs)
+
+        plt.figlegend(fontsize=legend_fs)
+        plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+        plt.show()
