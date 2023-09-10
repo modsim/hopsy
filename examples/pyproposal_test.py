@@ -140,9 +140,8 @@ if __name__ == "__main__":
     _, samples = hopsy.sample(
         mcs,
         [hopsy.RandomNumberGenerator(42 + i) for i in range(4)],
-        n_samples=10,
+        n_samples=100,
         n_procs=4,
     )
     print(mc.proposal.name)
-    print(_, samples)
     print(mc.proposal.proposal)

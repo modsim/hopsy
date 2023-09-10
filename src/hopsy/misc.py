@@ -565,10 +565,9 @@ def _parallel_sampling(
     for i in range(len(args)):
         args[i] += (result_queue,)
 
-    workers = _s.multiprocessing.Pool(n_procs - 1)
-    result = workers.starmap_async(_sample_parallel_chain, args)
-
     if callback is not None or progress_bar:
+        workers = _s.multiprocessing.Pool(n_procs - 1)
+        result = workers.starmap_async(_sample_parallel_chain, args)
         pbars = (
             [
                 _s.tqdm.trange(args[i][2], desc="chain {}".format(i))
@@ -596,6 +595,9 @@ def _parallel_sampling(
 
         if callback is not None:
             callback.finish()
+    else:
+        workers = _s.multiprocessing.Pool(n_procs)
+        result = workers.starmap_async(_sample_parallel_chain, args)
 
     workers.close()
     workers.join()
