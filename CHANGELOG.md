@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#95](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/95): Fix parallel sampling for PyProposals
 - [#91](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/91): Add benchmark example
 - [#90](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/90): Reduce ci build times
 - [#87](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/87): Reduce boilerplate for custom pyproposals

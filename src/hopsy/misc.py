@@ -517,7 +517,7 @@ def _sample_parallel_chain(
     if queue is not None:
         queue.put((chain_idx, None, None))
 
-    return meta, _s.numpy.array(states), markov_chain.state, rng.state
+    return meta, _s.numpy.array(states), markov_chain, rng.state
 
 
 def _process_record_meta(
@@ -565,10 +565,9 @@ def _parallel_sampling(
     for i in range(len(args)):
         args[i] += (result_queue,)
 
-    workers = _s.multiprocessing.Pool(n_procs - 1)
-    result = workers.starmap_async(_sample_parallel_chain, args)
-
     if callback is not None or progress_bar:
+        workers = _s.multiprocessing.Pool(n_procs - 1)
+        result = workers.starmap_async(_sample_parallel_chain, args)
         pbars = (
             [
                 _s.tqdm.trange(args[i][2], desc="chain {}".format(i))
@@ -596,6 +595,9 @@ def _parallel_sampling(
 
         if callback is not None:
             callback.finish()
+    else:
+        workers = _s.multiprocessing.Pool(n_procs)
+        result = workers.starmap_async(_sample_parallel_chain, args)
 
     workers.close()
     workers.join()
@@ -749,7 +751,7 @@ def sample(
         )
         for i, chain_result in enumerate(result_states):
             result.append((chain_result[0], chain_result[1]))
-            markov_chains[i].state = chain_result[2]
+            markov_chains[i] = chain_result[2]
             rngs[i].state = chain_result[3]
     else:
         for chain_idx in range(len(markov_chains)):
