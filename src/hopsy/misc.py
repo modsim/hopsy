@@ -399,7 +399,7 @@ def _sequential_sampling(
     callback: _c.Callback = None,
     progress_bar: bool = False,
 ):
-    states = []
+    states = [None] * n_samples
 
     meta = None
     if record_meta is None or record_meta is False:
@@ -434,7 +434,7 @@ def _sequential_sampling(
                     curr_meta[field] = base
 
         if in_memory:
-            states.append(state)
+            states[i] = state
 
             if record_meta is None or record_meta is False:
                 meta.append(curr_meta)

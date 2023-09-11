@@ -237,28 +237,22 @@ namespace hopsy {
 		};
 
         VectorType& propose(hops::RandomNumberGenerator& rng) override {
-//            std::cout << "proposal.hpp:239 trying to propose" << this << std::endl;
             pyObj.attr("propose")(std::nullopt);
             rng();
-//            std::cout << "proposal.hpp:241 proposed" << this << std::endl;
             proposal = pyObj.attr("proposal").cast<VectorType>();
-//            std::cout << "proposal.hpp:243 " << this << " " << proposal.transpose() << std::endl;
             return proposal;
         }
 
         VectorType& acceptProposal() override {
             if(hasattr(pyObj, "accept_proposal")) {
-//                std::cout << "proposal.hpp:250 accept in python" << std::endl;
                 state = pyObj.attr("accept_proposal")().cast<VectorType>();
             }
             else {
                 // default implementation
                 state.swap(proposal);
-//                std::cout << "proposal.hpp:256 swapping state & prop" << std::endl;
                 pyObj.attr("state") = state;
                 pyObj.attr("proposal") = proposal;
             }
-//            std::cout << "proposal.hpp:254" << this << " " << state.transpose() << std::endl;
             return state;
         }
 
@@ -280,23 +274,18 @@ namespace hopsy {
 
         VectorType getState() const override {
             if(hasattr(pyObj, "state")) {
-//                std::cout << "proposal.hpp:275 " << this << std::endl;
                 return pyObj.attr("state").cast<VectorType>();
             }
             // default implementation
-//             std::cout << "proposal.hpp:279 " << this << std::endl;
             return state;
         }
 
         void setState(const VectorType& newState) override {
-//            std::cout << "proposal.hpp:284 " << this << std::endl;
             if(hasattr(pyObj, "state")) {
-//                std::cout << "proposal.hpp:286 " << this << std::endl;
                 pyObj.attr("state") = newState;
             }
             // always track state
             state = newState;
-//            std::cout << "proposal.hpp:291 " << this << std::endl;
         }
 
         std::vector<std::string> getDimensionNames() const override {
