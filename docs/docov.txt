@@ -172,11 +172,12 @@ Found insufficient docstring for the following items:
   -- hopsy.core.MarkovChain.exchangeAttemptProbability
   -- hopsy.core.MarkovChain.model
   -- hopsy.core.MarkovChain.parallelTemperingSyncRng
+  -- hopsy.core.MarkovChain.problem
   -- hopsy.core.MarkovChain.proposal
   -- hopsy.core.MarkovChain.state
   -- hopsy.examples
   -- hopsy.lp
   -- hopsy.misc
   -- hopsy.tune
-Found 371 items of which 192 have suffcient docstring.
-Coverage: 51.8%
+Found 372 items of which 192 have suffcient docstring.
+Coverage: 51.6%
