@@ -470,7 +470,7 @@ def _sample_parallel_chain(
     record_meta=None,
     queue: _s.multiprocessing.Queue = None,
 ):
-    states = []  # improve performance by preallocating np.ndarray
+    states = [None] * n_samples
 
     meta = None
     if record_meta is None or record_meta is False:
@@ -500,7 +500,7 @@ def _sample_parallel_chain(
                     curr_meta[field] = base
 
         if in_memory:
-            states.append(state)
+            states[i] = state
 
             if record_meta is None or record_meta is False:
                 meta.append(curr_meta)
