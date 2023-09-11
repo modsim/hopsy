@@ -13,12 +13,12 @@ class GaussianProposal:
         self.b = b
         self.cov = cov
         self.stepsize = 1
-        self.proposal = state
-        self.state = state
+        self.proposal = state.flatten()
+        self.state = state.flatten()
 
     def propose(self, rng):
         mean = np.zeros((len(self.cov),))
-        y = np.random.multivariate_normal(mean, self.cov).reshape(-1, 1)
+        y = np.random.multivariate_normal(mean, self.cov).reshape(-1, 1).flatten()
         self.proposal = self.state + self.stepsize * y
         return self.proposal
 
@@ -32,13 +32,13 @@ class AdaptiveGaussianProposal:
     def __init__(self, A: np.ndarray, b: np.ndarray, state: np.ndarray, eps=0.001):
         self.A = A
         self.b = b
-        self.state = state
+        self.state = state.flatten()
         self.eps = eps
         self.stepsize = 1
-        self.proposal = state
+        self.proposal = state.flatten()
         self.t = 0
-        self.cov = np.identity(len(state))
-        self.mean = np.zeros(state.shape)
+        self.cov = np.identity(len(self.state))
+        self.mean = np.zeros(self.state.shape)
 
     def propose(self, rng):
         new_mean = (self.t * self.mean + self.state) / (self.t + 1)
@@ -57,7 +57,11 @@ class AdaptiveGaussianProposal:
         self.t += 1
 
         proposal_mean = np.zeros((len(self.cov),))
-        y = np.random.multivariate_normal(proposal_mean, self.cov).reshape(-1, 1)
+        y = (
+            np.random.multivariate_normal(proposal_mean, self.cov)
+            .reshape(-1, 1)
+            .flatten()
+        )
         self.proposal = self.state + self.stepsize * y
         return self.proposal
 

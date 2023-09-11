@@ -109,7 +109,8 @@ namespace hopsy {
 
         std::pair<double, VectorType>
         draw(hops::RandomNumberGenerator &randomNumberGenerator, long thinning = 1) override {
-            return markovChain->draw(randomNumberGenerator, thinning);
+            auto draw =  markovChain->draw(randomNumberGenerator, thinning);
+            return draw;
         }
 
         VectorType getState() const override {
@@ -226,7 +227,7 @@ namespace hopsy {
                 return Problem(proposal->getA(),
                                proposal->getB(),
                                (model ? model->copyModel() : std::unique_ptr<Model>(nullptr)),
-                               std::optional(proposal->getState()),
+                               proposal->getState(),
                                std::optional<MatrixType>(),
                                std::optional<VectorType>());
             }
@@ -318,6 +319,7 @@ namespace hopsy {
                     );
 
                     mc->markovChain = std::make_unique<decltype(tmp)>(tmp);
+                    return;
                 } else {
                     auto tmp = hops::MarkovChainAdapter(
                             hops::MetropolisHastingsFilter(
@@ -327,10 +329,9 @@ namespace hopsy {
                                     )
                             )
                     );
-
                     mc->markovChain = std::make_unique<decltype(tmp)>(tmp);
+                    return;
                 }
-                return;
             } else {
                 // Case: no model and no transformation
                 if (proposal->isSymmetric()) {
@@ -341,6 +342,7 @@ namespace hopsy {
                     );
 
                     mc->markovChain = std::make_unique<decltype(tmp)>(tmp);
+                    return;
                 } else {
                     auto tmp = hops::MarkovChainAdapter(
                             hops::MetropolisHastingsFilter(
@@ -348,8 +350,8 @@ namespace hopsy {
                             )
                     );
                     mc->markovChain = std::make_unique<decltype(tmp)>(tmp);
+                    return;
                 }
-                return;
             }
         }
     };
@@ -465,6 +467,7 @@ namespace hopsy {
                 .def_property("state", &MarkovChain::getState, &MarkovChain::setState, doc::MarkovChain::state)
                 .def_property("model", &MarkovChain::getModel, &MarkovChain::setModel, doc::MarkovChain::model)
                 .def_property("proposal", &MarkovChain::getProposal, &MarkovChain::setProposal, doc::MarkovChain::proposal)
+                .def_property_readonly("problem", &MarkovChain::getProblem)
                 .def_readwrite("parallelTemperingSyncRng", &MarkovChain::parallelTemperingSyncRng)
                 .def_property("exchangeAttemptProbability", &MarkovChain::getExchangeAttemptProbability,
                               &MarkovChain::setExchangeAttemptProbability,
@@ -487,6 +490,7 @@ namespace hopsy {
                                                                          t[4].cast<double>());
 
                                     markovChain.setState(t[2].cast<VectorType>());
+                                    VectorType s = markovChain.getState().transpose();
                                     return markovChain;
                                 }));
     }
