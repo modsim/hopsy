@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#96](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/96): Fix pickling for problem
 - [#95](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/95): Fix parallel sampling for PyProposals
 - [#91](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/91): Add benchmark example
 - [#90](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/90): Reduce ci build times

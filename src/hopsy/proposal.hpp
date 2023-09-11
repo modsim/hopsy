@@ -236,7 +236,9 @@ namespace hopsy {
 		PyProposal(py::object pyObj) : pyObj(std::move(pyObj)) {};
 
         VectorType& propose(hops::RandomNumberGenerator& rng) override {
-            proposal = pyObj.attr("propose")(hopsy::RandomNumberGenerator(rng)).cast<VectorType>();
+            pyObj.attr("propose")(std::nullopt);
+            rng();
+            proposal = pyObj.attr("proposal").cast<VectorType>();
             return proposal;
         }
 
@@ -247,7 +249,8 @@ namespace hopsy {
             else {
                 // default implementation
                 state.swap(proposal);
-                pyObj.attr("state") = pyObj.attr("proposal");
+                pyObj.attr("state") = state;
+                pyObj.attr("proposal") = proposal;
             }
             return state;
         }
@@ -278,7 +281,7 @@ namespace hopsy {
 
         void setState(const VectorType& newState) override {
             if(hasattr(pyObj, "state")) {
-                pyObj.attr("state")(newState);
+                pyObj.attr("state") = newState;
             }
             // always track state
             state = newState;
@@ -376,7 +379,7 @@ namespace hopsy {
 
         const MatrixType& getA() const override {
             if(hasattr(pyObj, "A")) {
-                this->A = pyObj.attr("A")().cast<MatrixType>();
+                this->A = pyObj.attr("A").cast<MatrixType>();
                 return this->A;
             }
             throw std::runtime_error("Function not implemented.");
@@ -384,7 +387,7 @@ namespace hopsy {
 
         const VectorType& getB() const override {
             if(hasattr(pyObj, "b")) {
-                this->b = pyObj.attr("b")().cast<VectorType>();
+                this->b = pyObj.attr("b").cast<VectorType>();
                 return this->b;
             }
             throw std::runtime_error("Function not implemented.");

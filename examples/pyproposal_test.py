@@ -1,3 +1,4 @@
+import pickle
 import sys
 from typing import List
 
@@ -12,14 +13,14 @@ class PyProposalWithFullBoilerplate:
     ):
         self.A = A
         self.b = b
-        self.state = state
+        self.state = state.flatten()
         self.cov = cov
         self.__stepsize = 1
-        self.proposal = state
+        self.proposal = state.flatten()
 
     def propose(self, rng):
         mean = np.zeros((len(cov),))
-        y = np.random.multivariate_normal(mean, cov).reshape(-1, 1)
+        y = np.random.multivariate_normal(mean, cov).reshape(-1, 1).flatten()
         self.proposal = self.state + self.stepsize * y
         return self.proposal
 
@@ -47,15 +48,15 @@ class PyProposalMinimalBoilerplate:
     def __init__(
         self, A: np.ndarray, b: np.ndarray, state: np.ndarray, cov: np.ndarray
     ):
-        self.proposal = state
+        self.proposal = state.flatten()
         self.A = A
         self.b = b
-        self.state = state
+        self.state = state.flatten()
         self.cov = cov
 
     def propose(self, rng):
         mean = np.zeros((len(cov),))
-        y = np.random.multivariate_normal(mean, cov).reshape(-1, 1)
+        y = np.random.multivariate_normal(mean, cov).reshape(-1, 1).flatten()
         self.proposal = self.state + y
         return self.proposal
 
@@ -87,11 +88,21 @@ if __name__ == "__main__":
     ]
     mc = mcs[0]
     assert mc.proposal.name == "CoordinateHitAndRun"
+    _, samples = hopsy.sample(
+        mcs,
+        [hopsy.RandomNumberGenerator(42 + i) for i in range(4)],
+        n_samples=10,
+        n_procs=4,
+    )
 
     mc.proposal = hopsy.GaussianHitAndRunProposal(problem, x0)
+    for i in range(4):
+        mcs[i].proposal = mc.proposal
     assert mc.proposal.name == "HitAndRun"
 
     mc.proposal = hopsy.UniformHitAndRunProposal(problem, x0)
+    for i in range(4):
+        mcs[i].proposal = mc.proposal
     assert mc.proposal.name == "HitAndRun"
     _, samples = hopsy.sample(
         mcs,
@@ -101,6 +112,8 @@ if __name__ == "__main__":
     )
 
     mc.proposal = PyProposalWithFullBoilerplate(A, b, x0, cov)
+    for i in range(4):
+        mcs[i].proposal = mc.proposal
     assert mc.proposal.name == "PyGaussianProposal"
     _, samples = hopsy.sample(
         mcs,
@@ -116,7 +129,10 @@ if __name__ == "__main__":
     proposal = hopsy.PyProposal(PyProposalMinimalBoilerplate(A, b, x0, cov))
     assert proposal.name == "PyProposalMinimalBoilerplate"
     mc.proposal = proposal
+    for i in range(4):
+        mcs[i].proposal = mc.proposal
     assert mc.proposal.name == "PyProposalMinimalBoilerplate"
+
     _, samples = hopsy.sample(mc, hopsy.RandomNumberGenerator(42), n_samples=10)
     _, samples = hopsy.sample(
         mcs,
@@ -129,10 +145,12 @@ if __name__ == "__main__":
     proposal = PyProposalMinimalBoilerplate(A, b, x0, cov)
     # proposal.name does not exist in python now!
     mc.proposal = proposal
+    for i in range(4):
+        mcs[i].proposal = mc.proposal
     # mc.proposal.name is default generated in C++ backend and is just the class name
     assert mc.proposal.name == "PyProposalMinimalBoilerplate"
 
-    # tests sequential sampling
+    # # tests sequential sampling
     _, samples = hopsy.sample(
         mc, hopsy.RandomNumberGenerator(42), n_samples=10, n_procs=1
     )
@@ -140,8 +158,9 @@ if __name__ == "__main__":
     _, samples = hopsy.sample(
         mcs,
         [hopsy.RandomNumberGenerator(42 + i) for i in range(4)],
-        n_samples=100,
+        n_samples=10,
         n_procs=4,
     )
-    print(mc.proposal.name)
+
+    print(samples)
     print(mc.proposal.proposal)
