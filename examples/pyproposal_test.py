@@ -57,13 +57,10 @@ class PyProposalMinimalBoilerplate:
     def propose(self, rng):
         mean = np.zeros((len(cov),))
         y = np.random.multivariate_normal(mean, cov).reshape(-1, 1).flatten()
-        print("y", y)
         self.proposal = self.state + y
-        print("py proposing ", self.proposal)
         return self.proposal
 
     def log_acceptance_probability(self) -> float:
-        print("py acceptance prob for", self.proposal)
         if ((self.A @ self.proposal - self.b) >= 0).any():
             return -np.inf
         return 0
@@ -91,7 +88,12 @@ if __name__ == "__main__":
     ]
     mc = mcs[0]
     assert mc.proposal.name == "CoordinateHitAndRun"
-    # _, samples = hopsy.sample(mcs, [hopsy.RandomNumberGenerator(42 + i) for i in range(4)], n_samples=10, n_procs=4)
+    _, samples = hopsy.sample(
+        mcs,
+        [hopsy.RandomNumberGenerator(42 + i) for i in range(4)],
+        n_samples=10,
+        n_procs=4,
+    )
 
     mc.proposal = hopsy.GaussianHitAndRunProposal(problem, x0)
     for i in range(4):
@@ -102,16 +104,26 @@ if __name__ == "__main__":
     for i in range(4):
         mcs[i].proposal = mc.proposal
     assert mc.proposal.name == "HitAndRun"
-    # _, samples = hopsy.sample(mcs, [hopsy.RandomNumberGenerator(42 + i) for i in range(4)], n_samples=10, n_procs=4)
+    _, samples = hopsy.sample(
+        mcs,
+        [hopsy.RandomNumberGenerator(42 + i) for i in range(4)],
+        n_samples=10,
+        n_procs=4,
+    )
 
     mc.proposal = PyProposalWithFullBoilerplate(A, b, x0, cov)
     for i in range(4):
         mcs[i].proposal = mc.proposal
     assert mc.proposal.name == "PyGaussianProposal"
-    # _, samples = hopsy.sample(mcs, [hopsy.RandomNumberGenerator(42 + i) for i in range(4)], n_samples=10, n_procs=4)
+    _, samples = hopsy.sample(
+        mcs,
+        [hopsy.RandomNumberGenerator(42 + i) for i in range(4)],
+        n_samples=10,
+        n_procs=4,
+    )
 
     # tests sampling with custom proposal
-    # hopsy.sample(mc, hopsy.RandomNumberGenerator(42), n_samples=10)
+    hopsy.sample(mc, hopsy.RandomNumberGenerator(42), n_samples=10)
 
     # Wrapping proposal in python in order to fill in boilerplate code
     proposal = hopsy.PyProposal(PyProposalMinimalBoilerplate(A, b, x0, cov))
@@ -120,11 +132,8 @@ if __name__ == "__main__":
     for i in range(4):
         mcs[i].proposal = mc.proposal
     assert mc.proposal.name == "PyProposalMinimalBoilerplate"
-    dump = pickle.dumps(mc)
-    new_mc = pickle.loads(dump)
-    print("pickled", mc)
-    print("loaded", new_mc)
-    # _, samples = hopsy.sample(mc, hopsy.RandomNumberGenerator(42), n_samples=10)
+
+    _, samples = hopsy.sample(mc, hopsy.RandomNumberGenerator(42), n_samples=10)
     _, samples = hopsy.sample(
         mcs,
         [hopsy.RandomNumberGenerator(42 + i) for i in range(4)],
@@ -142,7 +151,9 @@ if __name__ == "__main__":
     assert mc.proposal.name == "PyProposalMinimalBoilerplate"
 
     # # tests sequential sampling
-    # _, samples = hopsy.sample( mc, hopsy.RandomNumberGenerator(42), n_samples=10, n_procs=1)
+    _, samples = hopsy.sample(
+        mc, hopsy.RandomNumberGenerator(42), n_samples=10, n_procs=1
+    )
     # tests parallel sampling
     _, samples = hopsy.sample(
         mcs,
@@ -150,5 +161,6 @@ if __name__ == "__main__":
         n_samples=10,
         n_procs=4,
     )
-    print(mc.proposal.name)
-    # print(mc.proposal.proposal)
+
+    print(samples)
+    print(mc.proposal.proposal)

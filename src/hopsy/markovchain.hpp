@@ -119,7 +119,6 @@ namespace hopsy {
         }
 
         void setState(const VectorType &x) override {
-            std::cout << "markovchain:122 setState " << this << std::endl;
             return markovChain->setState(x);
         }
 
@@ -485,7 +484,6 @@ namespace hopsy {
                                                           self.parallelTemperingSyncRng, self.exchangeAttemptProbability);
                                 },
                                 [](py::tuple t) {
-                                    std::cout << "markovchain.hpp:490 Unpickling mc " << std::endl;
                                     if (t.size() != 5) throw std::runtime_error("Invalid state!");
                                     auto markovChain = createMarkovChain(t[0].cast<Proposal *>(),
                                                                          t[1].cast<Problem>(),
@@ -494,7 +492,6 @@ namespace hopsy {
 
                                     markovChain.setState(t[2].cast<VectorType>());
                                     VectorType s = markovChain.getState().transpose();
-                                    std::cout << "markovchain:490 cast worked and state is now " << s.transpose() << std::endl;
                                     return markovChain;
                                 }));
     }

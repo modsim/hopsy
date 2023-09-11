@@ -470,7 +470,6 @@ def _sample_parallel_chain(
     record_meta=None,
     queue: _s.multiprocessing.Queue = None,
 ):
-    print("_sample_parallel_chain")
     states = []  # improve performance by preallocating np.ndarray
 
     meta = None
@@ -480,9 +479,7 @@ def _sample_parallel_chain(
         meta = {field: [] for field in record_meta}
 
     for i in range(n_samples):
-        print("drawing next")
         accrate, state = markov_chain.draw(rng, thinning)
-        print("drew", accrate, state)
 
         curr_meta = None
         if record_meta is None or record_meta is False:
@@ -602,13 +599,8 @@ def _parallel_sampling(
         workers.join()
         return result.get()
     else:
-        n_procs = 1
         with _s.multiprocessing.Pool(n_procs) as workers:
             result = workers.starmap(_sample_parallel_chain, args)
-        # result = []
-        # for i in range(len(args)):
-        #     print('sampling with ', args[i])
-        #     result.append(_sample_parallel_chain(*args[i]))
         return result
 
 
@@ -761,7 +753,6 @@ def sample(
             result.append((chain_result[0], chain_result[1]))
             markov_chains[i].state = chain_result[2]
             rngs[i].state = chain_result[3]
-        print("updated chains sucessfully")
     else:
         for chain_idx in range(len(markov_chains)):
             _accrates, _states = _sequential_sampling(
@@ -799,7 +790,6 @@ def sample(
                 meta[field] = _s.numpy.array(meta[field])
             meta.update(missing_fields)
 
-        print("returning sample results")
         return meta, _s.numpy.array(states)
 
 
