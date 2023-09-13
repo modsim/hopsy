@@ -104,7 +104,7 @@ visit us `on our Gitter <https://gitter.im/modsim/hopsy>`_!
    firststeps.rst
    userguide.rst
    examples.rst
-   zreference.rst
+   reference.rst
 
 
 .. raw:: html
