@@ -3,7 +3,6 @@ build/
 dist/
 wheelhouse/
 _build/
-docs/generated
 _generate/
 *.so
 *.py[cod]
