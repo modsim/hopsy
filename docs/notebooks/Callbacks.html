@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 
 
@@ -28,18 +29,18 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script src="../_static/jquery.js?v=5d32c60e"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-    <script src="../_static/documentation_options.js?v=06f1c677"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -341,7 +342,7 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <section id="Callbacks">
-<h1>Callbacks<a class="headerlink" href="#Callbacks" title="Link to this heading">#</a></h1>
+<h1>Callbacks<a class="headerlink" href="#Callbacks" title="Permalink to this heading">#</a></h1>
 <p>By default, <em>hopsy</em> stores samples and meta data in memory. For small sampling problems, this is usually fine. However, when sampling large problems that have high dimension and require a lot of samples, memory can become a problem. Therefore, saving data in memory can be turned off. In these cases, samples and meta data can be saved using a callback. For convenience, hopsy has already implemented a callback for <code class="docutils literal notranslate"><span class="pre">mcbackend</span></code>, which offers multiple storage backends like <em>Clickhouse</em> databases.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -358,7 +359,7 @@ document.write(`
 </div>
 </div>
 <section id="Setting-up-Clickhouse">
-<h2>Setting up Clickhouse<a class="headerlink" href="#Setting-up-Clickhouse" title="Link to this heading">#</a></h2>
+<h2>Setting up Clickhouse<a class="headerlink" href="#Setting-up-Clickhouse" title="Permalink to this heading">#</a></h2>
 <p>Clickhouse is a fast database, perfect for storing mcmc samples on the fly. hopsy can directly write samples to a clickhouse database. In order to run this example a clickhouse server is required. In order to quickly set up a server for testing purposes, two commands are required.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span># curl https://clickhouse.com/ | sh
 # clickhouse server # starts server blocking ports 8123 and 9000 by default
@@ -675,7 +676,7 @@ Backend run id: TEY6CF
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.5.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     <br/>
   </p>
 </div>
