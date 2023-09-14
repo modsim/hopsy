@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 
 
@@ -29,17 +28,17 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script src="../_static/documentation_options.js?v=06f1c677"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -158,7 +157,7 @@
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../reference.html">
+                      <a class="nav-link nav-internal" href="../zreference.html">
                         Reference
                       </a>
                     </li>
@@ -262,7 +261,7 @@ document.write(`
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../reference.html">
+                      <a class="nav-link nav-internal" href="../zreference.html">
                         Reference
                       </a>
                     </li>
@@ -501,7 +500,7 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <section id="problem-description">
-<h1>Problem Description<a class="headerlink" href="#problem-description" title="Permalink to this heading">#</a></h1>
+<h1>Problem Description<a class="headerlink" href="#problem-description" title="Link to this heading">#</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">hopsy</span></code> ships with a number of simple models, also known as target functions.
 Together with the polytope</p>
 <div class="math notranslate nohighlight">
@@ -527,12 +526,12 @@ Depending on the algorithm you aim to use, it might also be necessary to further
 </ul>
 <p>For more details on signature and return type, please refer to <a class="reference internal" href="../generated/hopsy.PyModel.html#hopsy.PyModel" title="hopsy.PyModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">hopsy.PyModel</span></code></a> or</p>
 <section id="problem">
-<h2>Problem<a class="headerlink" href="#problem" title="Permalink to this heading">#</a></h2>
+<h2>Problem<a class="headerlink" href="#problem" title="Link to this heading">#</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">hopsy.Problem</span></code> classes contain the full description of the problem, we aim to sample.
 A problem consists mainly of the domain, that is the inequality <span class="math notranslate nohighlight">\(Ax \leq b\)</span>, and the target distribution, the <code class="docutils literal notranslate"><span class="pre">hopsy.Model</span></code> object.</p>
 </section>
 <section id="linear-transformations">
-<h2>Linear Transformations<a class="headerlink" href="#linear-transformations" title="Permalink to this heading">#</a></h2>
+<h2>Linear Transformations<a class="headerlink" href="#linear-transformations" title="Link to this heading">#</a></h2>
 <p>Often, it is desirable to apply linear transformations on the polytope to precondition the problem.
 However, the states and the space of interest, may be the untransformed space.
 For polytopes, the most common transformation is a “rounding” transformation.
@@ -550,9 +549,9 @@ For more details about rounding, please refer to xyz.</p>
 </aside>
 </section>
 <section id="reference">
-<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this heading">#</a></h2>
+<h2>Reference<a class="headerlink" href="#reference" title="Link to this heading">#</a></h2>
 <section id="models">
-<h3>Models<a class="headerlink" href="#models" title="Permalink to this heading">#</a></h3>
+<h3>Models<a class="headerlink" href="#models" title="Link to this heading">#</a></h3>
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="../generated/hopsy.Model.html#hopsy.Model" title="hopsy.Model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Model</span></code></a></p></td>
@@ -574,7 +573,7 @@ For more details about rounding, please refer to xyz.</p>
 </table>
 </section>
 <section id="id2">
-<h3>Problem<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
+<h3>Problem<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
 <table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="../generated/hopsy.Problem.html#hopsy.Problem" title="hopsy.Problem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Problem</span></code></a></p></td>
@@ -698,7 +697,7 @@ For more details about rounding, please refer to xyz.</p>
       
         <div class="footer-item">
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     <br/>
   </p>
 </div>
