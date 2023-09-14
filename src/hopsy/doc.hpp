@@ -29,8 +29,8 @@ namespace hopsy {
             static const char* base;
             static const char* __init__;
             static const char* logDensity;
-            static const char* gradLogDensity;
-            static const char* hessian;
+            static const char* logGradient;
+            static const char* logCurvature;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -43,8 +43,8 @@ namespace hopsy {
             static const char* covariance;
             static const char* inactives;
             static const char* logDensity;
-            static const char* gradLogDensity;
-            static const char* hessian;
+            static const char* logGradient;
+            static const char* logCurvature;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -54,8 +54,8 @@ namespace hopsy {
             static const char* base;
             static const char* __init__;
             static const char* logDensity;
-            static const char* gradLogDensity;
-            static const char* hessian;
+            static const char* logGradient;
+            static const char* logCurvature;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -67,8 +67,8 @@ namespace hopsy {
             static const char* components;
             static const char* weights;
             static const char* logDensity;
-            static const char* gradLogDensity;
-            static const char* hessian;
+            static const char* logGradient;
+            static const char* logCurvature;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -78,8 +78,8 @@ namespace hopsy {
             static const char* base;
             static const char* __init__;
             static const char* logDensity;
-            static const char* gradLogDensity;
-            static const char* hessian;
+            static const char* logGradient;
+            static const char* logCurvature;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -90,8 +90,8 @@ namespace hopsy {
             static const char* __init__;
             static const char* model;
             static const char* logDensity;
-            static const char* gradLogDensity;
-            static const char* hessian;
+            static const char* logGradient;
+            static const char* logCurvature;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -103,8 +103,8 @@ namespace hopsy {
             static const char* scale;
             static const char* shift;
             static const char* logDensity;
-            static const char* gradLogDensity;
-            static const char* hessian;
+            static const char* logGradient;
+            static const char* logCurvature;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
@@ -114,8 +114,8 @@ namespace hopsy {
             static const char* base;
             static const char* __init__;
             static const char* logDensity;
-            static const char* gradLogDensity;
-            static const char* hessian;
+            static const char* logGradient;
+            static const char* logCurvature;
             static const char* computeNegativeLogLikelihood;
             static const char* computeLogLikelihoodGradient;
             static const char* computeExpectedFisherInformation;
