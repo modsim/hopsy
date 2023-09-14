@@ -131,6 +131,7 @@ build-docs:
     - cp -r _build/html/* ../docs/
     - cd -
     - python3 -m docov hopsy --output docs/; cat docs/docov.txt
+    - touch docs/.nojekyll
   artifacts:
     paths:
       - docs
