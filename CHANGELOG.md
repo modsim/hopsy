@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#97](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/97): Disable jekyll in automatic doc building
 - [#96](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/96): Fix pickling for problem
 - [#95](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/95): Fix parallel sampling for PyProposals
 - [#91](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/91): Add benchmark example
