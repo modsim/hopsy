@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 
 
@@ -28,18 +29,18 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
 
-    <script src="../_static/jquery.js?v=5d32c60e"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-    <script src="../_static/documentation_options.js?v=06f1c677"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -341,14 +342,14 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <section id="Benchmarking-Multiphase-Monte-Carlo-Sampling">
-<h1>Benchmarking Multiphase Monte Carlo Sampling<a class="headerlink" href="#Benchmarking-Multiphase-Monte-Carlo-Sampling" title="Link to this heading">#</a></h1>
+<h1>Benchmarking Multiphase Monte Carlo Sampling<a class="headerlink" href="#Benchmarking-Multiphase-Monte-Carlo-Sampling" title="Permalink to this heading">#</a></h1>
 </section>
 <section id="Motivation">
-<h1>Motivation<a class="headerlink" href="#Motivation" title="Link to this heading">#</a></h1>
+<h1>Motivation<a class="headerlink" href="#Motivation" title="Permalink to this heading">#</a></h1>
 <p>As a methods researcher one is often interested in testing new methods and benchmarking them together with state-of-the-art algorithms. hopsy provides the framework for conducting such comparisons, because it allows the methods researcher to focus on the algorithms, while the scaffolding, i.e., I/O, convergence diagnostics, and state-of-the-art implementations of existing algorithms are provided.</p>
 <p>We show in this notebook how one can adapt build a multiphase monte carlo sampling plugin for hopsy</p>
 <section id="Background">
-<h2>Background<a class="headerlink" href="#Background" title="Link to this heading">#</a></h2>
+<h2>Background<a class="headerlink" href="#Background" title="Permalink to this heading">#</a></h2>
 <p>Instead of rounding before sampling, multiphase monte carlo sampling rounds adaptively based on the samples of the Markov chain during a run. It has been reported to be an efficient strategy, if the underlying Markov chain is efficient enough.</p>
 <p>The Idea has found previous adaption in the artificially centered coordinate hit-and-run and the optGP sampler. However, Coordinate Hit-and-Run Rounded showed greater and more stable performance (<a class="reference external" href="https://pubmed.ncbi.nlm.nih.gov/28158334/">https://pubmed.ncbi.nlm.nih.gov/28158334/</a>) than both of those algorithms.</p>
 <p>The idea is resurrected and shown to be efficient given a better Markov chain implementation. See <a class="reference external" href="https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf">https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf</a></p>
@@ -368,7 +369,7 @@ document.write(`
 </section>
 </section>
 <section id="Custom-proposals">
-<h1>Custom proposals<a class="headerlink" href="#Custom-proposals" title="Link to this heading">#</a></h1>
+<h1>Custom proposals<a class="headerlink" href="#Custom-proposals" title="Permalink to this heading">#</a></h1>
 <p>In case the proposal you want to benchmark is not already implemented, it is possible to implement it yourself in a small class. It is then possible to seamlessy integrate this proposal into existing workflows with hopsy. As an example, we implement Overrelaxed Hit-and-Run, see <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2015IJMPC..2650010D/abstract">https://ui.adsabs.harvard.edu/abs/2015IJMPC..2650010D/abstract</a></p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -413,7 +414,7 @@ document.write(`
 </div>
 </section>
 <section id="More-complex-custom-sampling-schemes">
-<h1>More complex custom sampling schemes<a class="headerlink" href="#More-complex-custom-sampling-schemes" title="Link to this heading">#</a></h1>
+<h1>More complex custom sampling schemes<a class="headerlink" href="#More-complex-custom-sampling-schemes" title="Permalink to this heading">#</a></h1>
 <p>In addition to custom proposals, it is also possible to implement adaptive workflows. In this case we implement the adaptive rounding from <a class="reference external" href="https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf">https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf</a> using the Billiard walk that is already implemented in hopsy.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -456,7 +457,7 @@ document.write(`
 </div>
 </section>
 <section id="Helper-functions">
-<h1>Helper functions<a class="headerlink" href="#Helper-functions" title="Link to this heading">#</a></h1>
+<h1>Helper functions<a class="headerlink" href="#Helper-functions" title="Permalink to this heading">#</a></h1>
 <p>In this section we implement some helper functions for executing the benchmarks as well as a function which constructs our benchmark problems</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -636,7 +637,7 @@ document.write(`
 </div>
 </section>
 <section id="Benchmark-parameters">
-<h1>Benchmark parameters<a class="headerlink" href="#Benchmark-parameters" title="Link to this heading">#</a></h1>
+<h1>Benchmark parameters<a class="headerlink" href="#Benchmark-parameters" title="Permalink to this heading">#</a></h1>
 <p>Next set up the benchmark parameters</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
@@ -656,7 +657,7 @@ document.write(`
 </div>
 </section>
 <section id="Benchmarking">
-<h1>Benchmarking<a class="headerlink" href="#Benchmarking" title="Link to this heading">#</a></h1>
+<h1>Benchmarking<a class="headerlink" href="#Benchmarking" title="Permalink to this heading">#</a></h1>
 <p>Sample all problems with all sampling schemes, i.e., two for loops.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -1426,7 +1427,7 @@ Benchmarking {problem_selection}
 </div>
 </section>
 <section id="Visualizing-the-results">
-<h1>Visualizing the results<a class="headerlink" href="#Visualizing-the-results" title="Link to this heading">#</a></h1>
+<h1>Visualizing the results<a class="headerlink" href="#Visualizing-the-results" title="Permalink to this heading">#</a></h1>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -1457,7 +1458,7 @@ Benchmarking {problem_selection}
 </div>
 </div>
 <section id="visualize-runtimes">
-<h2>visualize runtimes<a class="headerlink" href="#visualize-runtimes" title="Link to this heading">#</a></h2>
+<h2>visualize runtimes<a class="headerlink" href="#visualize-runtimes" title="Permalink to this heading">#</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
@@ -1494,7 +1495,7 @@ Benchmarking {problem_selection}
 </div>
 </section>
 <section id="visualize-ESS/t-[1/s]">
-<h2>visualize ESS/t [1/s]<a class="headerlink" href="#visualize-ESS/t-[1/s]" title="Link to this heading">#</a></h2>
+<h2>visualize ESS/t [1/s]<a class="headerlink" href="#visualize-ESS/t-[1/s]" title="Permalink to this heading">#</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
@@ -1532,14 +1533,14 @@ Benchmarking {problem_selection}
 </section>
 </section>
 <section id="Conclusion">
-<h1>Conclusion<a class="headerlink" href="#Conclusion" title="Link to this heading">#</a></h1>
+<h1>Conclusion<a class="headerlink" href="#Conclusion" title="Permalink to this heading">#</a></h1>
 <p>In this benchmark the overrelaxed hit and run does not perform well against modern sampling algorithms. Furthermore we can see, that the performance is problem dependendent.</p>
 <p>The values of the benchmark are not the main result of this script, however. Much more important is that hopsy is flexible enough to quickly construct fair benchmarks comparing novel algorithms with existing implementations. Furthermore all sampling algorithms access the models (polytopes) via the same interface, which reduces work for the methods researcher.</p>
 </section>
 <section id="Appendix">
-<h1>Appendix<a class="headerlink" href="#Appendix" title="Link to this heading">#</a></h1>
+<h1>Appendix<a class="headerlink" href="#Appendix" title="Permalink to this heading">#</a></h1>
 <section id="Visualizing-the-samples">
-<h2>Visualizing the samples<a class="headerlink" href="#Visualizing-the-samples" title="Link to this heading">#</a></h2>
+<h2>Visualizing the samples<a class="headerlink" href="#Visualizing-the-samples" title="Permalink to this heading">#</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
