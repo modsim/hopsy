@@ -63,20 +63,20 @@ class ModelTests(unittest.TestCase):
                 )
             )
         )
-        self.assertIsNotNone(model.grad_log_density(model.mean))
+        self.assertIsNotNone(model.log_gradient(model.mean))
         self.assertTrue(
             np.all(
                 np.isclose(
-                    model.grad_log_density(model.mean),
+                    model.log_gradient(model.mean),
                     model.compute_log_likelihood_gradient(model.mean),
                 )
             )
         )
-        self.assertIsNotNone(model.hessian(model.mean))
+        self.assertIsNotNone(model.log_curvature(model.mean))
         self.assertTrue(
             np.all(
                 np.isclose(
-                    model.hessian(model.mean),
+                    model.log_curvature(model.mean),
                     model.compute_expected_fisher_information(model.mean),
                 )
             )
@@ -99,10 +99,10 @@ class ModelTests(unittest.TestCase):
             def log_density(self, x):
                 return 0
 
-            def grad_log_density(self, x):
+            def log_gradient(self, x):
                 raise RuntimeError("Method not implemented.")
 
-            def hessian(self, x):
+            def log_curvature(self, x):
                 raise RuntimeError("Method not implemented.")
 
             def __copy__(self):
@@ -122,10 +122,10 @@ class ModelTests(unittest.TestCase):
             def log_density(self, x):
                 return 0
 
-            def grad_log_density(self, x):
+            def log_gradient(self, x):
                 raise RuntimeError("Method not implemented.")
 
-            def hessian(self, x):
+            def log_curvature(self, x):
                 raise RuntimeError("Method not implemented.")
 
             def __copy__(self):

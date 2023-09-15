@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#98](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/98): Consistent names for model functions
 - [#97](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/97): Disable jekyll in automatic doc building
 - [#96](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/96): Fix pickling for problem
 - [#95](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/95): Fix parallel sampling for PyProposals

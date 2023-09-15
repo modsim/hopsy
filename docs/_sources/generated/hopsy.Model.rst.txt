@@ -28,13 +28,13 @@
          ~Model.compute_negative_log_likelihood
       
       
-         ~Model.grad_log_density
-      
-      
-         ~Model.hessian
+         ~Model.log_curvature
       
       
          ~Model.log_density
+      
+      
+         ~Model.log_gradient
       
    
    

@@ -34,13 +34,13 @@
          ~PyModel.compute_negative_log_likelihood
       
       
-         ~PyModel.grad_log_density
-      
-      
-         ~PyModel.hessian
+         ~PyModel.log_curvature
       
       
          ~PyModel.log_density
+      
+      
+         ~PyModel.log_gradient
       
    
    

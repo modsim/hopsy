@@ -79,7 +79,7 @@ Returns
 
 const char* hopsy::doc::Model::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
 deprecated:: 1.4
-   Use :func:`grad_log_density` instead.
+   Use :func:`log_gradient` instead.
 For some proposals, the gradient will help converging faster as long as the gradient computation is not too slow.
 If you can not compute a useful or fast enough gradient for your custom model, you can just return a zero vector with the correct dimensionality (number of rows equal to number of parameters).
 
@@ -97,7 +97,7 @@ numpy.ndarray[n, 1]
 
 const char* hopsy::doc::Model::computeExpectedFisherInformation = R"pbdoc(
 deprecated:: 1.4
-   Use :func:`hessian` instead.
+   Use :func:`log_curvature` instead.
 
 For some proposals, the expected fisher information will help converging faster as long as the gradient computation is not too slow.
 If you can not compute a useful or fast enough expected fisher information for your custom model, you can just return a zero matrix with the correct dimensionality (number of rows and cols each equal to number of parameters).
@@ -130,7 +130,7 @@ Returns
 )pbdoc";
 
 
-const char* hopsy::doc::Model::gradLogDensity = R"pbdoc(grad_log_density(self, x)
+const char* hopsy::doc::Model::logGradient = R"pbdoc(log_gradient(self, x)
 
 For some proposals, the gradient will help converging faster as long as the gradient computation is not too slow.
 If you can not compute a useful or fast enough gradient for your custom model, you can just return a zero vector with the correct dimensionality (number of rows equal to number of parameters).
@@ -147,10 +147,12 @@ numpy.ndarray[n, 1]
 )pbdoc";
 
 
-const char* hopsy::doc::Model::hessian = R"pbdoc(hessian(self, x)
+const char* hopsy::doc::Model::logCurvature = R"pbdoc(log_curvature(self x)
 
-For some proposals, the expected fisher information will help converging faster as long as the gradient computation is not too slow.
-If you can not compute a useful or fast enough expected fisher information for your custom model, you can just return a zero matrix with the correct dimensionality (number of rows and cols each equal to number of parameters).
+For some proposals, the curvature will help converging faster as long as the gradient computation is not too slow.
+The curvature is a square matrix which is (semi-)positive definit. For example one can use the fisher information, the hessian, linear approximations to the hessian and so on.
+If you can not compute a useful or fast enough curvature for your custom model, you can just return a zero matrix with the correct dimensionality (number of rows and cols each equal to number of parameters).
+Alternatively do not implement it and it will not be used.
 
 Parameters
 ----------
@@ -159,7 +161,7 @@ Parameters
 
 Returns
 -------
-:return: The value of ``model.hessian(x)``
+:return: The value of ``model.log_curvature(x)``
 :rtype: numpy.ndarray[float64[n,n]]
 )pbdoc";
 
@@ -258,7 +260,7 @@ float
 
 const char* hopsy::doc::Gaussian::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
 deprecated:: 1.4
-   Use :func:`grad_log_density` instead.
+   Use :func:`log_gradient` instead.
 
 Computes the gradient of the logarithm of the probability density function of a multivariate Gaussian
 model in :math:`n-k` dimensions at ``x``. Note that `x` still has to have dimension :math:`n`.
@@ -278,7 +280,7 @@ numpy.ndarray[n, 1]
 
 const char* hopsy::doc::Gaussian::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
 deprecated:: 1.4
-   Use :func:`hessian` instead.
+   Use :func:`log_curvature` instead.
 
 Computes the expected fisher information of a multivariate Gaussian model
 in :math:`n-k` dimensions at ``x``. This turns out to be just the reduced covariance matrix.
@@ -315,7 +317,7 @@ float
 
 
 
-const char* hopsy::doc::Gaussian::gradLogDensity = R"pbdoc(grad_log_density(self, x)
+const char* hopsy::doc::Gaussian::logGradient = R"pbdoc(log_gradient(self, x)
 
 Computes the gradient of the logarithm of the probability density function of a multivariate Gaussian
 model in :math:`n-k` dimensions at ``x``. Note that `x` still has to have dimension :math:`n`.
@@ -333,7 +335,7 @@ numpy.ndarray[n, 1]
 )pbdoc";
 
 
-const char* hopsy::doc::Gaussian::hessian = R"pbdoc(hessian(self, x)
+const char* hopsy::doc::Gaussian::logCurvature = R"pbdoc(log_curvature(self x)
 
 Computes the expected fisher information of a multivariate Gaussian model
 in :math:`n-k` dimensions at ``x``. This turns out to be just the reduced covariance matrix.
@@ -347,7 +349,7 @@ x : numpy.ndarray[n, 1]
 Returns
 -------
 numpy.narray[n, n]
-    The expected Fisher information matrix, which we call hessian in this context.
+    The expected Fisher information matrix, which we call log_curvature in this context.
 )pbdoc";
 
 
@@ -425,7 +427,7 @@ float
 
 const char* hopsy::doc::Mixture::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
 deprecated:: 1.4
-   Use :func:`grad_log_density` instead.
+   Use :func:`log_gradient` instead.
 
 Computes the gradient of the logarithm of the weighted sum of the probability density functions of the model
 components
@@ -447,7 +449,7 @@ numpy.ndarray[n, 1]
 
 const char* hopsy::doc::Mixture::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
 deprecated:: 1.4
-   Use :func:`hessian` instead.
+   Use :func:`log_curvature` instead.
 
 This method is not implemented, as there exists no closed-form solution to
 computing the expected Fisher information of a general mixture model.
@@ -485,7 +487,7 @@ float
 )pbdoc";
 
 
-const char* hopsy::doc::Mixture::gradLogDensity = R"pbdoc(grad_log_density(self, x)
+const char* hopsy::doc::Mixture::logGradient = R"pbdoc(log_gradient(self, x)
 
 Computes the gradient of the logarithm of the weighted sum of the probability density functions of the model
 components
@@ -505,10 +507,10 @@ numpy.ndarray[n, 1]
 )pbdoc";
 
 
-const char* hopsy::doc::Mixture::hessian = R"pbdoc(hessian(self, x)
+const char* hopsy::doc::Mixture::logCurvature = R"pbdoc(log_curvature(self x)
 
 This method is not implemented, as there exists no closed-form solution to
-computing the hessian (typically defined as the expected Fisher information) of a general mixture model.
+computing the log curvature (typically defined as the expected Fisher information) of a general mixture model.
 
 Parameters
 ----------
@@ -569,7 +571,7 @@ deprecated:: 1.4
 
 const char* hopsy::doc::PyModel::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
 deprecated:: 1.4
-   Use :func:`grad_log_density` instead.
+   Use :func:`log_gradient` instead.
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[n,1]]
@@ -581,7 +583,7 @@ deprecated:: 1.4
 
 const char* hopsy::doc::PyModel::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
 deprecated:: 1.4
-   Use :func:`hessian` instead.
+   Use :func:`log_curvature` instead.
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[n,1]]
@@ -601,22 +603,22 @@ const char* hopsy::doc::PyModel::logDensity = R"pbdoc(log_density(self, x)
 )pbdoc";
 
 
-const char* hopsy::doc::PyModel::gradLogDensity = R"pbdoc(grad_log_density(self, x)
+const char* hopsy::doc::PyModel::logGradient = R"pbdoc(log_gradient(self, x)
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[n,1]]
 
-:return: The value of ``model.grad_log_density(x)``
+:return: The value of ``model.log_gradient(x)``
 :rtype: numpy.ndarray[float64[n,1]]
 )pbdoc";
 
 
-const char* hopsy::doc::PyModel::hessian = R"pbdoc(hessian(self, x)
+const char* hopsy::doc::PyModel::logCurvature = R"pbdoc(log_curvature(self x)
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[n,1]]
 
-:return: The value of ``model.hessian(x)``
+:return: The value of ``model.log_curvature(x)``
 :rtype: numpy.ndarray[float64[n,n]]
 )pbdoc";
 
@@ -668,7 +670,7 @@ deprecated:: 1.4
 
 const char* hopsy::doc::Rosenbrock::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
 deprecated:: 1.4
-   Use :func:`grad_log_density` instead.
+   Use :func:`log_gradient` instead.
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[2n,1]]
@@ -680,7 +682,7 @@ deprecated:: 1.4
 
 const char* hopsy::doc::Rosenbrock::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
 deprecated:: 1.4
-   Use :func:`hessian` instead.
+   Use :func:`log_curvature` instead.
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[2n,1]]
@@ -700,7 +702,7 @@ const char* hopsy::doc::Rosenbrock::logDensity = R"pbdoc(log_density(self, x)
 )pbdoc";
 
 
-const char* hopsy::doc::Rosenbrock::gradLogDensity = R"pbdoc(grad_log_density(self, x)
+const char* hopsy::doc::Rosenbrock::logGradient = R"pbdoc(log_gradient(self, x)
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[2n,1]]
@@ -710,12 +712,12 @@ const char* hopsy::doc::Rosenbrock::gradLogDensity = R"pbdoc(grad_log_density(se
 )pbdoc";
 
 
-const char* hopsy::doc::Rosenbrock::hessian = R"pbdoc(hessian(self, x)
+const char* hopsy::doc::Rosenbrock::logCurvature = R"pbdoc(log_curvature(self x)
 
 :param x: Input vector
 :type x: numpy.ndarray[float64[2n,1]]
 
-:return: The hessian (in this case the expected Fisher information matrix)
+:return: The log curvature (in this case the expected Fisher information matrix)
 :rtype: numpy.ndarray[float64[2n,2n]]
 )pbdoc";
 
@@ -775,7 +777,7 @@ an exception, when being called.**
 
 const char* hopsy::doc::UniformModel::computeLogLikelihoodGradient = R"pbdoc(compute_log_likelihood_gradient(self, x)
 deprecated:: 1.4
-   Use :func:`grad_log_density` instead.
+   Use :func:`log_gradient` instead.
 
 For similar reasons as with the ``compute_negative_log_likelihod``, this function **will always throw
 an exception, when being called.**
@@ -792,7 +794,7 @@ an exception, when being called.**
 
 const char* hopsy::doc::UniformModel::computeExpectedFisherInformation = R"pbdoc(compute_expected_fisher_information(self, x)
 deprecated:: 1.4
-   Use :func:`hessian` instead.
+   Use :func:`log_curvature` instead.
 
 For similar reasons as with the ``compute_negative_log_likelihod``, this function **will always throw
 an exception, when being called.**
@@ -826,7 +828,7 @@ an exception, when being called.**
 )pbdoc";
 
 
-const char* hopsy::doc::UniformModel::gradLogDensity = R"pbdoc(grad_log_density(self, x)
+const char* hopsy::doc::UniformModel::logGradient = R"pbdoc(log_gradient(self, x)
 
 For similar reasons as with the ``log_density``, this function **will always throw
 an exception, when being called.**
@@ -841,7 +843,7 @@ an exception, when being called.**
 )pbdoc";
 
 
-const char* hopsy::doc::UniformModel::hessian = R"pbdoc(hessian(self, x)
+const char* hopsy::doc::UniformModel::logCurvature = R"pbdoc(log_curvature(self x)
 
 For similar reasons as with the ``log_density``, this function **will always throw
 an exception, when being called.**
@@ -849,7 +851,7 @@ an exception, when being called.**
 :param x: Input vector
 :type x: numpy.ndarray[float64[n,1]]
 
-:return: The hessian
+:return: The log curvature
 :rtype: numpy.ndarray[float64[n,n]]
 
 :raises RuntimeError: always
@@ -998,7 +1000,7 @@ float
 const char* hopsy::doc::Proposal::hasLogDensity = R"pbdoc(has_log_density()
 
 Returns whether the proposal knows about the log density or not.
-Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+Most proposals dont know about the log density. Exceptions are usually proposals which use log_gradient().
 
 Returns
 -------
@@ -1097,7 +1099,7 @@ float
 const char* hopsy::doc::AdaptiveMetropolisProposal::hasLogDensity = R"pbdoc(has_log_density()
 
 Returns whether the proposal knows about the log density or not.
-Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+Most proposals dont know about the log density. Exceptions are usually proposals which use log_gradient().
 
 Returns
 -------
@@ -1207,7 +1209,7 @@ float
 const char* hopsy::doc::BilliardAdaptiveMetropolisProposal::hasLogDensity = R"pbdoc(has_log_density()
 
 Returns whether the proposal knows about the log density or not.
-Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+Most proposals dont know about the log density. Exceptions are usually proposals which use log_gradient().
 
 Returns
 -------
@@ -1321,7 +1323,7 @@ float
 const char* hopsy::doc::BallWalkProposal::hasLogDensity = R"pbdoc(has_log_density()
 
 Returns whether the proposal knows about the log density or not.
-Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+Most proposals dont know about the log density. Exceptions are usually proposals which use log_gradient().
 
 Returns
 -------
@@ -1422,7 +1424,7 @@ float
 const char* hopsy::doc::BilliardMALAProposal::hasLogDensity = R"pbdoc(has_log_density()
 
 Returns whether the proposal knows about the log density or not.
-Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+Most proposals dont know about the log density. Exceptions are usually proposals which use log_gradient().
 
 Returns
 -------
@@ -1526,7 +1528,7 @@ float
 const char* hopsy::doc::BilliardWalkProposal::hasLogDensity = R"pbdoc(has_log_density()
 
 Returns whether the proposal knows about the log density or not.
-Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+Most proposals dont know about the log density. Exceptions are usually proposals which use log_gradient().
 
 Returns
 -------
@@ -1630,7 +1632,7 @@ float
 const char* hopsy::doc::CSmMALAProposal::hasLogDensity = R"pbdoc(has_log_density()
 
 Returns whether the proposal knows about the log density or not.
-Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+Most proposals dont know about the log density. Exceptions are usually proposals which use log_gradient().
 
 Returns
 -------
@@ -1736,7 +1738,7 @@ float
 const char* hopsy::doc::DikinWalkProposal::hasLogDensity = R"pbdoc(has_log_density()
 
 Returns whether the proposal knows about the log density or not.
-Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+Most proposals dont know about the log density. Exceptions are usually proposals which use log_gradient().
 
 Returns
 -------
@@ -1843,7 +1845,7 @@ float
 const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::hasLogDensity = R"pbdoc(has_log_density()
 
 Returns whether the proposal knows about the log density or not.
-Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+Most proposals dont know about the log density. Exceptions are usually proposals which use log_gradient().
 
 Returns
 -------
@@ -1945,7 +1947,7 @@ float
 const char* hopsy::doc::GaussianHitAndRunProposal::hasLogDensity = R"pbdoc(has_log_density()
 
 Returns whether the proposal knows about the log density or not.
-Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+Most proposals dont know about the log density. Exceptions are usually proposals which use log_gradient().
 
 Returns
 -------
@@ -2047,7 +2049,7 @@ float
 const char* hopsy::doc::GaussianProposal::hasLogDensity = R"pbdoc(has_log_density()
 
 Returns whether the proposal knows about the log density or not.
-Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+Most proposals dont know about the log density. Exceptions are usually proposals which use log_gradient().
 
 Returns
 -------
@@ -2149,7 +2151,7 @@ float
 const char* hopsy::doc::PyProposal::hasLogDensity = R"pbdoc(has_log_density()
 
 Returns whether the proposal knows about the log density or not.
-Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+Most proposals dont know about the log density. Exceptions are usually proposals which use log_gradient().
 
 Returns
 -------
@@ -2245,7 +2247,7 @@ float
 const char* hopsy::doc::TruncatedGaussianProposal::hasLogDensity = R"pbdoc(has_log_density()
 
 Returns whether the proposal knows about the log density or not.
-Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+Most proposals dont know about the log density. Exceptions are usually proposals which use log_gradient().
 
 Returns
 -------
@@ -2342,7 +2344,7 @@ float
 const char* hopsy::doc::UniformCoordinateHitAndRunProposal::hasLogDensity = R"pbdoc(has_log_density()
 
 Returns whether the proposal knows about the log density or not.
-Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+Most proposals dont know about the log density. Exceptions are usually proposals which use log_gradient().
 
 Returns
 -------
@@ -2440,7 +2442,7 @@ float
 const char* hopsy::doc::UniformHitAndRunProposal::hasLogDensity = R"pbdoc(has_log_density()
 
 Returns whether the proposal knows about the log density or not.
-Most proposals dont know about the log density. Exceptions are usually proposals which use grad_log_density().
+Most proposals dont know about the log density. Exceptions are usually proposals which use log_gradient().
 
 Returns
 -------
