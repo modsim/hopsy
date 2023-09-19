@@ -404,9 +404,7 @@ document.write(`
         <span class="n">direction</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">direction</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="n">inverse_distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">@</span> <span class="n">direction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">@</span> <span class="n">direction</span>
-            <span class="p">)</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">@</span> <span class="n">direction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="n">forward_distance</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">inverse_distances</span><span class="p">)</span>
         <span class="n">backward_distance</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">inverse_distances</span><span class="p">)</span>
@@ -769,209 +767,221 @@ Academic license - for non-commercial use only - expires 2023-11-30
                 ess 1321.6148361675992, samples 960
         proposal OHRR
                 iter: 1
-                ess 7.625745323520432, samples 320
+                ess 6.3905634150280255, samples 320
                 iter: 2
-                ess 7.6054662230477454, samples 640
+                ess 9.346467825584075, samples 640
                 iter: 3
-                ess 12.38432877661255, samples 960
+                ess 14.219976958238968, samples 960
                 iter: 4
-                ess 13.182005874239481, samples 1280
+                ess 15.04430627004068, samples 1280
                 iter: 5
-                ess 12.401342018005563, samples 1600
+                ess 24.45519242833982, samples 1600
                 iter: 6
-                ess 22.244281110746087, samples 1920
+                ess 28.136130410499568, samples 1920
                 iter: 7
-                ess 25.62949774599076, samples 2240
+                ess 33.64586735024439, samples 2240
                 iter: 8
-                ess 34.04845549392683, samples 2560
+                ess 32.30563065797879, samples 2560
                 iter: 9
-                ess 45.30986010578385, samples 2880
+                ess 30.510169473870313, samples 2880
                 iter: 10
-                ess 60.94902208036537, samples 3200
+                ess 47.28635280261449, samples 3200
                 iter: 11
-                ess 80.49974823489278, samples 3520
+                ess 58.373762597640905, samples 3520
                 iter: 12
-                ess 49.97771163146812, samples 3840
+                ess 54.09744246113346, samples 3840
                 iter: 13
-                ess 71.80388733908671, samples 4160
+                ess 81.1327556312664, samples 4160
                 iter: 14
-                ess 122.4001314499352, samples 4480
+                ess 89.10341759083516, samples 4480
                 iter: 15
-                ess 133.78822579318992, samples 4800
+                ess 101.45287504462985, samples 4800
                 iter: 16
-                ess 142.17921949774305, samples 5120
+                ess 109.46202692623092, samples 5120
                 iter: 17
-                ess 149.61748340502388, samples 5440
+                ess 90.06408768090002, samples 5440
                 iter: 18
-                ess 182.34634077280296, samples 5760
+                ess 81.25179475136875, samples 5760
                 iter: 19
-                ess 178.68634332487036, samples 6080
+                ess 85.09972937289388, samples 6080
                 iter: 20
-                ess 189.4045406530288, samples 6400
+                ess 146.48145067835537, samples 6400
                 iter: 21
-                ess 189.17287087444478, samples 6720
+                ess 165.83693160110326, samples 6720
                 iter: 22
-                ess 214.01648654224107, samples 7040
+                ess 152.44125946430458, samples 7040
                 iter: 23
-                ess 203.17688287422175, samples 7360
+                ess 168.167431366183, samples 7360
                 iter: 24
-                ess 186.6080605897047, samples 7680
+                ess 146.50236938182613, samples 7680
                 iter: 25
-                ess 207.50838526420483, samples 8000
+                ess 196.32742994258018, samples 8000
                 iter: 26
-                ess 213.79453417004535, samples 8320
+                ess 185.4850396678383, samples 8320
                 iter: 27
-                ess 219.96522885675455, samples 8640
+                ess 189.87855732886163, samples 8640
                 iter: 28
-                ess 219.00320468397933, samples 8960
+                ess 248.25208562523292, samples 8960
                 iter: 29
-                ess 229.17806011811587, samples 9280
+                ess 257.86499793915823, samples 9280
                 iter: 30
-                ess 236.89728952606106, samples 9600
+                ess 261.15673574241566, samples 9600
                 iter: 31
-                ess 251.53492550075143, samples 9920
+                ess 286.7033411686906, samples 9920
                 iter: 32
-                ess 228.70971670541672, samples 10240
+                ess 290.2147471574689, samples 10240
                 iter: 33
-                ess 232.14255820710176, samples 10560
+                ess 298.7161394208523, samples 10560
                 iter: 34
-                ess 231.35035089363, samples 10880
+                ess 311.0414204054929, samples 10880
                 iter: 35
-                ess 238.13227599749655, samples 11200
+                ess 315.68011700488717, samples 11200
                 iter: 36
-                ess 252.40977955258555, samples 11520
+                ess 320.75249332628727, samples 11520
                 iter: 37
-                ess 271.7049789684051, samples 11840
+                ess 335.45802517396777, samples 11840
                 iter: 38
-                ess 271.43163776402827, samples 12160
+                ess 346.62761728533593, samples 12160
                 iter: 39
-                ess 277.3145362821676, samples 12480
+                ess 360.7068994198182, samples 12480
                 iter: 40
-                ess 288.70460644400725, samples 12800
+                ess 350.6468219381816, samples 12800
                 iter: 41
-                ess 288.0138079421149, samples 13120
+                ess 370.1017964407313, samples 13120
                 iter: 42
-                ess 291.24329556313114, samples 13440
+                ess 386.788979680817, samples 13440
                 iter: 43
-                ess 306.01256971648405, samples 13760
+                ess 398.0341472609545, samples 13760
                 iter: 44
-                ess 347.4433073767895, samples 14080
+                ess 393.69019872797816, samples 14080
                 iter: 45
-                ess 345.73058472149273, samples 14400
+                ess 417.6862490746803, samples 14400
                 iter: 46
-                ess 402.2219867030997, samples 14720
+                ess 435.84078468774976, samples 14720
                 iter: 47
-                ess 396.76500943644686, samples 15040
+                ess 446.6308642990863, samples 15040
                 iter: 48
-                ess 368.76575241008146, samples 15360
+                ess 410.65402061846, samples 15360
                 iter: 49
-                ess 392.30164700619, samples 15680
+                ess 454.55276530885976, samples 15680
                 iter: 50
-                ess 410.2366011190137, samples 16000
+                ess 473.28554936076443, samples 16000
                 iter: 51
-                ess 441.6461313486626, samples 16320
+                ess 475.95051602462394, samples 16320
                 iter: 52
-                ess 453.0733371644818, samples 16640
+                ess 494.63667552012674, samples 16640
                 iter: 53
-                ess 468.732442074824, samples 16960
+                ess 485.72404679157194, samples 16960
                 iter: 54
-                ess 486.4985515361956, samples 17280
+                ess 476.11092021810526, samples 17280
                 iter: 55
-                ess 519.1807533773064, samples 17600
+                ess 449.0914871124704, samples 17600
                 iter: 56
-                ess 526.0039144703743, samples 17920
+                ess 486.67463634773344, samples 17920
                 iter: 57
-                ess 542.6627957629679, samples 18240
+                ess 497.41691512579547, samples 18240
                 iter: 58
-                ess 564.6542865302788, samples 18560
+                ess 501.4250757877438, samples 18560
                 iter: 59
-                ess 572.1605181538064, samples 18880
+                ess 503.9411515824292, samples 18880
                 iter: 60
-                ess 582.9605183292837, samples 19200
+                ess 524.3117116776266, samples 19200
                 iter: 61
-                ess 607.6319445348865, samples 19520
+                ess 544.0775913878332, samples 19520
                 iter: 62
-                ess 617.7775496450698, samples 19840
+                ess 556.1525036976883, samples 19840
                 iter: 63
-                ess 615.5620446086798, samples 20160
+                ess 566.7872679336498, samples 20160
                 iter: 64
-                ess 621.7914271826387, samples 20480
+                ess 578.0182365684104, samples 20480
                 iter: 65
-                ess 634.3810925490033, samples 20800
+                ess 595.5541534162325, samples 20800
                 iter: 66
-                ess 652.7013511505703, samples 21120
+                ess 595.0575394864396, samples 21120
                 iter: 67
-                ess 664.0200810675003, samples 21440
+                ess 599.8355065269536, samples 21440
                 iter: 68
-                ess 685.1734889365622, samples 21760
+                ess 625.8737234138665, samples 21760
                 iter: 69
-                ess 690.2429803532992, samples 22080
+                ess 658.786191298775, samples 22080
                 iter: 70
-                ess 700.5969984896539, samples 22400
+                ess 649.5799877835636, samples 22400
                 iter: 71
-                ess 707.5300030315993, samples 22720
+                ess 661.4439434977735, samples 22720
                 iter: 72
-                ess 712.0200695601641, samples 23040
+                ess 683.6480827775129, samples 23040
                 iter: 73
-                ess 719.4777760952321, samples 23360
+                ess 720.841534136995, samples 23360
                 iter: 74
-                ess 726.6854100579153, samples 23680
+                ess 715.2766835652563, samples 23680
                 iter: 75
-                ess 729.7764469907538, samples 24000
+                ess 728.0772430929366, samples 24000
                 iter: 76
-                ess 749.9049885509074, samples 24320
+                ess 755.4951402345323, samples 24320
                 iter: 77
-                ess 764.7278155614728, samples 24640
+                ess 757.6694930124635, samples 24640
                 iter: 78
-                ess 772.4826595691761, samples 24960
+                ess 746.9314487334583, samples 24960
                 iter: 79
-                ess 775.3396255287553, samples 25280
+                ess 732.6477577867856, samples 25280
                 iter: 80
-                ess 785.3862092073803, samples 25600
+                ess 753.754560597872, samples 25600
                 iter: 81
-                ess 776.6369258349741, samples 25920
+                ess 756.4609775860462, samples 25920
                 iter: 82
-                ess 807.3864377744391, samples 26240
+                ess 759.6743069314127, samples 26240
                 iter: 83
-                ess 812.3774474945751, samples 26560
+                ess 778.1922242433412, samples 26560
                 iter: 84
-                ess 810.6148666352443, samples 26880
+                ess 782.4349729452235, samples 26880
                 iter: 85
-                ess 825.62219029761, samples 27200
+                ess 794.2250976796194, samples 27200
                 iter: 86
-                ess 835.7092337458173, samples 27520
+                ess 781.8202023719297, samples 27520
                 iter: 87
-                ess 850.0974246400841, samples 27840
+                ess 790.9248909050239, samples 27840
                 iter: 88
-                ess 856.5489600687148, samples 28160
+                ess 810.1883724039653, samples 28160
                 iter: 89
-                ess 885.8507476804983, samples 28480
+                ess 822.4739207684347, samples 28480
                 iter: 90
-                ess 910.2524842863202, samples 28800
+                ess 846.1068298502629, samples 28800
                 iter: 91
-                ess 927.415848100618, samples 29120
+                ess 868.4565154688227, samples 29120
                 iter: 92
-                ess 931.8235433070624, samples 29440
+                ess 881.7970493729915, samples 29440
                 iter: 93
-                ess 935.1144528214636, samples 29760
+                ess 888.34615749224, samples 29760
                 iter: 94
-                ess 968.5931352003619, samples 30080
+                ess 903.4191751210767, samples 30080
                 iter: 95
-                ess 969.2722160601122, samples 30400
+                ess 920.1442746992757, samples 30400
                 iter: 96
-                ess 986.7999600062252, samples 30720
+                ess 897.3075888543864, samples 30720
                 iter: 97
-                ess 997.2739538863411, samples 31040
+                ess 915.2150391717562, samples 31040
                 iter: 98
-                ess 997.305561805389, samples 31360
+                ess 931.6070210282812, samples 31360
                 iter: 99
-                ess 1016.6394428035395, samples 31680
+                ess 970.0119279247484, samples 31680
+                iter: 100
+                ess 982.2442638111461, samples 32000
+                iter: 101
+                ess 981.2651768963758, samples 32320
+                iter: 102
+                ess 983.4369482542774, samples 32640
+                iter: 103
+                ess 978.3890316314015, samples 32960
+                iter: 104
+                ess 991.6394881554052, samples 33280
+                iter: 105
+                ess 1013.3290676328572, samples 33600
         Billiard walk rhat: 1.0061219415504485
         CHRRT rhat: 1.0038641732435272
-        OHRR rhat: 1.0094257854838848
-        ess {&#39;Billiard walk&#39;: 1583.2881720652492, &#39;CHRRT&#39;: 1321.6148361675992, &#39;OHRR&#39;: 1016.6394428035395}
-        times {&#39;Billiard walk&#39;: 0.06821775436401367, &#39;CHRRT&#39;: 0.9356920719146729, &#39;OHRR&#39;: 6.253354072570801}
-        ess/t {&#39;Billiard walk&#39;: 23209.32705607307, &#39;CHRRT&#39;: 1412.446333400289, &#39;OHRR&#39;: 162.57506467814503}
+        OHRR rhat: 1.0089446374601516
+        ess {&#39;Billiard walk&#39;: 1583.2881720652492, &#39;CHRRT&#39;: 1321.6148361675992, &#39;OHRR&#39;: 1013.3290676328572}
+        times {&#39;Billiard walk&#39;: 0.0759425163269043, &#39;CHRRT&#39;: 0.9467864036560059, &#39;OHRR&#39;: 6.334418058395386}
+        ess/t {&#39;Billiard walk&#39;: 20848.508169650086, &#39;CHRRT&#39;: 1395.8954533611775, &#39;OHRR&#39;: 159.97192769584117}
 Benchmarking {problem_selection}
         proposal Billiard walk
                 iter: 1
@@ -1001,441 +1011,419 @@ Benchmarking {problem_selection}
                 ess 1079.4569141209104, samples 960
         proposal OHRR
                 iter: 1
-                ess 9.776492135162716, samples 480
+                ess 7.576569954116734, samples 480
                 iter: 2
-                ess 11.167662736853401, samples 960
+                ess 17.132001798080605, samples 960
                 iter: 3
-                ess 12.056069168566689, samples 1440
+                ess 17.616015135661456, samples 1440
                 iter: 4
-                ess 15.398902876392471, samples 1920
+                ess 18.38853483154202, samples 1920
                 iter: 5
-                ess 20.245304042818685, samples 2400
+                ess 24.838542331867274, samples 2400
                 iter: 6
-                ess 29.168726784213288, samples 2880
+                ess 22.754985187830517, samples 2880
                 iter: 7
-                ess 19.73043196745499, samples 3360
+                ess 41.55888224577957, samples 3360
                 iter: 8
-                ess 26.356181832325316, samples 3840
+                ess 83.88606845765823, samples 3840
                 iter: 9
-                ess 48.42195274182534, samples 4320
+                ess 65.9928547362446, samples 4320
                 iter: 10
-                ess 48.16850733314359, samples 4800
+                ess 77.80686771016401, samples 4800
                 iter: 11
-                ess 61.57524465875833, samples 5280
+                ess 67.12096264360937, samples 5280
                 iter: 12
-                ess 66.62612789837534, samples 5760
+                ess 96.4439635538298, samples 5760
                 iter: 13
-                ess 73.93473816812214, samples 6240
+                ess 67.73022370812504, samples 6240
                 iter: 14
-                ess 91.08798638997315, samples 6720
+                ess 114.98783592534645, samples 6720
                 iter: 15
-                ess 100.27310498100584, samples 7200
+                ess 106.15239869823952, samples 7200
                 iter: 16
-                ess 97.24442507446783, samples 7680
+                ess 103.42648824634605, samples 7680
                 iter: 17
-                ess 110.4156099692275, samples 8160
+                ess 103.83075790727742, samples 8160
                 iter: 18
-                ess 121.31426064888853, samples 8640
+                ess 78.35427475249816, samples 8640
                 iter: 19
-                ess 132.61932128582418, samples 9120
+                ess 116.24250716731088, samples 9120
                 iter: 20
-                ess 141.0655628782827, samples 9600
+                ess 86.40930954007561, samples 9600
                 iter: 21
-                ess 146.60715889511573, samples 10080
+                ess 107.23054414989512, samples 10080
                 iter: 22
-                ess 159.8040645277806, samples 10560
+                ess 133.50155169068938, samples 10560
                 iter: 23
-                ess 170.26508887199415, samples 11040
+                ess 139.7857456058598, samples 11040
                 iter: 24
-                ess 174.0608097706658, samples 11520
+                ess 153.17965345662913, samples 11520
                 iter: 25
-                ess 181.4891482809182, samples 12000
+                ess 148.79979310846454, samples 12000
                 iter: 26
-                ess 190.5787357308853, samples 12480
+                ess 142.05197909061368, samples 12480
                 iter: 27
-                ess 212.05269870884433, samples 12960
+                ess 145.9742150958074, samples 12960
                 iter: 28
-                ess 216.7154821077659, samples 13440
+                ess 168.58418317393134, samples 13440
                 iter: 29
-                ess 154.16746586802677, samples 13920
+                ess 200.95169824835693, samples 13920
                 iter: 30
-                ess 152.37333380523785, samples 14400
+                ess 180.79688277978786, samples 14400
                 iter: 31
-                ess 173.66341302826484, samples 14880
+                ess 204.64138172352727, samples 14880
                 iter: 32
-                ess 197.03570465163702, samples 15360
+                ess 220.84530534651557, samples 15360
                 iter: 33
-                ess 149.8657968735399, samples 15840
+                ess 224.9777307579755, samples 15840
                 iter: 34
-                ess 209.7315161765984, samples 16320
+                ess 236.09700938393908, samples 16320
                 iter: 35
-                ess 131.55423339798966, samples 16800
+                ess 244.64314025697556, samples 16800
                 iter: 36
-                ess 96.6167718486756, samples 17280
+                ess 251.92132523822318, samples 17280
                 iter: 37
-                ess 71.26867746721672, samples 17760
+                ess 234.40894874420505, samples 17760
                 iter: 38
-                ess 72.50259658714803, samples 18240
+                ess 248.14143720724553, samples 18240
                 iter: 39
-                ess 66.2384974854968, samples 18720
+                ess 252.2777723780358, samples 18720
                 iter: 40
-                ess 50.22793603309223, samples 19200
+                ess 259.19620685418215, samples 19200
                 iter: 41
-                ess 49.696471880515105, samples 19680
+                ess 265.926989814103, samples 19680
                 iter: 42
-                ess 57.092345894314036, samples 20160
+                ess 251.89518282829223, samples 20160
                 iter: 43
-                ess 67.85617007749494, samples 20640
+                ess 255.24838171597614, samples 20640
                 iter: 44
-                ess 74.79057336510849, samples 21120
+                ess 284.71212887631225, samples 21120
                 iter: 45
-                ess 90.75721729194993, samples 21600
+                ess 290.1725301923382, samples 21600
                 iter: 46
-                ess 134.39499689992982, samples 22080
+                ess 287.24096193647637, samples 22080
                 iter: 47
-                ess 151.95008105224895, samples 22560
+                ess 282.1583915718737, samples 22560
                 iter: 48
-                ess 153.14369148253127, samples 23040
+                ess 278.26334498724253, samples 23040
                 iter: 49
-                ess 156.006972943283, samples 23520
+                ess 278.99418067859256, samples 23520
                 iter: 50
-                ess 146.28503347435532, samples 24000
+                ess 277.6752922499565, samples 24000
                 iter: 51
-                ess 127.74100165220875, samples 24480
+                ess 279.43301332394856, samples 24480
                 iter: 52
-                ess 121.71655320308433, samples 24960
+                ess 278.87746201046724, samples 24960
                 iter: 53
-                ess 147.33104198243035, samples 25440
+                ess 285.85225798764384, samples 25440
                 iter: 54
-                ess 137.9514676930531, samples 25920
+                ess 282.21789875703956, samples 25920
                 iter: 55
-                ess 162.3453611877319, samples 26400
+                ess 280.3984783901852, samples 26400
                 iter: 56
-                ess 170.25325873949635, samples 26880
+                ess 292.36221603193576, samples 26880
                 iter: 57
-                ess 213.19066914216077, samples 27360
+                ess 286.60264376624815, samples 27360
                 iter: 58
-                ess 230.51311453590304, samples 27840
+                ess 298.5483407473439, samples 27840
                 iter: 59
-                ess 238.06411449329764, samples 28320
+                ess 311.2259269668154, samples 28320
                 iter: 60
-                ess 243.1405245375716, samples 28800
+                ess 314.21510464366224, samples 28800
                 iter: 61
-                ess 216.668916184032, samples 29280
+                ess 326.67221132458167, samples 29280
                 iter: 62
-                ess 242.13494330385038, samples 29760
+                ess 328.41796135585207, samples 29760
                 iter: 63
-                ess 248.11172742356032, samples 30240
+                ess 332.63806779642414, samples 30240
                 iter: 64
-                ess 256.3323419653533, samples 30720
+                ess 323.9650433437731, samples 30720
                 iter: 65
-                ess 266.2249489329944, samples 31200
+                ess 346.55905518570484, samples 31200
                 iter: 66
-                ess 241.00698523153264, samples 31680
+                ess 321.4306166447336, samples 31680
                 iter: 67
-                ess 236.34284794675355, samples 32160
+                ess 338.7471729651236, samples 32160
                 iter: 68
-                ess 233.3626938734582, samples 32640
+                ess 366.2373604657607, samples 32640
                 iter: 69
-                ess 234.9255844935538, samples 33120
+                ess 350.3675616288061, samples 33120
                 iter: 70
-                ess 252.61212200492133, samples 33600
+                ess 380.9363081428833, samples 33600
                 iter: 71
-                ess 270.5394203766128, samples 34080
+                ess 381.6100815433609, samples 34080
                 iter: 72
-                ess 291.60335448589865, samples 34560
+                ess 394.35024696428854, samples 34560
                 iter: 73
-                ess 309.3500892806769, samples 35040
+                ess 402.79872345675676, samples 35040
                 iter: 74
-                ess 311.12182362135474, samples 35520
+                ess 408.10482590494973, samples 35520
                 iter: 75
-                ess 320.12628315641666, samples 36000
+                ess 412.8165422753618, samples 36000
                 iter: 76
-                ess 348.7925620643069, samples 36480
+                ess 418.3489179126493, samples 36480
                 iter: 77
-                ess 361.6615823252901, samples 36960
+                ess 424.100555327584, samples 36960
                 iter: 78
-                ess 354.5376657353069, samples 37440
+                ess 428.7293999507969, samples 37440
                 iter: 79
-                ess 311.4690816982753, samples 37920
+                ess 439.4362032476059, samples 37920
                 iter: 80
-                ess 308.78208157119394, samples 38400
+                ess 448.6320902057233, samples 38400
                 iter: 81
-                ess 282.2030283479515, samples 38880
+                ess 447.59021824833144, samples 38880
                 iter: 82
-                ess 305.6157190415213, samples 39360
+                ess 457.44736006892947, samples 39360
                 iter: 83
-                ess 357.943938467633, samples 39840
+                ess 463.9303927032666, samples 39840
                 iter: 84
-                ess 364.694681811208, samples 40320
+                ess 476.47063512337184, samples 40320
                 iter: 85
-                ess 365.8206848631206, samples 40800
+                ess 461.72483021608923, samples 40800
                 iter: 86
-                ess 380.86201316902765, samples 41280
+                ess 469.63557313725556, samples 41280
                 iter: 87
-                ess 394.2609444706249, samples 41760
+                ess 473.3126762148311, samples 41760
                 iter: 88
-                ess 395.641061288681, samples 42240
+                ess 475.84637320247396, samples 42240
                 iter: 89
-                ess 398.9979521266321, samples 42720
+                ess 473.68628800315696, samples 42720
                 iter: 90
-                ess 393.15886380308433, samples 43200
+                ess 464.3124319869429, samples 43200
                 iter: 91
-                ess 395.9086781978561, samples 43680
+                ess 455.7196105722587, samples 43680
                 iter: 92
-                ess 394.4070361186469, samples 44160
+                ess 431.4510801827955, samples 44160
                 iter: 93
-                ess 396.6467574974821, samples 44640
+                ess 448.26400890392637, samples 44640
                 iter: 94
-                ess 413.63618561687514, samples 45120
+                ess 462.6891799421292, samples 45120
                 iter: 95
-                ess 413.6841204910174, samples 45600
+                ess 503.7193098782691, samples 45600
                 iter: 96
-                ess 403.5252280685143, samples 46080
+                ess 515.061987756499, samples 46080
                 iter: 97
-                ess 406.9465665057137, samples 46560
+                ess 521.9445188435989, samples 46560
                 iter: 98
-                ess 414.2390898395199, samples 47040
+                ess 512.2181823431999, samples 47040
                 iter: 99
-                ess 427.10909891829476, samples 47520
+                ess 486.7553593327919, samples 47520
                 iter: 100
-                ess 431.77120184396534, samples 48000
+                ess 488.6206246547012, samples 48000
                 iter: 101
-                ess 430.48343182059574, samples 48480
+                ess 513.7014432480289, samples 48480
                 iter: 102
-                ess 445.5670372425206, samples 48960
+                ess 510.68516914364454, samples 48960
                 iter: 103
-                ess 456.2252520593618, samples 49440
+                ess 530.4105214245683, samples 49440
                 iter: 104
-                ess 461.8073730309261, samples 49920
+                ess 546.4280778739898, samples 49920
                 iter: 105
-                ess 449.51563861796734, samples 50400
+                ess 552.9355705868153, samples 50400
                 iter: 106
-                ess 451.2125184778504, samples 50880
+                ess 557.8209374329467, samples 50880
                 iter: 107
-                ess 448.34735897941584, samples 51360
+                ess 557.411404062742, samples 51360
                 iter: 108
-                ess 467.54932042622636, samples 51840
+                ess 542.6847159428553, samples 51840
                 iter: 109
-                ess 477.24564649210555, samples 52320
+                ess 543.9310381466227, samples 52320
                 iter: 110
-                ess 485.90243495163713, samples 52800
+                ess 529.0151022171947, samples 52800
                 iter: 111
-                ess 488.5346014571642, samples 53280
+                ess 538.0451592463559, samples 53280
                 iter: 112
-                ess 497.74058989783674, samples 53760
+                ess 541.9431420410004, samples 53760
                 iter: 113
-                ess 502.06771889721455, samples 54240
+                ess 540.190254635888, samples 54240
                 iter: 114
-                ess 504.2795752382087, samples 54720
+                ess 538.9223999118097, samples 54720
                 iter: 115
-                ess 505.0741842859752, samples 55200
+                ess 537.7425169036393, samples 55200
                 iter: 116
-                ess 513.4190058338743, samples 55680
+                ess 558.3535129692709, samples 55680
                 iter: 117
-                ess 520.3964437744485, samples 56160
+                ess 574.2811331557291, samples 56160
                 iter: 118
-                ess 527.0154600027546, samples 56640
+                ess 577.861681628129, samples 56640
                 iter: 119
-                ess 520.8240364046208, samples 57120
+                ess 585.3797975557958, samples 57120
                 iter: 120
-                ess 522.9649235308951, samples 57600
+                ess 596.5792614042125, samples 57600
                 iter: 121
-                ess 537.7889509188342, samples 58080
+                ess 606.2442033552657, samples 58080
                 iter: 122
-                ess 538.263521252906, samples 58560
+                ess 614.1261064256113, samples 58560
                 iter: 123
-                ess 548.296566485919, samples 59040
+                ess 628.0546903454207, samples 59040
                 iter: 124
-                ess 550.5958656465868, samples 59520
+                ess 633.5762990415968, samples 59520
                 iter: 125
-                ess 575.0410524675801, samples 60000
+                ess 625.3297629581909, samples 60000
                 iter: 126
-                ess 581.0926810327787, samples 60480
+                ess 628.4577378096052, samples 60480
                 iter: 127
-                ess 575.1841698676168, samples 60960
+                ess 627.9176201237366, samples 60960
                 iter: 128
-                ess 567.4658416850558, samples 61440
+                ess 622.0176653311039, samples 61440
                 iter: 129
-                ess 557.6083268019893, samples 61920
+                ess 615.1728404431269, samples 61920
                 iter: 130
-                ess 547.0362688236758, samples 62400
+                ess 623.395775966783, samples 62400
                 iter: 131
-                ess 559.6885460444615, samples 62880
+                ess 615.9264781512037, samples 62880
                 iter: 132
-                ess 570.3627161929511, samples 63360
+                ess 607.6971548225742, samples 63360
                 iter: 133
-                ess 583.6928033131561, samples 63840
+                ess 601.1615792958104, samples 63840
                 iter: 134
-                ess 603.0921748543786, samples 64320
+                ess 613.6075093797672, samples 64320
                 iter: 135
-                ess 619.976201196154, samples 64800
+                ess 625.5751867325149, samples 64800
                 iter: 136
-                ess 603.3629490349441, samples 65280
+                ess 646.0362282619145, samples 65280
                 iter: 137
-                ess 604.880867411402, samples 65760
+                ess 635.5106582004457, samples 65760
                 iter: 138
-                ess 612.0044266157959, samples 66240
+                ess 631.4307711397472, samples 66240
                 iter: 139
-                ess 620.6843981200377, samples 66720
+                ess 642.258634342499, samples 66720
                 iter: 140
-                ess 623.336759218216, samples 67200
+                ess 658.8347637283141, samples 67200
                 iter: 141
-                ess 636.3628799234094, samples 67680
+                ess 659.7342566618047, samples 67680
                 iter: 142
-                ess 649.7697594130741, samples 68160
+                ess 660.9250947327337, samples 68160
                 iter: 143
-                ess 650.5367049648278, samples 68640
+                ess 661.6556428140533, samples 68640
                 iter: 144
-                ess 639.9466275638673, samples 69120
+                ess 693.8437208919685, samples 69120
                 iter: 145
-                ess 640.2957466724021, samples 69600
+                ess 704.4050441085076, samples 69600
                 iter: 146
-                ess 640.0153814658115, samples 70080
+                ess 720.4246692684225, samples 70080
                 iter: 147
-                ess 626.9871491217674, samples 70560
+                ess 735.2342226381354, samples 70560
                 iter: 148
-                ess 630.5099627978551, samples 71040
+                ess 730.9728772761955, samples 71040
                 iter: 149
-                ess 641.475836513853, samples 71520
+                ess 734.1563891476425, samples 71520
                 iter: 150
-                ess 647.0777591330285, samples 72000
+                ess 733.3139714338438, samples 72000
                 iter: 151
-                ess 658.2180241625047, samples 72480
+                ess 732.8940718034717, samples 72480
                 iter: 152
-                ess 664.4616871046815, samples 72960
+                ess 740.9637856219517, samples 72960
                 iter: 153
-                ess 669.388023229061, samples 73440
+                ess 747.8977615312247, samples 73440
                 iter: 154
-                ess 680.3659258749831, samples 73920
+                ess 752.1513933771118, samples 73920
                 iter: 155
-                ess 687.1401822225786, samples 74400
+                ess 747.4387293290506, samples 74400
                 iter: 156
-                ess 692.5701574201029, samples 74880
+                ess 746.5345328681697, samples 74880
                 iter: 157
-                ess 696.9208505171567, samples 75360
+                ess 774.986268838351, samples 75360
                 iter: 158
-                ess 698.9831285938126, samples 75840
+                ess 782.0759394134686, samples 75840
                 iter: 159
-                ess 701.7865933833568, samples 76320
+                ess 799.3076367114963, samples 76320
                 iter: 160
-                ess 712.1668792764433, samples 76800
+                ess 778.4088356570278, samples 76800
                 iter: 161
-                ess 717.8664150269951, samples 77280
+                ess 768.0286207768837, samples 77280
                 iter: 162
-                ess 723.3685677781476, samples 77760
+                ess 756.1809662636285, samples 77760
                 iter: 163
-                ess 726.6618355324545, samples 78240
+                ess 771.7208712635983, samples 78240
                 iter: 164
-                ess 731.9046863723236, samples 78720
+                ess 774.6334140067105, samples 78720
                 iter: 165
-                ess 734.6077846981581, samples 79200
+                ess 773.575726525255, samples 79200
                 iter: 166
-                ess 743.4587000835944, samples 79680
+                ess 775.3020950001752, samples 79680
                 iter: 167
-                ess 749.5954998881085, samples 80160
+                ess 786.9654003916723, samples 80160
                 iter: 168
-                ess 756.8026494121233, samples 80640
+                ess 797.6792863387965, samples 80640
                 iter: 169
-                ess 748.2430131931433, samples 81120
+                ess 819.1426918247289, samples 81120
                 iter: 170
-                ess 736.9373823565642, samples 81600
+                ess 833.0757244104155, samples 81600
                 iter: 171
-                ess 738.7646863358979, samples 82080
+                ess 843.4828960646715, samples 82080
                 iter: 172
-                ess 747.4466509312857, samples 82560
+                ess 863.8936298511738, samples 82560
                 iter: 173
-                ess 759.2949604609098, samples 83040
+                ess 869.2260368915585, samples 83040
                 iter: 174
-                ess 774.8756138451412, samples 83520
+                ess 873.4220328999962, samples 83520
                 iter: 175
-                ess 783.7448844740625, samples 84000
+                ess 893.4696609604258, samples 84000
                 iter: 176
-                ess 788.0867664178603, samples 84480
+                ess 878.1153611477228, samples 84480
                 iter: 177
-                ess 811.3160190921128, samples 84960
+                ess 867.202602953267, samples 84960
                 iter: 178
-                ess 818.5318706982479, samples 85440
+                ess 860.116826815347, samples 85440
                 iter: 179
-                ess 815.8145301170484, samples 85920
+                ess 860.2292157715247, samples 85920
                 iter: 180
-                ess 813.7085477182601, samples 86400
+                ess 866.8027950987166, samples 86400
                 iter: 181
-                ess 815.645973893186, samples 86880
+                ess 874.1479416492795, samples 86880
                 iter: 182
-                ess 829.759247582038, samples 87360
+                ess 866.4783731629233, samples 87360
                 iter: 183
-                ess 840.9754865813895, samples 87840
+                ess 875.0867902171897, samples 87840
                 iter: 184
-                ess 847.7761670199511, samples 88320
+                ess 882.5124723218623, samples 88320
                 iter: 185
-                ess 849.3690799068195, samples 88800
+                ess 884.3829862503727, samples 88800
                 iter: 186
-                ess 845.7500589106621, samples 89280
+                ess 881.5963235624874, samples 89280
                 iter: 187
-                ess 841.9175659986442, samples 89760
+                ess 881.9874817749458, samples 89760
                 iter: 188
-                ess 850.8926790802444, samples 90240
+                ess 880.7596725442, samples 90240
                 iter: 189
-                ess 862.8987969863543, samples 90720
+                ess 891.5227682557565, samples 90720
                 iter: 190
-                ess 873.7681727158528, samples 91200
+                ess 909.4842027304476, samples 91200
                 iter: 191
-                ess 878.1383620730409, samples 91680
+                ess 935.9535556221624, samples 91680
                 iter: 192
-                ess 873.82537952647, samples 92160
+                ess 949.615522517204, samples 92160
                 iter: 193
-                ess 877.3322108327878, samples 92640
+                ess 971.7233095420539, samples 92640
                 iter: 194
-                ess 879.344204024488, samples 93120
+                ess 986.2365331805875, samples 93120
                 iter: 195
-                ess 882.487619738579, samples 93600
+                ess 956.3377316938954, samples 93600
                 iter: 196
-                ess 891.3070115159609, samples 94080
+                ess 947.2659140152814, samples 94080
                 iter: 197
-                ess 896.2654263339139, samples 94560
+                ess 945.3042543907125, samples 94560
                 iter: 198
-                ess 901.6865332169081, samples 95040
+                ess 944.5061989771216, samples 95040
                 iter: 199
-                ess 911.771093624819, samples 95520
+                ess 931.5310437077468, samples 95520
                 iter: 200
-                ess 922.2760009235533, samples 96000
+                ess 956.2798167766795, samples 96000
                 iter: 201
-                ess 922.4904575144362, samples 96480
+                ess 967.0816786239229, samples 96480
                 iter: 202
-                ess 921.1875924603441, samples 96960
+                ess 979.1280959956978, samples 96960
                 iter: 203
-                ess 922.0922740437478, samples 97440
+                ess 991.9694374059596, samples 97440
                 iter: 204
-                ess 928.4435088190756, samples 97920
-                iter: 205
-                ess 934.2191465465089, samples 98400
-                iter: 206
-                ess 941.6035620608822, samples 98880
-                iter: 207
-                ess 941.7193125886082, samples 99360
-                iter: 208
-                ess 960.4504766392033, samples 99840
-                iter: 209
-                ess 968.507965036127, samples 100320
-                iter: 210
-                ess 981.167921221783, samples 100800
-                iter: 211
-                ess 983.7435303124782, samples 101280
-                iter: 212
-                ess 990.3398433232712, samples 101760
-                iter: 213
-                ess 993.2330647065727, samples 102240
-                iter: 214
-                ess 994.0147757822937, samples 102720
-                iter: 215
-                ess 1002.9918608020398, samples 103200
+                ess 1001.983145079881, samples 97920
         Billiard walk rhat: 1.002332053243373
         CHRRT rhat: 1.0106888666904759
-        OHRR rhat: 1.0085877482689396
-        ess {&#39;Billiard walk&#39;: 2089.437296408794, &#39;CHRRT&#39;: 1079.4569141209104, &#39;OHRR&#39;: 1002.9918608020398}
-        times {&#39;Billiard walk&#39;: 1.1041920185089111, &#39;CHRRT&#39;: 0.9261925220489502, &#39;OHRR&#39;: 18.405820846557617}
-        ess/t {&#39;Billiard walk&#39;: 1892.2771233488422, &#39;CHRRT&#39;: 1165.4778984102616, &#39;OHRR&#39;: 54.49318827796948}
+        OHRR rhat: 1.0085491217896128
+        ess {&#39;Billiard walk&#39;: 2089.437296408794, &#39;CHRRT&#39;: 1079.4569141209104, &#39;OHRR&#39;: 1001.983145079881}
+        times {&#39;Billiard walk&#39;: 1.4442555904388428, &#39;CHRRT&#39;: 0.9311459064483643, &#39;OHRR&#39;: 18.012763023376465}
+        ess/t {&#39;Billiard walk&#39;: 1446.722664770098, &#39;CHRRT&#39;: 1159.2779462868964, &#39;OHRR&#39;: 55.62628808137514}
 </pre></div></div>
 </div>
 </section>
@@ -1555,7 +1543,7 @@ Benchmarking {problem_selection}
 <section id="Visualizing-the-samples">
 <h2>Visualizing the samples<a class="headerlink" href="#Visualizing-the-samples" title="Link to this heading">#</a></h2>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">problem_selection</span> <span class="ow">in</span> <span class="n">samples</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -1603,18 +1591,11 @@ Benchmarking {problem_selection}
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/notebooks_BenchmarkingMultiphaseMonteCarloSampling_24_0.png" src="../_images/notebooks_BenchmarkingMultiphaseMonteCarloSampling_24_0.png" />
-</div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_BenchmarkingMultiphaseMonteCarloSampling_24_1.png" src="../_images/notebooks_BenchmarkingMultiphaseMonteCarloSampling_24_1.png" />
+<img alt="../_images/notebooks_BenchmarkingMultiphaseMonteCarloSampling_24_0.png" src="../_images/notebooks_BenchmarkingMultiphaseMonteCarloSampling_24_0.png" />
 </div>
 </div>
 </section>
