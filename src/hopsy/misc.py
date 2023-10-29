@@ -6,6 +6,7 @@
 class _core:
     from .callback import Callback
     from .core import (
+        BilliardWalkProposal,
         GaussianHitAndRunProposal,
         MarkovChain,
         Problem,
@@ -20,6 +21,7 @@ _c = _core
 
 
 class _submodules:
+    import time
     import warnings
 
     import arviz
@@ -1097,3 +1099,127 @@ def rhat(*args, **kwargs):
 
     """
     return _arviz(_s.arviz.rhat, *args, **kwargs)
+
+
+def _svd_rounding(samples, polytope):
+    """
+    Polytope rounding based on samples, as suggested in https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf
+    This is used in the multipase_sampling function
+    """
+    # We concatenate them samples to [n_dim, n_iterations] for rounding
+    stacked_samples = _s.numpy.vstack(
+        [samples[i, :, :] for i in range(samples.shape[0])]
+    )
+
+    mean = _s.numpy.mean(stacked_samples, axis=0)
+    stacked_samples = stacked_samples - mean
+    U, S, Vh = _s.numpy.linalg.svd(stacked_samples)
+    # Rescaling as mentioned in  https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf
+    s_ratio = _s.numpy.max(S) / _s.numpy.min(S)
+    S = S / _s.numpy.min(S)
+    if _s.numpy.max(S) >= 2.0:
+        S[_s.numpy.where(S < 2.0)] = 1.0
+    else:
+        S = _s.numpy.ones(S.shape)
+        Vh = _s.numpy.identity(Vh.shape[0])
+
+    rounding_matrix = _s.numpy.transpose(Vh).dot(_s.numpy.diag(S))
+
+    # Transforms current last samples into new polytope
+    sub_problem = _c.Problem(
+        polytope.A, polytope.b, transformation=rounding_matrix, shift=mean
+    )
+    starting_points = transform(
+        sub_problem, [samples[i, -1, :] for i in range(samples.shape[0])]
+    )
+    polytope.apply_shift(mean)
+    polytope.apply_transformation(rounding_matrix)
+
+    return s_ratio, starting_points, polytope, sub_problem
+
+
+def run_multiphase_sampling(
+    problem: _c.Problem,
+    seeds: _s.typing.List,
+    steps_per_phase: int,
+    starting_points: _s.typing.List,
+    target_ess=1000,
+    proposal=_c.BilliardWalkProposal,
+    n_procs=1,
+    limit_singular_value_ratio=2.3,
+):
+    """
+    runs multiphase sampling as suggested in https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf
+    limit_singular_value_ratio=2.3
+
+    Beware this algorithm works well for uniform sampling, BUT it is not officially supported for non-uniform targets!
+    """
+    limit_singular_value_ratio = 2.3
+    assert len(starting_points) == len(seeds)
+    rngs = [_c.RandomNumberGenerator(s) for s in seeds]
+
+    polytope = _s.polytope.Polytope(A=problem.A, b=problem.b)
+    polytope.normalize()
+    current_ess = 0
+    iterations = 0
+    s_ratio = limit_singular_value_ratio + 1
+    sampling_time = 0
+    samples = None
+    last_iteration_did_rounding = True
+    while current_ess < target_ess:
+        iterations += 1
+        internal_polytope = polytope
+        p = _c.Problem(internal_polytope.A, internal_polytope.b)
+        markov_chains = [
+            MarkovChain(proposal=proposal, problem=p, starting_point=s)
+            for s in starting_points
+        ]
+
+        start = _s.time.time()
+        acceptance_rate, _samples = sample(
+            markov_chains, rngs, n_samples=steps_per_phase, thinning=1, n_procs=4
+        )
+        end = _s.time.time()
+        sampling_time += end - start
+
+        if s_ratio > limit_singular_value_ratio:
+            samples = _samples
+            # also measures the rounding time
+            start = _s.time.time()
+            s_ratio, starting_points, internal_polytope, sub_problem = _svd_rounding(
+                samples, internal_polytope
+            )
+            end = _s.time.time()
+            sampling_time += end - start
+            last_iteration_did_rounding = True
+        else:
+            if last_iteration_did_rounding:
+                # next operation transforms last samples to current space before concatenating
+                for j in range(samples.shape[0]):
+                    samples[j] = transform(
+                        sub_problem, [samples[j, i, :] for i in range(samples.shape[1])]
+                    )
+                last_iteration_did_rounding = False
+
+            samples = _s.numpy.concatenate((samples, _samples), axis=1)
+            starting_points = [samples[i, -1, :] for i in range(samples.shape[0])]
+        current_ess = ess(samples)
+        current_ess = _s.numpy.min(current_ess)
+        steps_per_phase += 100
+
+    # transforms back to full space
+    _samples = _s.numpy.zeros(
+        (samples.shape[0], samples.shape[1], polytope.transformation.shape[0])
+    )
+    for j in range(samples.shape[0]):
+        _samples[j] = back_transform(
+            _c.Problem(
+                A=internal_polytope.A,
+                b=internal_polytope.b,
+                transformation=internal_polytope.transformation,
+                shift=internal_polytope.shift,
+            ),
+            [samples[j, i, :] for i in range(samples.shape[1])],
+        )
+
+    return _samples, iterations, current_ess, sampling_time
