@@ -32,9 +32,11 @@ class _submodules:
         from PolyRound.api import PolyRoundApi
         from PolyRound.mutable_classes import polytope
         from PolyRound.static_classes.lp_utils import ChebyshevFinder
+        from PolyRound.static_classes.lp_utils import OptlangInterfacer
 
     import multiprocessing
     import os
+    import warnings
 
     if "JPY_PARENT_PID" in os.environ:
         import tqdm.notebook as tqdm
@@ -107,6 +109,7 @@ def add_box_constraints(
     """
     if problem.A.shape[1] == 0:
         raise ValueError("Cannot determine dimension for empty inequality Ax <= b.")
+        gggg
 
     if hasattr(lower_bound, "__len__") and len(lower_bound) != problem.A.shape[1]:
         raise TypeError(
@@ -179,24 +182,65 @@ def add_equality_constraints(
 
     dim = problem.A.shape[1]
 
-    polytope = _s.polytope.Polytope(A=problem.A, b=problem.b, S=A_eq, h=b_eq)
-    with _s.warnings.catch_warnings():
-        _s.warnings.simplefilter("ignore")
-        polytope = _s.PolyRoundApi.simplify_polytope(polytope, _c.LP().settings)
+    try:
+        polytope = _s.polytope.Polytope(A=problem.A, b=problem.b, S=A_eq, h=b_eq)
+        with _s.warnings.catch_warnings():
+            _s.warnings.simplefilter("ignore")
+            polytope = _s.PolyRoundApi.simplify_polytope(polytope, _c.LP().settings)
 
-    # transform_polytope carries out dimension reduction due to equality constraints if possible
-    polytope = _s.PolyRoundApi.transform_polytope(polytope, _c.LP().settings)
+        # transform_polytope carries out dimension reduction due to equality constraints if possible
+        polytope = _s.PolyRoundApi.transform_polytope(polytope, _c.LP().settings)
 
-    _problem = _c.Problem(
-        polytope.A,
-        polytope.b,
-        problem.model,
-        problem.starting_point,
-        polytope.transformation,
-        polytope.shift,
-    )
+        _problem = _c.Problem(
+            polytope.A,
+            polytope.b,
+            problem.model,
+            problem.starting_point,
+            polytope.transformation,
+            polytope.shift,
+        )
+        return _problem
+    except ValueError as e:
+        raise ValueError(
+            "Adding these equality constraints makes the problem infeasible! Check the problem and/or the LP().settings"
+        )
 
-    return _problem
+
+def is_polytope_empty(
+    A: _s.numpy.ndarray,
+    b: _s.numpy.ndarray,
+    S: _s.numpy.ndarray = None,
+    h: _s.numpy.ndarray = None,
+):
+    """
+    Checks whether the polytope given by Ax < b and optionally Sx=h has a solution x.
+
+    The result is only as precise as the LP solver and settings used.
+    We recommend using Gurobi and the NumericFocus option if problems are hard.
+    See hopsy.LP to access LP solver settings.
+    """
+    if not (S is not None and h is not None) and not (S is None and h is None):
+        raise RuntimeError("Either S and h must both be None OR both must have values")
+    polytope = _s.polytope.Polytope(A=A, b=b, S=S, h=h)
+    _s.warnings.filterwarnings("ignore", category=DeprecationWarning)
+    optlang_model = _s.OptlangInterfacer.polytope_to_optlang(polytope, _c.LP().settings)
+    status = optlang_model.optimize()
+    _s.warnings.simplefilter("always")
+    if status != "optimal":
+        return True
+    else:
+        return False
+
+
+def is_problem_polytope_empty(problem: _c.Problem):
+    """
+    Checks whether the problem with polytope given by Ax < b and optionally Sx=h has a solution x.
+
+    The result is only as precise as the LP solver and settings used.
+    We recommend using Gurobi and the NumericFocus option if problems are hard.
+    See hopsy.LP to access LP solver settings.
+    """
+    return is_polytope_empty(problem.A, problem.b)
 
 
 def compute_chebyshev_center(problem: _c.Problem):

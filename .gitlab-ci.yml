@@ -22,7 +22,7 @@ build-release:
   stage: build
   parallel:
     matrix:
-      - PYTHON_VERSION: ["cp37-cp37m", "cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311"]
+      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311"]
   environment: $PYTHON_VERSION
   script:
     - /opt/python/cp310-cp310/bin/python .check_version.py
@@ -38,7 +38,7 @@ build-debug:
   stage: build
   parallel:
     matrix:
-      - PYTHON_VERSION: ["cp37-cp37m", "cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311"]
+      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311"]
   environment: $PYTHON_VERSION
   script:
     - /opt/python/cp310-cp310/bin/python .check_version.py
@@ -59,7 +59,7 @@ test-release:
     - build-release
   parallel:
     matrix:
-      - PYTHON_VERSION: ["cp37-cp37m", "cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311"]
+      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311"]
   environment: $PYTHON_VERSION
   before_script:
     - /opt/python/$PYTHON_VERSION/bin/python -m pip install docov
@@ -78,7 +78,7 @@ test-debug:
     - build-debug
   parallel:
     matrix:
-      - PYTHON_VERSION: ["cp37-cp37m", "cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311"]
+      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311"]
   environment: $PYTHON_VERSION
   before_script:
     - /opt/python/$PYTHON_VERSION/bin/python -m pip install docov
@@ -100,7 +100,7 @@ test-integration-release:
     - curl https://clickhouse.com/ | sh
     - ./clickhouse server &> clickhouse.log &
     - rm examples/ParallelTempering.ipynb examples/parallel_tempering.py # mpi not compatible with manylinux
-    - rm examples/Callbacks.ipynb # somehow samples go missing in CI but not locally?
+    - rm examples/Callbacks.ipynb # somehow samples go missing in CI but not locally? For now we skip this test
     - rm examples/BenchmarkingMultiphaseMonteCarloSampling.ipynb # too slow for CI
   script:
     - VERSION=$(cat .version); for PY in "cp311-cp311"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
