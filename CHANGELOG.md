@@ -2,6 +2,8 @@
 
 ## Last Changes
 
+- [#105](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/105): Drop support for unsupported python 3.7
+- [#101](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/101): Add helper functions for testing if polytope is empty
 - [#99](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/99): Fix benchmark example typo
 - [#98](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/98): Consistent names for model functions
 - [#97](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/97): Disable jekyll in automatic doc building
