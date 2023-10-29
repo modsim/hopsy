@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#83](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/83): Readd vectorization for hopsy
 - [#103](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/103): Fix callback example
 - [#105](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/105): Drop support for unsupported python 3.7
 - [#101](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/101): Add helper functions for testing if polytope is empty
