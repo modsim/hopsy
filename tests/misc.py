@@ -408,3 +408,33 @@ class MiscTests(unittest.TestCase):
         ret = sample(chains, rngs, n_samples, thinning, in_memory=False)
 
         self.assertEqual(ret, None)
+
+    def test_multiphase_sampling(self):
+        polytope = BirkhoffPolytope(3)
+        problem = Problem(polytope.A, polytope.b)
+        cheby = compute_chebyshev_center(polytope)
+        seeds = [42, 43, 44, 45]
+        samples, iterations, ess, runtime = run_multiphase_sampling(
+            problem=problem,
+            seeds=seeds,
+            steps_per_phase=100,
+            starting_points=[cheby for s in seeds],
+            n_procs=len(seeds),
+        )
+
+        self.assertGreater(ess, 1000)
+
+    def test_multiphase_sampling_starting_in_rounded_space(self):
+        polytope = BirkhoffPolytope(3)
+        problem = round(Problem(polytope.A, polytope.b))
+        cheby = compute_chebyshev_center(polytope)
+        seeds = [42, 43, 44, 45]
+        samples, iterations, ess, runtime = run_multiphase_sampling(
+            problem=problem,
+            seeds=seeds,
+            steps_per_phase=100,
+            starting_points=[cheby for s in seeds],
+            n_procs=len(seeds),
+        )
+
+        self.assertGreater(ess, 1000)
