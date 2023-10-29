@@ -156,10 +156,7 @@ def add_box_constraints(
 
 
 def add_equality_constraints(
-    problem: _c.Problem,
-    A_eq: _s.numpy.ndarray,
-    b_eq: _s.numpy.typing.ArrayLike,
-    simplify=True,
+    problem: _c.Problem, A_eq: _s.numpy.ndarray, b_eq: _s.numpy.typing.ArrayLike
 ):
     r"""Adds equality constraints as specified. This will change :attr:`hopsy.Problem.A` and :attr:`hopsy.Problem.b`.
     The equality constraints are incorporated into the transformation of the original problem.
