@@ -31,6 +31,55 @@ ProposalTypes = [
 
 
 class MiscTests(unittest.TestCase):
+    def test_is_polytope_empty_returns_false_on_non_empty(self):
+        # test problem is x < 10, -x < 10
+        A = np.array([[1], [-1]])
+        b = np.array([10, 10])
+        is_empty = is_polytope_empty(A, b, S=None, h=None)
+        self.assertEqual(is_empty, False)
+
+    def test_is_polytope_empty_throws_exceptions_on_bad_arguments(self):
+        A = np.array([[1], [-1]])
+        b = np.array([10, 10])
+        with self.assertRaises(RuntimeError):
+            is_polytope_empty(A, b, None, 1)
+        with self.assertRaises(RuntimeError):
+            is_polytope_empty(A, b, 1, None)
+
+    def test_is_polytope_empty_returns_true_on_empty(self):
+        # test problem is x < 1, x > 2
+        A = np.array([[1], [-1]])
+        b = np.array([1, -2])
+        is_empty = is_polytope_empty(A, b)
+        self.assertEqual(is_empty, True)
+
+    def test_is_polytope_empty_returns_false_on_non_empty_with_equality_constraints(
+        self,
+    ):
+        # test problem is x < 10, -x < 10, x=0
+        A = np.array([[1], [-1]])
+        b = np.array([10, 10])
+        S = np.array([[1]])
+        h = np.array([5])
+        is_empty = is_polytope_empty(A, b, S=S, h=h)
+        self.assertEqual(is_empty, False)
+
+    def test_is_problem_empty_returns_false_on_non_empty(self):
+        # test problem is x < 10, -x < 10
+        A = np.array([[1], [-1]])
+        b = np.array([10, 10])
+        problem = Problem(A, b)
+        is_empty = is_problem_polytope_empty(problem)
+        self.assertEqual(is_empty, False)
+
+    def test_is_problem_empty_returns_true_on_empty(self):
+        # test problem is x < 1, x > 2
+        A = np.array([[1], [-1]])
+        b = np.array([1, -2])
+        problem = Problem(A, b)
+        is_empty = is_problem_polytope_empty(problem)
+        self.assertEqual(is_empty, True)
+
     def test_sequential_sampling(self):
         chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
         rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
