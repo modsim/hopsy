@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>A Quick Tutorial &#8212; hopsy 1.4.0b0 documentation</title>
+    <title>Checking polytope feasibility &#8212; hopsy 1.4.0b0 documentation</title>
   
   
   
@@ -44,12 +44,10 @@
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/QuickTutorial';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/CheckIfPolytopeIsEmpty';</script>
     <link rel="icon" href="../_static/hopsy.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="A Guide to Sampling Your First Model With hopsy" href="SamplingAdvice.html" />
-    <link rel="prev" title="Introduction" href="../firststeps/introduction.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -147,7 +145,7 @@
   </p>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item current active">
+                    <li class="nav-item">
                       <a class="nav-link nav-internal" href="../firststeps.html">
                         First Steps
                       </a>
@@ -237,7 +235,7 @@ document.write(`
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -255,7 +253,7 @@ document.write(`
   </p>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item current active">
+                    <li class="nav-item">
                       <a class="nav-link nav-internal" href="../firststeps.html">
                         First Steps
                       </a>
@@ -306,21 +304,6 @@ document.write(`
     
   </div>
   
-    <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
-     aria-label="Section Navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">First Steps</span></p>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../firststeps/installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../firststeps/introduction.html">Introduction</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">A Quick Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="SamplingAdvice.html">A Guide to Sampling Your First Model With hopsy</a></li>
-</ul>
-</div>
-</nav></div>
-    </div>
-  
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
   </div>
@@ -355,10 +338,7 @@ document.write(`
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    
-    <li class="breadcrumb-item"><a href="../firststeps.html" class="nav-link">First Steps</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page">A Quick Tutorial</li>
+    <li class="breadcrumb-item active" aria-current="page">Checking...</li>
   </ul>
 </nav>
 </div>
@@ -375,97 +355,100 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="A-Quick-Tutorial">
-<h1>A Quick Tutorial<a class="headerlink" href="#A-Quick-Tutorial" title="Link to this heading">#</a></h1>
-<p>In this example, we sample a truncated Gaussian distribution centered at the origin and restricted to a simplex. The simplex inequality is given as</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}Ax = \begin{pmatrix}
-     1 &amp;  1 &amp; \cdots &amp;  1 \\
-    -1 &amp;  0 &amp; \cdots &amp;  0 \\
-     0 &amp; -1 &amp; \cdots &amp;  0 \\
-     \vdots &amp; \vdots &amp; \cdots &amp; \vdots \\
-     0 &amp;  0 &amp; \cdots &amp; -1
-\end{pmatrix} \begin{pmatrix}
-    x_1 \\
-    \vdots \\
-    x_n
-\end{pmatrix} \leq \begin{pmatrix}
-    1 \\
-    0 \\
-    \vdots \\
-    0
-\end{pmatrix} = b,\end{split}\]</div>
-<p>with <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{m \times n}\)</span>, <span class="math notranslate nohighlight">\(x \in \mathbb{R}^n\)</span> and <span class="math notranslate nohighlight">\(b \in \mathbb{R}^m\)</span>. Since the Gaussian distribution is included in <code class="docutils literal notranslate"><span class="pre">hopsy</span></code> as a model, we do not have to worry further about it for the following example.</p>
-<div class="nbinput docutils container">
+  <section id="Checking-polytope-feasibility">
+<h1>Checking polytope feasibility<a class="headerlink" href="#Checking-polytope-feasibility" title="Link to this heading">#</a></h1>
+<p>It is useful to check problems and polytopes, whether they are empty before sampling or when encountering issues. For this purpose, hopsy provides simple functions, which we will show on examples in this notebook.</p>
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hopsy</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-
-<span class="c1"># set up the polytope inequality for a 3-dimensional simplex</span>
-<span class="n">A</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-
-<span class="c1"># create a 3-dimensional gaussian model centered at the origin</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-
-<span class="c1"># set up the problem</span>
-<span class="n">problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
-
-<span class="c1"># number of chains we will use</span>
-<span class="n">n_chains</span> <span class="o">=</span> <span class="mi">4</span>
-
-<span class="c1"># set up a few parallel markov chains using a gaussian proposal and starting in the origin</span>
-<span class="n">chains</span> <span class="o">=</span> <span class="p">[</span><span class="n">hopsy</span><span class="o">.</span><span class="n">MarkovChain</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">proposal</span><span class="o">=</span><span class="n">hopsy</span><span class="o">.</span><span class="n">GaussianProposal</span><span class="p">,</span> <span class="n">starting_point</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-          <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_chains</span><span class="p">)]</span>
-
-<span class="c1"># proposal distributions usually have some adjustable hyperparameters,</span>
-<span class="c1"># the most common being the stepsize (or standard deviation in case</span>
-<span class="c1"># of a gaussian proposal)</span>
-<span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chains</span><span class="p">:</span>
-    <span class="n">chain</span><span class="o">.</span><span class="n">proposal</span><span class="o">.</span><span class="n">stepsize</span> <span class="o">=</span> <span class="mf">0.2</span>
-
-<span class="c1"># set up the random number generators</span>
-<span class="n">rngs</span> <span class="o">=</span> <span class="p">[</span><span class="n">hopsy</span><span class="o">.</span><span class="n">RandomNumberGenerator</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_chains</span><span class="p">)]</span>
-
-<span class="c1"># and now for the fun!</span>
-<span class="n">accrate</span><span class="p">,</span> <span class="n">states</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">chains</span><span class="p">,</span> <span class="n">rngs</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">thinning</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-
-<span class="c1"># when doing mcmc, assessing convergence is very important!</span>
-<span class="n">rhat</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">rhat</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">series</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Acceptance rates (per chain):&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">accrate</span><span class="p">)</span>
-
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
-
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1010</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">rhat</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">],</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span>
-        <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Convergence threshold&#39;</span><span class="p">)</span>
-
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$n_</span><span class="si">{samples}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\hat</span><span class="si">{R}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
+<section id="Example-1:-empty-polytope-x-&lt;-1-and-x-&gt;-2">
+<h2>Example 1: empty polytope x &lt; 1 and x &gt; 2<a class="headerlink" href="#Example-1:-empty-polytope-x-<-1-and-x->-2" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
 </div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Acceptance rates (per chain): 0.2878 0.2892 0.2938 0.2862
-</pre></div></div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">empty_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">empty_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">empty_problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">empty_A</span><span class="p">,</span> <span class="n">empty_b</span><span class="p">)</span>
+
+<span class="c1"># option 1: check np.arrays directly</span>
+<span class="k">assert</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">is_polytope_empty</span><span class="p">(</span><span class="n">empty_A</span><span class="p">,</span> <span class="n">empty_b</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span>
+
+<span class="c1"># option 2: check hopsy.Problem</span>
+<span class="k">assert</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">is_problem_polytope_empty</span><span class="p">(</span><span class="n">empty_problem</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span>
+</pre></div>
+</div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_QuickTutorial_1_1.png" src="../_images/notebooks_QuickTutorial_1_1.png" />
+<div class="highlight"><pre>
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-11-30
+</pre></div></div>
+</div>
+</section>
+<section id="Example-2:-valid-polytope-x-&lt;-1-and-x-&gt;-0">
+<h2>Example 2: valid polytope x &lt; 1 and x &gt; 0<a class="headerlink" href="#Example-2:-valid-polytope-x-<-1-and-x->-0" title="Link to this heading">#</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">valid_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">valid_problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">valid_A</span><span class="p">,</span> <span class="n">valid_b</span><span class="p">)</span>
+
+<span class="c1"># option 1: check np.arrays directly</span>
+<span class="k">assert</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">is_polytope_empty</span><span class="p">(</span><span class="n">valid_A</span><span class="p">,</span> <span class="n">valid_b</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span>
+
+<span class="c1"># option 2: check hopsy.Problem</span>
+<span class="k">assert</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">is_problem_polytope_empty</span><span class="p">(</span><span class="n">valid_problem</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span>
+</pre></div>
 </div>
 </div>
-<p>The potential scale reduction factor (or R-hat statistics) indicates good convergence of the chain.</p>
+</section>
+<section id="Example-3:-invalid-polytope-x-&lt;-1-and-x-&gt;-0-and-x=5">
+<h2>Example 3: invalid polytope x &lt; 1 and x &gt; 0 and x=5<a class="headerlink" href="#Example-3:-invalid-polytope-x-<-1-and-x->-0-and-x=5" title="Link to this heading">#</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">valid_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+<span class="n">invalid_equality_constraint_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">invalid_equality_bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">])</span>
+
+<span class="n">valid_problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">valid_A</span><span class="p">,</span> <span class="n">valid_b</span><span class="p">)</span>
+
+<span class="c1"># option 1: check np.arrays directly</span>
+<span class="k">assert</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">is_polytope_empty</span><span class="p">(</span><span class="n">valid_A</span><span class="p">,</span> <span class="n">valid_b</span><span class="p">,</span> <span class="n">invalid_equality_constraint_matrix</span><span class="p">,</span> <span class="n">invalid_equality_bounds</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span>
+
+<span class="c1"># option 2: There is no way to add invalid equality constraints using add_equality_constraints. hopsy will</span>
+<span class="c1"># directly raise a ValueError, because LP manipulations are required when simplifying added equality constraints, see PolyRound.</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">invalid_problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">add_equality_constraints</span><span class="p">(</span><span class="n">valid_problem</span><span class="p">,</span> <span class="n">A_eq</span><span class="o">=</span><span class="n">invalid_equality_constraint_matrix</span><span class="p">,</span> <span class="n">b_eq</span><span class="o">=</span><span class="n">invalid_equality_bounds</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+model in infeasible state, resetting lp
+Solver status: infeasible
+</pre></div></div>
+</div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -474,6 +457,7 @@ Acceptance rates (per chain): 0.2878 0.2892 0.2938 0.2862
 </pre></div>
 </div>
 </div>
+</section>
 </section>
 
 
@@ -486,24 +470,6 @@ Acceptance rates (per chain): 0.2878 0.2892 0.2938 0.2862
                 <footer class="prev-next-footer">
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
-    <a class="left-prev"
-       href="../firststeps/introduction.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Introduction</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="SamplingAdvice.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">A Guide to Sampling Your First Model With hopsy</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div>
                 </footer>
               
@@ -516,8 +482,20 @@ Acceptance rates (per chain): 0.2878 0.2892 0.2938 0.2862
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
   <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Example-1:-empty-polytope-x-&lt;-1-and-x-&gt;-2">Example 1: empty polytope x &lt; 1 and x &gt; 2</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Example-2:-valid-polytope-x-&lt;-1-and-x-&gt;-0">Example 2: valid polytope x &lt; 1 and x &gt; 0</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Example-3:-invalid-polytope-x-&lt;-1-and-x-&gt;-0-and-x=5">Example 3: invalid polytope x &lt; 1 and x &gt; 0 and x=5</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
   <div class="tocsection sourcelink">
-    <a href="../_sources/notebooks/QuickTutorial.ipynb.txt">
+    <a href="../_sources/notebooks/CheckIfPolytopeIsEmpty.ipynb.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

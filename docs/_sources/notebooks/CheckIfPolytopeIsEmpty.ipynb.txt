@@ -1,0 +1,159 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "b03740d7-8a0a-419b-aa4a-26f0a1c5f017",
+   "metadata": {},
+   "source": [
+    "# Checking polytope feasibility\n",
+    "\n",
+    "It is useful to check problems and polytopes, whether they are empty before sampling or when encountering issues.\n",
+    "For this purpose, hopsy provides simple functions, which we will show on examples in this notebook."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "5bf6388c-1a8d-4f21-ae05-6995aa5791c2",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import hopsy\n",
+    "import numpy as np"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "800d3e5f-53f8-49f6-a026-a3fb4d95f8db",
+   "metadata": {},
+   "source": [
+    "## Example 1: empty polytope x < 1 and x > 2"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "72718950-f35e-41ba-a53d-34d6fce1296d",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Set parameter Username\n",
+      "Academic license - for non-commercial use only - expires 2023-11-30\n"
+     ]
+    }
+   ],
+   "source": [
+    "empty_A = np.array([[1], [-1]])\n",
+    "empty_b = np.array([1, -2])\n",
+    "empty_problem = hopsy.Problem(empty_A, empty_b)\n",
+    "\n",
+    "# option 1: check np.arrays directly\n",
+    "assert hopsy.is_polytope_empty(empty_A, empty_b) == True\n",
+    "\n",
+    "# option 2: check hopsy.Problem \n",
+    "assert hopsy.is_problem_polytope_empty(empty_problem) == True"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8584a8ca-8f44-4726-9f75-612af2973b77",
+   "metadata": {},
+   "source": [
+    "## Example 2: valid polytope x < 1 and x > 0"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "70120e62-71be-49f9-acf0-b794d5178334",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "valid_A = np.array([[1], [-1]])\n",
+    "valid_b = np.array([1, 0])\n",
+    "valid_problem = hopsy.Problem(valid_A, valid_b)\n",
+    "\n",
+    "# option 1: check np.arrays directly\n",
+    "assert hopsy.is_polytope_empty(valid_A, valid_b) == False\n",
+    "\n",
+    "# option 2: check hopsy.Problem \n",
+    "assert hopsy.is_problem_polytope_empty(valid_problem) == False"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "571419cb-fb5e-4f6d-bfc6-7db15c28f748",
+   "metadata": {},
+   "source": [
+    "## Example 3: invalid polytope x < 1 and x > 0 and x=5"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "c0aac3a5-a472-403f-8e4f-35e8617e79ef",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "model in infeasible state, resetting lp\n",
+      "Solver status: infeasible\n"
+     ]
+    }
+   ],
+   "source": [
+    "valid_A = np.array([[1], [-1]])\n",
+    "valid_b = np.array([1, 0])\n",
+    "\n",
+    "invalid_equality_constraint_matrix = np.array([[1]])\n",
+    "invalid_equality_bounds = np.array([5])\n",
+    "\n",
+    "valid_problem = hopsy.Problem(valid_A, valid_b)\n",
+    "\n",
+    "# option 1: check np.arrays directly\n",
+    "assert hopsy.is_polytope_empty(valid_A, valid_b, invalid_equality_constraint_matrix, invalid_equality_bounds) == True\n",
+    "\n",
+    "# option 2: There is no way to add invalid equality constraints using add_equality_constraints. hopsy will \n",
+    "# directly raise a ValueError, because LP manipulations are required when simplifying added equality constraints, see PolyRound.\n",
+    "try:\n",
+    "    invalid_problem = hopsy.add_equality_constraints(valid_problem, A_eq=invalid_equality_constraint_matrix, b_eq=invalid_equality_bounds)\n",
+    "except ValueError:\n",
+    "    pass"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b5202072-f8a7-461e-a561-14d0328dc3f5",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.12"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
