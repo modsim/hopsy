@@ -179,5 +179,5 @@ Found insufficient docstring for the following items:
   -- hopsy.lp
   -- hopsy.misc
   -- hopsy.tune
-Found 374 items of which 194 have suffcient docstring.
-Coverage: 51.9%
+Found 375 items of which 195 have suffcient docstring.
+Coverage: 52.0%
