@@ -1381,42 +1381,65 @@ namespace hopsy {
                     py::arg("default_values")
                     );
         // common
-//        proposal::addCommon<ReversibleJumpProposal, doc::ReversibleJumpProposal>(reversibleJumpProposal);
+        proposal::addCommon<ReversibleJumpProposal, doc::ReversibleJumpProposal>(reversibleJumpProposal);
         // parameters
         reversibleJumpProposal
           .def_property("model_jump_probability",
               &ReversibleJumpProposal::getModelJumpProbability,
-              &ReversibleJumpProposal::setModelJumpProbability)
-//              ,
-//              doc::ReversibleJumpProposal::modelJumpProbability)
+              &ReversibleJumpProposal::setModelJumpProbability,
+              doc::ReversibleJumpProposal::modelJumpProbability)
           .def_property("activation_probability",
               &ReversibleJumpProposal::getActivationProbability,
-              &ReversibleJumpProposal::setActivationProbability)
-//              ,
-//              doc::ReversibleJumpProposal::activationProbability)
+              &ReversibleJumpProposal::setActivationProbability,
+              doc::ReversibleJumpProposal::activationProbability)
           .def_property("deactivation_probability",
               &ReversibleJumpProposal::getDeactivationProbability,
-              &ReversibleJumpProposal::setDeactivationProbability)
-//              ,
-//              doc::ReversibleJumpProposal::deactivationProbability)
-              ;
+              &ReversibleJumpProposal::setDeactivationProbability,
+              doc::ReversibleJumpProposal::deactivationProbability);
 //         pickling
-//        reversibleJumpProposal.def(py::pickle([] (const ReversibleJumpProposal& self) {
-//                        return py::make_tuple(self.proposal->getA(),
-//                                              self.proposal->getB(),
-//                                              self.proposal->getState(),
-//                                              std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
-//                    },
-//                    [] (py::tuple t) {
-//                        if (t.size() != 4) throw std::runtime_error("Invalid state!");
-//
-//                        return ReversibleJumpProposal(t[0].cast<MatrixType>(),
-//                                                t[1].cast<VectorType>(),
-//                                                t[2].cast<VectorType>(),
-//                                                t[3].cast<double>()
-//                                );
-//                    })
-//                );
+        reversibleJumpProposal.def(py::pickle([] (const ReversibleJumpProposal& self) {
+                        return py::make_tuple(
+                            self.getProposalImpl()->copyProposal(),
+                            self.getJumpIndices(),
+                            self.getDefaultValues(),
+                            self.getState(),
+                            self.getProposal(),
+                            self.getDimensionNames(),
+                            self.getModelJumpProbability(),
+                            self.getActivationProbability(),
+                            self.getDeactivationProbability(),
+                            self.getBackwardDistances(),
+                            self.getForwardDistances(),
+                            self.getActivationState(),
+                            self.getActivationProposal(),
+                            self.getLogAcceptanceChanceModelJump(),
+                            self.isLastProposalJumpedModel());
+                    },
+                    [] (py::tuple t) {
+                        if (t.size() != 15) throw std::runtime_error("Invalid state!");
+
+                        auto rjmcmcProposal = ReversibleJumpProposal(
+                            t[0].cast<std::unique_ptr<Proposal>>(),
+                            t[1].cast<Eigen::VectorXi>(),
+                            t[2].cast<VectorType>()
+                        );
+
+                        rjmcmcProposal.setState(t[3].cast<VectorType>());
+                        rjmcmcProposal.setProposal(t[4].cast<VectorType>());
+                        rjmcmcProposal.setDimensionNames(t[5].cast<std::vector<std::string>>());
+                        rjmcmcProposal.setModelJumpProbability(t[6].cast<double>());
+                        rjmcmcProposal.setActivationProbability(t[7].cast<double>());
+                        rjmcmcProposal.setDeactivationProbability(t[8].cast<double>());
+                        rjmcmcProposal.setBackwardDistances(t[9].cast<VectorType>());
+                        rjmcmcProposal.setForwardDistances(t[10].cast<VectorType>());
+                        rjmcmcProposal.setActivationState(t[11].cast<VectorType>());
+                        rjmcmcProposal.setActivationProposal(t[12].cast<VectorType>());
+                        rjmcmcProposal.setLogAcceptanceChanceModelJump(t[13].cast<double>());
+                        rjmcmcProposal.setLastProposalJumpedModel(t[14].cast<double>());
+
+                        return rjmcmcProposal;
+                    })
+                );
 
 
         // register PyProposal

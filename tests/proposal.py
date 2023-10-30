@@ -291,3 +291,11 @@ class ProposalTests(unittest.TestCase):
         )
         # for fresh proposals the log likelihood is still unitialized at 0
         self.assertEqual(proposal_with_log_density.proposal_negative_log_likelihood, 0)
+
+    def test_rjmcmc(self):
+        # TODO  construct gamma problem
+        problem = Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0], starting_point=[0, 0])
+        prop = UniformCoordinateHitAndRunProposal(problem)
+        jumpIndices = np.array([1])
+        defaultValues = np.array([1])
+        rjmcmc_proposal = ReversibleJumpProposal(prop, jumpIndices, defaultValues)
