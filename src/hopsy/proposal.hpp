@@ -682,6 +682,7 @@ namespace hopsy {
 			hops::HitAndRunProposal<MatrixType, VectorType, hops::GaussianStepDistribution<double>>, double>;
     using GaussianProposal = UninitializedProposalWrapper<
 			hops::GaussianProposal<MatrixType, VectorType>, double>;
+    using ReversibleJumpProposal = hops::ReversibleJumpProposal;
     using TruncatedGaussianProposal = UninitializedProposalWrapper<
             hops::TruncatedGaussianProposal<MatrixType, VectorType>, hops::Gaussian>;
     using UniformCoordinateHitAndRunProposal = UninitializedProposalWrapper<
@@ -700,6 +701,7 @@ PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::DikinWalkProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::GaussianCoordinateHitAndRunProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::GaussianHitAndRunProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::GaussianProposal);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::ReversibleJumpProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::PyProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::TruncatedGaussianProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::UniformCoordinateHitAndRunProposal);
@@ -1365,6 +1367,56 @@ namespace hopsy {
                                 );
                     })
                 );
+
+        // register ReversibleJumpProposal
+        py::classh<ReversibleJumpProposal, Proposal, ProposalTrampoline<ReversibleJumpProposal>> reversibleJumpProposal(
+                m, "ReversibleJumpProposal", doc::ReversibleJumpProposal::base);
+        // constructor
+        reversibleJumpProposal
+            //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
+            .def(py::init<std::unique_ptr<Proposal>, const Eigen::VectorXi&, const VectorType&>(),
+                    doc::ReversibleJumpProposal::__init__,
+                    py::arg("proposal"),
+                    py::arg("jump_indices"),
+                    py::arg("default_values")
+                    );
+        // common
+//        proposal::addCommon<ReversibleJumpProposal, doc::ReversibleJumpProposal>(reversibleJumpProposal);
+        // parameters
+        reversibleJumpProposal
+          .def_property("model_jump_probability",
+              &ReversibleJumpProposal::getModelJumpProbability,
+              &ReversibleJumpProposal::setModelJumpProbability)
+//              ,
+//              doc::ReversibleJumpProposal::modelJumpProbability)
+          .def_property("activation_probability",
+              &ReversibleJumpProposal::getActivationProbability,
+              &ReversibleJumpProposal::setActivationProbability)
+//              ,
+//              doc::ReversibleJumpProposal::activationProbability)
+          .def_property("deactivation_probability",
+              &ReversibleJumpProposal::getDeactivationProbability,
+              &ReversibleJumpProposal::setDeactivationProbability)
+//              ,
+//              doc::ReversibleJumpProposal::deactivationProbability)
+              ;
+//         pickling
+//        reversibleJumpProposal.def(py::pickle([] (const ReversibleJumpProposal& self) {
+//                        return py::make_tuple(self.proposal->getA(),
+//                                              self.proposal->getB(),
+//                                              self.proposal->getState(),
+//                                              std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
+//                    },
+//                    [] (py::tuple t) {
+//                        if (t.size() != 4) throw std::runtime_error("Invalid state!");
+//
+//                        return ReversibleJumpProposal(t[0].cast<MatrixType>(),
+//                                                t[1].cast<VectorType>(),
+//                                                t[2].cast<VectorType>(),
+//                                                t[3].cast<double>()
+//                                );
+//                    })
+//                );
 
 
         // register PyProposal

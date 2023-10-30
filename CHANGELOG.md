@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#102](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/102): Add RJMCMC
 - [#104](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/104): Add multiphase sampling
 - [#83](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/83): Readd vectorization for hopsy
 - [#103](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/103): Fix callback example

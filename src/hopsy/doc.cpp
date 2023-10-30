@@ -2064,6 +2064,110 @@ const char* hopsy::doc::GaussianProposal::copyProposal = R"pbdoc(
 const char* hopsy::doc::GaussianProposal::stepSize = R"pbdoc(
 )pbdoc";
 
+const char* hopsy::doc::ReversibleJumpProposal::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ReversibleJumpProposal::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ReversibleJumpProposal::propose = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ReversibleJumpProposal::acceptProposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ReversibleJumpProposal::logAcceptanceProbability = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ReversibleJumpProposal::proposal = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ReversibleJumpProposal::state = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ReversibleJumpProposal::getParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ReversibleJumpProposal::setParameter = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ReversibleJumpProposal::getStepSize = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ReversibleJumpProposal::name = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::ReversibleJumpProposal::stateNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`state_log_density` instead.
+)pbdoc";
+
+
+const char* hopsy::doc::ReversibleJumpProposal::proposalNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use -:attr:`proposal_log_density` instead.
+)pbdoc";
+
+
+const char* hopsy::doc::ReversibleJumpProposal::hasNegativeLogLikelihood = R"pbdoc(
+deprecated:: 1.4
+   Use :attr:`has_log_density` instead.
+)pbdoc";
+
+const char* hopsy::doc::ReversibleJumpProposal::stateLogDensity = R"pbdoc(state_log_density()
+
+Returns the log density of the current state of the proposal.
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::ReversibleJumpProposal::proposalLogDensity = R"pbdoc(proposal_log_density()
+Returns the log density of the proposal. If no proposal has been porposed, it returns 0
+
+Returns
+-------
+float
+    the log density
+)pbdoc";
+
+
+const char* hopsy::doc::ReversibleJumpProposal::hasLogDensity = R"pbdoc(has_log_density()
+
+Returns whether the proposal knows about the log density or not.
+Most proposals dont know about the log density. Exceptions are usually proposals which use log_gradient().
+
+Returns
+-------
+bool
+    whether proposal knows log density
+)pbdoc";
+
+const char* hopsy::doc::ReversibleJumpProposal::copyProposal = R"pbdoc(
+)pbdoc";
+
+const char* hopsy::doc::ReversibleJumpProposal::modelJumpProbability = R"pbdoc(
+)pbdoc";
+
+const char* hopsy::doc::ReversibleJumpProposal::activationProbability = R"pbdoc(
+)pbdoc";
+
+const char* hopsy::doc::ReversibleJumpProposal::deactivationProbability = R"pbdoc(
+)pbdoc";
 
 
 const char* hopsy::doc::PyProposal::base = R"pbdoc(
