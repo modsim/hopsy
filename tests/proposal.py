@@ -2,6 +2,7 @@ import pickle
 import unittest
 
 import numpy as np
+from scipy.special import gamma
 
 from hopsy import *
 
@@ -293,9 +294,52 @@ class ProposalTests(unittest.TestCase):
         self.assertEqual(proposal_with_log_density.proposal_negative_log_likelihood, 0)
 
     def test_rjmcmc(self):
+        class GammaPDF:
+            def __init__(self, data):
+                self.data = data
+                self.A = np.array(
+                    [
+                        [1, 0, 0],
+                        [-1, 0, 0],
+                        [0, 1, 0],
+                        [0, -1, 0],
+                        [0, 0, 1],
+                        [0, 0, -1],
+                    ]
+                )
+                self.b = np.array([0.9, 0, 10, -0.1, 10, -0.1])
+
+            def log_density(self, x):
+                location = x[0]
+                scale = x[1]
+                shape = x[2]
+                if scale <= 0 or shape <= 0:
+                    raise ValueError("invalid parameters")
+                log_density = 0
+                for datum in self.data:
+                    if datum - location < 0:
+                        continue
+                    density = (
+                        (x - location) ** (shape - 1) * np.exp(-(x - location) / scale)
+                    ) / (gamma(shape) * scale**shape)
+                    log_density += np.log(density)
+
+                return log_density
+
         # TODO  construct gamma problem
-        problem = Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0], starting_point=[0, 0])
-        prop = UniformCoordinateHitAndRunProposal(problem)
-        jumpIndices = np.array([1])
-        defaultValues = np.array([1])
-        rjmcmc_proposal = ReversibleJumpProposal(prop, jumpIndices, defaultValues)
+        measurements = [[1]]
+        gammaPDF = GammaPDF(measurements)
+        problem = Problem(gammaPDF.A, gammaPDF.b, starting_point=[0.5, 0.5, 0.5])
+        proposal = GaussianHitAndRunProposal(problem)
+        jumpIndices = np.array([0, 1])
+        defaultValues = np.array([0, 1])
+        rjmcmc_proposal = ReversibleJumpProposal(proposal, jumpIndices, defaultValues)
+
+        mc = MarkovChain(problem=problem, proposal=rjmcmc_proposal)
+        rng = RandomNumberGenerator(5)
+
+        print("\nproposal name is now:", mc.proposal.name)
+        rjmcmc_proposal.propose(rng)
+
+        # acc, samples = sample(mc, rng, n_samples=10, thinning=1)
+        # print(acc, samples)

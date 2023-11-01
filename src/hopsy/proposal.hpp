@@ -554,6 +554,11 @@ namespace hopsy {
             return proposal->propose(rng);
         }
 
+        VectorType& propose(RandomNumberGenerator &rng, const Eigen::VectorXd &activeSubspaces) override {
+            if (!proposal) throw std::runtime_error(uninitializedMethod("propose"));
+            return proposal->propose(rng, activeSubspaces);
+        }
+
         VectorType& acceptProposal() override {
             if (!proposal) throw std::runtime_error(uninitializedMethod("accept_proposal"));
             return proposal->acceptProposal();
@@ -726,11 +731,13 @@ namespace hopsy {
     namespace proposal {
         template<typename ProposalType, typename Docs, typename ClassType>
         void addCommon(ClassType& prop) {
-            prop.def("propose", [](ProposalType& self, hopsy::RandomNumberGenerator& rng) -> hops::VectorType& {
+            prop
+                .def("propose", [](ProposalType& self, hopsy::RandomNumberGenerator& rng) -> hops::VectorType& {
                             return self.propose(rng.rng);
                         },
-                        Docs::propose
-                )
+                        Docs::propose)
+//                .def("propose", py::overload_cast<hops::RandomNumberGenerator>(&ProposalType::propose), Docs::propose)
+//                .def("propose", py::overload_cast<hops::RandomNumberGenerator, const Eigen::VectorXd&>(&ProposalType::propose), Docs::propose)
                 .def("accept_proposal", &ProposalType::acceptProposal, Docs::acceptProposal)
                 .def_property_readonly("log_acceptance_probability", &ProposalType::computeLogAcceptanceProbability, Docs::logAcceptanceProbability)
                 .def_property_readonly("proposal", &ProposalType::getProposal, Docs::proposal)
