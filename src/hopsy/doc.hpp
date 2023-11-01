@@ -409,6 +409,32 @@ namespace hopsy {
             static const char* stepSize;
         };
 
+        struct ReversibleJumpProposal {
+            static const char* base;
+            static const char* __init__;
+
+            static const char* propose;
+            static const char* acceptProposal;
+            static const char* logAcceptanceProbability;
+            static const char* proposal;
+            static const char* state;
+            static const char* getStepSize;
+            static const char* getParameter;
+            static const char* setParameter;
+            static const char* name;
+            static const char* stateNegativeLogLikelihood;
+            static const char* proposalNegativeLogLikelihood;
+            static const char* hasNegativeLogLikelihood;
+            static const char* stateLogDensity;
+            static const char* proposalLogDensity;
+            static const char* hasLogDensity;
+            static const char* copyProposal;
+
+            static const char* modelJumpProbability;
+            static const char* activationProbability;
+            static const char* deactivationProbability;
+        };
+
         struct PyProposal {
             static const char* base;
             static const char* __init__;
