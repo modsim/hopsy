@@ -126,6 +126,17 @@ Found insufficient docstring for the following items:
   -- hopsy.RandomNumberGenerator.seed
   -- hopsy.RandomNumberGenerator.state
   -- hopsy.RandomNumberGenerator.stream
+  -- hopsy.ReversibleJumpProposal
+  -- hopsy.ReversibleJumpProposal.accept_proposal
+  -- hopsy.ReversibleJumpProposal.activation_probability
+  -- hopsy.ReversibleJumpProposal.deactivation_probability
+  -- hopsy.ReversibleJumpProposal.deepcopy
+  -- hopsy.ReversibleJumpProposal.log_acceptance_probability
+  -- hopsy.ReversibleJumpProposal.model_jump_probability
+  -- hopsy.ReversibleJumpProposal.name
+  -- hopsy.ReversibleJumpProposal.proposal
+  -- hopsy.ReversibleJumpProposal.propose
+  -- hopsy.ReversibleJumpProposal.state
   -- hopsy.Rosenbrock.scale
   -- hopsy.Rosenbrock.shift
   -- hopsy.ThompsonSamplingTuning
@@ -179,5 +190,5 @@ Found insufficient docstring for the following items:
   -- hopsy.lp
   -- hopsy.misc
   -- hopsy.tune
-Found 375 items of which 195 have suffcient docstring.
-Coverage: 52.0%
+Found 392 items of which 201 have suffcient docstring.
+Coverage: 51.3%
