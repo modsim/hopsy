@@ -406,7 +406,29 @@ class ProposalTests(unittest.TestCase):
             dump = pickle.dumps(rjmcmc_proposal)
             new_proposal = pickle.loads(dump)
             self.assertIsInstance(new_proposal, ReversibleJumpProposal)
-            rng = RandomNumberGenerator(43)
+
+    def test_pickle_rjmcmc_when_in_markov_chain(self):
+        measurements = [[1.0]]
+        gammaPDF = GammaPDF(measurements)
+        problem = Problem(
+            gammaPDF.A, gammaPDF.b, gammaPDF, starting_point=[0.5, 0.5, 0.5]
+        )
+        internal_proposals = [
+            UniformCoordinateHitAndRunProposal(problem),
+            GaussianCoordinateHitAndRunProposal(problem),
+            UniformHitAndRunProposal(problem),
+            GaussianHitAndRunProposal(problem),
+        ]
+
+        jumpIndices = np.array([0, 1])
+        defaultValues = np.array([0, 1])
+        for proposal in internal_proposals:
+            rjmcmc = MarkovChain(
+                proposal=ReversibleJumpProposal(proposal, jumpIndices, defaultValues),
+                problem=problem,
+            )
+            dump = pickle.dumps(rjmcmc)
+            new_rjmcmc = pickle.loads(dump)
 
     def test_rjmcmc_parallel(self):
         measurements = [[1.0]]
@@ -416,9 +438,9 @@ class ProposalTests(unittest.TestCase):
         )
         proposals = [
             UniformHitAndRunProposal(problem),
-            UniformHitAndRunProposal(problem),
             GaussianHitAndRunProposal(problem),
-            GaussianHitAndRunProposal(problem),
+            UniformCoordinateHitAndRunProposal(problem),
+            GaussianCoordinateHitAndRunProposal(problem),
         ]
         jumpIndices = np.array([0, 1])
         defaultValues = np.array([0, 1])
@@ -434,11 +456,8 @@ class ProposalTests(unittest.TestCase):
         rng = [RandomNumberGenerator(5 * i) for i in range(len(rjmcmc_proposals))]
 
         num_procs = 4
-        acc, samples = sample(mc, rng, n_samples=5, thinning=1, n_procs=num_procs)
-        # acc, samples = sample(mc, rng, n_samples=500_000, thinning=1, n_procs=num_procs)
-        # loc_means = [np.mean(samples[i, :, 3]) for i in range(4)]
-        # scale_means = [np.mean(samples[i, :, 4]) for i in range(4)]
-        # shape_means = [np.mean(samples[i, :, 5]) for i in range(4)]
+        acc, samples = sample(mc, rng, n_samples=500_000, thinning=1, n_procs=num_procs)
+
         samples = np.concatenate(
             tuple([samples[i, :, :] for i in range(len(rjmcmc_proposals))]), axis=0
         )
@@ -464,6 +483,7 @@ class ProposalTests(unittest.TestCase):
         expected_location_mean = 0.25381601398469622
         expected_scale_mean = 1.5811482758198503
         expected_shape_mean = 1.7883893206783834
+
         expected_model_probabilities = [
             0.3147978599901968,
             0.15325738646688555,
