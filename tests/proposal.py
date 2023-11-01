@@ -23,6 +23,41 @@ ProposalTypes = [
 ]
 
 
+class GammaPDF:
+    """Test class for Reversible Jump proposal"""
+
+    def __init__(self, data):
+        self.data = data
+        self.A = np.array(
+            [
+                [1, 0, 0],
+                [-1, 0, 0],
+                [0, 1, 0],
+                [0, -1, 0],
+                [0, 0, 1],
+                [0, 0, -1],
+            ]
+        )
+        self.b = np.array([0.9, 0, 10, -0.1, 10, -0.1])
+
+    def log_density(self, x):
+        location = x[3]
+        scale = x[4]
+        shape = x[5]
+        if scale <= 0 or shape <= 0:
+            raise ValueError("invalid parameters")
+        log_density = 0
+        for datum in self.data:
+            if datum - location < 0:
+                continue
+            density = (
+                (datum - location) ** (shape - 1) * np.exp(-(datum - location) / scale)
+            ) / (gamma(shape) * scale**shape)
+            log_density += np.log(density)
+
+        return log_density
+
+
 class ProposalTests(unittest.TestCase):
     def test_dimension_mismatch(self):
         pass
@@ -100,7 +135,6 @@ class ProposalTests(unittest.TestCase):
                 self.assertEqual(proposal.fisher_weight, 1.0e-2)
 
             if hasattr(proposal, "stepsize"):
-                print(ProposalType)
                 proposal = ProposalType(problem, stepsize=1.0e3)
                 self.assertEqual(proposal.stepsize, 1.0e3)
 
@@ -294,43 +328,12 @@ class ProposalTests(unittest.TestCase):
         self.assertEqual(proposal_with_log_density.proposal_negative_log_likelihood, 0)
 
     def test_rjmcmc(self):
-        class GammaPDF:
-            def __init__(self, data):
-                self.data = data
-                self.A = np.array(
-                    [
-                        [1, 0, 0],
-                        [-1, 0, 0],
-                        [0, 1, 0],
-                        [0, -1, 0],
-                        [0, 0, 1],
-                        [0, 0, -1],
-                    ]
-                )
-                self.b = np.array([0.9, 0, 10, -0.1, 10, -0.1])
-
-            def log_density(self, x):
-                location = x[0]
-                scale = x[1]
-                shape = x[2]
-                if scale <= 0 or shape <= 0:
-                    raise ValueError("invalid parameters")
-                log_density = 0
-                for datum in self.data:
-                    if datum - location < 0:
-                        continue
-                    density = (
-                        (x - location) ** (shape - 1) * np.exp(-(x - location) / scale)
-                    ) / (gamma(shape) * scale**shape)
-                    log_density += np.log(density)
-
-                return log_density
-
-        # TODO  construct gamma problem
-        measurements = [[1]]
+        measurements = [[1.0]]
         gammaPDF = GammaPDF(measurements)
-        problem = Problem(gammaPDF.A, gammaPDF.b, starting_point=[0.5, 0.5, 0.5])
-        proposal = GaussianHitAndRunProposal(problem)
+        problem = Problem(
+            gammaPDF.A, gammaPDF.b, gammaPDF, starting_point=[0.5, 0.5, 0.5]
+        )
+        proposal = UniformHitAndRunProposal(problem)
         jumpIndices = np.array([0, 1])
         defaultValues = np.array([0, 1])
         rjmcmc_proposal = ReversibleJumpProposal(proposal, jumpIndices, defaultValues)
@@ -338,8 +341,144 @@ class ProposalTests(unittest.TestCase):
         mc = MarkovChain(problem=problem, proposal=rjmcmc_proposal)
         rng = RandomNumberGenerator(5)
 
-        print("\nproposal name is now:", mc.proposal.name)
-        rjmcmc_proposal.propose(rng)
+        acc, samples = sample(mc, rng, n_samples=500_000, thinning=1)
 
-        # acc, samples = sample(mc, rng, n_samples=10, thinning=1)
-        # print(acc, samples)
+        location_samples = samples[0, :, 3]
+        scale_samples = samples[0, :, 4]
+        shape_samples = samples[0, :, 5]
+
+        actual_location_mean = np.mean(location_samples)
+        actual_scale_mean = np.mean(scale_samples)
+        actual_shape_mean = np.mean(shape_samples)
+
+        actual_model_visits = [0, 0, 0, 0]
+        for s in samples[0, :, :]:
+            model_index = 0
+            for j in range(jumpIndices.shape[0]):
+                model_index += 2 ** (jumpIndices.shape[0] - 1 - j) * s[jumpIndices[j]]
+            actual_model_visits[int(model_index)] += 1
+        actual_model_probabilities = [
+            float(v) / samples.shape[1] for v in actual_model_visits
+        ]
+
+        expected_location_mean = 0.25381601398469622
+        expected_scale_mean = 1.5811482758198503
+        expected_shape_mean = 1.7883893206783834
+
+        expected_model_probabilities = [
+            0.3147978599901968,
+            0.15325738646688555,
+            0.3485946848672095,
+            0.18335006867570805,
+        ]
+
+        # In order to save time testing, we sample less and receive less accurate results.
+        # The RJMCMC proposal is more rigorously tested in HOPS. Here we test that the python bindings work.
+        self.assertAlmostEqual(expected_location_mean, actual_location_mean, places=1)
+        self.assertAlmostEqual(expected_scale_mean, actual_scale_mean, places=1)
+        self.assertAlmostEqual(expected_shape_mean, actual_shape_mean, places=1)
+        for i in range(
+            max(len(expected_model_probabilities), len(actual_model_probabilities))
+        ):
+            self.assertAlmostEqual(
+                expected_model_probabilities[i], actual_model_probabilities[i], places=1
+            )
+
+    def test_pickle_rjmcmc(self):
+        measurements = [[1.0]]
+        gammaPDF = GammaPDF(measurements)
+        problem = Problem(
+            gammaPDF.A, gammaPDF.b, gammaPDF, starting_point=[0.5, 0.5, 0.5]
+        )
+        internal_proposals = [
+            UniformCoordinateHitAndRunProposal(problem),
+            GaussianCoordinateHitAndRunProposal(problem),
+            UniformHitAndRunProposal(problem),
+            GaussianHitAndRunProposal(problem),
+        ]
+
+        jumpIndices = np.array([0, 1])
+        defaultValues = np.array([0, 1])
+        for proposal in internal_proposals:
+            rjmcmc_proposal = ReversibleJumpProposal(
+                proposal, jumpIndices, defaultValues
+            )
+            dump = pickle.dumps(rjmcmc_proposal)
+            new_proposal = pickle.loads(dump)
+            self.assertIsInstance(new_proposal, ReversibleJumpProposal)
+            rng = RandomNumberGenerator(43)
+
+    def test_rjmcmc_parallel(self):
+        measurements = [[1.0]]
+        gammaPDF = GammaPDF(measurements)
+        problem = Problem(
+            gammaPDF.A, gammaPDF.b, gammaPDF, starting_point=[0.5, 0.5, 0.5]
+        )
+        proposals = [
+            UniformHitAndRunProposal(problem),
+            UniformHitAndRunProposal(problem),
+            GaussianHitAndRunProposal(problem),
+            GaussianHitAndRunProposal(problem),
+        ]
+        jumpIndices = np.array([0, 1])
+        defaultValues = np.array([0, 1])
+        rjmcmc_proposals = [
+            ReversibleJumpProposal(proposal, jumpIndices, defaultValues)
+            for proposal in proposals
+        ]
+
+        mc = [
+            MarkovChain(problem=problem, proposal=rjmcmc_proposal)
+            for rjmcmc_proposal in rjmcmc_proposals
+        ]
+        rng = [RandomNumberGenerator(5 * i) for i in range(len(rjmcmc_proposals))]
+
+        num_procs = 4
+        acc, samples = sample(mc, rng, n_samples=5, thinning=1, n_procs=num_procs)
+        # acc, samples = sample(mc, rng, n_samples=500_000, thinning=1, n_procs=num_procs)
+        # loc_means = [np.mean(samples[i, :, 3]) for i in range(4)]
+        # scale_means = [np.mean(samples[i, :, 4]) for i in range(4)]
+        # shape_means = [np.mean(samples[i, :, 5]) for i in range(4)]
+        samples = np.concatenate(
+            tuple([samples[i, :, :] for i in range(len(rjmcmc_proposals))]), axis=0
+        )
+
+        location_samples = samples[:, 3]
+        scale_samples = samples[:, 4]
+        shape_samples = samples[:, 5]
+
+        actual_location_mean = np.mean(location_samples)
+        actual_scale_mean = np.mean(scale_samples)
+        actual_shape_mean = np.mean(shape_samples)
+
+        actual_model_visits = [0, 0, 0, 0]
+        for s in samples[:, :]:
+            model_index = 0
+            for j in range(jumpIndices.shape[0]):
+                model_index += 2 ** (jumpIndices.shape[0] - 1 - j) * s[jumpIndices[j]]
+            actual_model_visits[int(model_index)] += 1
+        actual_model_probabilities = [
+            float(v) / samples.shape[0] for v in actual_model_visits
+        ]
+
+        expected_location_mean = 0.25381601398469622
+        expected_scale_mean = 1.5811482758198503
+        expected_shape_mean = 1.7883893206783834
+        expected_model_probabilities = [
+            0.3147978599901968,
+            0.15325738646688555,
+            0.3485946848672095,
+            0.18335006867570805,
+        ]
+
+        # In order to save time testing, we sample less and receive less accurate results.
+        # The RJMCMC proposal is more rigorously tested in HOPS. Here we test that the python bindings work.
+        self.assertAlmostEqual(expected_location_mean, actual_location_mean, places=1)
+        self.assertAlmostEqual(expected_scale_mean, actual_scale_mean, places=1)
+        self.assertAlmostEqual(expected_shape_mean, actual_shape_mean, places=1)
+        for i in range(
+            max(len(expected_model_probabilities), len(actual_model_probabilities))
+        ):
+            self.assertAlmostEqual(
+                expected_model_probabilities[i], actual_model_probabilities[i], places=2
+            )

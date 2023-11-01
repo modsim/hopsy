@@ -48,6 +48,16 @@ namespace hopsy {
 			);
         }
 
+        virtual VectorType& propose(hops::RandomNumberGenerator& rng, const VectorType &activeSubspace) override {
+			PYBIND11_OVERRIDE_PURE(
+				VectorType&,
+				ProposalBase,
+				propose,
+				activeSubspace,
+                rng
+			);
+        }
+
         VectorType& acceptProposal() override {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				VectorType&,     /* Return type */
@@ -554,7 +564,7 @@ namespace hopsy {
             return proposal->propose(rng);
         }
 
-        VectorType& propose(RandomNumberGenerator &rng, const Eigen::VectorXd &activeSubspaces) override {
+        VectorType& propose(hops::RandomNumberGenerator &rng, const VectorType &activeSubspaces) override {
             if (!proposal) throw std::runtime_error(uninitializedMethod("propose"));
             return proposal->propose(rng, activeSubspaces);
         }
@@ -1405,23 +1415,91 @@ namespace hopsy {
               doc::ReversibleJumpProposal::deactivationProbability);
 //         pickling
         reversibleJumpProposal.def(py::pickle([] (const ReversibleJumpProposal& self) {
-                        return py::make_tuple(
-                            self.getProposalImpl()->copyProposal(),
-                            self.getJumpIndices(),
-                            self.getDefaultValues(),
-                            self.getState(),
-                            self.getProposal(),
-                            self.getDimensionNames(),
-                            self.getModelJumpProbability(),
-                            self.getActivationProbability(),
-                            self.getDeactivationProbability(),
-                            self.getBackwardDistances(),
-                            self.getForwardDistances(),
-                            self.getActivationState(),
-                            self.getActivationProposal(),
-                            self.getLogAcceptanceChanceModelJump(),
-                            self.isLastProposalJumpedModel());
-                    },
+                std::shared_ptr<hops::Proposal> ptr = std::move(self.getProposalImpl()->copyProposal());
+                if(std::dynamic_pointer_cast<UniformCoordinateHitAndRunProposal>(ptr)) {
+                    return py::make_tuple(
+                        UniformCoordinateHitAndRunProposal(self.getA(), self.getB(), self.getProposalImpl()->getState()),
+                        self.getJumpIndices(),
+                        self.getDefaultValues(),
+                        self.getState(),
+                        self.getProposal(),
+                        self.getDimensionNames(),
+                        self.getModelJumpProbability(),
+                        self.getActivationProbability(),
+                        self.getDeactivationProbability(),
+                        self.getBackwardDistances(),
+                        self.getForwardDistances(),
+                        self.getActivationState(),
+                        self.getActivationProposal(),
+                        self.getLogAcceptanceChanceModelJump(),
+                        self.isLastProposalJumpedModel());
+                }
+                else if(std::dynamic_pointer_cast<GaussianCoordinateHitAndRunProposal>(ptr)) {
+                    return py::make_tuple(
+                        GaussianCoordinateHitAndRunProposal(
+                            self.getA(),
+                            self.getB(),
+                            self.getProposalImpl()->getState(),
+                            self.getProposalImpl()->getStepSize().value_or(1)),
+                        self.getJumpIndices(),
+                        self.getDefaultValues(),
+                        self.getState(),
+                        self.getProposal(),
+                        self.getDimensionNames(),
+                        self.getModelJumpProbability(),
+                        self.getActivationProbability(),
+                        self.getDeactivationProbability(),
+                        self.getBackwardDistances(),
+                        self.getForwardDistances(),
+                        self.getActivationState(),
+                        self.getActivationProposal(),
+                        self.getLogAcceptanceChanceModelJump(),
+                        self.isLastProposalJumpedModel());
+                }
+                else if(std::dynamic_pointer_cast<UniformHitAndRunProposal>(ptr)) {
+                    return py::make_tuple(
+                        UniformHitAndRunProposal(self.getA(), self.getB(), self.getProposalImpl()->getState()),
+                        self.getJumpIndices(),
+                        self.getDefaultValues(),
+                        self.getState(),
+                        self.getProposal(),
+                        self.getDimensionNames(),
+                        self.getModelJumpProbability(),
+                        self.getActivationProbability(),
+                        self.getDeactivationProbability(),
+                        self.getBackwardDistances(),
+                        self.getForwardDistances(),
+                        self.getActivationState(),
+                        self.getActivationProposal(),
+                        self.getLogAcceptanceChanceModelJump(),
+                        self.isLastProposalJumpedModel());
+                }
+                else if(std::dynamic_pointer_cast<GaussianHitAndRunProposal>(ptr)) {
+                    return py::make_tuple(
+                        GaussianHitAndRunProposal(
+                            self.getA(),
+                            self.getB(),
+                            self.getProposalImpl()->getState(),
+                            self.getProposalImpl()->getStepSize().value_or(1)),
+                        self.getJumpIndices(),
+                        self.getDefaultValues(),
+                        self.getState(),
+                        self.getProposal(),
+                        self.getDimensionNames(),
+                        self.getModelJumpProbability(),
+                        self.getActivationProbability(),
+                        self.getDeactivationProbability(),
+                        self.getBackwardDistances(),
+                        self.getForwardDistances(),
+                        self.getActivationState(),
+                        self.getActivationProposal(),
+                        self.getLogAcceptanceChanceModelJump(),
+                        self.isLastProposalJumpedModel());
+                }
+                else {
+                    throw std::runtime_error("Pickling of RJMCMC is not (yet) supported for proposals other than hit-and-run variants.");
+                }
+            },
                     [] (py::tuple t) {
                         if (t.size() != 15) throw std::runtime_error("Invalid state!");
 
