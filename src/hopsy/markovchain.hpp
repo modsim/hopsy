@@ -109,7 +109,7 @@ namespace hopsy {
 
         std::pair<double, VectorType>
         draw(hops::RandomNumberGenerator &randomNumberGenerator, long thinning = 1) override {
-            auto draw =  markovChain->draw(randomNumberGenerator, thinning);
+            auto draw = markovChain->draw(randomNumberGenerator, thinning);
             return draw;
         }
 
@@ -425,13 +425,19 @@ namespace hopsy {
     MarkovChain createMarkovChain(const Proposal *proposal,
                                   const Problem &problem,
                                   std::optional <RandomNumberGenerator> parallelTemperingSyncRng = std::nullopt,
-                                  double exchangeAttemptProbability = 0.1) {
+                                  double exchangeAttemptProbability = 0.1,
+                                  bool proposalIsReversibleJump=false) {
         if (problem.A.rows() != problem.b.rows()) {
             throw std::runtime_error(
                     "Dimension mismatch between row dimension of right-hand side operator A and row dimension of left-hand side vector b.");
         }
 
-        if (problem.startingPoint && problem.A.cols() != problem.startingPoint->rows()) {
+        if (!proposalIsReversibleJump && (problem.startingPoint && problem.A.cols() != problem.startingPoint->rows()) ) {
+            throw std::runtime_error(
+                    "Dimension mismatch between column dimension of right-hand side operator A and row dimension of vector starting_point.");
+        }
+        else if (proposalIsReversibleJump && (problem.startingPoint && problem.A.cols()*2 != problem.startingPoint->rows()) ) {
+            // With reversible jump the model is also tracking the model space. Therefore, the states are twice the size!
             throw std::runtime_error(
                     "Dimension mismatch between column dimension of right-hand side operator A and row dimension of vector starting_point.");
         }
@@ -455,7 +461,8 @@ namespace hopsy {
                      py::arg("proposal"),
                      py::arg("problem"),
                      py::arg("parallelTemperingSyncRng") = std::nullopt,
-                     py::arg("exchangeAttemptProbability") = 0.1)
+                     py::arg("exchangeAttemptProbability") = 0.1,
+                     py::arg("isReversibleJumpChain") = false)
         .def("draw", [](MarkovChain &self,
                                 RandomNumberGenerator &rng,
                                 long thinning = 1) -> std::pair<double, VectorType> {
@@ -484,13 +491,16 @@ namespace hopsy {
                                 },
                                 [](py::tuple t) {
                                     if (t.size() != 5) throw std::runtime_error("Invalid state!");
-                                    auto markovChain = createMarkovChain(t[0].cast<Proposal *>(),
+                                    auto state = t[2].cast<VectorType>();
+                                    auto proposal = t[0].cast<Proposal *>();
+                                    bool isReversibleJumpChain = proposal->getProposalName().substr(0, 6) == "RJMCMC";
+                                    auto markovChain = createMarkovChain(proposal,
                                                                          t[1].cast<Problem>(),
                                                                          t[3].cast<std::optional<RandomNumberGenerator>>(),
-                                                                         t[4].cast<double>());
+                                                                         t[4].cast<double>(),
+                                                                         isReversibleJumpChain);
 
                                     markovChain.setState(t[2].cast<VectorType>());
-                                    VectorType s = markovChain.getState().transpose();
                                     return markovChain;
                                 }));
     }

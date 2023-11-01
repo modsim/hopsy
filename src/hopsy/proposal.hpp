@@ -48,6 +48,16 @@ namespace hopsy {
 			);
         }
 
+        virtual VectorType& propose(hops::RandomNumberGenerator& rng, const VectorType &activeSubspace) override {
+			PYBIND11_OVERRIDE_PURE(
+				VectorType&,
+				ProposalBase,
+				propose,
+				activeSubspace,
+                rng
+			);
+        }
+
         VectorType& acceptProposal() override {
 			PYBIND11_OVERRIDE_PURE_NAME(
 				VectorType&,     /* Return type */
@@ -438,6 +448,10 @@ namespace hopsy {
             return proposalPtr->getProposal();
         }
 
+        void setProposal(const VectorType& newProposal) override {
+            proposalPtr->setProposal(newProposal);
+        }
+
         VectorType getState() const override {
             return proposalPtr->getState();
         }
@@ -554,6 +568,11 @@ namespace hopsy {
             return proposal->propose(rng);
         }
 
+        VectorType& propose(hops::RandomNumberGenerator &rng, const VectorType &activeSubspaces) override {
+            if (!proposal) throw std::runtime_error(uninitializedMethod("propose"));
+            return proposal->propose(rng, activeSubspaces);
+        }
+
         VectorType& acceptProposal() override {
             if (!proposal) throw std::runtime_error(uninitializedMethod("accept_proposal"));
             return proposal->acceptProposal();
@@ -567,6 +586,11 @@ namespace hopsy {
         VectorType getProposal() const override {
             if (!proposal) throw std::runtime_error(uninitializedMethod("proposal"));
             return proposal->getProposal();
+        }
+
+        void setProposal(const VectorType& newProposal) override {
+            if (!proposal) throw std::runtime_error(uninitializedMethod("state"));
+            proposal->setProposal(newProposal);
         }
 
         VectorType getState() const override {
@@ -682,6 +706,7 @@ namespace hopsy {
 			hops::HitAndRunProposal<MatrixType, VectorType, hops::GaussianStepDistribution<double>>, double>;
     using GaussianProposal = UninitializedProposalWrapper<
 			hops::GaussianProposal<MatrixType, VectorType>, double>;
+    using ReversibleJumpProposal = hops::ReversibleJumpProposal;
     using TruncatedGaussianProposal = UninitializedProposalWrapper<
             hops::TruncatedGaussianProposal<MatrixType, VectorType>, hops::Gaussian>;
     using UniformCoordinateHitAndRunProposal = UninitializedProposalWrapper<
@@ -700,6 +725,7 @@ PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::DikinWalkProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::GaussianCoordinateHitAndRunProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::GaussianHitAndRunProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::GaussianProposal);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::ReversibleJumpProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::PyProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::TruncatedGaussianProposal);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::UniformCoordinateHitAndRunProposal);
@@ -724,11 +750,11 @@ namespace hopsy {
     namespace proposal {
         template<typename ProposalType, typename Docs, typename ClassType>
         void addCommon(ClassType& prop) {
-            prop.def("propose", [](ProposalType& self, hopsy::RandomNumberGenerator& rng) -> hops::VectorType& {
+            prop
+                .def("propose", [](ProposalType& self, hopsy::RandomNumberGenerator& rng) -> hops::VectorType& {
                             return self.propose(rng.rng);
                         },
-                        Docs::propose
-                )
+                        Docs::propose)
                 .def("accept_proposal", &ProposalType::acceptProposal, Docs::acceptProposal)
                 .def_property_readonly("log_acceptance_probability", &ProposalType::computeLogAcceptanceProbability, Docs::logAcceptanceProbability)
                 .def_property_readonly("proposal", &ProposalType::getProposal, Docs::proposal)
@@ -1363,6 +1389,82 @@ namespace hopsy {
                                                 t[2].cast<VectorType>(),
                                                 t[3].cast<double>()
                                 );
+                    })
+                );
+
+        // register ReversibleJumpProposal
+        py::classh<ReversibleJumpProposal, Proposal, ProposalTrampoline<ReversibleJumpProposal>> reversibleJumpProposal(
+                m, "ReversibleJumpProposal", doc::ReversibleJumpProposal::base);
+        // constructor
+        reversibleJumpProposal
+            //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
+            .def(py::init<std::unique_ptr<Proposal>, const Eigen::VectorXi&, const VectorType&>(),
+                    doc::ReversibleJumpProposal::__init__,
+                    py::arg("proposal"),
+                    py::arg("jump_indices"),
+                    py::arg("default_values")
+                    );
+        // common
+        proposal::addCommon<ReversibleJumpProposal, doc::ReversibleJumpProposal>(reversibleJumpProposal);
+        // parameters
+        reversibleJumpProposal
+          .def_property("model_jump_probability",
+              &ReversibleJumpProposal::getModelJumpProbability,
+              &ReversibleJumpProposal::setModelJumpProbability,
+              doc::ReversibleJumpProposal::modelJumpProbability)
+          .def_property("activation_probability",
+              &ReversibleJumpProposal::getActivationProbability,
+              &ReversibleJumpProposal::setActivationProbability,
+              doc::ReversibleJumpProposal::activationProbability)
+          .def_property("deactivation_probability",
+              &ReversibleJumpProposal::getDeactivationProbability,
+              &ReversibleJumpProposal::setDeactivationProbability,
+              doc::ReversibleJumpProposal::deactivationProbability);
+//         pickling
+        reversibleJumpProposal.def(py::pickle([] (const ReversibleJumpProposal& self) {
+                return py::make_tuple(
+                    self.getProposalImpl()->copyProposal().release(),
+                    self.getJumpIndices(),
+                    self.getDefaultValues(),
+                    self.getState(),
+                    self.getProposal(),
+                    self.getDimensionNames(),
+                    self.getModelJumpProbability(),
+                    self.getActivationProbability(),
+                    self.getDeactivationProbability(),
+                    self.getBackwardDistances(),
+                    self.getForwardDistances(),
+                    self.getActivationState(),
+                    self.getActivationProposal(),
+                    self.getLogAcceptanceChanceModelJump(),
+                    self.isLastProposalJumpedModel());
+            },
+                    [] (py::tuple t) {
+                        if (t.size() != 15) throw std::runtime_error("Invalid state!");
+                        auto proposal = t[0].cast<std::unique_ptr<Proposal>>();
+
+                        auto rjmcmcProposal = ReversibleJumpProposal(
+                            std::move(proposal->copyProposal()),
+                            t[1].cast<Eigen::VectorXi>(),
+                            t[2].cast<VectorType>(),
+                            proposal->getA(),
+                            proposal->getB()
+                        );
+
+                        rjmcmcProposal.setState(t[3].cast<VectorType>());
+                        rjmcmcProposal.setProposal(t[4].cast<VectorType>());
+                        rjmcmcProposal.setDimensionNames(t[5].cast<std::vector<std::string>>());
+                        rjmcmcProposal.setModelJumpProbability(t[6].cast<double>());
+                        rjmcmcProposal.setActivationProbability(t[7].cast<double>());
+                        rjmcmcProposal.setDeactivationProbability(t[8].cast<double>());
+                        rjmcmcProposal.setBackwardDistances(t[9].cast<VectorType>());
+                        rjmcmcProposal.setForwardDistances(t[10].cast<VectorType>());
+                        rjmcmcProposal.setActivationState(t[11].cast<VectorType>());
+                        rjmcmcProposal.setActivationProposal(t[12].cast<VectorType>());
+                        rjmcmcProposal.setLogAcceptanceChanceModelJump(t[13].cast<double>());
+                        rjmcmcProposal.setLastProposalJumpedModel(t[14].cast<double>());
+
+                        return rjmcmcProposal;
                     })
                 );
 
