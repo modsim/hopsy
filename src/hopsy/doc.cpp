@@ -914,6 +914,21 @@ const char* hopsy::doc::Problem::transformation = R"pbdoc(numpy.ndarray[float64[
 const char* hopsy::doc::Problem::shift = R"pbdoc(numpy.ndarray[float64[n,1]]: For preconditioning (e.g. polytope rounding) one may wish to transform the polytope defined by :math:`Ax \leq b` as :math:`ATy \leq b - As` where `x = Ty + s`. If a non-zero sized ``shift`` is passed, then it will be used as the vector :math:`s` to transform all recorded states :math:`x` as `x = y + s`. The vector ``b`` will be assumed to be the right-hand side of the already transformed problem.
 )pbdoc";
 
+const char* hopsy::doc::Problem::slacks = R"pbdoc(problem.slacks(point)
+
+Given a `point`` computes polytope slacks, i.e., `b - A * x`. Note, that if A and b have been transformed, then the slacks are computed in the transformed space, e.g. after rounding.
+
+Parameters
+----------
+:param point: point at which to compute slacks
+:type point: numpy.ndarray[float64[n,1]]
+
+Returns
+-------
+:return: The value of the slacks at ``point``
+:rtype: numpy.ndarray[float64[n,1]]
+)pbdoc";
+
 
 const char* hopsy::doc::Proposal::base = R"pbdoc(
 )pbdoc";

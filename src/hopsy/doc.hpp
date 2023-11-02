@@ -130,6 +130,7 @@ namespace hopsy {
             static const char* startingPoint;
             static const char* transformation;
             static const char* shift;
+            static const char* slacks;
         };
 
         struct Proposal {

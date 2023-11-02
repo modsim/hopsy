@@ -174,6 +174,9 @@ namespace hopsy {
                     py::arg("transformation") = py::none(),
                     py::arg("shift") = py::none()
             )
+            .def("slacks", [] (const Problem& self, const VectorType& point) {
+               return self.b - self.A * point;
+            }, doc::Problem::slacks)
             .def_readwrite("A", &Problem::A, doc::Problem::A)
             .def_readwrite("b", &Problem::b, doc::Problem::b)
             .def_readwrite("starting_point", &Problem::startingPoint, doc::Problem::startingPoint)
