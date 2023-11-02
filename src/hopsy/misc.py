@@ -245,11 +245,13 @@ def is_problem_polytope_empty(problem: _c.Problem):
     return is_polytope_empty(problem.A, problem.b)
 
 
-def compute_chebyshev_center(problem: _c.Problem):
+def compute_chebyshev_center(problem: _c.Problem, original_space: bool = False):
     """
     Computes the Chebyshev center, that is the midpoint of a (non-unique) largest inscribed ball in the polytope defined by :math:`Ax \leq b`.
+    Note that if A and b are transformed (e.g. rounded), the chebyshev center is computed in the transformed space. To trigger a backtransform, use the parameter `original_space=True`.
 
     :param hopsy.Problem problem: Problem for which the Chebyshev center should be computed and which contains the matrix :math:`A` and vector :math:`b` in :math:`Ax \leq b`.
+    :param bool original_space: If the problem has been transformed (e.g. rounded). the chebyshev center is computed in the rounded space by default. If the chebyshev center is required in the original space, use original_space=True. Only works if the transformation and shift are stored in the problem.
 
     :return: The Chebyshev center of the passed problem.
     :rtype: numpy.ndarray[float64[n,1]]
@@ -262,6 +264,8 @@ def compute_chebyshev_center(problem: _c.Problem):
         raise ValueError(
             "Chebyshev center is outside of polytope. To solve check polytope feasibility or change LP settings"
         )
+    if original_space:
+        return back_transform(problem=problem, points=[chebyshev_center])[0]
 
     return chebyshev_center
 
@@ -407,7 +411,11 @@ def back_transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
             if problem.transformation is not None
             else point
         )
-        _point = _point + problem.shift if problem.shift is not None else _point
+        _point = (
+            _point + problem.shift.reshape(point.shape)
+            if problem.shift is not None
+            else _point
+        )
 
         transformed_points.append(_point)
 
