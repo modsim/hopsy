@@ -438,3 +438,21 @@ class MiscTests(unittest.TestCase):
         )
 
         self.assertGreater(ess, 1000)
+
+    def test_compute_chebyshev_center_in_original_space(self):
+        A = np.array([]).reshape(0, 3)
+        b = np.array([])
+
+        lb = [0.01, 1e-10, 1e-10]
+        ub = [3, 0.1, 1]
+        problem = Problem(A, b)
+        problem = add_box_constraints(
+            problem, lower_bound=lb, upper_bound=ub, simplify=True
+        )
+        chebyshev = compute_chebyshev_center(problem)
+        self.assertGreater(np.min(problem.slacks(chebyshev)), 0)
+        problem_rounded = round(problem)
+        chebyshev_rounded = compute_chebyshev_center(
+            problem_rounded, original_space=True
+        )
+        self.assertGreater(np.min(problem.slacks(chebyshev_rounded)), 0)
