@@ -48,6 +48,8 @@
     <link rel="icon" href="../_static/hopsy.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Birkhoff polytope" href="BirkhoffPolytope.html" />
+    <link rel="prev" title="TMVN Sampling" href="TruncatedGaussianProposal.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -159,7 +161,7 @@
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item current active">
                       <a class="nav-link nav-internal" href="../examples.html">
                         Examples
                       </a>
@@ -235,7 +237,7 @@ document.write(`
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      <div class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -267,7 +269,7 @@ document.write(`
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item current active">
                       <a class="nav-link nav-internal" href="../examples.html">
                         Examples
                       </a>
@@ -304,6 +306,29 @@ document.write(`
     
   </div>
   
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="SamplingAdvice.html">A Guide to Sampling Your First Model With hopsy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="QuickTutorial.html">A Quick Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ConstrainedSampling.html">Constrained Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CheckIfPolytopeIsEmpty.html">Checking polytope feasibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="EqualityConstraints.html">Equality Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TruncatedGaussianProposal.html">TMVN Sampling</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Benchmarking Multiphase Monte Carlo Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="BirkhoffPolytope.html">Birkhoff polytope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MultiphaseMonteCarlo.html">Demo for Multiphase Monte Carlo in hopsy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ParallelTempering.html">Parallel Tempering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eval_pt_samples.html">Visualizing samples from parallel tempering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Callbacks.html">Callbacks</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
   </div>
@@ -338,6 +363,9 @@ document.write(`
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
+    
+    <li class="breadcrumb-item"><a href="../examples.html" class="nav-link">Examples</a></li>
+    
     <li class="breadcrumb-item active" aria-current="page">Benchmarking...</li>
   </ul>
 </nav>
@@ -357,16 +385,17 @@ document.write(`
                   
   <section id="Benchmarking-Multiphase-Monte-Carlo-Sampling">
 <h1>Benchmarking Multiphase Monte Carlo Sampling<a class="headerlink" href="#Benchmarking-Multiphase-Monte-Carlo-Sampling" title="Link to this heading">#</a></h1>
-</section>
 <section id="Motivation">
-<h1>Motivation<a class="headerlink" href="#Motivation" title="Link to this heading">#</a></h1>
+<h2>Motivation<a class="headerlink" href="#Motivation" title="Link to this heading">#</a></h2>
 <p>As a methods researcher one is often interested in testing new methods and benchmarking them together with state-of-the-art algorithms. hopsy provides the framework for conducting such comparisons, because it allows the methods researcher to focus on the algorithms, while the scaffolding, i.e., I/O, convergence diagnostics, and state-of-the-art implementations of existing algorithms are provided.</p>
 <p>We show in this notebook how one can adapt build a multiphase monte carlo sampling plugin for hopsy</p>
 <section id="Preimplemented-Multiphase-sampling">
-<h2>Preimplemented Multiphase sampling<a class="headerlink" href="#Preimplemented-Multiphase-sampling" title="Link to this heading">#</a></h2>
+<h3>Preimplemented Multiphase sampling<a class="headerlink" href="#Preimplemented-Multiphase-sampling" title="Link to this heading">#</a></h3>
 <p>The multiphase Monte Carlo algorithm is also available preimplemented in hopsy, see MultiphaseMonteCarlo.ipynb for a short example</p>
+</section>
+</section>
 <section id="Background">
-<h3>Background<a class="headerlink" href="#Background" title="Link to this heading">#</a></h3>
+<h2>Background<a class="headerlink" href="#Background" title="Link to this heading">#</a></h2>
 <p>Instead of rounding before sampling, multiphase monte carlo sampling rounds adaptively based on the samples of the Markov chain during a run. It has been reported to be an efficient strategy, if the underlying Markov chain is efficient enough.</p>
 <p>The Idea has found previous adaption in the artificially centered coordinate hit-and-run and the optGP sampler. However, Coordinate Hit-and-Run Rounded showed greater and more stable performance (<a class="reference external" href="https://pubmed.ncbi.nlm.nih.gov/28158334/">https://pubmed.ncbi.nlm.nih.gov/28158334/</a>) than both of those algorithms.</p>
 <p>The idea is resurrected and shown to be efficient given a better Markov chain implementation. See <a class="reference external" href="https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf">https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf</a></p>
@@ -384,10 +413,8 @@ document.write(`
 </div>
 </div>
 </section>
-</section>
-</section>
 <section id="Custom-proposals">
-<h1>Custom proposals<a class="headerlink" href="#Custom-proposals" title="Link to this heading">#</a></h1>
+<h2>Custom proposals<a class="headerlink" href="#Custom-proposals" title="Link to this heading">#</a></h2>
 <p>In case the proposal you want to benchmark is not already implemented, it is possible to implement it yourself in a small class. It is then possible to seamlessy integrate this proposal into existing workflows with hopsy. As an example, we implement Overrelaxed Hit-and-Run, see <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2015IJMPC..2650010D/abstract">https://ui.adsabs.harvard.edu/abs/2015IJMPC..2650010D/abstract</a></p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -430,7 +457,7 @@ document.write(`
 </div>
 </section>
 <section id="More-complex-custom-sampling-schemes">
-<h1>More complex custom sampling schemes<a class="headerlink" href="#More-complex-custom-sampling-schemes" title="Link to this heading">#</a></h1>
+<h2>More complex custom sampling schemes<a class="headerlink" href="#More-complex-custom-sampling-schemes" title="Link to this heading">#</a></h2>
 <p>In addition to custom proposals, it is also possible to implement adaptive workflows. In this case we implement the adaptive rounding from <a class="reference external" href="https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf">https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf</a> using the Billiard walk that is already implemented in hopsy.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -473,7 +500,7 @@ document.write(`
 </div>
 </section>
 <section id="Helper-functions">
-<h1>Helper functions<a class="headerlink" href="#Helper-functions" title="Link to this heading">#</a></h1>
+<h2>Helper functions<a class="headerlink" href="#Helper-functions" title="Link to this heading">#</a></h2>
 <p>In this section we implement some helper functions for executing the benchmarks as well as a function which constructs our benchmark problems</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -653,7 +680,7 @@ document.write(`
 </div>
 </section>
 <section id="Benchmark-parameters">
-<h1>Benchmark parameters<a class="headerlink" href="#Benchmark-parameters" title="Link to this heading">#</a></h1>
+<h2>Benchmark parameters<a class="headerlink" href="#Benchmark-parameters" title="Link to this heading">#</a></h2>
 <p>Next set up the benchmark parameters</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
@@ -673,7 +700,7 @@ document.write(`
 </div>
 </section>
 <section id="Benchmarking">
-<h1>Benchmarking<a class="headerlink" href="#Benchmarking" title="Link to this heading">#</a></h1>
+<h2>Benchmarking<a class="headerlink" href="#Benchmarking" title="Link to this heading">#</a></h2>
 <p>Sample all problems with all sampling schemes, i.e., two for loops.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -1478,7 +1505,7 @@ Benchmarking {problem_selection}
 </div>
 </section>
 <section id="Visualizing-the-results">
-<h1>Visualizing the results<a class="headerlink" href="#Visualizing-the-results" title="Link to this heading">#</a></h1>
+<h2>Visualizing the results<a class="headerlink" href="#Visualizing-the-results" title="Link to this heading">#</a></h2>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -1508,6 +1535,9 @@ Benchmarking {problem_selection}
 </pre></div>
 </div>
 </div>
+</section>
+<section id="visualize-runtimes">
+<h2>visualize runtimes<a class="headerlink" href="#visualize-runtimes" title="Link to this heading">#</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
@@ -1542,6 +1572,9 @@ Benchmarking {problem_selection}
 <img alt="../_images/notebooks_BenchmarkingMultiphaseMonteCarloSampling_18_0.png" src="../_images/notebooks_BenchmarkingMultiphaseMonteCarloSampling_18_0.png" />
 </div>
 </div>
+</section>
+<section id="visualize-ESS/t-[1/s]">
+<h2>visualize ESS/t [1/s]<a class="headerlink" href="#visualize-ESS/t-[1/s]" title="Link to this heading">#</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
@@ -1578,12 +1611,15 @@ Benchmarking {problem_selection}
 </div>
 </section>
 <section id="Conclusion">
-<h1>Conclusion<a class="headerlink" href="#Conclusion" title="Link to this heading">#</a></h1>
+<h2>Conclusion<a class="headerlink" href="#Conclusion" title="Link to this heading">#</a></h2>
 <p>In this benchmark the overrelaxed hit and run does not perform well against modern sampling algorithms. Furthermore we can see, that the performance is problem dependendent.</p>
 <p>The values of the benchmark are not the main result of this script, however. Much more important is that hopsy is flexible enough to quickly construct fair benchmarks comparing novel algorithms with existing implementations. Furthermore all sampling algorithms access the models (polytopes) via the same interface, which reduces work for the methods researcher.</p>
 </section>
 <section id="Appendix">
-<h1>Appendix<a class="headerlink" href="#Appendix" title="Link to this heading">#</a></h1>
+<h2>Appendix<a class="headerlink" href="#Appendix" title="Link to this heading">#</a></h2>
+</section>
+<section id="Visualizing-the-samples">
+<h2>Visualizing the samples<a class="headerlink" href="#Visualizing-the-samples" title="Link to this heading">#</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
@@ -1648,6 +1684,7 @@ Benchmarking {problem_selection}
 </div>
 </div>
 </section>
+</section>
 
 
                 </article>
@@ -1659,6 +1696,24 @@ Benchmarking {problem_selection}
                 <footer class="prev-next-footer">
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="TruncatedGaussianProposal.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">TMVN Sampling</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="BirkhoffPolytope.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Birkhoff polytope</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               
@@ -1676,24 +1731,23 @@ Benchmarking {problem_selection}
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Benchmarking Multiphase Monte Carlo Sampling</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Motivation">Motivation</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Preimplemented-Multiphase-sampling">Preimplemented Multiphase sampling</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Background">Background</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Motivation">Motivation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Preimplemented-Multiphase-sampling">Preimplemented Multiphase sampling</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Background">Background</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Custom-proposals">Custom proposals</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#More-complex-custom-sampling-schemes">More complex custom sampling schemes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Helper-functions">Helper functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Benchmark-parameters">Benchmark parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Benchmarking">Benchmarking</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Visualizing-the-results">Visualizing the results</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-runtimes">visualize runtimes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-ESS/t-[1/s]">visualize ESS/t [1/s]</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Conclusion">Conclusion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Appendix">Appendix</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Visualizing-the-samples">Visualizing the samples</a></li>
 </ul>
-</li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Custom-proposals">Custom proposals</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#More-complex-custom-sampling-schemes">More complex custom sampling schemes</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Helper-functions">Helper functions</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Benchmark-parameters">Benchmark parameters</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Benchmarking">Benchmarking</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Visualizing-the-results">Visualizing the results</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Conclusion">Conclusion</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Appendix">Appendix</a></li>
-</ul>
-
   </nav></div>
 
   <div class="sidebar-secondary-item">
@@ -1732,7 +1786,7 @@ Benchmarking {problem_selection}
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2021-2022, Forschungszentrum Jülich GmbH, authors: Richard D. Paul, Johann F. Jadebeck, Katharina Nöh.
+      © Copyright 2021-2023, Forschungszentrum Jülich GmbH, authors: Richard D. Paul, Johann F. Jadebeck, Anton Stratmann, Katharina Nöh.
       <br/>
     
   </p>

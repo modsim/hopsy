@@ -1,6 +1,28 @@
 Reference
 =========
 
+Functions
+"""""""""
+
+.. autosummary::
+   :caption: Functions
+   :toctree: generated/
+   :template: ../_templates/autosummary/base.rst
+
+   hopsy.back_transform
+   hopsy.add_box_constraints
+   hopsy.add_equality_constraints
+   hopsy.compute_chebyshev_center
+   hopsy.generate_unit_hypercube
+   hopsy.generate_unit_simplex
+   hopsy.is_polytope_empty
+   hopsy.round
+   hopsy.run_multiphase_sampling
+   hopsy.sample
+   hopsy.simplify
+   hopsy.transform
+   hopsy.tune
+
 Models
 """"""
 
@@ -24,10 +46,16 @@ Problem
    :template: ../_templates/autosummary/class.rst
 
    hopsy.Problem
-   hopsy.add_box_constraints
-   hopsy.compute_chebyshev_center
-   hopsy.round
-   hopsy.simplify
+
+Linear Programming
+""""""""""""""""""
+
+.. autosummary::
+   :caption: Problem
+   :toctree: generated/
+   :template: ../_templates/autosummary/class.rst
+
+   hopsy.LP
 
 Proposals
 """""""""
@@ -40,12 +68,14 @@ Proposals
    hopsy.Proposal
    hopsy.AdaptiveMetropolisProposal
    hopsy.BallWalkProposal
+   hopsy.BilliardWalkProposal
    hopsy.CSmMALAProposal
    hopsy.DikinWalkProposal
    hopsy.GaussianCoordinateHitAndRunProposal
    hopsy.GaussianHitAndRunProposal
    hopsy.GaussianProposal
    hopsy.PyProposal
+   hopsy.ReversibleJumpProposal
    hopsy.UniformCoordinateHitAndRunProposal
    hopsy.UniformHitAndRunProposal
 
@@ -70,7 +100,18 @@ Markov Chain
    :template: ../_templates/autosummary/class.rst
 
    hopsy.MarkovChain
-   hopsy.sample
+
+Diagnostics
+"""""""""""
+
+.. autosummary::
+   :caption: Diagnostics
+   :toctree: generated/
+   :template: ../_templates/autosummary/base.rst
+
+   hopsy.ess
+   hopsy.mcse
+   hopsy.rhat
 
 Tuning
 """"""
@@ -80,22 +121,25 @@ Tuning
    :toctree: generated/
    :template: ../_templates/autosummary/class.rst
 
-   hopsy.tune
    hopsy.ThompsonSamplingTuning
    hopsy.TuningTarget
    hopsy.AcceptanceRateTarget
    hopsy.ExpectedSquaredJumpDistanceTarget
    hopsy.PyTuningTarget
 
-Diagnostics
-"""""""""""
+
+
+Birkhoff Polytope
+"""""""""""""""""
 
 .. autosummary::
-   :caption: Diagnostics
+   :caption: Birkhoff Polytope
    :toctree: generated/
    :template: ../_templates/autosummary/class.rst
 
-   hopsy.ess
-   hopsy.mcse
-   hopsy.rhat
+   hopsy.BirkhoffPolytope
+
+
+
+
 

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>First sample without equality constraints &#8212; hopsy 1.4.0b0 documentation</title>
+    <title>Equality Constraints &#8212; hopsy 1.4.0b0 documentation</title>
   
   
   
@@ -48,6 +48,8 @@
     <link rel="icon" href="../_static/hopsy.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="TMVN Sampling" href="TruncatedGaussianProposal.html" />
+    <link rel="prev" title="Checking polytope feasibility" href="CheckIfPolytopeIsEmpty.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -159,7 +161,7 @@
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item current active">
                       <a class="nav-link nav-internal" href="../examples.html">
                         Examples
                       </a>
@@ -235,7 +237,7 @@ document.write(`
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      <div class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -267,7 +269,7 @@ document.write(`
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item current active">
                       <a class="nav-link nav-internal" href="../examples.html">
                         Examples
                       </a>
@@ -304,6 +306,29 @@ document.write(`
     
   </div>
   
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="SamplingAdvice.html">A Guide to Sampling Your First Model With hopsy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="QuickTutorial.html">A Quick Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ConstrainedSampling.html">Constrained Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CheckIfPolytopeIsEmpty.html">Checking polytope feasibility</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Equality Constraints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TruncatedGaussianProposal.html">TMVN Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="BenchmarkingMultiphaseMonteCarloSampling.html">Benchmarking Multiphase Monte Carlo Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="BirkhoffPolytope.html">Birkhoff polytope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MultiphaseMonteCarlo.html">Demo for Multiphase Monte Carlo in hopsy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ParallelTempering.html">Parallel Tempering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eval_pt_samples.html">Visualizing samples from parallel tempering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Callbacks.html">Callbacks</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
   </div>
@@ -338,7 +363,10 @@ document.write(`
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page">First...</li>
+    
+    <li class="breadcrumb-item"><a href="../examples.html" class="nav-link">Examples</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Equality Constraints</li>
   </ul>
 </nav>
 </div>
@@ -355,8 +383,10 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+  <section id="Equality-Constraints">
+<h1>Equality Constraints<a class="headerlink" href="#Equality-Constraints" title="Link to this heading">#</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hopsy</span>
@@ -365,8 +395,10 @@ document.write(`
 </pre></div>
 </div>
 </div>
+<section id="Basic-example-without-qquality-constraints">
+<h2>Basic example without qquality constraints<a class="headerlink" href="#Basic-example-without-qquality-constraints" title="Link to this heading">#</a></h2>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># create 3D rectangle</span>
@@ -387,10 +419,8 @@ document.write(`
 </pre></div>
 </div>
 </div>
-<section id="First-sample-without-equality-constraints">
-<h1>First sample without equality constraints<a class="headerlink" href="#First-sample-without-equality-constraints" title="Link to this heading">#</a></h1>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mc</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">MarkovChain</span><span class="p">(</span><span class="n">rectangle</span><span class="p">,</span> <span class="n">starting_point</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
@@ -400,7 +430,7 @@ document.write(`
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
@@ -422,7 +452,7 @@ document.write(`
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
@@ -442,28 +472,28 @@ document.write(`
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_EqualityConstraints_5_0.png" src="../_images/notebooks_EqualityConstraints_5_0.png" />
+<img alt="../_images/notebooks_EqualityConstraints_6_0.png" src="../_images/notebooks_EqualityConstraints_6_0.png" />
 </div>
 </div>
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_EqualityConstraints_5_1.png" src="../_images/notebooks_EqualityConstraints_5_1.png" />
+<img alt="../_images/notebooks_EqualityConstraints_6_1.png" src="../_images/notebooks_EqualityConstraints_6_1.png" />
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_EqualityConstraints_5_2.png" src="../_images/notebooks_EqualityConstraints_5_2.png" />
+<img alt="../_images/notebooks_EqualityConstraints_6_2.png" src="../_images/notebooks_EqualityConstraints_6_2.png" />
 </div>
 </div>
 </section>
 <section id="Now-constraint-rectangle-to-2D-by-fixing-third-dimension-at-2.5">
-<h1>Now constraint rectangle to 2D by fixing third dimension at 2.5<a class="headerlink" href="#Now-constraint-rectangle-to-2D-by-fixing-third-dimension-at-2.5" title="Link to this heading">#</a></h1>
+<h2>Now constraint rectangle to 2D by fixing third dimension at 2.5<a class="headerlink" href="#Now-constraint-rectangle-to-2D-by-fixing-third-dimension-at-2.5" title="Link to this heading">#</a></h2>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A_eq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
@@ -487,7 +517,7 @@ Academic license - for non-commercial use only - expires 2023-11-30
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mc</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">MarkovChain</span><span class="p">(</span><span class="n">constrained_rectangle</span><span class="p">,</span> <span class="n">starting_point</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
@@ -497,7 +527,7 @@ Academic license - for non-commercial use only - expires 2023-11-30
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
@@ -517,21 +547,21 @@ Academic license - for non-commercial use only - expires 2023-11-30
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_EqualityConstraints_9_0.png" src="../_images/notebooks_EqualityConstraints_9_0.png" />
+<img alt="../_images/notebooks_EqualityConstraints_10_0.png" src="../_images/notebooks_EqualityConstraints_10_0.png" />
 </div>
 </div>
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_EqualityConstraints_9_1.png" src="../_images/notebooks_EqualityConstraints_9_1.png" />
+<img alt="../_images/notebooks_EqualityConstraints_10_1.png" src="../_images/notebooks_EqualityConstraints_10_1.png" />
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_EqualityConstraints_9_2.png" src="../_images/notebooks_EqualityConstraints_9_2.png" />
+<img alt="../_images/notebooks_EqualityConstraints_10_2.png" src="../_images/notebooks_EqualityConstraints_10_2.png" />
 </div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -542,6 +572,7 @@ Academic license - for non-commercial use only - expires 2023-11-30
 </pre></div>
 </div>
 </div>
+</section>
 </section>
 
 
@@ -554,6 +585,24 @@ Academic license - for non-commercial use only - expires 2023-11-30
                 <footer class="prev-next-footer">
                   <!-- Previous / next buttons -->
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="CheckIfPolytopeIsEmpty.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Checking polytope feasibility</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="TruncatedGaussianProposal.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">TMVN Sampling</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               
@@ -571,10 +620,9 @@ Academic license - for non-commercial use only - expires 2023-11-30
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">First sample without equality constraints</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Now-constraint-rectangle-to-2D-by-fixing-third-dimension-at-2.5">Now constraint rectangle to 2D by fixing third dimension at 2.5</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Basic-example-without-qquality-constraints">Basic example without qquality constraints</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Now-constraint-rectangle-to-2D-by-fixing-third-dimension-at-2.5">Now constraint rectangle to 2D by fixing third dimension at 2.5</a></li>
 </ul>
-
   </nav></div>
 
   <div class="sidebar-secondary-item">
@@ -613,7 +661,7 @@ Academic license - for non-commercial use only - expires 2023-11-30
         <div class="footer-item">
   <p class="copyright">
     
-      © Copyright 2021-2022, Forschungszentrum Jülich GmbH, authors: Richard D. Paul, Johann F. Jadebeck, Katharina Nöh.
+      © Copyright 2021-2023, Forschungszentrum Jülich GmbH, authors: Richard D. Paul, Johann F. Jadebeck, Anton Stratmann, Katharina Nöh.
       <br/>
     
   </p>
