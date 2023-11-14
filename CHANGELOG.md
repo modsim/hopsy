@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#111](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/111): Update documentation
 - [#92](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/92): Add convenience functions for generating hybercubes, simplices and Birkhoff polytopes
 - [#110](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/110): Add convenience method to problem for computing slacks
 - [#82](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/82): Add option to compute\_chebyshev to return point in transformed or original space
