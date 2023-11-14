@@ -3,12 +3,4 @@
 
 .. currentmodule:: hopsy
 
-.. autoclass:: simplify
-
-   
-   
-   
-
-   
-   
-   
+.. autofunction:: simplify

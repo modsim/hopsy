@@ -29,5 +29,8 @@
 
    
       
+      
+         ~Problem.slacks
+      
    
    

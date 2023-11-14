@@ -61,8 +61,8 @@ master_doc = "index"
 
 # General information about the project.
 project = "hopsy"
-copyright = "2021-2022, Forschungszentrum Jülich GmbH, authors: Richard D. Paul, Johann F. Jadebeck, Katharina Nöh"
-author = "Richard D. Paul, Johann F. Jadebeck, Katharina Nöh"
+copyright = "2021-2023, Forschungszentrum Jülich GmbH, authors: Richard D. Paul, Johann F. Jadebeck, Anton Stratmann, Katharina Nöh"
+author = "Richard D. Paul, Johann F. Jadebeck, Anton Stratmann, Katharina Nöh"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
