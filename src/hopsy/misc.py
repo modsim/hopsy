@@ -412,7 +412,7 @@ def back_transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
             else point
         )
         _point = (
-            _point + problem.shift.reshape(point.shape)
+            _point + problem.shift.reshape(_point.shape)
             if problem.shift is not None
             else _point
         )
