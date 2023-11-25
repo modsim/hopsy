@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+## v1.4.0
 - [#113](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/113): Fix small bug in back\_transform
 - [#111](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/111): Update documentation
 - [#92](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/92): Add convenience functions for generating hybercubes, simplices and Birkhoff polytopes
