@@ -47,7 +47,7 @@ build-release-macos:
     - pyenv activate $PYTHON_VERSION
     - rm build dist -r || true
   script:
-    - pyenv actviate $PYTHON_VERSION && python setup.py bdist_wheel
+    - pyenv activate $PYTHON_VERSION && python setup.py bdist_wheel
     - VERSION=$(cat .version);  delocate_wheel -v dist/hopsy-$VERSION-$PYTHON_VERSION-*
   artifacts:
     paths:
