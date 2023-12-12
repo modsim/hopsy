@@ -34,6 +34,17 @@ build-release:
       - dist/*manylinux*
     expire_in: 7 days
 
+build-release-macos:
+  stage: build
+  tags:
+      - macos
+  script:
+    - ./mac_makewheels.sh
+  artifacts:
+    paths:
+      - dist/*
+    expire_in: 7 days
+
 build-debug:
   stage: build
   parallel:
