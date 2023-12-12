@@ -102,7 +102,7 @@ test-release-macos:
       - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311"]
   environment: $PYTHON_VERSION
   before_script:
-    - eval "$(pyenv init -)" && eval "($pyenv virtualenv-init -)"
+    - eval "$(pyenv init -)" && eval "$(pyenv virtualenv-init -)"
     - pyenv activate $PYTHON_VERSION
     - python -m pip install docov
   script:
