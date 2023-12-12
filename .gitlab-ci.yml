@@ -82,6 +82,25 @@ test-release:
       - dist
     expire_in: 7 days
 
+test-release-macos:
+  stage: test
+  dependencies:
+    - build-release
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311"]
+  environment: $PYTHON_VERSION
+  before_script:
+    - pyenv activate $PYTHON_VERSION
+    - python -m pip install docov
+  script:
+    - VERSION=$(cat .version); python -m pip install dist/hopsy-$VERSION-$PYTHON_VERSION-*macosx*arm64.whl
+    - VERSION=$(cat .version); python -m unittest -v tests
+  artifacts:
+    paths:
+      - dist
+    expire_in: 7 days
+
 
 test-debug:
   stage: test
