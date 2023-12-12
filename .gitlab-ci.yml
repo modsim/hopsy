@@ -84,6 +84,8 @@ test-release:
 
 test-release-macos:
   stage: test
+  tags:
+      - macos
   dependencies:
     - build-release
   parallel:
