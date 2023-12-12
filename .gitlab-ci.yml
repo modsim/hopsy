@@ -48,7 +48,7 @@ build-release-macos:
     - rm build dist -r || true
   script:
     - pyenv activate $PYTHON_VERSION && python setup.py bdist_wheel
-    - VERSION=$(cat .version);  delocate_wheel -v dist/hopsy-$VERSION-$PYTHON_VERSION-*
+    - VERSION=$(cat .version);  /Users/jadebeck/Library/Python/3.9/bin/delocate_wheel -v dist/hopsy-$VERSION-$PYTHON_VERSION-*
   artifacts:
     paths:
       - dist/*
