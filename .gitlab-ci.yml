@@ -38,8 +38,17 @@ build-release-macos:
   stage: build
   tags:
       - macos
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311"]
+  environment: $PYTHON_VERSION
+  before_script:
+    - eval "$(pyenv init -)" && eval "$pyenv virtualenv-init -)"
+    - pyenv activate $PYTHON_VERSION
+    - rm build dist -r || true
   script:
-    - ./mac_makewheels.sh
+    - pyenv actviate $PYTHON_VERSION && python setup.py bdist_wheel
+    - VERSION=$(cat .version);  delocate_wheel -v dist/hopsy-$VERSION-$PYTHON_VERSION-*
   artifacts:
     paths:
       - dist/*
@@ -87,16 +96,17 @@ test-release-macos:
   tags:
       - macos
   dependencies:
-    - build-release
+    - build-release-macos
   parallel:
     matrix:
       - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311"]
   environment: $PYTHON_VERSION
   before_script:
+    - eval "$(pyenv init -)" && eval "$pyenv virtualenv-init -)"
     - pyenv activate $PYTHON_VERSION
     - python -m pip install docov
   script:
-    - VERSION=$(cat .version); python -m pip install dist/hopsy-$VERSION-$PYTHON_VERSION-*macosx*arm64.whl
+    - VERSION=$(cat .version); python -m pip install dist/hopsy-$VERSION-$PYTHON_VERSION-*macosx*arm64.whl --force-reinstall
     - VERSION=$(cat .version); python -m unittest -v tests
   artifacts:
     paths:
