@@ -1,7 +1,8 @@
 # Changelog
 
 ## Last Changes
-- [#118](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/113): Fix back\_transform when manually adding equality constraints and rounding
+- [#117](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/117): Update Optlang, sympy and numpy dependencies
+- [#118](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/118): Fix back\_transform when manually adding equality constraints and rounding
 
 ## v1.4.0
 - [#113](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/113): Fix small bug in back\_transform
