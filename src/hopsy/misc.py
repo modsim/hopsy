@@ -198,8 +198,8 @@ def add_equality_constraints(
             polytope.b,
             problem.model,
             problem.starting_point,
-            polytope.transformation,
-            polytope.shift,
+            polytope.transformation.values,
+            polytope.shift.values,
         )
         return _problem
     except ValueError as e:
@@ -368,6 +368,9 @@ def round(problem: _c.Problem):
 
         polytope = _s.PolyRoundApi.simplify_polytope(polytope, _c.LP().settings)
 
+        existing_transform = problem.transformation
+        existing_shift = problem.shift
+
         if polytope.S is not None:
             polytope = _s.PolyRoundApi.transform_polytope(polytope, _c.LP().settings)
         else:
@@ -385,12 +388,23 @@ def round(problem: _c.Problem):
 
         polytope = _s.PolyRoundApi.round_polytope(polytope, _c.LP().settings)
 
+        complete_transform = (
+            polytope.transformation.values
+            if existing_transform is None
+            else existing_transform @ polytope.transformation.values
+        )
+        complete_shift = (
+            polytope.shift.values
+            if existing_shift is None
+            else existing_shift + existing_transform @ polytope.shift.values
+        )
+
         _problem = _c.Problem(
             polytope.A.values,
             polytope.b.values,
             problem.model,
-            transformation=polytope.transformation.values,
-            shift=polytope.shift.values,
+            transformation=complete_transform,
+            shift=complete_shift,
         )
 
         if problem.starting_point is not None:
