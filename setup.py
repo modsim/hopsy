@@ -155,10 +155,10 @@ setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     install_requires=[
-        "PolyRound==0.2.10",
-        "sympy<1.12.0",
+        "PolyRound>=0.2.10",
+        "optlang>=1.7.0",
         "arviz",
-        "numpy<1.24.0",
+        "numpy",
         "mcbackend",
         "pandas",
         "tqdm",
