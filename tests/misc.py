@@ -456,3 +456,30 @@ class MiscTests(unittest.TestCase):
             problem_rounded, original_space=True
         )
         self.assertGreater(np.min(problem.slacks(chebyshev_rounded)), 0)
+
+    def test_compute_chebyshev_center_in_original_space_with_equality_constraints_when_rounded(
+        self,
+    ):
+        A = np.array([]).reshape((0, 3))
+        b = np.array([])
+
+        problem = Problem(A, b)
+
+        lb = [-5, -5, -5]
+        ub = [5, 5, 5]
+
+        problem = add_box_constraints(problem, lb, ub, simplify=False)
+
+        A_eq = np.array([[2.0, 1.0, 0]])
+        b_eq = np.array([8])
+
+        problem = add_equality_constraints(problem, A_eq, b_eq)
+
+        chebychev = compute_chebyshev_center(problem, original_space=True)[:, 0]
+        problem_rounded = round(problem)
+
+        chebychev_rounded = compute_chebyshev_center(
+            problem_rounded, original_space=True
+        )[:, 0]
+
+        self.assertEqual(chebychev.shape, chebychev_rounded.shape)
