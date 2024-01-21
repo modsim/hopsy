@@ -1,6 +1,7 @@
 # Changelog
 
 ## Last Changes
+- [#120](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/120): Fix parallel sampling with additional equality constraints
 - [#117](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/117): Update Optlang, sympy and numpy dependencies
 - [#118](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/118): Fix back\_transform when manually adding equality constraints and rounding
 

@@ -486,21 +486,19 @@ namespace hopsy {
                                        },
                                        doc::MarkovChain::stateLogDensity)
                 .def(py::pickle([](const MarkovChain &self) {
-                                    return py::make_tuple(self.proposal->copyProposal().release(), self.getProblem(), self.getState(),
+                                    return py::make_tuple(self.proposal->copyProposal().release(), self.getProblem(),
                                                           self.parallelTemperingSyncRng, self.exchangeAttemptProbability);
                                 },
                                 [](py::tuple t) {
-                                    if (t.size() != 5) throw std::runtime_error("Invalid state!");
-                                    auto state = t[2].cast<VectorType>();
+                                    if (t.size() != 4) throw std::runtime_error("Invalid state!");
                                     auto proposal = t[0].cast<Proposal *>();
                                     bool isReversibleJumpChain = proposal->getProposalName().substr(0, 6) == "RJMCMC";
                                     auto markovChain = createMarkovChain(proposal,
                                                                          t[1].cast<Problem>(),
-                                                                         t[3].cast<std::optional<RandomNumberGenerator>>(),
-                                                                         t[4].cast<double>(),
+                                                                         t[2].cast<std::optional<RandomNumberGenerator>>(),
+                                                                         t[3].cast<double>(),
                                                                          isReversibleJumpChain);
 
-                                    markovChain.setState(t[2].cast<VectorType>());
                                     return markovChain;
                                 }));
     }
