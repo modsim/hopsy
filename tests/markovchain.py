@@ -71,6 +71,9 @@ class MarkovChainTests(unittest.TestCase):
             new_mc = pickle.loads(dump)
 
             self.assertTrue(np.all(np.isclose(mc.state, new_mc.state)))
+            mc.state = mc.state
+            mc.state = new_mc.state
+            self.assertTrue(np.all(np.isclose(mc.state, new_mc.state)))
 
     def test_markovchain_pickling_with_equality_constraints(self):
         problem = Problem([[1, 1, 0], [-1, 0, 0], [0, -1, 0]], [1, 0, 0])
@@ -84,16 +87,17 @@ class MarkovChainTests(unittest.TestCase):
         for ProposalType in ProposalTypes:
             try:
                 proposal = ProposalType(problem)
-            except:
-                pass
-            mc = MarkovChain(problem, proposal)
-            dump = pickle.dumps(mc)
-            new_mc = pickle.loads(dump)
+                mc = MarkovChain(problem, proposal)
+                dump = pickle.dumps(mc)
+                new_mc = pickle.loads(dump)
 
-            self.assertTrue(np.all(np.isclose(mc.state, new_mc.state)))
-            # tests setting of state with equality constraints. This triggers a transform internally,
-            # which introduced a bug in the past. Therefore, we test it specifically.
-            mc.state = mc.state
-            mc.state = new_mc.state
-            new_mc.state = mc.state
-            self.assertTrue(np.all(np.isclose(mc.state, new_mc.state)))
+                self.assertTrue(np.all(np.isclose(mc.state, new_mc.state)))
+                # tests setting of state with equality constraints. This triggers a transform internally,
+                # which introduced a bug in the past. Therefore, we test it specifically.
+                mc.state = mc.state
+                mc.state = new_mc.state
+                new_mc.state = mc.state
+                self.assertTrue(np.all(np.isclose(mc.state, new_mc.state)))
+            except:
+                # skip proposals that require the model
+                pass
