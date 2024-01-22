@@ -585,7 +585,7 @@ def _sample_parallel_chain(
     if queue is not None:
         queue.put((chain_idx, None, None))
 
-    return meta, _s.numpy.array(states), markov_chain.state, rng.state
+    return meta, _s.numpy.array(states), markov_chain.proposal.state, rng.state
 
 
 def _process_record_meta(
@@ -819,7 +819,7 @@ def sample(
         )
         for i, chain_result in enumerate(result_states):
             result.append((chain_result[0], chain_result[1]))
-            markov_chains[i].state = chain_result[2]
+            markov_chains[i].proposal.state = chain_result[2]
             rngs[i].state = chain_result[3]
     else:
         for chain_idx in range(len(markov_chains)):
