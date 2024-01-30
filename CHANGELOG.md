@@ -1,5 +1,8 @@
 # Changelog
 
+## Latest
+- [#121](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/121): Update docs for problem
+
 ## v.1.4.1
 - [#120](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/120): Fix parallel sampling with additional equality constraints
 - [#117](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/117): Update Optlang, sympy and numpy dependencies
@@ -37,7 +40,6 @@
 - [#77](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/77): Add feasibility check to compute\_chebyshev\_center
 
 ## v1.2.0
-
 - [#70](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/70): Add correct license
 - [#64](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/64): Optional in memory saving of states
 - [#58](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/58): Add mcbackend support

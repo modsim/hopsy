@@ -899,7 +899,7 @@ const char* hopsy::doc::Problem::b = R"pbdoc(numpy.ndarray[shape[m,1]]: Right-ha
 )pbdoc";
 
 
-const char* hopsy::doc::Problem::model = R"pbdoc(object: The ``model`` object defines the target distribution inside the polytope via its :meth:`compute_negative_log_likelihood`. If no model is passed, then a uniform target on the polytope will be assumed. **Note that a uniform distribution on a polytope is only defined for bounded polytopes.**
+const char* hopsy::doc::Problem::model = R"pbdoc(object: The ``model`` object defines the target distribution inside the polytope via its :meth:`log_density`. If no model is passed, then a uniform target on the polytope will be assumed. **Note that a uniform distribution on a polytope is only defined for bounded polytopes.**
 )pbdoc";
 
 
