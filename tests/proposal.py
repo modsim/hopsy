@@ -384,6 +384,64 @@ class ProposalTests(unittest.TestCase):
                 expected_model_probabilities[i], actual_model_probabilities[i], places=1
             )
 
+    def test_rjmcmc_rounded(self):
+        measurements = [[1.0]]
+        gammaPDF = GammaPDF(measurements)
+        problem = Problem(
+            gammaPDF.A, gammaPDF.b, gammaPDF, starting_point=[0.5, 0.5, 0.5]
+        )
+        problem = round(problem)
+        proposal = UniformHitAndRunProposal(problem)
+        jumpIndices = np.array([0, 1])
+        defaultValues = np.array([0, 1])
+        rjmcmc_proposal = ReversibleJumpProposal(proposal, jumpIndices, defaultValues)
+
+        mc = MarkovChain(problem=problem, proposal=rjmcmc_proposal)
+        rng = RandomNumberGenerator(5)
+
+        acc, samples = sample(mc, rng, n_samples=500_000, thinning=1)
+
+        location_samples = samples[0, :, 3]
+        scale_samples = samples[0, :, 4]
+        shape_samples = samples[0, :, 5]
+
+        actual_location_mean = np.mean(location_samples)
+        actual_scale_mean = np.mean(scale_samples)
+        actual_shape_mean = np.mean(shape_samples)
+
+        actual_model_visits = [0, 0, 0, 0]
+        for s in samples[0, :, :]:
+            model_index = 0
+            for j in range(jumpIndices.shape[0]):
+                model_index += 2 ** (jumpIndices.shape[0] - 1 - j) * s[jumpIndices[j]]
+            actual_model_visits[int(model_index)] += 1
+        actual_model_probabilities = [
+            float(v) / samples.shape[1] for v in actual_model_visits
+        ]
+
+        expected_location_mean = 0.25381601398469622
+        expected_scale_mean = 1.5811482758198503
+        expected_shape_mean = 1.7883893206783834
+
+        expected_model_probabilities = [
+            0.3147978599901968,
+            0.15325738646688555,
+            0.3485946848672095,
+            0.18335006867570805,
+        ]
+
+        # In order to save time testing, we sample less and receive less accurate results.
+        # The RJMCMC proposal is more rigorously tested in HOPS. Here we test that the python bindings work.
+        self.assertAlmostEqual(expected_location_mean, actual_location_mean, places=1)
+        self.assertAlmostEqual(expected_scale_mean, actual_scale_mean, places=1)
+        self.assertAlmostEqual(expected_shape_mean, actual_shape_mean, places=1)
+        for i in range(
+            max(len(expected_model_probabilities), len(actual_model_probabilities))
+        ):
+            self.assertAlmostEqual(
+                expected_model_probabilities[i], actual_model_probabilities[i], places=1
+            )
+
     def test_pickle_rjmcmc(self):
         measurements = [1.0]
         gammaPDF = GammaPDF(measurements)
