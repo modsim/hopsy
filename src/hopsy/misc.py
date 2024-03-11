@@ -39,12 +39,14 @@ class _submodules:
     import multiprocessing
     import os
     import warnings
+    from concurrent.futures.process import ProcessPoolExecutor
 
     if "JPY_PARENT_PID" in os.environ:
         import tqdm.notebook as tqdm
     else:
         import tqdm
     import typing
+    from enum import Enum
 
     import numpy.typing
 
@@ -52,32 +54,81 @@ class _submodules:
 _s = _submodules
 
 
+class ParallelTemperingBackend(_s.Enum):
+    # To use MPI make sure hopsy was compiled on your system and linked to your MPI implementation
+    MPI = 0
+    # multiprocessing just requires python multiprocessing module
+    MULTIPROCESSING = 1
+
+
+class MarkovChainWrapperPT:
+    """
+    A wrapper for MarkovChains for parallel tempering with multiprocess
+    """
+
+    def __init__(self, n_chains):
+        self.executor = _s.ProcessPoolExecutor(max_workers=n_chains)
+        # TODO create shared memory for state exchange (how big should it be?)
+        pass
+
+    def draw(self):
+        pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.executor.shutdown()
+
+
 def MarkovChain(
     problem: _c.Problem,
     proposal: _s.typing.Union[
-        _c.Proposal, _s.typing.Type[_c.Proposal]
+        _c.Proposal,
+        _s.typing.Type[_c.Proposal],
+        _c.typing.Mapping[float, _c.Proposal],
+        _c.typing.Mapping[float, _s.typing.Type[_c.Proposal]],
     ] = _c.GaussianHitAndRunProposal,
     starting_point: _s.numpy.typing.ArrayLike = None,
     parallelTemperingSyncRng: _c.RandomNumberGenerator = None,
+    parallelTemperingBackend: ParallelTemperingBackend = None,
     exchangeAttemptProbability: float = 0.1,
 ):
-    _proposal = None
-    if isinstance(proposal, type):
-        if starting_point is not None:
-            _proposal = proposal(problem, starting_point=starting_point)
-        elif problem.starting_point is not None:
-            _proposal = proposal(problem, starting_point=problem.starting_point)
-        else:
-            _proposal = proposal(problem)
-    else:
-        _proposal = proposal
+    """
 
-    return _c.MarkovChain(
-        _proposal,
-        problem,
-        parallelTemperingSyncRng=parallelTemperingSyncRng,
-        exchangeAttemptProbability=exchangeAttemptProbability,
-    )
+    :param problem:
+    :param proposal:
+    :param starting_point:
+    :param parallelTemperingSyncRng:
+    :param parallelTemperingBackend:
+    :param exchangeAttemptProbability:
+    :return:  Markov chain
+    """
+    # case 1: no parallel tempering or parallel tempering with MPI
+    if parallelTemperingBackend is not ParallelTemperingBackend.MULTIPROCESSING:
+        # TODO check args
+        _proposal = None
+        if isinstance(proposal, type):
+            if starting_point is not None:
+                _proposal = proposal(problem, starting_point=starting_point)
+            elif problem.starting_point is not None:
+                _proposal = proposal(problem, starting_point=problem.starting_point)
+            else:
+                _proposal = proposal(problem)
+        else:
+            _proposal = proposal
+
+        return _c.MarkovChain(
+            _proposal,
+            problem,
+            parallelTemperingSyncRng=parallelTemperingSyncRng,
+            exchangeAttemptProbability=exchangeAttemptProbability,
+        )
+    else:
+        # parallelTemperingBackend is MULTIPROCESSING
+        # case 2: parallel tempering with multiprocessing backend
+        # TODO check args
+        pass
 
 
 MarkovChain.__doc__ = _core.MarkovChain.__doc__  # propagate docstring
