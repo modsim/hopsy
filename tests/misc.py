@@ -103,8 +103,7 @@ class MiscTests(unittest.TestCase):
         self.assertListEqual(list(states.shape), [n_chains, n_samples, 2])
 
     def test_parallel_sampling(self):
-        n_procs = 4
-
+        n_procs = 10
         chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
         rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
 

@@ -216,7 +216,6 @@ namespace hopsy {
         }
 
         Problem getProblem() const {
-            py::object handle = py::cast(proposal->copyProposal().get());
             if (transformation) {
                 return Problem(proposal->getA(),
                                proposal->getB(),
@@ -237,6 +236,7 @@ namespace hopsy {
         std::shared_ptr <Proposal> proposal;
         std::shared_ptr <Model> model;
         std::optional <hopsy::RandomNumberGenerator> parallelTemperingSyncRng;
+        bool isReversibleJumpChain;
         double exchangeAttemptProbability;
 
     private:
@@ -466,7 +466,7 @@ namespace hopsy {
                            problem.model,
                            transformation,
                            parallelTemperingSyncRng,
-                           exchangeAttemptProbability = exchangeAttemptProbability);
+                           exchangeAttemptProbability);
     }
 
     void addMarkovChain(py::module &m) {
@@ -475,8 +475,8 @@ namespace hopsy {
                      doc::MarkovChain::__init__,
                      py::arg("proposal"),
                      py::arg("problem"),
-                     py::arg("parallelTemperingSyncRng") = std::nullopt,
-                     py::arg("exchangeAttemptProbability") = 0.1,
+                     py::arg("parallel_tempering_sync_rng") = std::nullopt,
+                     py::arg("exchange_attempt_probability") = 0.1,
                      py::arg("isReversibleJumpChain") = false)
         .def("draw", [](MarkovChain &self,
                                 RandomNumberGenerator &rng,
@@ -490,8 +490,8 @@ namespace hopsy {
                 .def_property("model", &MarkovChain::getModel, &MarkovChain::setModel, doc::MarkovChain::model)
                 .def_property("proposal", &MarkovChain::getProposal, &MarkovChain::setProposal, doc::MarkovChain::proposal)
                 .def_property_readonly("problem", &MarkovChain::getProblem)
-                .def_readwrite("parallelTemperingSyncRng", &MarkovChain::parallelTemperingSyncRng)
-                .def_property("exchangeAttemptProbability", &MarkovChain::getExchangeAttemptProbability,
+                .def_readwrite("parallel_tempering_sync_rng", &MarkovChain::parallelTemperingSyncRng)
+                .def_property("exchange_attempt_probability", &MarkovChain::getExchangeAttemptProbability,
                               &MarkovChain::setExchangeAttemptProbability,
                               doc::MarkovChain::exchangeAttemptProbability)
                 .def_property_readonly("state_negative_log_likelihood", &MarkovChain::getStateNegativeLogLikelihood,
