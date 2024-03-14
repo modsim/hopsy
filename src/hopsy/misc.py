@@ -620,6 +620,23 @@ def _process_record_meta(
     return record_meta, shapes, missing_fields
 
 
+def _reversible_parallel_tempering(
+    args: _s.typing.List[_s.typing.Any],
+    n_procs: int,
+    callback: _c.Callback,
+    progress_bar: bool,
+    # one for each replicate
+    temperature_ladders: _s.typing.List[_s.typing.List],
+    sync_rngs: _s.typing.List[_c.RandomNumberGenerator],
+):
+    if len(temperature_ladders) != len(sync_rngs):
+        raise RuntimeError(
+            "Missmatch between number of temperature ladders ({len(temperature_ladders)}) and sync rngs ({len(sync_rngs)})"
+        )
+
+    shared_state_memory = []  # only needs to be large enough to exchange two states
+
+
 def _parallel_sampling(
     args: _s.typing.List[_s.typing.Any],
     n_procs: int,

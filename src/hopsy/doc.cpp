@@ -2616,6 +2616,14 @@ const char* hopsy::doc::MarkovChain::model = R"pbdoc(
 
 
 const char* hopsy::doc::MarkovChain::exchangeAttemptProbability = R"pbdoc(
+    This parameter is used when using MPI for parallel tempering. It controls how often the parallel chains try to
+    exchange states. The default is 0.1.
+)pbdoc";
+
+const char* hopsy::doc::MarkovChain::parallelTemperingSyncRng = R"pbdoc(
+    This parameter is used when using MPI for parallel tempering. It helps distributed chains to synchronize.
+    Specifically, the chains draw from this rng to determine what chain pairs will attempt state exchanges and whether those
+    exchanges are successful. As each chain has this rng and keeps it in sync, the chains minimize communication.
 )pbdoc";
 
 

@@ -533,6 +533,7 @@ namespace hopsy {
             static const char* proposal;
             static const char* stateNegativeLogLikelihood;
             static const char* stateLogDensity;
+            static const char* parallelTemperingSyncRng;
             static const char* exchangeAttemptProbability;
         };
 
