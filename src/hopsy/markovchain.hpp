@@ -475,8 +475,8 @@ namespace hopsy {
                 .def_property("model", &MarkovChain::getModel, &MarkovChain::setModel, doc::MarkovChain::model)
                 .def_property("proposal", &MarkovChain::getProposal, &MarkovChain::setProposal, doc::MarkovChain::proposal)
                 .def_property_readonly("problem", &MarkovChain::getProblem)
-                .def_readwrite("parallelTemperingSyncRng", &MarkovChain::parallelTemperingSyncRng)
-                .def_property("exchangeAttemptProbability", &MarkovChain::getExchangeAttemptProbability,
+                .def_readwrite("parallel_tempering_sync_rng", &MarkovChain::parallelTemperingSyncRng)
+                .def_property("exchange_attempt_probability", &MarkovChain::getExchangeAttemptProbability,
                               &MarkovChain::setExchangeAttemptProbability,
                               doc::MarkovChain::exchangeAttemptProbability)
                 .def_property_readonly("state_negative_log_likelihood", &MarkovChain::getStateNegativeLogLikelihood,
