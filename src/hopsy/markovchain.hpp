@@ -215,7 +215,6 @@ namespace hopsy {
         }
 
         Problem getProblem() const {
-            py::object handle = py::cast(proposal->copyProposal().get());
             if (transformation) {
                 return Problem(proposal->getA(),
                                proposal->getB(),
@@ -236,6 +235,7 @@ namespace hopsy {
         std::shared_ptr <Proposal> proposal;
         std::shared_ptr <Model> model;
         std::optional <hopsy::RandomNumberGenerator> parallelTemperingSyncRng;
+        bool isReversibleJumpChain;
         double exchangeAttemptProbability;
 
     private:
@@ -277,8 +277,7 @@ namespace hopsy {
                         wrapProposal(mc->proposal, mc->transformation.value()),
                         mc->model,
                         mc->parallelTemperingSyncRng,
-                        exchangeAttemptProbability
-                );
+                        exchangeAttemptProbability);
 
                 mc->markovChain = std::move(markovChain);
                 return;
@@ -451,7 +450,7 @@ namespace hopsy {
                            problem.model,
                            transformation,
                            parallelTemperingSyncRng,
-                           exchangeAttemptProbability = exchangeAttemptProbability);
+                           exchangeAttemptProbability);
     }
 
     void addMarkovChain(py::module &m) {

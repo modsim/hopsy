@@ -1444,7 +1444,7 @@ namespace hopsy {
                         auto proposal = t[0].cast<std::unique_ptr<Proposal>>();
 
                         auto rjmcmcProposal = ReversibleJumpProposal(
-                            std::move(proposal->copyProposal()),
+                            proposal->copyProposal(),
                             t[1].cast<Eigen::VectorXi>(),
                             t[2].cast<VectorType>(),
                             proposal->getA(),
