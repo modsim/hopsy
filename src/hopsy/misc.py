@@ -25,6 +25,7 @@ class _submodules:
     import warnings
 
     import arviz
+    import copy
     import numpy
     import pandas
     import random
@@ -62,10 +63,11 @@ def create_shared_memory(state_shape, state_type=_s.numpy.float64):
     shared_state_memory = [_s.shared_memory.SharedMemory(create=True, size=shared_memory_size) for i in range(2)]
     return [shm.name for shm in shared_state_memory]
 
+
 def release_shared_memory(name):
-     shm = _s.shared_memory.SharedMemory(name=name)
-     shm.close()
-     shm.unlink()
+    shm = _s.shared_memory.SharedMemory(name=name)
+    shm.close()
+    shm.unlink()
 
 
 class PyParallelTemperingChain:
@@ -73,13 +75,21 @@ class PyParallelTemperingChain:
                  markov_chain: _c.MarkovChain,
                  sync_rng: _c.RandomNumberGenerator = None,
                  barrier: _s.multiprocessing.Barrier = None,
-                 shared_memory_name: str = None,
+                 shared_memory_names: _s.typing.List[str] = None,
                  exchange_attempt_probability: float = 0.1):
         self.markov_chain = markov_chain
         self.sync_rng = sync_rng
         self.barrier = barrier
-        self.shared_memory_name = shared_memory_name
+        self.shared_memory_names = shared_memory_names
         self.exchange_attempt_probability = exchange_attempt_probability,
+
+    def __del__(self):
+        self.barrier.wait()
+        if self.markov_chain.problem.model.coldness == 1.:
+            for n in self.shared_memory_names:
+                # TODO
+                print("RELEASING MEMORY!!!")
+                release_shared_memory(n)
 
     @property
     def coldness(self):
@@ -159,9 +169,51 @@ class ColdModel:
         return "Cold (beta={}) hopsy.Model({})".format(self.coldness, repr(self.model))
 
 
-class ParallelTemperingBackend(_s.Enum):
-    MPI = 0
-    MULTIPROCESSING = 1
+def create_py_parallel_tempering_ensembles(
+        markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.MarkovChain]],
+        temperature_ladder: _s.typing.List[float],
+        sync_rngs: _s.typing.Union[_c.RandomNumberGenerator, _s.typing.List[_c.RandomNumberGenerator]],
+        exchange_attempt_probability: float = 0.1,
+):
+    """
+    TODO
+    Parameters
+    ----------
+    markov_chains
+    temperature_ladder
+    parallel_tempering_sync_rng
+    exchange_attempt_probability
+
+    Returns
+    -------
+
+    """
+    if isinstance(markov_chains, _c.MarkovChain) != isinstance(sync_rngs, _c.RandomNumberGenerator):
+        raise RuntimeError("markov chains and sync rng need to both be lists or their respective types")
+
+    if isinstance(markov_chains, _c.MarkovChain):
+        markov_chains = [markov_chains]
+    if isinstance(markov_chains, _c.RandomNumberGenerator):
+        sync_rngs = [sync_rngs]
+
+    if len(markov_chains) != len(sync_rngs):
+        raise RuntimeError("Exactly one sync rng is required for every ensemble (markov chain replicate).")
+
+
+    pte = []
+    for i, markov_chain in enumerate(markov_chains):
+        barrier = _s.multiprocessing.Barrier(len(markov_chains))
+        shm = create_shared_memory(markov_chain.state.shape)
+        for coldness in enumerate(temperature_ladder):
+            mc = _s.copy.deepcopy(markov_chain)
+            mc.problem.model = ColdModel(model=mc.problem.model, coldness=coldness)
+
+            pte.append(PyParallelTemperingChain(markov_chain=mc,
+                                                sync_rng=sync_rngs[i],
+                                                exchange_attempt_probability=exchange_attempt_probability,
+                                                barrier=barrier,
+                                                shared_memory_names=shm))
+    return pte
 
 
 def MarkovChain(
@@ -170,12 +222,8 @@ def MarkovChain(
             _c.Proposal, _s.typing.Type[_c.Proposal]
         ] = _c.GaussianHitAndRunProposal,
         starting_point: _s.numpy.typing.ArrayLike = None,
-        parallel_tempering_backend: ParallelTemperingBackend = ParallelTemperingBackend.MPI,
         parallel_tempering_sync_rng: _c.RandomNumberGenerator = None,
-        parallel_tempering_coldness: float = None,
         exchange_attempt_probability: float = 0.1,
-        parallel_tempering_shared_memory: _s.typing.List[str] = None,
-        parallel_tempering_barrier: _s.multiprocessing.Barrier = None,
 ):
     """
 
@@ -184,14 +232,11 @@ def MarkovChain(
     problem
     proposal
     starting_point
-    parallel_tempering_backend
     parallel_tempering_sync_rng
         only used for parallel tempering with MPI, see docs for example. If None, no parallel
         tempering will be applied. If not None and MPI is used, parallel tempering is used.
-    parallel_tempering_coldness
     exchange_attempt_probability
-    parallel_tempering_shared_memory
-        only used for parallel tempering with MPI, see docs for example.
+        only used for parallel tempering with MPI. Controls how often parallel chains communicate.
     Returns Markov chain ready for sampling with hopsy.sample
     -------
 
@@ -208,23 +253,12 @@ def MarkovChain(
     else:
         _proposal = proposal
 
-    mc = _c.MarkovChain(
+    return _c.MarkovChain(
         _proposal,
         problem,
         parallelTemperingSyncRng=parallel_tempering_sync_rng,
         exchangeAttemptProbability=exchange_attempt_probability,
     )
-
-    if parallel_tempering_backend != ParallelTemperingBackend.MPI or parallel_tempering_backend is None:
-        return mc
-    else:
-        # TODO check parameters
-        mc.problem.model = ColdModel(mc.problem.model, coldness=parallel_tempering_coldness)
-        PyParallelTemperingChain(markov_chain=mc,
-                                 parallel_tempering_sync_rng=parallel_tempering_sync_rng,
-                                 exchange_attempt_probability=exchange_attempt_probability,
-                                 parallel_tempering_barrier=parallel_tempering_barrier,
-                                 parallel_tempering_shared_memory=parallel_tempering_shared_memory)
 
 
 MarkovChain.__doc__ = _core.MarkovChain.__doc__  # propagate docstring
