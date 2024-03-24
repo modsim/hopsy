@@ -94,6 +94,7 @@ namespace hopsy {
 
     using Normal = std::normal_distribution<double>;
     using Uniform = std::uniform_real_distribution<double>;
+    using UniformInt = std::uniform_int_distribution<long>;
 
     void addRandom(py::module& m) {
         py::class_<RandomNumberGenerator>(m, "RandomNumberGenerator", doc::RandomNumberGenerator::base)
@@ -141,6 +142,29 @@ namespace hopsy {
                     })
             .def("__repr__", [] (Uniform& self) -> std::string {
                         std::string repr = "hopsy.Uniform(";
+                        repr += "a=" + std::to_string(self.a()) + ", ";
+                        repr += "b=" + std::to_string(self.b()) + ")";
+                        return repr;
+                    });
+
+        py::class_<UniformInt>(m, "UniformInt", doc::UniformInt::base)
+            .def(py::init<long, long>(),
+                    doc::UniformInt::__init__,
+                    py::arg("a") = 0,
+                    py::arg("b") = 1)
+            .def("__call__", [] (UniformInt& self, RandomNumberGenerator& rng) -> long {
+                        return self(rng.rng);
+                    },
+                    doc::UniformInt::__call__
+                )
+            .def_property("a", &UniformInt::a, [] (UniformInt& self, long a) {
+                        self = UniformInt(a, self.b());
+                    })
+            .def_property("b", &UniformInt::a, [] (UniformInt& self, long b) {
+                        self = UniformInt(self.a(), b);
+                    })
+            .def("__repr__", [] (Uniform& self) -> std::string {
+                        std::string repr = "hopsy.UniformInt(";
                         repr += "a=" + std::to_string(self.a()) + ", ";
                         repr += "b=" + std::to_string(self.b()) + ")";
                         return repr;

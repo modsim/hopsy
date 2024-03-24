@@ -65,17 +65,9 @@ namespace hopsy {
                 std::shared_ptr<Model> sharedModelPtr = std::move(model->copyModel());
                 std::shared_ptr<PyModel> pyModelPtr = std::dynamic_pointer_cast<PyModel>(sharedModelPtr);
                 if(pyModelPtr) {
-                    std::cout << "getting pymodel" << std::endl;
-                    if(hasattr(pyModelPtr->pyObj, "coldness")) {
-                        std::cout << "coldness is " << pyModelPtr->pyObj.attr("coldness").cast<double>() << std::endl;
-                    }
-                    else {
-                        std::cout << "no coldness" << std::endl;
-                    }
                     return pyModelPtr->pyObj;
                 }
                 else {
-                    std::cout << "return cpp model" << std::endl;
                     return model->copyModel();
                 }
             }

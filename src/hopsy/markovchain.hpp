@@ -459,8 +459,8 @@ namespace hopsy {
                      doc::MarkovChain::__init__,
                      py::arg("proposal"),
                      py::arg("problem"),
-                     py::arg("parallelTemperingSyncRng") = std::nullopt,
-                     py::arg("exchangeAttemptProbability") = 0.1,
+                     py::arg("parallel_tempering_sync_rng") = std::nullopt,
+                     py::arg("exchange_attempt_probability") = 0.1,
                      py::arg("isReversibleJumpChain") = false)
         .def("draw", [](MarkovChain &self,
                                 RandomNumberGenerator &rng,

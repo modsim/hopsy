@@ -19,7 +19,7 @@ class GaussianMixture:
 
 
 if __name__ == "__main__":
-    replicates = 2
+    replicates = 1
 
     A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
     b = np.array([1, 1, 1, 1])
@@ -32,9 +32,10 @@ if __name__ == "__main__":
         for r in range(replicates)
     ]
 
-    n_temps = 3
-    temperature_ladder = [1. - n / (n_temps - 1) for n in range(n_temps)]
-    print('temp ladder', temperature_ladder)
+    n_temps = 5
+    n_samples = 10_000
+    thinning = 10
+    temperature_ladder = [1. - float(n) / (n_temps - 1) for n in range(n_temps)]
 
     mcs = [
         hopsy.MarkovChain(
@@ -43,8 +44,10 @@ if __name__ == "__main__":
             starting_point=0.9 * np.ones(2))
         for r in range(replicates)]
 
+    print(f"There are {len(mcs)} replicates")
+
     # Creates one parallel tempering ensemble for each replicate.
-    # Each ensemble will have n_temp chains.
+    # Each ensemble will have len(temperature_ladder) chains.
     chains = hopsy.create_py_parallel_tempering_ensembles(
         markov_chains=mcs,
         temperature_ladder=temperature_ladder,
@@ -52,11 +55,18 @@ if __name__ == "__main__":
         exchange_attempt_probability=0.15)
     print(f"There are now {len(chains)} chains")
 
-    for c in chains:
-        print(repr(c))
-        del c
-    # mc.proposal.stepsize = 0.25
+    rngs = [hopsy.RandomNumberGenerator(i + 1234) for i, _ in enumerate(chains)]
 
-    # rng = hopsy.RandomNumberGenerator(rank + chain_idx + 11)
+    acc_rate, samples = hopsy.sample(markov_chains=chains,
+                                     rngs=rngs,
+                                     n_samples=n_samples,
+                                     thinning=thinning,
+                                     n_procs=1,# len(chains),
+                                     progress_bar=True)
 
-    # acc_rate, samples = hopsy.sample(markov_chains=mc, rngs=rng, n_samples=n_samples)
+    print(samples.shape)
+    plt.figure()
+    for i, chain in enumerate(chains):
+        plt.hist(samples[i, :, 0], density=True, alpha=0.245, bins=10)
+
+    plt.show()

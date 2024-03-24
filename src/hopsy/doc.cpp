@@ -29,6 +29,17 @@ const char* hopsy::doc::Uniform::__init__ = R"pbdoc(
 const char* hopsy::doc::Uniform::__call__ = R"pbdoc(
 )pbdoc";
 
+const char* hopsy::doc::UniformInt::base = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformInt::__init__ = R"pbdoc(
+)pbdoc";
+
+
+const char* hopsy::doc::UniformInt::__call__ = R"pbdoc(
+)pbdoc";
+
 
 
 const char* hopsy::doc::Normal::base = R"pbdoc(
