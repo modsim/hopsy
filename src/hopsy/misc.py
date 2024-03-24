@@ -85,7 +85,7 @@ class PyParallelTemperingChain:
         self.barrier = barrier
         self.shared_memory_names = shared_memory_names
         self.exchange_attempt_probability = exchange_attempt_probability,
-        atexit.register(self.__del__)
+        # atexit.register(self.__del__)
 
     def __del__(self):
         print('test deconstruction')
@@ -227,6 +227,7 @@ def create_py_parallel_tempering_ensembles(
                                                 exchange_attempt_probability=exchange_attempt_probability,
                                                 barrier=barrier,
                                                 shared_memory_names=shm))
+    raise RuntimeError("TEST releasing")
     return pte
 
 
