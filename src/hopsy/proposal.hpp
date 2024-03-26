@@ -1462,7 +1462,7 @@ namespace hopsy {
                         rjmcmcProposal.setActivationState(t[11].cast<VectorType>());
                         rjmcmcProposal.setActivationProposal(t[12].cast<VectorType>());
                         rjmcmcProposal.setLogAcceptanceChanceModelJump(t[13].cast<double>());
-                        rjmcmcProposal.setLastProposalJumpedModel(t[14].cast<double>());
+                        rjmcmcProposal.setLastProposalJumpedModel(t[14].cast<bool>());
 
                         return rjmcmcProposal;
                     })

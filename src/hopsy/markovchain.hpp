@@ -176,7 +176,7 @@ namespace hopsy {
         }
 
         double getExchangeAttemptProbability() {
-            return this->getExchangeAttemptProbability();
+            return this->exchangeAttemptProbability;
         }
 
         std::variant<py::object, Model *> getModel() const {

@@ -1,6 +1,7 @@
 # Changelog
 
 ## Latest
+- [#119](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/119): Fix numpy deprecation warnings in unit tests
 - [#121](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/121): Update docs for problem
 
 ## v.1.4.1

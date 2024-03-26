@@ -328,7 +328,7 @@ class ProposalTests(unittest.TestCase):
         self.assertEqual(proposal_with_log_density.proposal_negative_log_likelihood, 0)
 
     def test_rjmcmc(self):
-        measurements = [[1.0]]
+        measurements = [1.0]
         gammaPDF = GammaPDF(measurements)
         problem = Problem(
             gammaPDF.A, gammaPDF.b, gammaPDF, starting_point=[0.5, 0.5, 0.5]
@@ -385,7 +385,7 @@ class ProposalTests(unittest.TestCase):
             )
 
     def test_pickle_rjmcmc(self):
-        measurements = [[1.0]]
+        measurements = [1.0]
         gammaPDF = GammaPDF(measurements)
         problem = Problem(
             gammaPDF.A, gammaPDF.b, gammaPDF, starting_point=[0.5, 0.5, 0.5]
@@ -408,7 +408,7 @@ class ProposalTests(unittest.TestCase):
             self.assertIsInstance(new_proposal, ReversibleJumpProposal)
 
     def test_pickle_rjmcmc_when_in_markov_chain(self):
-        measurements = [[1.0]]
+        measurements = [1.0]
         gammaPDF = GammaPDF(measurements)
         problem = Problem(
             gammaPDF.A, gammaPDF.b, gammaPDF, starting_point=[0.5, 0.5, 0.5]
@@ -431,7 +431,7 @@ class ProposalTests(unittest.TestCase):
             new_rjmcmc = pickle.loads(dump)
 
     def test_rjmcmc_parallel(self):
-        measurements = [[1.0]]
+        measurements = [1.0]
         gammaPDF = GammaPDF(measurements)
         problem = Problem(
             gammaPDF.A, gammaPDF.b, gammaPDF, starting_point=[0.5, 0.5, 0.5]
