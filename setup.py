@@ -164,6 +164,7 @@ setup(
         "tqdm",
         "matplotlib",
         "scikit-learn",
+        "importlib_metadata",
     ],
     zip_safe=False,
 )
