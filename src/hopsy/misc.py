@@ -891,7 +891,6 @@ def _sample_parallel_chain(
 
     if queue is not None:
         queue.put((chain_idx, None, None))
-        return 0
 
     return meta, _s.numpy.array(states), markov_chain.proposal.state, rng.state
 

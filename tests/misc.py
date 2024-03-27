@@ -373,7 +373,26 @@ class MiscTests(unittest.TestCase):
             )
         )
 
-    def test_progress_bar(self):
+    def test_progress_bar_sequential_sampling(self):
+        n_procs = 1
+
+        chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
+        rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
+
+        accrates, states = sample(
+            chains, rngs, n_samples, thinning, n_procs, progress_bar=True
+        )
+
+        self.assertListEqual(list(states.shape), [n_chains, n_samples, 2])
+
+        chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
+        rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
+
+        accrates, states = sample(chains, rngs, n_samples, thinning, progress_bar=True)
+
+        self.assertListEqual(list(states.shape), [n_chains, n_samples, 2])
+
+    def test_progress_bar_parallel_sampling(self):
         n_procs = 4
 
         chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
@@ -392,7 +411,24 @@ class MiscTests(unittest.TestCase):
 
         self.assertListEqual(list(states.shape), [n_chains, n_samples, 2])
 
-    def test_not_in_memory(self):
+    def test_not_in_memory_sequential(self):
+        n_procs = 1
+
+        chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
+        rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
+
+        ret = sample(chains, rngs, n_samples, thinning, n_procs, in_memory=False)
+
+        self.assertEqual(ret, None)
+
+        chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
+        rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]
+
+        ret = sample(chains, rngs, n_samples, thinning, in_memory=False)
+
+        self.assertEqual(ret, None)
+
+    def test_not_in_memory_parallel(self):
         n_procs = 4
 
         chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
