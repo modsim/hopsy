@@ -932,51 +932,55 @@ def _parallel_sampling(
     callback: _c.Callback,
     progress_bar: bool,
 ):
-    result_queue = (
-        _s.multiprocessing.Manager().Queue()
-        if callback is not None or progress_bar
-        else None
-    )
-    for i in range(len(args)):
-        args[i] += (result_queue,)
-
-    if callback is not None or progress_bar:
-        workers = _s.multiprocessing.Pool(n_procs - 1)
-        result = workers.starmap_async(_sample_parallel_chain, args)
-        pbars = (
-            [
-                _s.tqdm.trange(args[i][2], desc="chain {}".format(i))
-                for i in range(len(args))
-            ]
-            if progress_bar
+    with _s.multiprocessing.Manager() as manager:
+        result_queue = (
+            manager.Queue()
+            if callback is not None or progress_bar
             else None
         )
-        finished = [False for i in range(len(args))]
-        while not _s.numpy.all(finished):
-            chain_idx, state, meta = result_queue.get()
-            if state is not None:
-                if progress_bar:
-                    pbars[chain_idx].update()
-                if callback is not None:
-                    callback.record(
-                        chain_idx,
-                        state,
-                        meta if isinstance(meta, dict) else {"acceptance_rate": meta},
-                    )
-            else:
-                finished[chain_idx] = True
-                if progress_bar:
-                    pbars[chain_idx].close()
+        # barrier = manager.Barrier(n_procs)
+        for i in range(len(args)):
+            args[i] += (result_queue,)
+            # args[i] += (barrier,)
 
-        if callback is not None:
-            callback.finish()
-        workers.close()
-        workers.join()
-        return result.get()
-    else:
-        with _s.multiprocessing.Pool(n_procs) as workers:
-            result = workers.starmap(_sample_parallel_chain, args)
-        return result
+        if callback is not None or progress_bar:
+            workers = _s.multiprocessing.Pool(n_procs)
+            result = workers.starmap_async(_sample_parallel_chain, args)
+            pbars = (
+                [
+                    _s.tqdm.trange(args[i][2], desc="chain {}".format(i))
+                    for i in range(len(args))
+                ]
+                if progress_bar
+                else None
+            )
+            finished = [False for i in range(len(args))]
+            while not _s.numpy.all(finished):
+                chain_idx, state, meta = result_queue.get()
+                if state is not None:
+                    if progress_bar:
+                        pbars[chain_idx].update()
+                    if callback is not None:
+                        callback.record(
+                            chain_idx,
+                            state,
+                            meta if isinstance(meta, dict) else {"acceptance_rate": meta},
+                        )
+                else:
+                    finished[chain_idx] = True
+                    if progress_bar:
+                        pbars[chain_idx].close()
+
+            if callback is not None:
+                callback.finish()
+            workers.close()
+            workers.join()
+            print()
+            return result.get()
+        else:
+            with _s.multiprocessing.Pool(n_procs) as workers:
+                result = workers.starmap(_sample_parallel_chain, args)
+            return result
 
 
 def sample(
