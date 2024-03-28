@@ -1,7 +1,7 @@
-import numpy as np
-import hopsy
-
 import matplotlib.pyplot as plt
+import numpy as np
+
+import hopsy
 
 
 class GaussianMixture:
@@ -20,9 +20,9 @@ class GaussianMixture:
 
 if __name__ == "__main__":
     replicates = 4
-    n_temps = 8
-    n_samples = 10_000
-    thinning = 1
+    n_temps = 4
+    n_samples = 1_000
+    thinning = 10
 
     A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
     b = np.array([1, 1, 1, 1])
@@ -30,21 +30,18 @@ if __name__ == "__main__":
     model = GaussianMixture(np.ones(2).reshape(2, 1), -np.ones(2).reshape(2, 1))
     problem = hopsy.Problem(A, b, model)
 
-    sync_rngs = [
-        hopsy.RandomNumberGenerator(seed=4321 + r)
-        for r in range(replicates)
-    ]
+    sync_rngs = [hopsy.RandomNumberGenerator(seed=4321 + r) for r in range(replicates)]
 
-    temperature_ladder = [1. - float(n) / (n_temps - 1) for n in range(n_temps)]
+    temperature_ladder = [1.0 - float(n) / (n_temps - 1) for n in range(n_temps)]
 
     mcs = [
         hopsy.MarkovChain(
             proposal=hopsy.UniformCoordinateHitAndRunProposal,
             problem=problem,
-            starting_point=0.9 * np.ones(2))
-        for r in range(replicates)]
-
-    print(f"There are {len(mcs)} replicates")
+            starting_point=0.9 * np.ones(2),
+        )
+        for r in range(replicates)
+    ]
 
     # Creates one parallel tempering ensemble for each replicate.
     # Each ensemble will have len(temperature_ladder) chains.
@@ -52,17 +49,19 @@ if __name__ == "__main__":
         markov_chains=mcs,
         temperature_ladder=temperature_ladder,
         sync_rngs=sync_rngs,
-        exchange_attempt_probability=0.15)
-    print(f"There are now {len(chains)} chains")
+        exchange_attempt_probability=0.15,
+    )
 
     rngs = [hopsy.RandomNumberGenerator(i + 1234) for i, _ in enumerate(chains)]
 
-    acc_rate, samples = hopsy.sample(markov_chains=chains,
-                                     rngs=rngs,
-                                     n_samples=n_samples,
-                                     thinning=thinning,
-                                     n_procs=len(chains),
-                                     progress_bar=True)
+    acc_rate, samples = hopsy.sample(
+        markov_chains=chains,
+        rngs=rngs,
+        n_samples=n_samples,
+        thinning=thinning,
+        n_procs=len(chains),
+        progress_bar=False,
+    )
 
     print(samples.shape)
     plt.figure()
