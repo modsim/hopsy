@@ -19,7 +19,10 @@ class GaussianMixture:
 
 
 if __name__ == "__main__":
-    replicates = 1
+    replicates = 4
+    n_temps = 8
+    n_samples = 10_000
+    thinning = 1
 
     A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
     b = np.array([1, 1, 1, 1])
@@ -32,9 +35,6 @@ if __name__ == "__main__":
         for r in range(replicates)
     ]
 
-    n_temps = 5
-    n_samples = 10_000
-    thinning = 10
     temperature_ladder = [1. - float(n) / (n_temps - 1) for n in range(n_temps)]
 
     mcs = [
@@ -61,7 +61,7 @@ if __name__ == "__main__":
                                      rngs=rngs,
                                      n_samples=n_samples,
                                      thinning=thinning,
-                                     n_procs=1,# len(chains),
+                                     n_procs=len(chains),
                                      progress_bar=True)
 
     print(samples.shape)

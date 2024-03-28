@@ -197,7 +197,6 @@ class PyParallelTemperingChain:
         else:
             # keeps rngs in sync
             self.parallel_tempering_sync_rng()
-        barrier.wait()
         return 1. if accepted else 0.
 
     def _generate_pair_for_exchange(self):
@@ -854,7 +853,7 @@ def _sample_parallel_chain(
         meta = {field: [] for field in record_meta}
 
     for i in range(n_samples):
-        accrate, state = markov_chain.draw(rng, thinning)
+        accrate, state = markov_chain.draw(rng, thinning, barrier)
 
         curr_meta = None
         if record_meta is None or record_meta is False:
@@ -938,10 +937,10 @@ def _parallel_sampling(
             if callback is not None or progress_bar
             else None
         )
-        # barrier = manager.Barrier(n_procs)
+        barrier = manager.Barrier(n_procs)
         for i in range(len(args)):
             args[i] += (result_queue,)
-            # args[i] += (barrier,)
+            args[i] += (barrier,)
 
         if callback is not None or progress_bar:
             workers = _s.multiprocessing.Pool(n_procs)
