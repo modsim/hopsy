@@ -1,7 +1,7 @@
 # Changelog
 
 ## Latest
-- [#106](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/106): Add official support for numpy 3.12
+- [#106](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/106): Add official support for python 3.12
 - [#130](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/130): Update requirements-dev.txt
 - [#108](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/108): For development: Fix setup.py warning on missing commit ID
 - [#119](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/119): Fix numpy deprecation warnings in unit tests
