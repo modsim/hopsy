@@ -21,7 +21,7 @@ which appear in many domains:
 **hopsy** is a Python3 package powered by the C++ library [HOPS](https://jugit.fz-juelich.de/IBG-1/ModSim/hops).
 Using `pybind11` **hopsy** calls and extends HOPS with a range of useful features, bringing the performance of C++
 and simplicity of Python together in one package.
-Details and more use-cases are described [here](https://www.biorxiv.org/content/10.1101/2023.12.22.573091v1)
+Details and more use-cases are described [here](https://www.biorxiv.org/content/10.1101/2023.12.22.573091v1).
 
 
 ## Installation
