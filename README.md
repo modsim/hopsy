@@ -1,7 +1,7 @@
 # hopsy - a methods marketplace for convex polytope sampling powered by the C++ library HOPS
 
  [![pipeline status](https://jugit.fz-juelich.de/fluxomics/hopsy/badges/main/pipeline.svg)](https://jugit.fz-juelich.de/fluxomics/hopsy/-/commits/main)
- [![docstring coverage](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/blob/main/docs/docov.svg?ref_type=heads)](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/blob/main/docs/docov.svg?ref_type=heads)
+ [![docstring coverage](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/blob/main/docs/docov.svg)](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/blob/main/docs/docov.svg)
 
 
 <img src="docs/_static/hopsy.png" alt="HOPSY Logo" width="300"/>
