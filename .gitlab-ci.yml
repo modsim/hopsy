@@ -3,12 +3,6 @@ image: quay.io/pypa/manylinux2014_x86_64
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
-workflow:
-  rules:
-  - if: ${CI_COMMIT_AUTHOR} == "CI_BOT"
-    when: never
-  - when: always
-
 stages:
   - build
   - test
@@ -190,6 +184,8 @@ upload-docs:
   stage: upload-artifacts
   except:
     - main
+  rules:
+    - if: ${CI_COMMIT_AUTHOR} != "CI_BOT"
   dependencies:
     - build-docs
   script:
