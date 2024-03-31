@@ -40,7 +40,7 @@ build-release:
 #build-release-macos:
 #  stage: build
 #  rules:
-#    - if: ${CI_COMMIT_AUTHOR} != "CI_BOT"
+#    - if: ${CI_COMMIT_AUTHOR} == "CI_BOT"
 #    - when: never
 #  tags:
 #      - macos
@@ -63,7 +63,7 @@ build-release:
 #build-debug:
 #  stage: build
 #  rules:
-#    - if: ${CI_COMMIT_AUTHOR} != "CI_BOT"
+#    - if: ${CI_COMMIT_AUTHOR} == "CI_BOT"
 #    - when: never
 #  parallel:
 #    matrix:
@@ -85,7 +85,7 @@ build-release:
 test-release:
   stage: test
   rules:
-    - if: ${CI_COMMIT_AUTHOR} != "CI_BOT"
+    - if: $CI_COMMIT_AUTHOR == "CI_BOT"
     - when: never
   dependencies:
     - build-release
@@ -107,7 +107,7 @@ test-release:
 #test-release-macos:
 #  stage: test
 #  rules:
-#    - if: ${CI_COMMIT_AUTHOR} != "CI_BOT"
+#    - if: ${CI_COMMIT_AUTHOR} == "CI_BOT"
 #    - when: never
 #  tags:
 #      - macos
@@ -133,7 +133,7 @@ test-release:
 #test-debug:
 #  stage: test
 #  rules:
-#    - if: ${CI_COMMIT_AUTHOR} != "CI_BOT"
+#    - if: ${CI_COMMIT_AUTHOR} == "CI_BOT"
 #    - when: never
 #  dependencies:
 #    - build-debug
@@ -154,7 +154,7 @@ test-release:
 #test-integration-release:
 #  stage: test
 #  rules:
-#    - if: ${CI_COMMIT_AUTHOR} != "CI_BOT"
+#    - if: ${CI_COMMIT_AUTHOR} == "CI_BOT"
 #    - when: never
 #  dependencies:
 #    - build-release
@@ -179,9 +179,9 @@ test-release:
 
 build-docs:
   stage: build-docs
-#  rules:
-#    - if: ${CI_COMMIT_AUTHOR} != "CI_BOT"
-#    - when: never
+  rules:
+    - if: ${CI_COMMIT_AUTHOR} == "CI_BOT"
+    - when: never
   image: ubuntu:22.04
   dependencies:
     - test-release
@@ -207,8 +207,8 @@ build-docs:
 upload-docs:
   stage: upload-artifacts
   rules:
-    - if: ${CI_COMMIT_AUTHOR} != "CI_BOT"
-    - if: ${CI_COMMIT_BRANCH} != "main"
+    - if: ${CI_COMMIT_AUTHOR} == "CI_BOT"
+    - if: ${CI_COMMIT_BRANCH} == "main"
     - when: never
   dependencies:
     - build-docs
