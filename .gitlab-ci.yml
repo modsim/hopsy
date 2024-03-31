@@ -3,6 +3,11 @@ image: quay.io/pypa/manylinux2014_x86_64
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
+workflow:
+  rules:
+  - if: $CI_COMMIT_AUTHOR == "CI_BOT"
+    when: never
+
 stages:
   - build
   - test
@@ -195,4 +200,4 @@ upload-docs:
     - git commit -m "${CI_COMMIT_MESSAGE} + docs" --no-verify --allow-empty
     - git remote remove origin
     - git remote add origin https://oauth2:${CI_BOT}@jugit.fz-juelich.de/IBG-1/ModSim/hopsy.git
-    - git push origin HEAD:$CI_COMMIT_BRANCH -o ci.skip # prevent triggering pipeline again
+    - git push origin HEAD:$CI_COMMIT_BRANCH
