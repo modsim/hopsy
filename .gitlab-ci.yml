@@ -158,7 +158,6 @@ test-release:
 
 build-docs:
   stage: build-docs
-  image: ubuntu:22.04
   dependencies:
     - test-release
   before_script:
