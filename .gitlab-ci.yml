@@ -186,7 +186,7 @@ build-docs:
 
 upload-docs:
   stage: upload-artifacts
-  only:
+  except:
     - main
   dependencies:
     - build-docs
