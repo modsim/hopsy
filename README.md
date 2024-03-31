@@ -1,8 +1,9 @@
-# hopsy - Python bindings for HOPS
+# hopsy - a methods marketplace for convex polytope sampling powered by the C++ library HOPS
 
- [![pipeline status](https://jugit.fz-juelich.de/fluxomics/hopsy/badges/develop/pipeline.svg)](https://jugit.fz-juelich.de/fluxomics/hopsy/-/commits/develop)
+ [![pipeline status](https://jugit.fz-juelich.de/fluxomics/hopsy/badges/main/pipeline.svg)](https://jugit.fz-juelich.de/fluxomics/hopsy/-/commits/develop)
  [![docstring coverage](https://jugit.fz-juelich.de/fluxomics/hopsy/-/jobs/220246/artifacts/raw/docs/docov.svg?job=test_release)](https://jugit.fz-juelich.de/fluxomics/hopsy/-/jobs/220246/artifacts/file/docs/docov.txt?job=test_release)
 
+hopsy is a versatile open-source platform for sampling convex polytopes
 A python interface for HOPS - the **H**ighly **O**ptimized toolbox for **P**olytope **S**ampling.
 Built using `pybind11`
 
