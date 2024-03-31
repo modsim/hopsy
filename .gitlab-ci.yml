@@ -20,8 +20,7 @@ pre-commit:
 build-release:
   stage: build
   rules:
-    - if: $CI_COMMIT_AUTHOR == "CI_BOT"
-    - when: never
+    - if: $CI_COMMIT_AUTHOR != "CI_BOT"
   parallel:
     matrix:
       #      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
@@ -39,9 +38,6 @@ build-release:
 
 #build-release-macos:
 #  stage: build
-#  rules:
-#    - if: ${CI_COMMIT_AUTHOR} == "CI_BOT"
-#    - when: never
 #  tags:
 #      - macos
 #  parallel:
@@ -62,9 +58,6 @@ build-release:
 
 #build-debug:
 #  stage: build
-#  rules:
-#    - if: ${CI_COMMIT_AUTHOR} == "CI_BOT"
-#    - when: never
 #  parallel:
 #    matrix:
 #      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
@@ -85,8 +78,7 @@ build-release:
 test-release:
   stage: test
   rules:
-    - if: $CI_COMMIT_AUTHOR == "CI_BOT"
-    - when: never
+    - if: $CI_COMMIT_AUTHOR != "CI_BOT"
   dependencies:
     - build-release
   parallel:
@@ -106,9 +98,6 @@ test-release:
 
 #test-release-macos:
 #  stage: test
-#  rules:
-#    - if: ${CI_COMMIT_AUTHOR} == "CI_BOT"
-#    - when: never
 #  tags:
 #      - macos
 #  dependencies:
@@ -132,9 +121,6 @@ test-release:
 
 #test-debug:
 #  stage: test
-#  rules:
-#    - if: ${CI_COMMIT_AUTHOR} == "CI_BOT"
-#    - when: never
 #  dependencies:
 #    - build-debug
 #  parallel:
@@ -153,9 +139,6 @@ test-release:
 
 #test-integration-release:
 #  stage: test
-#  rules:
-#    - if: ${CI_COMMIT_AUTHOR} == "CI_BOT"
-#    - when: never
 #  dependencies:
 #    - build-release
 #  before_script:
@@ -179,10 +162,9 @@ test-release:
 
 build-docs:
   stage: build-docs
-  image: ubuntu:22.04
   rules:
-    - if: $CI_COMMIT_AUTHOR == "CI_BOT"
-    - when: never
+    - if: ${CI_COMMIT_AUTHOR} != "CI_BOT"
+  image: ubuntu:22.04
   dependencies:
     - test-release
   before_script:
@@ -207,10 +189,7 @@ build-docs:
 upload-docs:
   stage: upload-artifacts
   rules:
-    - if: $CI_COMMIT_AUTHOR == "CI_BOT"
-    - when: never
-    - if: $CI_COMMIT_BRANCH == "main"
-    - when: never
+    - if: ${CI_COMMIT_AUTHOR} != "CI_BOT" || ${CI_COMMIT_BRANCH} != "main"
   dependencies:
     - build-docs
   script:
