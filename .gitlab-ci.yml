@@ -177,7 +177,7 @@ build-docs:
     - touch new-docs/.nojekyll
   artifacts:
     paths:
-      - docs
+      - new-docs
     expire_in: 7 days
 
 upload-docs:
