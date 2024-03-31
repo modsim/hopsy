@@ -162,9 +162,9 @@ test-release:
 
 build-docs:
   stage: build-docs
+  image: ubuntu:22.04
   rules:
     - if: $CI_COMMIT_AUTHOR != "CI_BOT"
-  image: ubuntu:22.04
   dependencies:
     - test-release
   before_script:
