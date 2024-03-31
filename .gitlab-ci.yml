@@ -163,7 +163,7 @@ test-release:
 build-docs:
   stage: build-docs
   rules:
-    - if: ${CI_COMMIT_AUTHOR} != "CI_BOT"
+    - if: $CI_COMMIT_AUTHOR != "CI_BOT"
   image: ubuntu:22.04
   dependencies:
     - test-release
@@ -189,7 +189,7 @@ build-docs:
 upload-docs:
   stage: upload-artifacts
   rules:
-    - if: ${CI_COMMIT_AUTHOR} != "CI_BOT" || ${CI_COMMIT_BRANCH} != "main"
+    - if: $CI_COMMIT_AUTHOR != "CI_BOT" || ${CI_COMMIT_BRANCH} != "main"
   dependencies:
     - build-docs
   script:
