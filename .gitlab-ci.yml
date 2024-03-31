@@ -20,7 +20,7 @@ pre-commit:
 build-release:
   stage: build
   rules:
-    - if: $CI_COMMIT_AUTHOR != "CI_BOT"
+    - if: ${CI_COMMIT_BRANCH} != "main"
   parallel:
     matrix:
       #      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
@@ -78,7 +78,7 @@ build-release:
 test-release:
   stage: test
   rules:
-    - if: $CI_COMMIT_AUTHOR != "CI_BOT"
+    - if: ${CI_COMMIT_BRANCH} != "main"
   dependencies:
     - build-release
   parallel:
@@ -164,7 +164,7 @@ build-docs:
   stage: build-docs
   image: ubuntu:22.04
   rules:
-    - if: $CI_COMMIT_AUTHOR != "CI_BOT"
+    - if: ${CI_COMMIT_BRANCH} != "main"
   dependencies:
     - test-release
   before_script:
@@ -189,7 +189,7 @@ build-docs:
 upload-docs:
   stage: upload-artifacts
   rules:
-    - if: $CI_COMMIT_AUTHOR != "CI_BOT" || ${CI_COMMIT_BRANCH} != "main"
+    - if: ${CI_COMMIT_BRANCH} != "main"
   dependencies:
     - build-docs
   script:
