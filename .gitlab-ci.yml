@@ -5,7 +5,8 @@ variables:
 
 workflow:
   rules:
-  - if: $CI_COMMIT_AUTHOR != "CI_BOT"
+  - if: ${CI_COMMIT_AUTHOR} == "CI_BOT"
+    when: never
 
 stages:
   - build
@@ -191,6 +192,7 @@ upload-docs:
   dependencies:
     - build-docs
   script:
+    - echo "Author is ${CI_COMMIT_AUTHOR}"
     - git checkout $CI_COMMIT_BRANCH
     - git rm docs -rf # remove old docs so no stales files remain
     - mv new-docs docs
