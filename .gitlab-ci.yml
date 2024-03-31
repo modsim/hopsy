@@ -22,7 +22,7 @@ build-release:
   parallel:
     matrix:
 #      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
-      - PYTHON_VERSION: ["cp312-cp312"]
+      - PYTHON_VERSION: ["cp310-cp310"]
   environment: $PYTHON_VERSION
   script:
     - /opt/python/cp310-cp310/bin/python .check_version.py
@@ -80,7 +80,7 @@ test-release:
   parallel:
     matrix:
 #      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
-      - PYTHON_VERSION: ["cp312-cp312"]
+      - PYTHON_VERSION: ["cp310-cp310"]
   environment: $PYTHON_VERSION
   before_script:
     - /opt/python/$PYTHON_VERSION/bin/python -m pip install docov
@@ -158,22 +158,23 @@ test-release:
 
 build-docs:
   stage: build-docs
+  image: ubuntu:22.04
   dependencies:
     - test-release
   before_script:
     - apt update -y
-    - apt install -y python3-dev pandoc git python3-pip
+    - apt install -y python3-dev pandoc python3-pip
   script:
-    - git rm docs -rf # remove old docs so no stales files remain
     - python3 -m pip install docov sphinx pybind11 numpy pandas matplotlib  sphinx-rtd-theme  nbsphinx pydata_sphinx_theme ipython --force-reinstall
-    - VERSION="$(cat .version)"; python3 -m pip install dist/hopsy-$VERSION-cp312-cp312-manylinux*.whl
-    - mkdir docs
+    # We have to use the python3.10 wheel, because this is what ubuntu:22.04 supports out of the box
+    - VERSION="$(cat .version)"; python3 -m pip install dist/hopsy-$VERSION-cp310-cp310-manylinux*.whl
+    - mkdir new-docs
     - cd docs-sources
     - python3 -m sphinx -b html -d _build/doctrees   . _build/html
-    - cp -r _build/html/* ../docs/
+    - cp -r _build/html/* ../new-docs/
     - cd -
-    - python3 -m docov hopsy --output docs/; cat docs/docov.txt
-    - touch docs/.nojekyll
+    - python3 -m docov hopsy --output new-docs/; cat new-docs/docov.txt
+    - touch new-docs/.nojekyll
   artifacts:
     paths:
       - docs
@@ -181,17 +182,19 @@ build-docs:
 
 upload-docs:
   stage: upload-artifacts
-  only:
-    - main
+#  only:
+#    - main
   dependencies:
     - build-docs
   script:
     - ls docs -la
+    - git rm docs -rf # remove old docs so no stales files remain
+    - mv new-docs docs
     - git config user.email $GITLAB_USER_EMAIL
     - git config user.name "CI_BOT"
     - git add docs
     - ls docs -la
-    - git commit -m "${CI_COMMIT_MESSAGE} + docs" --no-verify  || true
+    - git commit -m "${CI_COMMIT_MESSAGE} + docs" --no-verify --allow-empty || true
     - git remote remove origin || true
     - git remote add origin https://oauth2:${CI_BOT}@jugit.fz-juelich.de/IBG-1/ModSim/hopsy.git || true
     - git push origin HEAD:$CI_COMMIT_BRANCH -o ci.skip || true # prevent triggering pipeline again
