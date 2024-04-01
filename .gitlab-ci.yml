@@ -19,6 +19,8 @@ pre-commit:
 
 build-release:
   stage: build
+  rules:
+    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   parallel:
     matrix:
       - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
@@ -35,6 +37,8 @@ build-release:
 
 build-release-macos:
   stage: build
+  rules:
+    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   tags:
       - macos
   parallel:
@@ -55,6 +59,8 @@ build-release-macos:
 
 build-debug:
   stage: build
+  rules:
+    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   parallel:
     matrix:
       - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
@@ -74,6 +80,8 @@ build-debug:
 
 test-release:
   stage: test
+  rules:
+    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   dependencies:
     - build-release
   parallel:
@@ -92,6 +100,8 @@ test-release:
 
 test-release-macos:
   stage: test
+  rules:
+    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   tags:
       - macos
   dependencies:
@@ -115,6 +125,8 @@ test-release-macos:
 
 test-debug:
   stage: test
+  rules:
+    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   dependencies:
     - build-debug
   parallel:
@@ -133,6 +145,8 @@ test-debug:
 
 test-integration-release:
   stage: test
+  rules:
+    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   dependencies:
     - build-release
   before_script:
@@ -156,6 +170,8 @@ test-integration-release:
 
 build-docs:
   stage: build-docs
+  rules:
+    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   image: ubuntu:22.04
   dependencies:
     - test-release
