@@ -189,7 +189,7 @@ build-docs:
 upload-docs:
   stage: upload-artifacts
   rules:
-    - if: '$CI_COMMIT_BRANCH == "125-update-readme-md" && $CI_COMMIT_AUTHOR != "CI_BOT <j.jadebeck@fz-juelich.de>"'
+    - if: '$CI_COMMIT_BRANCH == "125-update-readme-md" && $CI_COMMIT_AUTHOR !~ /^CI_BOT/"'
   dependencies:
     - build-docs
   script:
