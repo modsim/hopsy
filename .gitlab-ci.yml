@@ -189,17 +189,17 @@ build-docs:
 upload-docs:
   stage: upload-artifacts
   rules:
-    - if: '$CI_COMMIT_BRANCH == "125-update-readme-md"'
+    - if: '$CI_COMMIT_BRANCH == "125-update-readme-md" && $CI_COMMIT_AUTHOR != "CI_BOT <j.jadebeck@fz-juelich.de>"'
   dependencies:
     - build-docs
   script:
+    - git config user.email $GITLAB_USER_EMAIL
+    - git config user.name "CI_BOT"
+    - git remote remove origin
+    - git remote add origin https://oauth2:${CI_BOT}@jugit.fz-juelich.de/IBG-1/ModSim/hopsy.git
     - echo "Author is ${CI_COMMIT_AUTHOR}"
     - git rm docs -rf # remove old docs so no stales files remain
     - mv new-docs docs
-    - git config user.email $GITLAB_USER_EMAIL
-    - git config user.name "CI_BOT"
     - git add docs
-    - git commit -m "${CI_COMMIT_MESSAGE} + docs" --no-verify --allow-empty
-    - git remote remove origin
-    - git remote add origin https://oauth2:${CI_BOT}@jugit.fz-juelich.de/IBG-1/ModSim/hopsy.git
+    - git commit --no-verify --allow-empty -m "automatically add docs for: ${CI_COMMIT_MESSAGE}"
     - git push origin HEAD:$CI_COMMIT_BRANCH
