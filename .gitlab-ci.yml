@@ -181,7 +181,7 @@ build-docs:
 upload-docs:
   stage: upload-artifacts
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main" && $CI_COMMIT_AUTHOR !~ /^CI_BOT/"'
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   dependencies:
     - build-docs
   script:
@@ -193,5 +193,5 @@ upload-docs:
     - git rm docs -rf # remove old docs so no stales files remain
     - mv new-docs docs
     - git add docs
-    - git commit --no-verify --allow-empty -m "automatically add docs for: ${CI_COMMIT_MESSAGE}"
+    - git commit --no-verify --allow-empty -m "automatically add docs for ${CI_COMMIT_MESSAGE}"
     - git push origin HEAD:$CI_COMMIT_BRANCH
