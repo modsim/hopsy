@@ -19,12 +19,9 @@ pre-commit:
 
 build-release:
   stage: build
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "125-update-readme-md"'
   parallel:
     matrix:
-      #      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
-      - PYTHON_VERSION: ["cp310-cp310"]
+      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
   environment: $PYTHON_VERSION
   script:
     - /opt/python/cp310-cp310/bin/python .check_version.py
@@ -36,55 +33,52 @@ build-release:
       - dist/*manylinux*
     expire_in: 7 days
 
-#build-release-macos:
-#  stage: build
-#  tags:
-#      - macos
-#  parallel:
-#    matrix:
-#      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
-#  environment: $PYTHON_VERSION
-#  before_script:
-#    - eval "$(pyenv init -)" && eval "$(pyenv virtualenv-init -)"
-#    - pyenv activate $PYTHON_VERSION
-#    - rm build dist -r || true
-#  script:
-#    - pyenv activate $PYTHON_VERSION && python setup.py bdist_wheel
-#    - VERSION=$(cat .version); delocate-wheel -v dist/hopsy-$VERSION-$PYTHON_VERSION-*
-#  artifacts:
-#    paths:
-#      - dist/*
-#    expire_in: 7 days
+build-release-macos:
+  stage: build
+  tags:
+      - macos
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
+  environment: $PYTHON_VERSION
+  before_script:
+    - eval "$(pyenv init -)" && eval "$(pyenv virtualenv-init -)"
+    - pyenv activate $PYTHON_VERSION
+    - rm build dist -r || true
+  script:
+    - pyenv activate $PYTHON_VERSION && python setup.py bdist_wheel
+    - VERSION=$(cat .version); delocate-wheel -v dist/hopsy-$VERSION-$PYTHON_VERSION-*
+  artifacts:
+    paths:
+      - dist/*
+    expire_in: 7 days
 
-#build-debug:
-#  stage: build
-#  parallel:
-#    matrix:
-#      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
-#  environment: $PYTHON_VERSION
-#  script:
-#    - /opt/python/cp310-cp310/bin/python .check_version.py
-#    - git rev-parse --short HEAD > .commit
-#    - echo "$(cat .version).dev0" > .version
-#    - sed -i 's/debug = 0/debug = 1/g' setup.cfg
-#    - /opt/python/$PYTHON_VERSION/bin/pip wheel --no-deps . -w dist
-#    - VERSION=$(cat .version); auditwheel repair dist/hopsy-$VERSION-$PYTHON_VERSION-* -w dist
-#  artifacts:
-#    paths:
-#      - dist/*manylinux*
-#    expire_in: 7 days
-#
+build-debug:
+  stage: build
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
+  environment: $PYTHON_VERSION
+  script:
+    - /opt/python/cp310-cp310/bin/python .check_version.py
+    - git rev-parse --short HEAD > .commit
+    - echo "$(cat .version).dev0" > .version
+    - sed -i 's/debug = 0/debug = 1/g' setup.cfg
+    - /opt/python/$PYTHON_VERSION/bin/pip wheel --no-deps . -w dist
+    - VERSION=$(cat .version); auditwheel repair dist/hopsy-$VERSION-$PYTHON_VERSION-* -w dist
+  artifacts:
+    paths:
+      - dist/*manylinux*
+    expire_in: 7 days
+
 
 test-release:
   stage: test
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "125-update-readme-md"'
   dependencies:
     - build-release
   parallel:
     matrix:
-#      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
-      - PYTHON_VERSION: ["cp310-cp310"]
+      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
   environment: $PYTHON_VERSION
   before_script:
     - /opt/python/$PYTHON_VERSION/bin/python -m pip install docov
@@ -96,75 +90,73 @@ test-release:
       - dist
     expire_in: 7 days
 
-#test-release-macos:
-#  stage: test
-#  tags:
-#      - macos
-#  dependencies:
-#    - build-release-macos
-#  parallel:
-#    matrix:
-#      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
-#  environment: $PYTHON_VERSION
-#  before_script:
-#    - eval "$(pyenv init -)" && eval "$(pyenv virtualenv-init -)"
-#    - pyenv activate $PYTHON_VERSION
-#    - python -m pip install docov
-#  script:
-#    - VERSION=$(cat .version); python -m pip install dist/hopsy-$VERSION-$PYTHON_VERSION-*macosx*arm64.whl --force-reinstall
-#    - VERSION=$(cat .version); python -m unittest -v tests
-#  artifacts:
-#    paths:
-#      - dist
-#    expire_in: 7 days
+test-release-macos:
+  stage: test
+  tags:
+      - macos
+  dependencies:
+    - build-release-macos
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
+  environment: $PYTHON_VERSION
+  before_script:
+    - eval "$(pyenv init -)" && eval "$(pyenv virtualenv-init -)"
+    - pyenv activate $PYTHON_VERSION
+    - python -m pip install docov
+  script:
+    - VERSION=$(cat .version); python -m pip install dist/hopsy-$VERSION-$PYTHON_VERSION-*macosx*arm64.whl --force-reinstall
+    - VERSION=$(cat .version); python -m unittest -v tests
+  artifacts:
+    paths:
+      - dist
+    expire_in: 7 days
 
 
-#test-debug:
-#  stage: test
-#  dependencies:
-#    - build-debug
-#  parallel:
-#    matrix:
-#      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
-#  environment: $PYTHON_VERSION
-#  before_script:
-#    - /opt/python/$PYTHON_VERSION/bin/python -m pip install docov
-#  script:
-#    - VERSION="$(cat .version).dev0"; /opt/python/$PYTHON_VERSION/bin/python -m pip install dist/hopsy-$VERSION-$PYTHON_VERSION-manylinux*.whl
-#    - VERSION="$(cat .version).dev0"; /opt/python/$PYTHON_VERSION/bin/python -m unittest -v tests
-#  artifacts:
-#    paths:
-#      - dist
-#    expire_in: 7 days
+test-debug:
+  stage: test
+  dependencies:
+    - build-debug
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
+  environment: $PYTHON_VERSION
+  before_script:
+    - /opt/python/$PYTHON_VERSION/bin/python -m pip install docov
+  script:
+    - VERSION="$(cat .version).dev0"; /opt/python/$PYTHON_VERSION/bin/python -m pip install dist/hopsy-$VERSION-$PYTHON_VERSION-manylinux*.whl
+    - VERSION="$(cat .version).dev0"; /opt/python/$PYTHON_VERSION/bin/python -m unittest -v tests
+  artifacts:
+    paths:
+      - dist
+    expire_in: 7 days
 
-#test-integration-release:
-#  stage: test
-#  dependencies:
-#    - build-release
-#  before_script:
-#    # for time reasons we only test the latest python version. Otherwise the tests take more than 1h.
-#    - for PY in "cp312-cp312"; do /opt/python/$PY/bin/python -m pip install docov jupyter nbconvert clickhouse-driver hagelkorn ipyparallel; done
-#    - curl https://clickhouse.com/ | sh
-#    - ./clickhouse server &> clickhouse.log &
-#    - rm examples/ParallelTempering.ipynb examples/parallel_tempering.py # mpi not compatible with manylinux
-#    - rm examples/Callbacks.ipynb # somehow samples go missing in CI but not locally? For now we skip this test
-#    - rm examples/BenchmarkingMultiphaseMonteCarloSampling.ipynb # too slow for CI
-#  script:
-#    - VERSION=$(cat .version); for PY in "cp312-cp312"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
-#    - for PY in "cp312-cp312"; do for f in examples/*.py; do /opt/python/$PY/bin/python $f || exit 1; done ;done
-#    - for PY in "cp312-cp312"; do for f in examples/*.ipynb; do /opt/python/$PY/bin/python -m jupyter nbconvert --to notebook --execute $f || exit 1; done;done
-#  after_script:
-#    - pkill clickhouse
-#  artifacts:
-#    paths:
-#      - dist
-#    expire_in: 7 days
+test-integration-release:
+  stage: test
+  dependencies:
+    - build-release
+  before_script:
+    # for time reasons we only test the latest python version. Otherwise the tests take more than 1h.
+    - for PY in "cp312-cp312"; do /opt/python/$PY/bin/python -m pip install docov jupyter nbconvert clickhouse-driver hagelkorn ipyparallel; done
+    - curl https://clickhouse.com/ | sh
+    - ./clickhouse server &> clickhouse.log &
+    - rm examples/ParallelTempering.ipynb examples/parallel_tempering.py # mpi not compatible with manylinux
+    - rm examples/Callbacks.ipynb # somehow samples go missing in CI but not locally? For now we skip this test
+    - rm examples/BenchmarkingMultiphaseMonteCarloSampling.ipynb # too slow for CI
+  script:
+    - VERSION=$(cat .version); for PY in "cp312-cp312"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
+    - for PY in "cp312-cp312"; do for f in examples/*.py; do /opt/python/$PY/bin/python $f || exit 1; done ;done
+    - for PY in "cp312-cp312"; do for f in examples/*.ipynb; do /opt/python/$PY/bin/python -m jupyter nbconvert --to notebook --execute $f || exit 1; done;done
+  after_script:
+    - pkill clickhouse
+  artifacts:
+    paths:
+      - dist
+    expire_in: 7 days
 
 build-docs:
   stage: build-docs
   image: ubuntu:22.04
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "125-update-readme-md"'
   dependencies:
     - test-release
   before_script:
@@ -189,7 +181,7 @@ build-docs:
 upload-docs:
   stage: upload-artifacts
   rules:
-    - if: '$CI_COMMIT_BRANCH == "125-update-readme-md" && $CI_COMMIT_AUTHOR !~ /^CI_BOT/"'
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_COMMIT_AUTHOR !~ /^CI_BOT/"'
   dependencies:
     - build-docs
   script:
