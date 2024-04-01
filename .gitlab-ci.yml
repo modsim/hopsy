@@ -17,9 +17,10 @@ pre-commit:
     - pre-commit install
     - pre-commit run --all
 
-
 build-release:
   stage: build
+  rules:
+    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   parallel:
     matrix:
       - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
@@ -36,6 +37,8 @@ build-release:
 
 build-release-macos:
   stage: build
+  rules:
+    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   tags:
       - macos
   parallel:
@@ -56,6 +59,8 @@ build-release-macos:
 
 build-debug:
   stage: build
+  rules:
+    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   parallel:
     matrix:
       - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
@@ -75,6 +80,8 @@ build-debug:
 
 test-release:
   stage: test
+  rules:
+    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   dependencies:
     - build-release
   parallel:
@@ -93,6 +100,8 @@ test-release:
 
 test-release-macos:
   stage: test
+  rules:
+    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   tags:
       - macos
   dependencies:
@@ -116,6 +125,8 @@ test-release-macos:
 
 test-debug:
   stage: test
+  rules:
+    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   dependencies:
     - build-debug
   parallel:
@@ -134,6 +145,8 @@ test-debug:
 
 test-integration-release:
   stage: test
+  rules:
+    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   dependencies:
     - build-release
   before_script:
@@ -157,41 +170,44 @@ test-integration-release:
 
 build-docs:
   stage: build-docs
+  rules:
+    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   image: ubuntu:22.04
   dependencies:
     - test-release
   before_script:
     - apt update -y
-    - apt install -y python3-dev pandoc git python3-pip
+    - apt install -y python3-dev pandoc python3-pip
   script:
-    - git rm docs -rf # remove old docs so no stales files remain
     - python3 -m pip install docov sphinx pybind11 numpy pandas matplotlib  sphinx-rtd-theme  nbsphinx pydata_sphinx_theme ipython --force-reinstall
+    # We have to use the python3.10 wheel, because this is what ubuntu:22.04 supports out of the box
     - VERSION="$(cat .version)"; python3 -m pip install dist/hopsy-$VERSION-cp310-cp310-manylinux*.whl
-    - mkdir docs
+    - mkdir new-docs
     - cd docs-sources
     - python3 -m sphinx -b html -d _build/doctrees   . _build/html
-    - cp -r _build/html/* ../docs/
+    - cp -r _build/html/* ../new-docs/
     - cd -
-    - python3 -m docov hopsy --output docs/; cat docs/docov.txt
-    - touch docs/.nojekyll
+    - python3 -m docov hopsy --output new-docs/; cat new-docs/docov.txt
+    - touch new-docs/.nojekyll
   artifacts:
     paths:
-      - docs
+      - new-docs
     expire_in: 7 days
 
 upload-docs:
   stage: upload-artifacts
-  only:
-    - develop
-    - main
-    - master
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   dependencies:
     - build-docs
   script:
     - git config user.email $GITLAB_USER_EMAIL
     - git config user.name "CI_BOT"
+    - git remote remove origin
+    - git remote add origin https://oauth2:${CI_BOT}@jugit.fz-juelich.de/IBG-1/ModSim/hopsy.git
+    - echo "Author is ${CI_COMMIT_AUTHOR}"
+    - git rm docs -rf # remove old docs so no stales files remain
+    - mv new-docs docs
     - git add docs
-    - git commit -m "${CI_COMMIT_DESCRIPTION} + docs" --no-verify  || true
-    - git remote remove origin || true
-    - git remote add origin https://oauth2:${CI_BOT}@jugit.fz-juelich.de/IBG-1/ModSim/hopsy.git || true
-    - git push origin HEAD:$CI_COMMIT_BRANCH -o ci.skip ||true # prevent triggering pipeline again
+    - git commit --no-verify --allow-empty -m "automatically add docs for ${CI_COMMIT_MESSAGE}"
+    - git push origin HEAD:$CI_COMMIT_BRANCH

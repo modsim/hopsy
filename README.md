@@ -1,19 +1,28 @@
-# hopsy - Python bindings for HOPS
+# hopsy - a methods marketplace for convex polytope sampling powered by the C++ library HOPS
 
- [![pipeline status](https://jugit.fz-juelich.de/fluxomics/hopsy/badges/develop/pipeline.svg)](https://jugit.fz-juelich.de/fluxomics/hopsy/-/commits/develop)
- [![docstring coverage](https://jugit.fz-juelich.de/fluxomics/hopsy/-/jobs/220246/artifacts/raw/docs/docov.svg?job=test_release)](https://jugit.fz-juelich.de/fluxomics/hopsy/-/jobs/220246/artifacts/file/docs/docov.txt?job=test_release)
+[![pipeline status](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/badges/main/pipeline.svg)](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/commits/main)
+[![docstring coverage](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/raw/main/docs/docov.svg)](/docs/docov.svg)
+[![license: MIT](https://assets-global.website-files.com/5e0f1144930a8bc8aace526c/65dd9eb5aaca434fac4f1c34_License-MIT-blue.svg)](/LICENSE)
 
-A python interface for HOPS - the **H**ighly **O**ptimized toolbox for **P**olytope **S**ampling.
-Built using `pybind11`
 
 <img src="docs/_static/hopsy.png" alt="HOPSY Logo" width="300"/>
 
-**hopsy** is a Python package for Markov chain Monte Carlo sampling on convex polytopes
+**hopsy** is a versatile open-source domain-agnostic platform for (MCMC)-sampling convex polytopes
 
 P = {x : Ax &#8804; b},
 
-which often arises in metabolic flux analysis.
+which appear in many domains:
+- metabolic flux analysis
+- ecological modeling
+- optimization of chromatography pipelines
+- Bayesian multi criteria decision analysis in economics
+- Bell scenarios in quantum mechanics
+- ...
 
+**hopsy** is a Python3 package powered by the C++ library [HOPS](https://jugit.fz-juelich.de/IBG-1/ModSim/hops).
+Using `pybind11` **hopsy** calls and extends HOPS with a range of useful features, bringing the performance of C++
+and simplicity of Python together in one package.
+Details and more use-cases are described [here](https://www.biorxiv.org/content/10.1101/2023.12.22.573091v1).
 
 
 ## Installation
