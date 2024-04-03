@@ -57,10 +57,11 @@ namespace hopsy {
 
         static inline auto wrapProposal(std::shared_ptr <Proposal> proposal,
                                         const LinearTransformation &transformation) {
-            return hops::StateTransformation(
-                    hopsy::ProposalWrapper(proposal),
-                    transformation
-            );
+            return hopsy::ProposalWrapper(proposal);
+//            return hops::StateTransformation(
+//                    hopsy::ProposalWrapper(proposal),
+//                    transformation
+//            );
         }
 
         static inline auto wrapProposal(std::shared_ptr <Proposal> proposal) {
@@ -311,10 +312,7 @@ namespace hopsy {
                 if (mc->proposal->isSymmetric()) {
                     auto tmp = hops::MarkovChainAdapter(
                             hops::NoOpDrawAdapter(
-                                    hops::StateTransformation(
-                                            hopsy::ProposalWrapper(mc->proposal),
-                                            *transformation
-                                    )
+                                    wrapProposal(mc->proposal, transformation.value())
                             )
                     );
 
@@ -323,10 +321,7 @@ namespace hopsy {
                 } else {
                     auto tmp = hops::MarkovChainAdapter(
                             hops::MetropolisHastingsFilter(
-                                    hops::StateTransformation(
-                                            hopsy::ProposalWrapper(proposal),
-                                            transformation.value()
-                                    )
+                                    wrapProposal(mc->proposal, transformation.value())
                             )
                     );
                     mc->markovChain = std::make_unique<decltype(tmp)>(tmp);
@@ -337,7 +332,7 @@ namespace hopsy {
                 if (proposal->isSymmetric()) {
                     auto tmp = hops::MarkovChainAdapter(
                             hops::NoOpDrawAdapter(
-                                    hopsy::ProposalWrapper(mc->proposal)
+                                    wrapProposal(mc->proposal)
                             )
                     );
 
@@ -346,7 +341,7 @@ namespace hopsy {
                 } else {
                     auto tmp = hops::MarkovChainAdapter(
                             hops::MetropolisHastingsFilter(
-                                    hopsy::ProposalWrapper(mc->proposal)
+                                    wrapProposal(mc->proposal)
                             )
                     );
                     mc->markovChain = std::make_unique<decltype(tmp)>(tmp);
@@ -425,21 +420,10 @@ namespace hopsy {
     MarkovChain createMarkovChain(const Proposal *proposal,
                                   const Problem &problem,
                                   std::optional <RandomNumberGenerator> parallelTemperingSyncRng = std::nullopt,
-                                  double exchangeAttemptProbability = 0.1,
-                                  bool proposalIsReversibleJump=false) {
+                                  double exchangeAttemptProbability = 0.1) {
         if (problem.A.rows() != problem.b.rows()) {
             throw std::runtime_error(
                     "Dimension mismatch between row dimension of right-hand side operator A and row dimension of left-hand side vector b.");
-        }
-
-        if (!proposalIsReversibleJump && (problem.startingPoint && problem.A.cols() != problem.startingPoint->rows()) ) {
-            throw std::runtime_error(
-                    "Dimension mismatch between column dimension of right-hand side operator A and row dimension of vector starting_point.");
-        }
-        else if (proposalIsReversibleJump && (problem.startingPoint && problem.A.cols()*2 != problem.startingPoint->rows()) ) {
-            // With reversible jump the model is also tracking the model space. Therefore, the states are twice the size!
-            throw std::runtime_error(
-                    "Dimension mismatch between column dimension of right-hand side operator A and row dimension of vector starting_point.");
         }
 
         std::optional <LinearTransformation> transformation = std::nullopt;
@@ -461,8 +445,7 @@ namespace hopsy {
                      py::arg("proposal"),
                      py::arg("problem"),
                      py::arg("parallelTemperingSyncRng") = std::nullopt,
-                     py::arg("exchangeAttemptProbability") = 0.1,
-                     py::arg("isReversibleJumpChain") = false)
+                     py::arg("exchangeAttemptProbability") = 0.1)
         .def("draw", [](MarkovChain &self,
                                 RandomNumberGenerator &rng,
                                 long thinning = 1) -> std::pair<double, VectorType> {
@@ -492,12 +475,10 @@ namespace hopsy {
                                 [](py::tuple t) {
                                     if (t.size() != 4) throw std::runtime_error("Invalid state!");
                                     auto proposal = t[0].cast<Proposal *>();
-                                    bool isReversibleJumpChain = proposal->getProposalName().substr(0, 6) == "RJMCMC";
                                     auto markovChain = createMarkovChain(proposal,
                                                                          t[1].cast<Problem>(),
                                                                          t[2].cast<std::optional<RandomNumberGenerator>>(),
-                                                                         t[3].cast<double>(),
-                                                                         isReversibleJumpChain);
+                                                                         t[3].cast<double>());
 
                                     return markovChain;
                                 }));

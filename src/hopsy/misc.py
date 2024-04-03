@@ -111,7 +111,6 @@ def add_box_constraints(
     """
     if problem.A.shape[1] == 0:
         raise ValueError("Cannot determine dimension for empty inequality Ax <= b.")
-        gggg
 
     if hasattr(lower_bound, "__len__") and len(lower_bound) != problem.A.shape[1]:
         raise TypeError(

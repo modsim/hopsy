@@ -51,8 +51,8 @@ class GammaPDF:
             if datum - location < 0:
                 continue
             density = (
-                (datum - location) ** (shape - 1) * np.exp(-(datum - location) / scale)
-            ) / (gamma(shape) * scale**shape)
+                              (datum - location) ** (shape - 1) * np.exp(-(datum - location) / scale)
+                      ) / (gamma(shape) * scale ** shape)
             log_density += np.log(density)
 
         return log_density
@@ -378,28 +378,53 @@ class ProposalTests(unittest.TestCase):
         self.assertAlmostEqual(expected_scale_mean, actual_scale_mean, places=1)
         self.assertAlmostEqual(expected_shape_mean, actual_shape_mean, places=1)
         for i in range(
-            max(len(expected_model_probabilities), len(actual_model_probabilities))
+                max(len(expected_model_probabilities), len(actual_model_probabilities))
         ):
             self.assertAlmostEqual(
                 expected_model_probabilities[i], actual_model_probabilities[i], places=1
             )
 
     def test_rjmcmc_rounded(self):
-        measurements = [[1.0]]
+        measurements = [1.0]
         gammaPDF = GammaPDF(measurements)
-        problem = Problem(
-            gammaPDF.A, gammaPDF.b, gammaPDF, starting_point=[0.5, 0.5, 0.5]
-        )
-        problem = round(problem)
+        problem = Problem(gammaPDF.A, gammaPDF.b, gammaPDF, starting_point=[0.5, 0.5, 0.5])
+        rounded_problem = round(problem)
+        print(rounded_problem.starting_point)
+        # print('trafo\n', rounded_problem.transformation)
+
+        # zero_block = np.zeros(rounded_problem.transformation.shape)
+        # rounded_problem.shift = np.concatenate(
+        #     [np.zeros(rounded_problem.transformation.shape[1]), rounded_problem.shift])
+        # rounded_problem.transformation = np.block([
+        #     [np.identity(rounded_problem.transformation.shape[1]), zero_block],
+        #     [zero_block.T, rounded_problem.transformation]]
+        # )
+
+        # print('stacked trafo\n', rounded_problem.transformation)
+        # print('rounded shift', rounded_problem.shift)
+        # print('rounded trafo', rounded_problem.transformation)
+        # print('shift', problem.shift)
+        # print('trafo', problem.transformation)
+
         proposal = UniformHitAndRunProposal(problem)
         jumpIndices = np.array([0, 1])
-        defaultValues = np.array([0, 1])
+        defaultValues = np.array([1e-14, 1])
         rjmcmc_proposal = ReversibleJumpProposal(proposal, jumpIndices, defaultValues)
 
-        mc = MarkovChain(problem=problem, proposal=rjmcmc_proposal)
         rng = RandomNumberGenerator(5)
+        rounded_proposal = UniformHitAndRunProposal(rounded_problem)
+        rounded_proposal.propose(rng)
+        print("proposed")
+        rounded_rjmcmc_proposal = ReversibleJumpProposal(rounded_proposal, jumpIndices, defaultValues)
+        print("built rjmcmc")
+        rounded_mc = MarkovChain(problem=problem, proposal=rounded_rjmcmc_proposal)
+        print("built mc")
+        rounded_mc.draw(rng)
+        print("used mc")
 
-        acc, samples = sample(mc, rng, n_samples=500_000, thinning=1)
+
+        acc, samples = sample(rounded_mc, rng, n_samples=500_000, thinning=1)
+        print("sampled mc")
 
         location_samples = samples[0, :, 3]
         scale_samples = samples[0, :, 4]
@@ -436,7 +461,7 @@ class ProposalTests(unittest.TestCase):
         self.assertAlmostEqual(expected_scale_mean, actual_scale_mean, places=1)
         self.assertAlmostEqual(expected_shape_mean, actual_shape_mean, places=1)
         for i in range(
-            max(len(expected_model_probabilities), len(actual_model_probabilities))
+                max(len(expected_model_probabilities), len(actual_model_probabilities))
         ):
             self.assertAlmostEqual(
                 expected_model_probabilities[i], actual_model_probabilities[i], places=1
@@ -555,7 +580,7 @@ class ProposalTests(unittest.TestCase):
         self.assertAlmostEqual(expected_scale_mean, actual_scale_mean, places=1)
         self.assertAlmostEqual(expected_shape_mean, actual_shape_mean, places=1)
         for i in range(
-            max(len(expected_model_probabilities), len(actual_model_probabilities))
+                max(len(expected_model_probabilities), len(actual_model_probabilities))
         ):
             self.assertAlmostEqual(
                 expected_model_probabilities[i], actual_model_probabilities[i], places=2

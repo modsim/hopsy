@@ -31,6 +31,20 @@ namespace hopsy {
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::Proposal);
 
 namespace hopsy {
+
+//    hops::ReversibleJumpProposal createReversibleJumpProposal(
+//        const Proposal*, proposal,
+//        const Problem& problem,
+//        const Eigen::VextorXi jumpIndices,
+//        const Eigen::VextorXd defaultValues) {
+//
+//        }
+//            .def(py::init<std::unique_ptr<Proposal>, const Eigen::VectorXi&, const VectorType&>(&createReversibleJumpProposal),
+//                    doc::ReversibleJumpProposal::__init__,
+//                    py::arg("proposal"),
+//                    py::arg("jump_indices"),
+//                    py::arg("default_values")
+//                    );
     template<typename ProposalBase = Proposal>
 	class ProposalTrampoline : public ProposalBase, public py::trampoline_self_life_support {
 	public:
@@ -526,12 +540,36 @@ namespace hopsy {
         UninitializedProposalWrapper() :
                 isInitialized(false) { }
 
+        UninitializedProposalWrapper(const UninitializedProposalWrapper& other) {
+            this->isInitialized = other.isInitialized;
+            this->proposal = other.proposal->copyProposal();
+        }
+
+        UninitializedProposalWrapper(UninitializedProposalWrapper&& other) {
+            this->isInitialized = other.isInitialized;
+            this->proposal = std::move(other.proposal);
+        }
+
+
+        UninitializedProposalWrapper& operator=(const UninitializedProposalWrapper& other) {
+            this->isInitialized = other.isInitialized;
+            this->proposal = other.proposal->copyProposal();
+            return *this;
+        }
+
+        UninitializedProposalWrapper& operator=(UninitializedProposalWrapper&& other) {
+            this->isInitialized = other.isInitialized;
+            this->proposal = std::move(other.proposal);
+            return *this;
+        }
+
         UninitializedProposalWrapper(const MatrixType& A,
                                      const VectorType& b,
                                      const VectorType& startingPoint,
-                                     const Args&... args) :
-                proposal(ProposalImpl(A, b, startingPoint, args...)),
-                isInitialized(true) { }
+                                     const Args&... args) {
+            proposal = std::make_unique<ProposalImpl>(A, b, startingPoint, args...);
+            this->isInitialized = true;
+        }
 
         static UninitializedProposalWrapper<ProposalImpl, Args...> createFromProblem(const Problem* problem,
                                                                                      const Args&... args) {
@@ -539,6 +577,23 @@ namespace hopsy {
                 if (!problem->startingPoint) {
                     throw std::runtime_error("Cannot setup a proposal without starting point.");
                 }
+                UninitializedProposalWrapper<ProposalImpl, Args...> wrapper(problem->A, problem->b, *problem->startingPoint, args...);
+
+                if (problem->transformation && problem->shift) {
+                    hops::LinearTransformation stateTransformation(problem->transformation.value(), problem->shift.value());
+                    wrapper.proposal = std::make_unique<hops::StateTransformation<std::unique_ptr<Proposal>, hops::LinearTransformation>>(
+                        std::move(wrapper.proposal->copyProposal()),
+                        stateTransformation);
+
+                }
+                if (problem->transformation && !problem->shift) {
+                    hops::LinearTransformation stateTransformation(problem->transformation.value(), VectorType::Zero(problem->transformation.value().rows()));
+                    wrapper.proposal = std::make_unique<hops::StateTransformation<std::unique_ptr<Proposal>, hops::LinearTransformation>>(
+                        std::move(wrapper.proposal->copyProposal()),
+                        stateTransformation);
+
+                }
+                return wrapper;
 
                 return UninitializedProposalWrapper<ProposalImpl, Args...>(problem->A, problem->b, *problem->startingPoint, args...);
             } else {
@@ -677,7 +732,7 @@ namespace hopsy {
             return std::make_unique<UninitializedProposalWrapper<ProposalImpl, Args...>>(*this);
         }
 
-        std::optional<ProposalImpl> proposal;
+        std::unique_ptr<hops::Proposal> proposal;
     private:
         std::string uninitializedMethod(const std::string& name) const {
             return "Tried to access " + name + " on an uninitialized proposal.";
@@ -863,7 +918,7 @@ namespace hopsy {
                         return py::make_tuple(self.proposal->getA(),
                                               self.proposal->getB(),
                                               self.proposal->getState(),
-                                              self.proposal->getCholeskyOfMaximumVolumeEllipsoid(),
+                                              dynamic_cast<hops::AdaptiveMetropolisProposal<MatrixType>&>(*self.proposal).getCholeskyOfMaximumVolumeEllipsoid(),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::BOUNDARY_CUSHION)),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::EPSILON)),
                                               std::any_cast<unsigned long>(self.proposal->getParameter(ProposalParameter::WARM_UP)));
@@ -981,7 +1036,7 @@ namespace hopsy {
                         return py::make_tuple(self.proposal->getA(),
                                               self.proposal->getB(),
                                               self.proposal->getState(),
-                                              self.proposal->getCholeskyOfMaximumVolumeEllipsoid(),
+                                              dynamic_cast<hops::BilliardAdaptiveMetropolisProposal<MatrixType>&>(*self.proposal).getCholeskyOfMaximumVolumeEllipsoid(),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::BOUNDARY_CUSHION)),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::EPSILON)),
                                               std::any_cast<unsigned long>(self.proposal->getParameter(ProposalParameter::WARM_UP)),
@@ -1059,7 +1114,7 @@ namespace hopsy {
                 billiardmalaProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::BilliardMALAProposal::stepSize);
         // pickling
         billiardmalaProposal.def(py::pickle([] (const BilliardMALAProposal& self) {
-                        auto model = self.proposal->getModel()->copyModel().release();
+                        auto model = dynamic_cast<hops::BilliardMALAProposal<ModelWrapper, MatrixType>&>(*self.proposal).getModel()->copyModel().release();
                         return py::make_tuple(self.proposal->getA(),
                                               self.proposal->getB(),
                                               self.proposal->getState(),
@@ -1197,7 +1252,7 @@ namespace hopsy {
                 csmmalaProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::CSmMALAProposal::stepSize);
         // pickling
         csmmalaProposal.def(py::pickle([] (const CSmMALAProposal& self) {
-                        auto model = self.proposal->getModel()->copyModel().release();
+                        auto model = dynamic_cast<hops::CSmMALAProposal<ModelWrapper, MatrixType>&>(*self.proposal).getModel()->copyModel().release();
                         return py::make_tuple(self.proposal->getA(),
                                               self.proposal->getB(),
                                               self.proposal->getState(),
@@ -1444,7 +1499,7 @@ namespace hopsy {
                         auto proposal = t[0].cast<std::unique_ptr<Proposal>>();
 
                         auto rjmcmcProposal = ReversibleJumpProposal(
-                            std::move(proposal->copyProposal()),
+                            proposal->copyProposal(),
                             t[1].cast<Eigen::VectorXi>(),
                             t[2].cast<VectorType>(),
                             proposal->getA(),
@@ -1547,7 +1602,7 @@ namespace hopsy {
         proposal::addCommon<TruncatedGaussianProposal, doc::TruncatedGaussianProposal>(truncatedgaussianProposal);
         // pickling
         truncatedgaussianProposal.def(py::pickle([] (const TruncatedGaussianProposal& self) {
-                                           std::shared_ptr<Model> modelPtr = self.proposal->getModel()->copyModel();
+                                           std::shared_ptr<Model> modelPtr = dynamic_cast<hops::TruncatedGaussianProposal<MatrixType, VectorType>&>(*self.proposal).getModel()->copyModel();
                                            auto casted = std::dynamic_pointer_cast<hops::Gaussian>(modelPtr);
                                            if (!casted) {
                                              throw std::runtime_error("Model is not Gaussian. Please reconsider.");
