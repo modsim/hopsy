@@ -31,20 +31,6 @@ namespace hopsy {
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::Proposal);
 
 namespace hopsy {
-
-//    hops::ReversibleJumpProposal createReversibleJumpProposal(
-//        const Proposal*, proposal,
-//        const Problem& problem,
-//        const Eigen::VextorXi jumpIndices,
-//        const Eigen::VextorXd defaultValues) {
-//
-//        }
-//            .def(py::init<std::unique_ptr<Proposal>, const Eigen::VectorXi&, const VectorType&>(&createReversibleJumpProposal),
-//                    doc::ReversibleJumpProposal::__init__,
-//                    py::arg("proposal"),
-//                    py::arg("jump_indices"),
-//                    py::arg("default_values")
-//                    );
     template<typename ProposalBase = Proposal>
 	class ProposalTrampoline : public ProposalBase, public py::trampoline_self_life_support {
 	public:
@@ -541,64 +527,31 @@ namespace hopsy {
                 isInitialized(false) { }
 
         UninitializedProposalWrapper(const UninitializedProposalWrapper& other) {
-            this->isInitialized = other.isInitialized;
             this->proposal = other.proposal->copyProposal();
         }
 
         UninitializedProposalWrapper(UninitializedProposalWrapper&& other) {
-            this->isInitialized = other.isInitialized;
             this->proposal = std::move(other.proposal);
-        }
-
-
-        UninitializedProposalWrapper& operator=(const UninitializedProposalWrapper& other) {
-            this->isInitialized = other.isInitialized;
-            this->proposal = other.proposal->copyProposal();
-            return *this;
-        }
-
-        UninitializedProposalWrapper& operator=(UninitializedProposalWrapper&& other) {
-            this->isInitialized = other.isInitialized;
-            this->proposal = std::move(other.proposal);
-            return *this;
         }
 
         UninitializedProposalWrapper(const MatrixType& A,
                                      const VectorType& b,
                                      const VectorType& startingPoint,
-                                     const Args&... args) {
-            proposal = std::make_unique<ProposalImpl>(A, b, startingPoint, args...);
-            this->isInitialized = true;
-        }
+                                     const Args&... args) :
+                proposal(std::make_unique<ProposalImpl>(A, b, startingPoint, args...)),
+                isInitialized(true) { }
+
+        UninitializedProposalWrapper(std::unique_ptr<Proposal> prop) :
+                proposal(std::move(prop)),
+                isInitialized(true) { }
+
 
         static UninitializedProposalWrapper<ProposalImpl, Args...> createFromProblem(const Problem* problem,
                                                                                      const Args&... args) {
-            if (problem) {
-                if (!problem->startingPoint) {
-                    throw std::runtime_error("Cannot setup a proposal without starting point.");
+                if (!(problem->startingPoint)) {
+                    throw std::runtime_error("Cannot setup a proposal without starting point");
                 }
-                UninitializedProposalWrapper<ProposalImpl, Args...> wrapper(problem->A, problem->b, *problem->startingPoint, args...);
-
-                if (problem->transformation && problem->shift) {
-                    hops::LinearTransformation stateTransformation(problem->transformation.value(), problem->shift.value());
-                    wrapper.proposal = std::make_unique<hops::StateTransformation<std::unique_ptr<Proposal>, hops::LinearTransformation>>(
-                        std::move(wrapper.proposal->copyProposal()),
-                        stateTransformation);
-
-                }
-                if (problem->transformation && !problem->shift) {
-                    hops::LinearTransformation stateTransformation(problem->transformation.value(), VectorType::Zero(problem->transformation.value().rows()));
-                    wrapper.proposal = std::make_unique<hops::StateTransformation<std::unique_ptr<Proposal>, hops::LinearTransformation>>(
-                        std::move(wrapper.proposal->copyProposal()),
-                        stateTransformation);
-
-                }
-                return wrapper;
-
-                return UninitializedProposalWrapper<ProposalImpl, Args...>(problem->A, problem->b, *problem->startingPoint, args...);
-            } else {
-                throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
-            }
+               return UninitializedProposalWrapper<ProposalImpl, Args...>::create(problem, &(problem->startingPoint.value()), args...);
         }
 
         static UninitializedProposalWrapper<ProposalImpl, Args...> create(const Problem* problem,
@@ -610,7 +563,17 @@ namespace hopsy {
                 }
 
                 VectorType _startingPoint = ( startingPoint ? *startingPoint : *problem->startingPoint );
-                return UninitializedProposalWrapper<ProposalImpl, Args...>(problem->A, problem->b, _startingPoint, args...);
+                if(!problem->transformation && !problem->shift) {
+                    auto prop = std::make_unique<ProposalImpl>(problem->A, problem->b, _startingPoint, args...);
+                    return UninitializedProposalWrapper<ProposalImpl, Args...>(std::move(prop));
+                }
+                else if (problem->transformation && problem->shift) {
+                    hops::LinearTransformation transformation(problem->transformation.value(), problem->shift.value());
+                    ProposalImpl proposalImpl(problem->A, problem->b, _startingPoint, args...);
+                    auto prop = std::make_unique<hops::StateTransformation<decltype(proposalImpl),decltype(transformation)>>(proposalImpl, transformation);
+                    return UninitializedProposalWrapper<ProposalImpl, Args...>(std::move(prop));
+                }
+                throw std::runtime_error(std::string("Inconsistent transformation. Error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
             } else {
                 throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
             }
@@ -733,6 +696,7 @@ namespace hopsy {
         }
 
         std::unique_ptr<hops::Proposal> proposal;
+
     private:
         std::string uninitializedMethod(const std::string& name) const {
             return "Tried to access " + name + " on an uninitialized proposal.";

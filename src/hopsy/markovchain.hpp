@@ -20,7 +20,6 @@
 #include "problem.hpp"
 #include "proposal.hpp"
 #include "random.hpp"
-#include "transformation.hpp"
 
 namespace py = pybind11;
 
@@ -55,15 +54,6 @@ namespace hopsy {
             }
         }
 
-        static inline auto wrapProposal(std::shared_ptr <Proposal> proposal,
-                                        const LinearTransformation &transformation) {
-            return hopsy::ProposalWrapper(proposal);
-//            return hops::StateTransformation(
-//                    hopsy::ProposalWrapper(proposal),
-//                    transformation
-//            );
-        }
-
         static inline auto wrapProposal(std::shared_ptr <Proposal> proposal) {
             return hopsy::ProposalWrapper(proposal);
         }
@@ -74,36 +64,30 @@ namespace hopsy {
         MarkovChain() = default;
 
         MarkovChain(const Proposal *proposal,
-                    const std::optional <LinearTransformation> &transformation = std::nullopt,
                     std::optional <RandomNumberGenerator> parallelTemperingSyncRng = std::nullopt,
                     double exchangeAttemptProbability = 0.1) :
                 proposal(nullptr),
                 model(nullptr),
                 parallelTemperingSyncRng(parallelTemperingSyncRng),
-                exchangeAttemptProbability(exchangeAttemptProbability),
-                transformation(transformation) {
+                exchangeAttemptProbability(exchangeAttemptProbability) {
             createMarkovChain(this,
                               proposal,
                               this->model,
-                              this->transformation,
                               this->parallelTemperingSyncRng,
                               this->exchangeAttemptProbability);
         }
 
         MarkovChain(const Proposal *proposal,
                     const std::unique_ptr <Model> &model,
-                    const std::optional <LinearTransformation> &transformation = std::nullopt,
                     std::optional <RandomNumberGenerator> parallelTemperingSyncRng = std::nullopt,
                     double exchangeAttemptProbability = 0.1) :
                 proposal(nullptr),
                 parallelTemperingSyncRng(parallelTemperingSyncRng),
-                exchangeAttemptProbability(exchangeAttemptProbability),
-                transformation(transformation) {
+                exchangeAttemptProbability(exchangeAttemptProbability) {
             if (model) this->model = model->copyModel();
             createMarkovChain(this,
                               proposal,
                               this->model,
-                              transformation,
                               parallelTemperingSyncRng,
                               exchangeAttemptProbability);
         }
@@ -159,7 +143,6 @@ namespace hopsy {
             createMarkovChain(this,
                               proposalPtr.get(),
                               this->model,
-                              this->transformation,
                               this->parallelTemperingSyncRng,
                               this->exchangeAttemptProbability);
         }
@@ -171,7 +154,6 @@ namespace hopsy {
             createMarkovChain(this,
                               this->proposal.get(),
                               this->model,
-                              this->transformation,
                               this->parallelTemperingSyncRng,
                               newExchangeAttemptProbability);
         }
@@ -207,7 +189,7 @@ namespace hopsy {
             catch (std::bad_variant_access &) {
                 modelPtr = std::get < std::shared_ptr < Model >> (model);
             }
-            createMarkovChain(this, this->proposal.get(), modelPtr, this->transformation,
+            createMarkovChain(this, this->proposal.get(), modelPtr,
                               this->parallelTemperingSyncRng, this->exchangeAttemptProbability);
         }
 
@@ -216,22 +198,24 @@ namespace hopsy {
         }
 
         Problem getProblem() const {
-            py::object handle = py::cast(proposal->copyProposal().get());
-            if (transformation) {
-                return Problem(proposal->getA(),
-                               proposal->getB(),
-                               (model ? model->copyModel() : std::unique_ptr<Model>(nullptr)),
-                               std::optional(proposal->getState()),
-                               std::optional(transformation->getMatrix()),
-                               std::optional(transformation->getShift()));
-            } else {
+            // try to cast transformation from pointer
+//            py::object handle = py::cast(proposal->copyProposal().get());
+            // TODO incomplete as of now!
                 return Problem(proposal->getA(),
                                proposal->getB(),
                                (model ? model->copyModel() : std::unique_ptr<Model>(nullptr)),
                                proposal->getState(),
                                std::optional<MatrixType>(),
                                std::optional<VectorType>());
-            }
+//            if (transformation) {
+//                return Problem(proposal->getA(),
+//                               proposal->getB(),
+//                               (model ? model->copyModel() : std::unique_ptr<Model>(nullptr)),
+//                               std::optional(proposal->getState()),
+//                               std::optional(transformation->getMatrix()),
+//                               std::optional(transformation->getShift()));
+//            } else {
+//            }
         }
 
         std::shared_ptr <Proposal> proposal;
@@ -241,7 +225,6 @@ namespace hopsy {
 
     private:
         std::shared_ptr <hops::MarkovChain> markovChain;
-        std::optional <LinearTransformation> transformation;
 
 
         /**
@@ -249,7 +232,6 @@ namespace hopsy {
          * @param mc
          * @param proposal
          * @param model
-         * @param transformation
          * @param parallelTemperingSyncRng if optional is not empty, chain will be created with parallel tempering.
          *                                  Note that parallel tempering requires MPI communicator set up by hops.
          *                                  The MPI_COMM_WORLD communicator is used.
@@ -257,7 +239,6 @@ namespace hopsy {
         static inline void createMarkovChain(MarkovChain *mc,
                                              const Proposal *proposal,
                                              const std::shared_ptr <Model> model,
-                                             const std::optional <LinearTransformation> &transformation,
                                              std::optional <RandomNumberGenerator> parallelTemperingSyncRng = std::nullopt,
                                              double exchangeAttemptProbability = 0.1) {
             if (!proposal) {
@@ -266,24 +247,9 @@ namespace hopsy {
 
             mc->proposal = proposal->copyProposal();
             mc->model = model;
-            mc->transformation = transformation;
             mc->parallelTemperingSyncRng = parallelTemperingSyncRng;
 
-            if (mc->model && mc->transformation) {
-                if (mc->proposal->hasNegativeLogLikelihood()) {
-                    throw std::invalid_argument(
-                            "Model & Transformation not valid for this proposal type. Try again without rounding the problem.");
-                }
-                auto markovChain = proposalImplToMarkovChain(
-                        wrapProposal(mc->proposal, mc->transformation.value()),
-                        mc->model,
-                        mc->parallelTemperingSyncRng,
-                        exchangeAttemptProbability
-                );
-
-                mc->markovChain = std::move(markovChain);
-                return;
-            } else if (mc->model && !mc->transformation) {
+             if (mc->model) {
                 // If proposal has negativeLogLikelihood, it knows the model and the model wrapper is not required.
                 if (mc->proposal->hasNegativeLogLikelihood()) {
                     // proposal knows model already
@@ -308,27 +274,8 @@ namespace hopsy {
                     mc->markovChain = std::move(markovChain);
                     return;
                 }
-            } else if (!mc->model && mc->transformation) {
-                if (mc->proposal->isSymmetric()) {
-                    auto tmp = hops::MarkovChainAdapter(
-                            hops::NoOpDrawAdapter(
-                                    wrapProposal(mc->proposal, transformation.value())
-                            )
-                    );
-
-                    mc->markovChain = std::make_unique<decltype(tmp)>(tmp);
-                    return;
-                } else {
-                    auto tmp = hops::MarkovChainAdapter(
-                            hops::MetropolisHastingsFilter(
-                                    wrapProposal(mc->proposal, transformation.value())
-                            )
-                    );
-                    mc->markovChain = std::make_unique<decltype(tmp)>(tmp);
-                    return;
-                }
-            } else {
-                // Case: no model and no transformation
+            }
+            else {
                 if (proposal->isSymmetric()) {
                     auto tmp = hops::MarkovChainAdapter(
                             hops::NoOpDrawAdapter(
@@ -426,14 +373,9 @@ namespace hopsy {
                     "Dimension mismatch between row dimension of right-hand side operator A and row dimension of left-hand side vector b.");
         }
 
-        std::optional <LinearTransformation> transformation = std::nullopt;
-        if (problem.transformation && problem.shift) {
-            transformation = LinearTransformation(problem.transformation.value(), problem.shift.value());
-        }
 
         return MarkovChain(proposal,
                            problem.model,
-                           transformation,
                            parallelTemperingSyncRng,
                            exchangeAttemptProbability = exchangeAttemptProbability);
     }

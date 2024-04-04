@@ -1,6 +1,7 @@
 import pickle
 import unittest
 
+import hopsy.core
 import numpy as np
 from scipy.special import gamma
 
@@ -45,7 +46,7 @@ class GammaPDF:
         scale = x[4]
         shape = x[5]
         if scale <= 0 or shape <= 0:
-            raise ValueError("invalid parameters")
+            raise ValueError(f"invalid parameters! {scale}, {shape}")
         log_density = 0
         for datum in self.data:
             if datum - location < 0:
@@ -388,43 +389,30 @@ class ProposalTests(unittest.TestCase):
         measurements = [1.0]
         gammaPDF = GammaPDF(measurements)
         problem = Problem(gammaPDF.A, gammaPDF.b, gammaPDF, starting_point=[0.5, 0.5, 0.5])
-        rounded_problem = round(problem)
-        print(rounded_problem.starting_point)
-        # print('trafo\n', rounded_problem.transformation)
+        problem = round(problem)
 
-        # zero_block = np.zeros(rounded_problem.transformation.shape)
-        # rounded_problem.shift = np.concatenate(
-        #     [np.zeros(rounded_problem.transformation.shape[1]), rounded_problem.shift])
-        # rounded_problem.transformation = np.block([
-        #     [np.identity(rounded_problem.transformation.shape[1]), zero_block],
-        #     [zero_block.T, rounded_problem.transformation]]
-        # )
-
-        # print('stacked trafo\n', rounded_problem.transformation)
-        # print('rounded shift', rounded_problem.shift)
-        # print('rounded trafo', rounded_problem.transformation)
-        # print('shift', problem.shift)
-        # print('trafo', problem.transformation)
-
+        rng = RandomNumberGenerator(42)
         proposal = UniformHitAndRunProposal(problem)
         jumpIndices = np.array([0, 1])
         defaultValues = np.array([1e-14, 1])
         rjmcmc_proposal = ReversibleJumpProposal(proposal, jumpIndices, defaultValues)
+        print(rjmcmc_proposal.state)
+        rjmcmc_proposal.state = np.array([1, 0, 1, 0.5, 0.5, 0.5])
+        print(rjmcmc_proposal.state)
 
-        rng = RandomNumberGenerator(5)
-        rounded_proposal = UniformHitAndRunProposal(rounded_problem)
-        rounded_proposal.propose(rng)
-        print("proposed")
-        rounded_rjmcmc_proposal = ReversibleJumpProposal(rounded_proposal, jumpIndices, defaultValues)
-        print("built rjmcmc")
-        rounded_mc = MarkovChain(problem=problem, proposal=rounded_rjmcmc_proposal)
-        print("built mc")
-        rounded_mc.draw(rng)
-        print("used mc")
+        # zero_block = np.zeros(problem.transformation.shape)
+        # problem.shift = np.concatenate(
+        #     [np.zeros(problem.transformation.shape[1]), problem.shift])
+        # problem.transformation = np.block([
+        #     [np.identity(problem.transformation.shape[1]), zero_block],
+        #     [zero_block.T, problem.transformation]]
+        # )
+
+        mc = MarkovChain(problem=problem, proposal=rjmcmc_proposal)
+        print('mc.state', mc.state)
 
 
-        acc, samples = sample(rounded_mc, rng, n_samples=500_000, thinning=1)
-        print("sampled mc")
+        acc, samples = sample(mc, rng, n_samples=500_000, thinning=1)
 
         location_samples = samples[0, :, 3]
         scale_samples = samples[0, :, 4]
