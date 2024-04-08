@@ -70,6 +70,8 @@ namespace hopsy {
                 model(nullptr),
                 parallelTemperingSyncRng(parallelTemperingSyncRng),
                 exchangeAttemptProbability(exchangeAttemptProbability) {
+
+            std::cout << "prop name is " << proposal->getProposalName() << std::endl;
             createMarkovChain(this,
                               proposal,
                               this->model,
