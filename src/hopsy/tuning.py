@@ -492,7 +492,9 @@ def tune(
     }
 
     # add user-defined transforms
-    transforms = {**_transforms, **transforms} if transforms is not None else _transforms
+    transforms = (
+        {**_transforms, **transforms} if transforms is not None else _transforms
+    )
 
     if target.lower() == "esjd":
         return tune_esjd(
