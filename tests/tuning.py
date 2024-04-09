@@ -14,8 +14,8 @@ class TuningTests(unittest.TestCase):
         target = ExpectedSquaredJumpDistanceTarget(mcs)
 
         # run twice to check that tune() doesnt break anything in target
-        tune(ts, target, [RandomNumberGenerator(0, i) for i in range(5)])
-        tune(ts, target, [RandomNumberGenerator(0, i) for i in range(5)])
+        tune_old(ts, target, [RandomNumberGenerator(0, i) for i in range(5)])
+        tune_old(ts, target, [RandomNumberGenerator(0, i) for i in range(5)])
 
         self.assertEqual(True, True)
 
@@ -25,7 +25,7 @@ class TuningTests(unittest.TestCase):
 
         ts = ThompsonSamplingTuning()
         target = ExpectedSquaredJumpDistanceTarget(mcs)
-        tune(ts, target, [RandomNumberGenerator(0, i) for i in range(5)])
+        tune_old(ts, target, [RandomNumberGenerator(0, i) for i in range(5)])
 
         result = target([0], [RandomNumberGenerator(0, i) for i in range(5)])
 
@@ -50,7 +50,7 @@ class TuningTests(unittest.TestCase):
 
         self.assertEqual(len(result), 2)
 
-        tune(ts, target, [RandomNumberGenerator(0, i) for i in range(5)])
+        tune_old(ts, target, [RandomNumberGenerator(0, i) for i in range(5)])
 
         self.assertEqual(True, True)
 
