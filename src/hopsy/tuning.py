@@ -409,7 +409,7 @@ def tune(
     upper=5,
     n_points=256,
     params=["stepsize"],
-    transforms=transforms,
+    transforms=None,
 ):
     r"""
     Thompson Sampling-based tuning method for specifying meaningful hyperparameters
@@ -492,7 +492,7 @@ def tune(
     }
 
     # add user-defined transforms
-    transforms = {**_transforms, **transforms}
+    transforms = {**_transforms, **transforms} if transforms is not None else _transforms
 
     if target.lower() == "esjd":
         return tune_esjd(
