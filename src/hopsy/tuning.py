@@ -7,6 +7,7 @@ from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF
 
 from .misc import *
+from .misc import _c
 
 
 def inv_sigmoid(x):
