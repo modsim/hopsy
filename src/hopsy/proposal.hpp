@@ -526,19 +526,11 @@ namespace hopsy {
         UninitializedProposalWrapper() :
                 isInitialized(false) { }
 
-        UninitializedProposalWrapper(const UninitializedProposalWrapper& other) {
-            this->proposal = other.proposal->copyProposal();
-        }
-
-        UninitializedProposalWrapper(UninitializedProposalWrapper&& other) {
-            this->proposal = std::move(other.proposal);
-        }
-
         UninitializedProposalWrapper(const MatrixType& A,
                                      const VectorType& b,
                                      const VectorType& startingPoint,
                                      const Args&... args) :
-                proposal(std::make_unique<ProposalImpl>(A, b, startingPoint, args...)),
+                proposal(ProposalImpl(A, b, startingPoint, args...)),
                 isInitialized(true) { }
 
         UninitializedProposalWrapper(std::unique_ptr<Proposal> prop) :
@@ -561,19 +553,8 @@ namespace hopsy {
                 if (!(problem->startingPoint || startingPoint)) {
                     throw std::runtime_error("Cannot setup a proposal without starting point.");
                 }
-
                 VectorType _startingPoint = ( startingPoint ? *startingPoint : *problem->startingPoint );
-                if(!problem->transformation && !problem->shift) {
-                    auto prop = std::make_unique<ProposalImpl>(problem->A, problem->b, _startingPoint, args...);
-                    return UninitializedProposalWrapper<ProposalImpl, Args...>(std::move(prop));
-                }
-                else if (problem->transformation && problem->shift) {
-                    hops::LinearTransformation transformation(problem->transformation.value(), problem->shift.value());
-                    ProposalImpl proposalImpl(problem->A, problem->b, _startingPoint, args...);
-                    auto prop = std::make_unique<hops::StateTransformation<decltype(proposalImpl),decltype(transformation)>>(proposalImpl, transformation);
-                    return UninitializedProposalWrapper<ProposalImpl, Args...>(std::move(prop));
-                }
-                throw std::runtime_error(std::string("Inconsistent transformation. Error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
+                return UninitializedProposalWrapper<ProposalImpl, Args...>(problem->A, problem->b, _startingPoint, args...);
             } else {
                 throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
             }
@@ -695,7 +676,7 @@ namespace hopsy {
             return std::make_unique<UninitializedProposalWrapper<ProposalImpl, Args...>>(*this);
         }
 
-        std::unique_ptr<hops::Proposal> proposal;
+        std::optional<ProposalImpl> proposal;
 
     private:
         std::string uninitializedMethod(const std::string& name) const {
@@ -882,7 +863,8 @@ namespace hopsy {
                         return py::make_tuple(self.proposal->getA(),
                                               self.proposal->getB(),
                                               self.proposal->getState(),
-                                              dynamic_cast<hops::AdaptiveMetropolisProposal<MatrixType>&>(*self.proposal).getCholeskyOfMaximumVolumeEllipsoid(),
+                                              self.proposal->getCholeskyOfMaximumVolumeEllipsoid(),
+//                                              dynamic_cast<hops::AdaptiveMetropolisProposal<MatrixType>&>(*self.proposal).getCholeskyOfMaximumVolumeEllipsoid(),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::BOUNDARY_CUSHION)),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::EPSILON)),
                                               std::any_cast<unsigned long>(self.proposal->getParameter(ProposalParameter::WARM_UP)));
@@ -1000,7 +982,8 @@ namespace hopsy {
                         return py::make_tuple(self.proposal->getA(),
                                               self.proposal->getB(),
                                               self.proposal->getState(),
-                                              dynamic_cast<hops::BilliardAdaptiveMetropolisProposal<MatrixType>&>(*self.proposal).getCholeskyOfMaximumVolumeEllipsoid(),
+                                              self.proposal->getCholeskyOfMaximumVolumeEllipsoid(),
+//                                              dynamic_cast<hops::BilliardAdaptiveMetropolisProposal<MatrixType>&>(*self.proposal).getCholeskyOfMaximumVolumeEllipsoid(),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::BOUNDARY_CUSHION)),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::EPSILON)),
                                               std::any_cast<unsigned long>(self.proposal->getParameter(ProposalParameter::WARM_UP)),
@@ -1078,7 +1061,7 @@ namespace hopsy {
                 billiardmalaProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::BilliardMALAProposal::stepSize);
         // pickling
         billiardmalaProposal.def(py::pickle([] (const BilliardMALAProposal& self) {
-                        auto model = dynamic_cast<hops::BilliardMALAProposal<ModelWrapper, MatrixType>&>(*self.proposal).getModel()->copyModel().release();
+                        auto model = self.proposal->getModel()->copyModel().release();
                         return py::make_tuple(self.proposal->getA(),
                                               self.proposal->getB(),
                                               self.proposal->getState(),
@@ -1216,7 +1199,7 @@ namespace hopsy {
                 csmmalaProposal, ProposalParameter::STEP_SIZE, "stepsize", doc::CSmMALAProposal::stepSize);
         // pickling
         csmmalaProposal.def(py::pickle([] (const CSmMALAProposal& self) {
-                        auto model = dynamic_cast<hops::CSmMALAProposal<ModelWrapper, MatrixType>&>(*self.proposal).getModel()->copyModel().release();
+                        auto model = self.proposal->getModel()->copyModel().release();
                         return py::make_tuple(self.proposal->getA(),
                                               self.proposal->getB(),
                                               self.proposal->getState(),
@@ -1566,7 +1549,8 @@ namespace hopsy {
         proposal::addCommon<TruncatedGaussianProposal, doc::TruncatedGaussianProposal>(truncatedgaussianProposal);
         // pickling
         truncatedgaussianProposal.def(py::pickle([] (const TruncatedGaussianProposal& self) {
-                                           std::shared_ptr<Model> modelPtr = dynamic_cast<hops::TruncatedGaussianProposal<MatrixType, VectorType>&>(*self.proposal).getModel()->copyModel();
+//                                           std::shared_ptr<Model> modelPtr = dynamic_cast<hops::TruncatedGaussianProposal<MatrixType, VectorType>&>(*self.proposal).getModel()->copyModel();
+                                           std::shared_ptr<Model> modelPtr = self.proposal->getModel()->copyModel();
                                            auto casted = std::dynamic_pointer_cast<hops::Gaussian>(modelPtr);
                                            if (!casted) {
                                              throw std::runtime_error("Model is not Gaussian. Please reconsider.");

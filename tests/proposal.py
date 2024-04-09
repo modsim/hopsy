@@ -393,24 +393,16 @@ class ProposalTests(unittest.TestCase):
 
         rng = RandomNumberGenerator(42)
         proposal = UniformHitAndRunProposal(problem)
+
         jumpIndices = np.array([0, 1])
+        # tip: perturb default values with epsilon to ensure they are not on the polytope borders
         defaultValues = np.array([1e-14, 1])
         rjmcmc_proposal = ReversibleJumpProposal(proposal, jumpIndices, defaultValues)
-        print(rjmcmc_proposal.state)
-        rjmcmc_proposal.state = np.array([1, 0, 1, 0.5, 0.5, 0.5])
-        print(rjmcmc_proposal.state)
-
-        # zero_block = np.zeros(problem.transformation.shape)
-        # problem.shift = np.concatenate(
-        #     [np.zeros(problem.transformation.shape[1]), problem.shift])
-        # problem.transformation = np.block([
-        #     [np.identity(problem.transformation.shape[1]), zero_block],
-        #     [zero_block.T, problem.transformation]]
-        # )
-
+        # rjmcmc_proposal.state = np.array([1, 1, 1, 0.5, 0.5, 0.5])
+        # print('state2', rjmcmc_proposal.state)
+        print('rjmcmc prop name', rjmcmc_proposal.name)
         mc = MarkovChain(problem=problem, proposal=rjmcmc_proposal)
-        print('mc.state', mc.state)
-
+        print('mc prop name', mc.proposal.name)
 
         acc, samples = sample(mc, rng, n_samples=500_000, thinning=1)
 
