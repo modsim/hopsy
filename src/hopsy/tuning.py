@@ -1,15 +1,19 @@
 import math
-import numpy as np
 import time
+
+import numpy as np
+from scipy.stats import qmc
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF
-from scipy.stats import qmc
+
 
 def inv_sigmoid(x):
     return np.log(x) - np.log(1 - x)
 
+
 def sigmoid(x):
-    return 1. / (1 + np.exp(-x))
+    return 1.0 / (1 + np.exp(-x))
+
 
 def set_params(mcs, params_map, param_values, transforms):
     for mc in mcs:
@@ -19,9 +23,11 @@ def set_params(mcs, params_map, param_values, transforms):
             else:
                 setattr(mc.proposal, param, param_values[i])
 
-default_transforms = {'stepsize': lambda x: 10**x,
-                      'fisher_weight': lambda x: sigmoid(x)
-                     }
+
+default_transforms = {
+    "stepsize": lambda x: 10**x,
+    "fisher_weight": lambda x: sigmoid(x),
+}
 
 
 def estimate_accrate(mcs, rngs, n_samples, *args, **kwargs):
@@ -29,7 +35,7 @@ def estimate_accrate(mcs, rngs, n_samples, *args, **kwargs):
     Estimate the acceptance rate of a Markov chain
     by computing average number of accepted proposals per sample drawn
 
-    .. math:: 
+    .. math::
         \alpha = \mathbb{E}\left[ 1_{x_i \neq x_{i+1}} \right]
 
 
@@ -53,13 +59,14 @@ def estimate_accrate(mcs, rngs, n_samples, *args, **kwargs):
     """
     accrates, samples = hopsy.sample(mcs, rngs, n_samples, *args, **kwargs)
     return np.array(accrates)
-    
+
+
 def estimate_esjd(mcs, rngs, n_samples, k=[1], consider_time=False, *args, **kwargs):
     r"""
     Estimate the Expected Squared Jump Distance of a Markov chain
     by computing the average squared displacement of consecutive samples
 
-    .. math:: 
+    .. math::
         ESJD = \mathbb{E}\left[\|x_i - x_{i+t}\|_2^2\right]
 
     for lag :math:`t`.
@@ -74,7 +81,7 @@ def estimate_esjd(mcs, rngs, n_samples, k=[1], consider_time=False, *args, **kwa
     n_samples : int
         Number of samples that will be drawn per chain.
     k : list of int, default=[1]
-        Lags at which the ESJDs are computed. If more than one lag is passed, 
+        Lags at which the ESJDs are computed. If more than one lag is passed,
         ESJDs across multiple lags will be summed up.
     consider_time : bool, default=False
         If set to `True`, the ESJD will be per second instead of being per sample.
@@ -92,189 +99,216 @@ def estimate_esjd(mcs, rngs, n_samples, k=[1], consider_time=False, *args, **kwa
     start = time.time()
     _, samples = hopsy.sample(mcs, rngs, n_samples, *args, **kwargs)
     time_per_sample = (time.time() - start) / n_samples
-    esjds = np.sum([np.mean(np.sum(np.diff(samples[:,::_k], axis=1)**2, axis=-1), axis=-1) for _k in k], axis=0)
+    esjds = np.sum(
+        [
+            np.mean(np.sum(np.diff(samples[:, ::_k], axis=1) ** 2, axis=-1), axis=-1)
+            for _k in k
+        ],
+        axis=0,
+    )
     return (esjds / time_per_sample) if consider_time else esjds
 
 
-def tune_acceptance_rate(mcs, rngs, 
-                         accrate=.234, 
-                         seed=42, 
-                         n_procs=1,
-                         n_rounds=100, 
-                         n_samples=1000, 
-                         lower=-5, 
-                         upper=5, 
-                         n_points=256,
-                         params=['stepsize']):
-    """
-    """
+def tune_acceptance_rate(
+    mcs,
+    rngs,
+    accrate=0.234,
+    seed=42,
+    n_procs=1,
+    n_rounds=100,
+    n_samples=1000,
+    lower=-5,
+    upper=5,
+    n_points=256,
+    params=["stepsize"],
+):
+    """ """
     if isinstance(mcs, hopsy.core.MarkovChain):
         mcs = [[mcs]]
         rngs = [[rngs]]
-    
+
     if isinstance(mcs, list) and isinstance(mcs[0], hopsy.core.MarkovChain):
         mcs = [mcs]
         rngs = [rngs]
-    
+
     if isinstance(mcs, list):
         _mcs = dict()
         _rngs = dict()
-    
+
         for i, group in enumerate(mcs):
             key = group[0].proposal.__class__.__name__
-            
+
             for mc in group:
                 if mc.proposal.__class__.__name__ != key:
-                    raise RuntimeError('''
+                    raise RuntimeError(
+                        """
                         `mcs` need to be list of list of type `hopsy.core.MarkovChain`, where every inner list of `hopsy.core.MarkovChain` objects is required to use the same proposal distribution.
-                    ''')
-                    
+                    """
+                    )
+
             _mcs[key] = group
             _rngs[key] = rngs[i]
-            
+
     mcs = _mcs
     rngs = _rngs
-    
-    lower = [lower] if not hasattr(lower, '__len__') else lower
-    upper = [upper] if not hasattr(upper, '__len__') else upper
-    
+
+    lower = [lower] if not hasattr(lower, "__len__") else lower
+    upper = [upper] if not hasattr(upper, "__len__") else upper
+
     log_prior_var = 10**2
     log_prior_mean = np.log(1e-5)
-    
+
     domains = dict()
     param_map = dict()
     gprs = dict()
     data = dict()
-    
+
     channel = 0
-    
+
     for j, key in enumerate(mcs):
         channel += len(mcs[key])
         param_map[key] = list()
-        
+
         a, b = [], []
         i = 0
         for param in params:
             if hasattr(mcs[key][0].proposal, param):
                 param_map[key].append(param)
-                a.append(lower[min(i, len(lower)-1)])
-                b.append(upper[min(i, len(upper)-1)])
-                
+                a.append(lower[min(i, len(lower) - 1)])
+                b.append(upper[min(i, len(upper) - 1)])
+
         a, b = np.array(a), np.array(b)
-                
+
         sampler = qmc.Sobol(d=len(param_map[key]), scramble=True)
         domains[key] = (b - a) * sampler.random_base2(m=int(np.log2(n_points))) + a
-        
-        gprs[key] = GaussianProcessRegressor(kernel=log_prior_var*RBF(), random_state=seed+1, optimizer=None)
-        data[key] = {'X': [], 'y': []}
-        
-    rng = hopsy.RandomNumberGenerator(seed, channel+1)
-    
+
+        gprs[key] = GaussianProcessRegressor(
+            kernel=log_prior_var * RBF(), random_state=seed + 1, optimizer=None
+        )
+        data[key] = {"X": [], "y": []}
+
+    rng = hopsy.RandomNumberGenerator(seed, channel + 1)
+
     for i in range(n_rounds):
         for j, key in enumerate(gprs):
             sample = gprs[key].sample_y(domains[key], random_state=rng())
-            idx = (-(sigmoid(sample) - accrate)**2).argmax()
+            idx = (-((sigmoid(sample) - accrate) ** 2)).argmax()
             x = domains[key][idx]
-            
+
             set_params(mcs[key], param_map[key], x, transforms)
-            
-            _y = estimate_accrate(mcs[key], rngs[key], n_samples=n_samples, n_procs=n_procs) * .9998 + .0001
+
+            _y = (
+                estimate_accrate(
+                    mcs[key], rngs[key], n_samples=n_samples, n_procs=n_procs
+                )
+                * 0.9998
+                + 0.0001
+            )
             y = inv_sigmoid(_y)
-            
-            data[key]['X'].append(x)
-            data[key]['y'].append(y)
-            
-            std = np.std(data[key]['y'], axis=-1)
-            gprs[key].alpha = np.max(np.hstack([std, 1e-3*np.ones_like(std)]), axis=-1)
-            gprs[key].fit(data[key]['X'], np.mean(data[key]['y'], axis=-1))
+
+            data[key]["X"].append(x)
+            data[key]["y"].append(y)
+
+            std = np.std(data[key]["y"], axis=-1)
+            gprs[key].alpha = np.max(
+                np.hstack([std, 1e-3 * np.ones_like(std)]), axis=-1
+            )
+            gprs[key].fit(data[key]["X"], np.mean(data[key]["y"], axis=-1))
 
     for j, key in enumerate(gprs):
         idx = gprs[key].predict(domains[key]).argmax()
         x = domains[key][idx]
         set_params(mcs[key], param_map[key], x, transforms)
-        
+
     return mcs, rngs, (gprs, domains)
 
-def tune_esjd(mcs, rngs, 
-              k=[1],
-              seed=42, 
-              n_procs=1,
-              n_burnin=50,
-              n_rounds=100, 
-              n_samples=1000, 
-              consider_time=True, 
-              sample_proposal=True,
-              lower=-5, 
-              upper=5, 
-              n_points=256, 
-              params=['stepsize']):
-    """
-    """
-    if not hasattr(k, '__len__'):
+
+def tune_esjd(
+    mcs,
+    rngs,
+    k=[1],
+    seed=42,
+    n_procs=1,
+    n_burnin=50,
+    n_rounds=100,
+    n_samples=1000,
+    consider_time=True,
+    sample_proposal=True,
+    lower=-5,
+    upper=5,
+    n_points=256,
+    params=["stepsize"],
+):
+    """ """
+    if not hasattr(k, "__len__"):
         k = [k]
-    
+
     if isinstance(mcs, hopsy.core.MarkovChain):
         mcs = [[mcs]]
         rngs = [[rngs]]
-    
+
     if isinstance(mcs, list) and isinstance(mcs[0], hopsy.core.MarkovChain):
         mcs = [mcs]
         rngs = [rngs]
-    
+
     if isinstance(mcs, list):
         _mcs = dict()
         _rngs = dict()
-    
+
         for i, group in enumerate(mcs):
             key = group[0].proposal.__class__.__name__
-            
+
             for mc in group:
                 if mc.proposal.__class__.__name__ != key:
-                    raise RuntimeError('''
+                    raise RuntimeError(
+                        """
                         `mcs` need to be list of list of type `hopsy.core.MarkovChain`, where every inner list of `hopsy.core.MarkovChain` objects is required to use the same proposal distribution.
-                    ''')
-                    
+                    """
+                    )
+
             _mcs[key] = group
             _rngs[key] = rngs[i]
-            
+
     mcs = _mcs
     rngs = _rngs
-    
-    lower = [lower] if not hasattr(lower, '__len__') else lower
-    upper = [upper] if not hasattr(upper, '__len__') else upper
-    
+
+    lower = [lower] if not hasattr(lower, "__len__") else lower
+    upper = [upper] if not hasattr(upper, "__len__") else upper
+
     log_prior_var = 1
     log_prior_mean = np.log(1e-5)
-    
+
     domains = dict()
     param_map = dict()
     gprs = dict()
     data = dict()
-    
+
     channel = 0
-    
+
     for j, key in enumerate(mcs):
         channel += len(mcs[key])
         param_map[key] = list()
-        
+
         a, b = [], []
         i = 0
         for param in params:
             if hasattr(mcs[key][0].proposal, param):
                 param_map[key].append(param)
-                a.append(lower[min(i, len(lower)-1)])
-                b.append(upper[min(i, len(upper)-1)])
-                
+                a.append(lower[min(i, len(lower) - 1)])
+                b.append(upper[min(i, len(upper) - 1)])
+
         a, b = np.array(a), np.array(b)
-                
+
         sampler = qmc.Sobol(d=len(param_map[key]), scramble=True)
         domains[key] = (b - a) * sampler.random_base2(m=int(np.log2(n_points))) + a
-        
-        gprs[key] = GaussianProcessRegressor(kernel=log_prior_var*RBF(), random_state=seed+1, optimizer=None)
-        data[key] = {'X': [], 'y': []}
-        
-    rng = hopsy.RandomNumberGenerator(seed, channel+1)
-        
+
+        gprs[key] = GaussianProcessRegressor(
+            kernel=log_prior_var * RBF(), random_state=seed + 1, optimizer=None
+        )
+        data[key] = {"X": [], "y": []}
+
+    rng = hopsy.RandomNumberGenerator(seed, channel + 1)
+
     for i in range(n_rounds):
         if sample_proposal and i > n_burnin:
             maxkey = None
@@ -283,70 +317,102 @@ def tune_esjd(mcs, rngs,
                 sample = gprs[key].sample_y(domains[key], random_state=rng())
                 idx = sample.argmax()
                 x = domains[key][idx]
-                
+
                 if np.exp(sample[idx]) > maxsample:
                     maxsample = sample[idx]
                     maxkey = key
-                
+
             key = maxkey
 
             set_params(mcs[key], param_map[key], x, transforms)
 
-            _y = estimate_esjd(mcs[key], rngs[key], k=k, consider_time=consider_time, n_samples=n_samples, n_procs=n_procs) + 1e-5
+            _y = (
+                estimate_esjd(
+                    mcs[key],
+                    rngs[key],
+                    k=k,
+                    consider_time=consider_time,
+                    n_samples=n_samples,
+                    n_procs=n_procs,
+                )
+                + 1e-5
+            )
             y = np.log(_y) - log_prior_mean
-            
-            data[key]['X'].append(x)
-            data[key]['y'].append(y)
-            
-            log_prior_var = max(2*np.max(np.array(data[key]['y'])), log_prior_var)
-            
-            std = np.std(data[key]['y'], axis=-1)
+
+            data[key]["X"].append(x)
+            data[key]["y"].append(y)
+
+            log_prior_var = max(2 * np.max(np.array(data[key]["y"])), log_prior_var)
+
+            std = np.std(data[key]["y"], axis=-1)
             gprs[key].kernel = log_prior_var**2 * RBF()
-            gprs[key].alpha = np.max(np.vstack([std, 1e-3*np.ones_like(std)]), axis=0)
-            gprs[key].fit(data[key]['X'], np.mean(data[key]['y'], axis=-1))
+            gprs[key].alpha = np.max(np.vstack([std, 1e-3 * np.ones_like(std)]), axis=0)
+            gprs[key].fit(data[key]["X"], np.mean(data[key]["y"], axis=-1))
         else:
             for j, key in enumerate(gprs):
-                sample = gprs[key].sample_y(domains[key], random_state=rng()) #- prior_mean 
+                sample = gprs[key].sample_y(
+                    domains[key], random_state=rng()
+                )  # - prior_mean
                 idx = sample.argmax()
                 x = domains[key][idx]
 
                 set_params(mcs[key], param_map[key], x, transforms)
 
-                _y = estimate_esjd(mcs[key], rngs[key], k=k, consider_time=consider_time, n_samples=n_samples, n_procs=n_procs) + 1e-5
+                _y = (
+                    estimate_esjd(
+                        mcs[key],
+                        rngs[key],
+                        k=k,
+                        consider_time=consider_time,
+                        n_samples=n_samples,
+                        n_procs=n_procs,
+                    )
+                    + 1e-5
+                )
                 y = np.log(_y) - log_prior_mean
 
-                data[key]['X'].append(x)
-                data[key]['y'].append(y)
+                data[key]["X"].append(x)
+                data[key]["y"].append(y)
 
-                log_prior_var = max(2*np.max(np.array(data[key]['y']))**2, log_prior_var)
-            
-                std = np.std(data[key]['y'], axis=-1)
+                log_prior_var = max(
+                    2 * np.max(np.array(data[key]["y"])) ** 2, log_prior_var
+                )
+
+                std = np.std(data[key]["y"], axis=-1)
                 gprs[key].kernel = log_prior_var * RBF()
-                gprs[key].alpha = np.max(np.hstack([std, 1e-3*np.ones_like(std)]), axis=-1)
-                gprs[key].fit(data[key]['X'], np.mean(data[key]['y'], axis=-1))
-                
+                gprs[key].alpha = np.max(
+                    np.hstack([std, 1e-3 * np.ones_like(std)]), axis=-1
+                )
+                gprs[key].fit(data[key]["X"], np.mean(data[key]["y"], axis=-1))
+
     for j, key in enumerate(gprs):
         idx = gprs[key].predict(domains[key]).argmax()
         x = domains[key][idx]
         set_params(mcs[key], param_map[key], x, transforms)
-        
+
     return mcs, rngs, (gprs, domains)
-    
-def tune(mcs, rngs, target, n_tuning,
-         k=[1],
-         accrate=.234, 
-         seed=42, 
-         n_procs=1,
-         n_rounds=100, 
-         n_burnin=50,
-         sample_proposal=True,
-         lower=-5, 
-         upper=5, 
-         n_points=256, 
-         params=['stepsize'],
-         transforms=transforms):
+
+
+def tune(
+    mcs,
+    rngs,
+    target,
+    n_tuning,
+    k=[1],
+    accrate=0.234,
+    seed=42,
+    n_procs=1,
+    n_rounds=100,
+    n_burnin=50,
+    sample_proposal=True,
+    lower=-5,
+    upper=5,
+    n_points=256,
+    params=["stepsize"],
+    transforms=transforms,
+):
     r"""
-    Thompson Sampling-based tuning method for specifying meaningful hyperparameters 
+    Thompson Sampling-based tuning method for specifying meaningful hyperparameters
     for Markov chain proposal distributions. This method supports three different tuning targets,
     namely the commonly used accpetance rate, the Expected Squared Jump Distance (ESJD) and the ESJD
     per second (ESJD/s) rather than per sample.
@@ -361,18 +427,18 @@ def tune(mcs, rngs, target, n_tuning,
     Parameters
     ----------
     mcs : list of list or list of hopsy.MarkovChain
-        Markov chains, which will be used to generate samples. If list of lists of ``hopsy.MarkovChain``s 
-        are passed, outer lists are expected to share the same proposal algorithm, 
+        Markov chains, which will be used to generate samples. If list of lists of ``hopsy.MarkovChain``s
+        are passed, outer lists are expected to share the same proposal algorithm,
         inner lists to be replicas of the same chain.
     rngs : list of list or list of hopsy.RandomNumberGenerator
-        Random number generators required for sampling from the Markov chains. Should match `mcs` in number 
+        Random number generators required for sampling from the Markov chains. Should match `mcs` in number
         and shape.
-    target : str 
+    target : str
         Tuning target. Choose one of `accrate`, `esjd` or `esjd/s`.
     n_tuning : int
         Total budget of samples that may be drawn for tuning per chain.
     k : list of int, default=[1]
-        Lags at which the ESJDs are computed. If more than one lag is passed, 
+        Lags at which the ESJDs are computed. If more than one lag is passed,
         ESJDs across multiple lags will be summed up.
     accrate : float, default=0.234
         Target accpetance rate for acceptance rate tuning.
@@ -399,8 +465,8 @@ def tune(mcs, rngs, target, n_tuning,
         If a proposal doesn't provide the corresponding parameter, then it will just be ignored.
     transforms : dict of callable, default=None
         Dictonary containing transforms mapping unbounded values to the proper range for a given parameter.
-        Default transforms exist for `stepsize`, which gets mapped using an exponential function, 
-        and `fisher_weight`, which gets mapped using a sigmoid. Default values are overridden if any other 
+        Default transforms exist for `stepsize`, which gets mapped using an exponential function,
+        and `fisher_weight`, which gets mapped using a sigmoid. Default values are overridden if any other
         transforms are passed here for the same parameters.
 
     Returns
@@ -408,34 +474,71 @@ def tune(mcs, rngs, target, n_tuning,
     mcs : dict of list of hopsy.MarkovChain
         List of tuned Markov chains, where each list of replicas is stored with `key==mc.proposal.__class__.__name__`.
     rngs : dict of list of hopsy.RandomNumberGenerator
-        List of forwarded random number generators, where corresponding RNGs to the Markov chains in `mcs` are 
+        List of forwarded random number generators, where corresponding RNGs to the Markov chains in `mcs` are
         also stored with `key==mc.proposal.__class__.__name__`.
     (gprs, domains) : tuple of dict
         `gprs` contains the fitted sklearn `GaussianProcessRegressor`s, which were used as surrogate functions
         to the blackbox tuning target. `domains` contains the Sobol sequence domains on which the GPs were
-        evaluated to obtain the next hyperparameter choice. Both dicts store using the respective proposal 
+        evaluated to obtain the next hyperparameter choice. Both dicts store using the respective proposal
         names as keys.
     """
-    n_samples = int(n_tuning / (n_rounds + (len(mcs)-1) * n_burnin))
+    n_samples = int(n_tuning / (n_rounds + (len(mcs) - 1) * n_burnin))
 
     # select transforms for params where we also want to perform tuning
-    _transforms = {param: transform for param, transform in default_transforms.items() if param in params}
+    _transforms = {
+        param: transform
+        for param, transform in default_transforms.items()
+        if param in params
+    }
 
     # add user-defined transforms
     transforms = {**_transforms, **transforms}
-    
-    if target.lower() == 'esjd':
-        return tune_esjd(mcs, rngs, k=k, seed=seed, n_procs=n_procs,
-                         n_rounds=n_rounds, n_burnin=n_burnin, n_samples=n_samples, 
-                         consider_time=False, sample_proposal=sample_proposal,
-                         lower=lower, upper=upper, n_points=n_points, params=params)
-    if target.lower() == 'esjd/s':
-        return tune_esjd(mcs, rngs, k=k, seed=seed, n_procs=n_procs,
-                         n_rounds=n_rounds, n_burnin=n_burnin, n_samples=n_samples, 
-                         consider_time=True, sample_proposal=sample_proposal,
-                         lower=lower, upper=upper, n_points=n_points, params=params)
-    if target.lower() == 'accrate':
-        return tune_acceptance_rate(mcs, rngs, accrate=accrate, seed=seed, n_procs=n_procs,
-                                    n_rounds=n_rounds, n_samples=n_samples, 
-                                    lower=lower, upper=upper, n_points=n_points, params=params)
 
+    if target.lower() == "esjd":
+        return tune_esjd(
+            mcs,
+            rngs,
+            k=k,
+            seed=seed,
+            n_procs=n_procs,
+            n_rounds=n_rounds,
+            n_burnin=n_burnin,
+            n_samples=n_samples,
+            consider_time=False,
+            sample_proposal=sample_proposal,
+            lower=lower,
+            upper=upper,
+            n_points=n_points,
+            params=params,
+        )
+    if target.lower() == "esjd/s":
+        return tune_esjd(
+            mcs,
+            rngs,
+            k=k,
+            seed=seed,
+            n_procs=n_procs,
+            n_rounds=n_rounds,
+            n_burnin=n_burnin,
+            n_samples=n_samples,
+            consider_time=True,
+            sample_proposal=sample_proposal,
+            lower=lower,
+            upper=upper,
+            n_points=n_points,
+            params=params,
+        )
+    if target.lower() == "accrate":
+        return tune_acceptance_rate(
+            mcs,
+            rngs,
+            accrate=accrate,
+            seed=seed,
+            n_procs=n_procs,
+            n_rounds=n_rounds,
+            n_samples=n_samples,
+            lower=lower,
+            upper=upper,
+            n_points=n_points,
+            params=params,
+        )
