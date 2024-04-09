@@ -6,6 +6,8 @@ from scipy.stats import qmc
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF
 
+from .misc import *
+
 
 def inv_sigmoid(x):
     return np.log(x) - np.log(1 - x)
@@ -57,7 +59,7 @@ def estimate_accrate(mcs, rngs, n_samples, *args, **kwargs):
         np.array
             Array with acceptance rates for every individual chain.
     """
-    accrates, samples = hopsy.sample(mcs, rngs, n_samples, *args, **kwargs)
+    accrates, samples = sample(mcs, rngs, n_samples, *args, **kwargs)
     return np.array(accrates)
 
 
@@ -97,7 +99,7 @@ def estimate_esjd(mcs, rngs, n_samples, k=[1], consider_time=False, *args, **kwa
             Array of cumulative ESJD over specified lags `k` for every individual chain.
     """
     start = time.time()
-    _, samples = hopsy.sample(mcs, rngs, n_samples, *args, **kwargs)
+    _, samples = sample(mcs, rngs, n_samples, *args, **kwargs)
     time_per_sample = (time.time() - start) / n_samples
     esjds = np.sum(
         [
@@ -123,11 +125,11 @@ def tune_acceptance_rate(
     params=["stepsize"],
 ):
     """ """
-    if isinstance(mcs, hopsy.core.MarkovChain):
+    if isinstance(mcs, _c.MarkovChain):
         mcs = [[mcs]]
         rngs = [[rngs]]
 
-    if isinstance(mcs, list) and isinstance(mcs[0], hopsy.core.MarkovChain):
+    if isinstance(mcs, list) and isinstance(mcs[0], _c.MarkovChain):
         mcs = [mcs]
         rngs = [rngs]
 
@@ -187,7 +189,7 @@ def tune_acceptance_rate(
         )
         data[key] = {"X": [], "y": []}
 
-    rng = hopsy.RandomNumberGenerator(seed, channel + 1)
+    rng = _c.RandomNumberGenerator(seed, channel + 1)
 
     for i in range(n_rounds):
         for j, key in enumerate(gprs):
@@ -243,11 +245,11 @@ def tune_esjd(
     if not hasattr(k, "__len__"):
         k = [k]
 
-    if isinstance(mcs, hopsy.core.MarkovChain):
+    if isinstance(mcs, _c.MarkovChain):
         mcs = [[mcs]]
         rngs = [[rngs]]
 
-    if isinstance(mcs, list) and isinstance(mcs[0], hopsy.core.MarkovChain):
+    if isinstance(mcs, list) and isinstance(mcs[0], _c.MarkovChain):
         mcs = [mcs]
         rngs = [rngs]
 
@@ -307,7 +309,7 @@ def tune_esjd(
         )
         data[key] = {"X": [], "y": []}
 
-    rng = hopsy.RandomNumberGenerator(seed, channel + 1)
+    rng = _c.RandomNumberGenerator(seed, channel + 1)
 
     for i in range(n_rounds):
         if sample_proposal and i > n_burnin:
