@@ -53,3 +53,33 @@ class TuningTests(unittest.TestCase):
         tune(ts, target, [RandomNumberGenerator(0, i) for i in range(5)])
 
         self.assertEqual(True, True)
+
+
+    def test_python_tuning(self):
+        for target in ['accrate', 'esjd', 'esjd/s']:
+            A, b = hopsy.examples.generate_unit_hypercube(10)
+            problem = hopsy.Problem(A, b, hopsy.Gaussian(mean=np.zeros(10), covariance=.001*np.eye(10)))
+            problem.starting_point = hopsy.compute_chebyshev_center(problem)
+
+            proposals = [hopsy.GaussianProposal, hopsy.GaussianHitAndRunProposal, hopsy.BallWalkProposal, hopsy.CSmMALAProposal, hopsy.DikinWalkProposal]
+
+            mcs = [[hopsy.MarkovChain(problem, proposal=proposal) for i in range(4)] for proposal in proposals]
+            rngs = [[hopsy.RandomNumberGenerator(42, 4*j+i) for i in range(4)] for j, _ in enumerate(proposals)]
+
+            _, _, (gprs, domains) = tune(mcs, rngs, target=target, n_tuning=10000)
+
+
+            proposal = hopsy.GaussianProposal
+
+            mcs = [hopsy.MarkovChain(problem, proposal=proposal) for i in range(4)]
+            rngs = [hopsy.RandomNumberGenerator(42, i) for i in range(4)]
+
+            _, _, (gprs, domains) = tune(mcs, rngs, target=target, n_tuning=10000)
+
+
+            mcs = hopsy.MarkovChain(problem, proposal=proposal)
+            rngs = hopsy.RandomNumberGenerator(42)
+
+            _, _, (gprs, domains) = tune(mcs, rngs, target=target, n_tuning=10000)
+            
+        self.assertEqual(True, True)
