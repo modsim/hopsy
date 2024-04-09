@@ -10,8 +10,10 @@ from sklearn.gaussian_process.kernels import RBF
 def inv_sigmoid(x):
     return np.log(x) - np.log(1 - x)
 
+
 def sigmoid(x):
     return 1.0 / (1 + np.exp(-x))
+
 
 def set_params(mcs, params_map, param_values, transforms):
     for mc in mcs:
@@ -21,10 +23,12 @@ def set_params(mcs, params_map, param_values, transforms):
             else:
                 setattr(mc.proposal, param, param_values[i])
 
+
 default_transforms = {
     "stepsize": lambda x: 10**x,
     "fisher_weight": lambda x: sigmoid(x),
 }
+
 
 def estimate_accrate(mcs, rngs, n_samples, *args, **kwargs):
     r"""
@@ -55,6 +59,7 @@ def estimate_accrate(mcs, rngs, n_samples, *args, **kwargs):
     """
     accrates, samples = hopsy.sample(mcs, rngs, n_samples, *args, **kwargs)
     return np.array(accrates)
+
 
 def estimate_esjd(mcs, rngs, n_samples, k=[1], consider_time=False, *args, **kwargs):
     r"""
