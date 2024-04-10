@@ -1,3 +1,8 @@
+"""
+Tuning module for hyperparameter tuning of proposal distributions using Bayesian optimization.
+"""
+
+
 class _submodules:
     import time
 
