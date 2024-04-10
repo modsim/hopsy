@@ -24,6 +24,6 @@ class DocTests(unittest.TestCase):
             for name in sorted([name for name, _ in bad]):
                 print("  -- " + name)
 
-        self.assertEqual(
+        self.assertEqual(  # All symbols should have at least an empty docstring!
             len(bad), 0
-        )  # All symbols should have at least an empty docstring!
+        )
