@@ -1,20 +1,38 @@
-import math
-import time
+class _submodules:
+    import math
+    import time
 
-import numpy as np
-from scipy.stats import qmc
-from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF
+    import numpy as np
+    from scipy.stats import qmc
+    from sklearn.gaussian_process import GaussianProcessRegressor
+    from sklearn.gaussian_process.kernels import RBF
+
+
+_s = _submodules
 
 from .misc import *
 from .misc import _c
 
 
 def inv_sigmoid(x):
+    r"""
+    Inverse sigmoid function
+
+    .. math::
+        y = \log(x) - \log(1 - x)
+
+    """
     return np.log(x) - np.log(1 - x)
 
 
 def sigmoid(x):
+    r"""
+    Sigmoid function
+
+    .. math::
+        y = \frac{1}{1 + \exp(-x)}
+
+    """
     return 1.0 / (1 + np.exp(-x))
 
 
@@ -127,35 +145,6 @@ def tune_acceptance_rate(
     transforms=default_transforms,
 ):
     """ """
-    if isinstance(mcs, _c.MarkovChain):
-        mcs = [[mcs]]
-        rngs = [[rngs]]
-
-    if isinstance(mcs, list) and isinstance(mcs[0], _c.MarkovChain):
-        mcs = [mcs]
-        rngs = [rngs]
-
-    if isinstance(mcs, list):
-        _mcs = dict()
-        _rngs = dict()
-
-        for i, group in enumerate(mcs):
-            key = group[0].proposal.__class__.__name__
-
-            for mc in group:
-                if mc.proposal.__class__.__name__ != key:
-                    raise RuntimeError(
-                        """
-                        `mcs` need to be list of list of type `hopsy.core.MarkovChain`, where every inner list of `hopsy.core.MarkovChain` objects is required to use the same proposal distribution.
-                    """
-                    )
-
-            _mcs[key] = group
-            _rngs[key] = rngs[i]
-
-    mcs = _mcs
-    rngs = _rngs
-
     lower = [lower] if not hasattr(lower, "__len__") else lower
     upper = [upper] if not hasattr(upper, "__len__") else upper
 
@@ -247,35 +236,6 @@ def tune_esjd(
     """ """
     if not hasattr(k, "__len__"):
         k = [k]
-
-    if isinstance(mcs, _c.MarkovChain):
-        mcs = [[mcs]]
-        rngs = [[rngs]]
-
-    if isinstance(mcs, list) and isinstance(mcs[0], _c.MarkovChain):
-        mcs = [mcs]
-        rngs = [rngs]
-
-    if isinstance(mcs, list):
-        _mcs = dict()
-        _rngs = dict()
-
-        for i, group in enumerate(mcs):
-            key = group[0].proposal.__class__.__name__
-
-            for mc in group:
-                if mc.proposal.__class__.__name__ != key:
-                    raise RuntimeError(
-                        """
-                        `mcs` need to be list of list of type `hopsy.core.MarkovChain`, where every inner list of `hopsy.core.MarkovChain` objects is required to use the same proposal distribution.
-                    """
-                    )
-
-            _mcs[key] = group
-            _rngs[key] = rngs[i]
-
-    mcs = _mcs
-    rngs = _rngs
 
     lower = [lower] if not hasattr(lower, "__len__") else lower
     upper = [upper] if not hasattr(upper, "__len__") else upper
@@ -487,6 +447,36 @@ def tune(
         evaluated to obtain the next hyperparameter choice. Both dicts store using the respective proposal
         names as keys.
     """
+
+    if isinstance(mcs, _c.MarkovChain):
+        mcs = [[mcs]]
+        rngs = [[rngs]]
+
+    if isinstance(mcs, list) and isinstance(mcs[0], _c.MarkovChain):
+        mcs = [mcs]
+        rngs = [rngs]
+
+    if isinstance(mcs, list):
+        _mcs = dict()
+        _rngs = dict()
+
+        for i, group in enumerate(mcs):
+            key = group[0].proposal.__class__.__name__
+
+            for mc in group:
+                if mc.proposal.__class__.__name__ != key:
+                    raise RuntimeError(
+                        """
+                        `mcs` need to be list of list of type `hopsy.core.MarkovChain`, where every inner list of `hopsy.core.MarkovChain` objects is required to use the same proposal distribution.
+                    """
+                    )
+
+            _mcs[key] = group
+            _rngs[key] = rngs[i]
+
+    mcs = _mcs
+    rngs = _rngs
+
     n_samples = int(n_tuning / (n_rounds + (len(mcs) - 1) * n_burnin))
 
     # select transforms for params where we also want to perform tuning
