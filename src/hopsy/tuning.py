@@ -124,6 +124,7 @@ def tune_acceptance_rate(
     upper=5,
     n_points=256,
     params=["stepsize"],
+    transforms=default_transforms,
 ):
     """ """
     if isinstance(mcs, _c.MarkovChain):
@@ -241,6 +242,7 @@ def tune_esjd(
     upper=5,
     n_points=256,
     params=["stepsize"],
+    transforms=default_transforms,
 ):
     """ """
     if not hasattr(k, "__len__"):
@@ -515,6 +517,7 @@ def tune(
             upper=upper,
             n_points=n_points,
             params=params,
+            transforms=transforms,
         )
     if target.lower() == "esjd/s":
         return tune_esjd(
@@ -532,6 +535,7 @@ def tune(
             upper=upper,
             n_points=n_points,
             params=params,
+            transforms=transforms,
         )
     if target.lower() == "accrate":
         return tune_acceptance_rate(
@@ -546,4 +550,5 @@ def tune(
             upper=upper,
             n_points=n_points,
             params=params,
+            transforms=transforms,
         )
