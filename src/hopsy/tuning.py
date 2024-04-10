@@ -1,5 +1,4 @@
 class _submodules:
-    import math
     import time
 
     import numpy as np
@@ -22,7 +21,7 @@ def inv_sigmoid(x):
         y = \log(x) - \log(1 - x)
 
     """
-    return np.log(x) - np.log(1 - x)
+    return _s.np.log(x) - _s.np.log(1 - x)
 
 
 def sigmoid(x):
@@ -33,10 +32,11 @@ def sigmoid(x):
         y = \frac{1}{1 + \exp(-x)}
 
     """
-    return 1.0 / (1 + np.exp(-x))
+    return 1.0 / (1 + _s.np.exp(-x))
 
 
 def set_params(mcs, params_map, param_values, transforms):
+    """ """
     for mc in mcs:
         for i, param in enumerate(params_map):
             if param in transforms:
@@ -79,7 +79,7 @@ def estimate_accrate(mcs, rngs, n_samples, *args, **kwargs):
             Array with acceptance rates for every individual chain.
     """
     accrates, samples = sample(mcs, rngs, n_samples, *args, **kwargs)
-    return np.array(accrates)
+    return _s.np.array(accrates)
 
 
 def estimate_esjd(mcs, rngs, n_samples, k=[1], consider_time=False, *args, **kwargs):
@@ -117,12 +117,14 @@ def estimate_esjd(mcs, rngs, n_samples, k=[1], consider_time=False, *args, **kwa
         np.array
             Array of cumulative ESJD over specified lags `k` for every individual chain.
     """
-    start = time.time()
+    start = _s.time.time()
     _, samples = sample(mcs, rngs, n_samples, *args, **kwargs)
-    time_per_sample = (time.time() - start) / n_samples
-    esjds = np.sum(
+    time_per_sample = (_s.time.time() - start) / n_samples
+    esjds = _s.np.sum(
         [
-            np.mean(np.sum(np.diff(samples[:, ::_k], axis=1) ** 2, axis=-1), axis=-1)
+            _s.np.mean(
+                _s.np.sum(_s.np.diff(samples[:, ::_k], axis=1) ** 2, axis=-1), axis=-1
+            )
             for _k in k
         ],
         axis=0,
@@ -149,7 +151,7 @@ def tune_acceptance_rate(
     upper = [upper] if not hasattr(upper, "__len__") else upper
 
     log_prior_var = 10**2
-    log_prior_mean = np.log(1e-5)
+    log_prior_mean = _s.np.log(1e-5)
 
     domains = dict()
     param_map = dict()
@@ -170,13 +172,13 @@ def tune_acceptance_rate(
                 a.append(lower[min(i, len(lower) - 1)])
                 b.append(upper[min(i, len(upper) - 1)])
 
-        a, b = np.array(a), np.array(b)
+        a, b = _s.np.array(a), _s.np.array(b)
 
-        sampler = qmc.Sobol(d=len(param_map[key]), scramble=True)
-        domains[key] = (b - a) * sampler.random_base2(m=int(np.log2(n_points))) + a
+        sampler = _s.qmc.Sobol(d=len(param_map[key]), scramble=True)
+        domains[key] = (b - a) * sampler.random_base2(m=int(_s.np.log2(n_points))) + a
 
-        gprs[key] = GaussianProcessRegressor(
-            kernel=log_prior_var * RBF(), random_state=seed + 1, optimizer=None
+        gprs[key] = _s.GaussianProcessRegressor(
+            kernel=log_prior_var * _s.RBF(), random_state=seed + 1, optimizer=None
         )
         data[key] = {"X": [], "y": []}
 
@@ -202,11 +204,11 @@ def tune_acceptance_rate(
             data[key]["X"].append(x)
             data[key]["y"].append(y)
 
-            std = np.std(data[key]["y"], axis=-1)
-            gprs[key].alpha = np.max(
-                np.hstack([std, 1e-3 * np.ones_like(std)]), axis=-1
+            std = _s.np.std(data[key]["y"], axis=-1)
+            gprs[key].alpha = _s.np.max(
+                _s.np.hstack([std, 1e-3 * _s.np.ones_like(std)]), axis=-1
             )
-            gprs[key].fit(data[key]["X"], np.mean(data[key]["y"], axis=-1))
+            gprs[key].fit(data[key]["X"], _s.np.mean(data[key]["y"], axis=-1))
 
     for j, key in enumerate(gprs):
         idx = gprs[key].predict(domains[key]).argmax()
@@ -241,7 +243,7 @@ def tune_esjd(
     upper = [upper] if not hasattr(upper, "__len__") else upper
 
     log_prior_var = 1
-    log_prior_mean = np.log(1e-5)
+    log_prior_mean = _s.np.log(1e-5)
 
     domains = dict()
     param_map = dict()
@@ -262,13 +264,13 @@ def tune_esjd(
                 a.append(lower[min(i, len(lower) - 1)])
                 b.append(upper[min(i, len(upper) - 1)])
 
-        a, b = np.array(a), np.array(b)
+        a, b = _s.np.array(a), _s.np.array(b)
 
-        sampler = qmc.Sobol(d=len(param_map[key]), scramble=True)
-        domains[key] = (b - a) * sampler.random_base2(m=int(np.log2(n_points))) + a
+        sampler = _s.qmc.Sobol(d=len(param_map[key]), scramble=True)
+        domains[key] = (b - a) * sampler.random_base2(m=int(_s.np.log2(n_points))) + a
 
-        gprs[key] = GaussianProcessRegressor(
-            kernel=log_prior_var * RBF(), random_state=seed + 1, optimizer=None
+        gprs[key] = _s.GaussianProcessRegressor(
+            kernel=log_prior_var * _s.RBF(), random_state=seed + 1, optimizer=None
         )
         data[key] = {"X": [], "y": []}
 
@@ -283,7 +285,7 @@ def tune_esjd(
                 idx = sample.argmax()
                 x = domains[key][idx]
 
-                if np.exp(sample[idx]) > maxsample:
+                if _s.np.exp(sample[idx]) > maxsample:
                     maxsample = sample[idx]
                     maxkey = key
 
@@ -302,17 +304,21 @@ def tune_esjd(
                 )
                 + 1e-5
             )
-            y = np.log(_y) - log_prior_mean
+            y = _s.np.log(_y) - log_prior_mean
 
             data[key]["X"].append(x)
             data[key]["y"].append(y)
 
-            log_prior_var = max(2 * np.max(np.array(data[key]["y"])), log_prior_var)
+            log_prior_var = max(
+                2 * _s.np.max(_s.np.array(data[key]["y"])), log_prior_var
+            )
 
-            std = np.std(data[key]["y"], axis=-1)
-            gprs[key].kernel = log_prior_var**2 * RBF()
-            gprs[key].alpha = np.max(np.vstack([std, 1e-3 * np.ones_like(std)]), axis=0)
-            gprs[key].fit(data[key]["X"], np.mean(data[key]["y"], axis=-1))
+            std = _s.np.std(data[key]["y"], axis=-1)
+            gprs[key].kernel = log_prior_var**2 * _s.RBF()
+            gprs[key].alpha = _s.np.max(
+                _s.np.vstack([std, 1e-3 * _s.np.ones_like(std)]), axis=0
+            )
+            gprs[key].fit(data[key]["X"], _s.np.mean(data[key]["y"], axis=-1))
         else:
             for j, key in enumerate(gprs):
                 sample = gprs[key].sample_y(
@@ -334,21 +340,21 @@ def tune_esjd(
                     )
                     + 1e-5
                 )
-                y = np.log(_y) - log_prior_mean
+                y = _s.np.log(_y) - log_prior_mean
 
                 data[key]["X"].append(x)
                 data[key]["y"].append(y)
 
                 log_prior_var = max(
-                    2 * np.max(np.array(data[key]["y"])) ** 2, log_prior_var
+                    2 * _s.np.max(_s.np.array(data[key]["y"])) ** 2, log_prior_var
                 )
 
-                std = np.std(data[key]["y"], axis=-1)
-                gprs[key].kernel = log_prior_var * RBF()
-                gprs[key].alpha = np.max(
-                    np.hstack([std, 1e-3 * np.ones_like(std)]), axis=-1
+                std = _s.np.std(data[key]["y"], axis=-1)
+                gprs[key].kernel = log_prior_var * _s.RBF()
+                gprs[key].alpha = _s.np.max(
+                    _s.np.hstack([std, 1e-3 * _s.np.ones_like(std)]), axis=-1
                 )
-                gprs[key].fit(data[key]["X"], np.mean(data[key]["y"], axis=-1))
+                gprs[key].fit(data[key]["X"], _s.np.mean(data[key]["y"], axis=-1))
 
     for j, key in enumerate(gprs):
         idx = gprs[key].predict(domains[key]).argmax()
