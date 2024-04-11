@@ -1,6 +1,7 @@
 # Changelog
 
 ## Latest
+- [#122](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/122): Fix rounding for Reversible Jump MCMC
 - [#125](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/125): Update Readme.md & Fix automatic docs generation
 - [#106](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/106): Add official support for python 3.12
 - [#130](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/130): Update requirements-dev.txt
