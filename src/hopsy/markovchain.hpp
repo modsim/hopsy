@@ -63,9 +63,10 @@ namespace hopsy {
             );
         }
 
-        static inline auto wrapProposal(std::shared_ptr <Proposal> proposal) {
-            return hopsy::ProposalWrapper(proposal);
+        static inline auto wrapProposal(Proposal* proposal, const LinearTransformation &transformation) {
+            return hops::StateTransformation(hopsy::ProposalWrapper(proposal), transformation);
         }
+
     }
 
     class MarkovChain : public hops::MarkovChain {
@@ -269,19 +270,38 @@ namespace hopsy {
             mc->parallelTemperingSyncRng = parallelTemperingSyncRng;
 
             if (mc->model && mc->transformation) {
-                if (mc->proposal->hasNegativeLogLikelihood()) {
-                    throw std::invalid_argument(
-                            "Model & Transformation not valid for this proposal type. Try again without rounding the problem.");
-                }
-                auto markovChain = proposalImplToMarkovChain(
-                        wrapProposal(mc->proposal, mc->transformation.value()),
-                        mc->model,
-                        mc->parallelTemperingSyncRng,
-                        exchangeAttemptProbability
-                );
+                hops::ReversibleJumpProposal* rjmcmc = dynamic_cast<hops::ReversibleJumpProposal*>(mc->proposal.get());
+                if(rjmcmc!=nullptr) {
+                    // case: Proposal is RJMCMC & needs transformation of internal proposal
+                    auto roundedInternalProposal = hops::StateTransformation(
+                        hopsy::ProposalWrapper(rjmcmc->getProposalImpl()->copyProposal()),
+                        mc->transformation.value());
+                    rjmcmc->setProposalImpl(std::make_unique<decltype(roundedInternalProposal)>(roundedInternalProposal));
 
-                mc->markovChain = std::move(markovChain);
-                return;
+                    auto markovChain = proposalImplToMarkovChain(
+                            hopsy::ProposalWrapper(rjmcmc),
+                            mc->model,
+                            mc->parallelTemperingSyncRng,
+                            exchangeAttemptProbability);
+                    mc->markovChain = std::move(markovChain);
+                    return;
+                }
+                else {
+                    if (mc->proposal->hasNegativeLogLikelihood()) {
+                        throw std::invalid_argument(
+                                "Model & Transformation not valid for this proposal type. Try again without rounding the problem.");
+                    }
+
+                    // case: Proposal needs transformation
+                    auto markovChain = proposalImplToMarkovChain(
+                            wrapProposal(mc->proposal, mc->transformation.value()),
+                            mc->model,
+                            mc->parallelTemperingSyncRng,
+                            exchangeAttemptProbability);
+
+                    mc->markovChain = std::move(markovChain);
+                    return;
+                }
             } else if (mc->model && !mc->transformation) {
                 // If proposal has negativeLogLikelihood, it knows the model and the model wrapper is not required.
                 if (mc->proposal->hasNegativeLogLikelihood()) {
@@ -289,7 +309,7 @@ namespace hopsy {
                     if (mc->parallelTemperingSyncRng) {
                         throw std::runtime_error("Parallel Tempering not yet supported for this proposal type.");
                     }
-                    auto markovChain = proposalImplToMarkovChain(wrapProposal(mc->proposal),
+                    auto markovChain = proposalImplToMarkovChain(hopsy::ProposalWrapper(proposal),
                                                                  nullptr,
                                                                  std::nullopt,
                                                                  exchangeAttemptProbability);
@@ -298,7 +318,7 @@ namespace hopsy {
                     return;
                 } else {
                     auto markovChain = proposalImplToMarkovChain(
-                            wrapProposal(mc->proposal),
+                            hopsy::ProposalWrapper(mc->proposal),
                             mc->model,
                             mc->parallelTemperingSyncRng,
                             exchangeAttemptProbability
@@ -311,10 +331,7 @@ namespace hopsy {
                 if (mc->proposal->isSymmetric()) {
                     auto tmp = hops::MarkovChainAdapter(
                             hops::NoOpDrawAdapter(
-                                    hops::StateTransformation(
-                                            hopsy::ProposalWrapper(mc->proposal),
-                                            *transformation
-                                    )
+                                wrapProposal(mc->proposal, mc->transformation.value())
                             )
                     );
 
@@ -324,8 +341,7 @@ namespace hopsy {
                     auto tmp = hops::MarkovChainAdapter(
                             hops::MetropolisHastingsFilter(
                                     hops::StateTransformation(
-                                            hopsy::ProposalWrapper(proposal),
-                                            transformation.value()
+                                        wrapProposal(mc->proposal, mc->transformation.value())
                                     )
                             )
                     );
@@ -419,7 +435,6 @@ namespace hopsy {
                     value
             );
         }
-
     };
 
     MarkovChain createMarkovChain(const Proposal *proposal,

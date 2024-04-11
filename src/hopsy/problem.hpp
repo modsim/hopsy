@@ -21,6 +21,10 @@ namespace hopsy {
         std::optional<VectorType> startingPoint;
         std::optional<MatrixType> transformation;
         std::optional<VectorType> shift;
+        // if A and b are later transformed, these attributes store the original values.
+        // This is much more accurate than reverting the transformation, if A and b are required.
+        MatrixType original_A;
+        VectorType original_b;
 
         Problem(const Problem& other) :
                 A(other.A),
@@ -28,7 +32,9 @@ namespace hopsy {
                 //model(std::move(other.model->copyModel())),
                 startingPoint(other.startingPoint),
                 transformation(other.transformation),
-                shift(other.shift) {
+                shift(other.shift),
+                original_A(other.original_A),
+                original_b(other.original_b) {
             if(other.model) this->model = std::move(other.model->copyModel());
         }
 
@@ -42,7 +48,9 @@ namespace hopsy {
                 b(b),
                 startingPoint(startingPoint),
                 transformation(transformation),
-                shift(shift) {
+                shift(shift),
+                original_A(A),
+                original_b(b) {
             if(model) this->model = std::move(model->copyModel());
         }
 
@@ -56,7 +64,9 @@ namespace hopsy {
                 b(b),
                 startingPoint(startingPoint),
                 transformation(transformation),
-                shift(shift) {
+                shift(shift),
+                original_A(A),
+                original_b(b) {
             if(model) this->model = model->copyModel();
         }
 
@@ -183,6 +193,8 @@ namespace hopsy {
             .def_property("model", &Problem::getModel, &Problem::setModel, doc::Problem::model)
             .def_readwrite("transformation", &Problem::transformation, doc::Problem::transformation)
             .def_readwrite("shift", &Problem::shift, doc::Problem::shift)
+            .def_readwrite("original_A", &Problem::original_A, doc::Problem::original_A)
+            .def_readwrite("original_b", &Problem::original_b, doc::Problem::original_b)
             .def("__repr__", &Problem::__repr__)
             .def(py::pickle([] (const Problem& self) { // __getstate__
                                 /* Return a tuple that fully encodes the state of the object */
@@ -191,10 +203,13 @@ namespace hopsy {
                                                       static_cast<hopsy::Model*>(self.model.get()),
                                                       self.startingPoint,
                                                       self.transformation,
-                                                      self.shift);
+                                                      self.shift,
+                                                      self.original_A,
+                                                      self.original_b
+                                                      );
                             },
                             [] (py::tuple t) { // __setstate__
-                                if (t.size() != 6) throw std::runtime_error("Tried to build hopsy.Model with invalid state.");
+                                if (t.size() != 8) throw std::runtime_error("Tried to build hopsy.Model with invalid state.");
 
                                 /* Create a new C++ instance */
                                 Problem p(t[0].cast<MatrixType>(),
@@ -203,6 +218,8 @@ namespace hopsy {
                                           t[3].cast<std::optional<VectorType>>(),
                                           t[4].cast<std::optional<MatrixType>>(),
                                           t[5].cast<std::optional<VectorType>>());
+                                p.original_A = t[6].cast<MatrixType>();
+                                p.original_b = t[7].cast<VectorType>();
 
                                 return p;
                             }
