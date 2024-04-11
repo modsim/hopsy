@@ -389,20 +389,24 @@ class ProposalTests(unittest.TestCase):
         measurements = [1.0]
         gammaPDF = GammaPDF(measurements)
         problem = Problem(gammaPDF.A, gammaPDF.b, gammaPDF, starting_point=[0.5, 0.5, 0.5])
-        problem = round(problem)
+
+        rounded_problem = round(problem)
 
         rng = RandomNumberGenerator(42)
-        proposal = UniformHitAndRunProposal(problem)
+        proposal = UniformHitAndRunProposal(rounded_problem)
+
 
         jumpIndices = np.array([0, 1])
         # tip: perturb default values with epsilon to ensure they are not on the polytope borders
         defaultValues = np.array([1e-14, 1])
-        rjmcmc_proposal = ReversibleJumpProposal(proposal, jumpIndices, defaultValues)
-        # rjmcmc_proposal.state = np.array([1, 1, 1, 0.5, 0.5, 0.5])
-        # print('state2', rjmcmc_proposal.state)
-        print('rjmcmc prop name', rjmcmc_proposal.name)
-        mc = MarkovChain(problem=problem, proposal=rjmcmc_proposal)
-        print('mc prop name', mc.proposal.name)
+        # RJMCMC requires original polytope A and B to insert correct default values
+        rjmcmc_proposal = ReversibleJumpProposal(proposal,
+                                                 jumpIndices,
+                                                 defaultValues,
+                                                 A=rounded_problem.original_A,
+                                                 b =rounded_problem.original_b)
+
+        mc = MarkovChain(problem=rounded_problem, proposal=rjmcmc_proposal)
 
         acc, samples = sample(mc, rng, n_samples=500_000, thinning=1)
 

@@ -406,6 +406,9 @@ def round(problem: _c.Problem):
             shift=complete_shift,
         )
 
+        _problem.original_A = problem.A
+        _problem.original_b = problem.b
+
         if problem.starting_point is not None:
             _problem.starting_point = transform(_problem, [problem.starting_point])[0]
 

@@ -274,24 +274,17 @@ namespace hopsy {
 
             if (mc->model && mc->transformation) {
                 hops::ReversibleJumpProposal* rjmcmc = dynamic_cast<hops::ReversibleJumpProposal*>(mc->proposal.get());
-                std::cout << "cast is " << rjmcmc << " true?: " << (rjmcmc!=nullptr) << std::endl;
                 if(rjmcmc!=nullptr) {
-                    std::cout << "wrapping rjmcmc" << std::endl;
-                    Proposal* proposalPointer = rjmcmc->getProposalImpl().get();
-//                    auto proposalImpl = wrapProposal(proposalPointer, mc->transformation.value());
-                    auto rjmcmc_with_transformation = hops::ReversibleJumpProposal::createFromProposal(
-                        proposalImpl,
-                        rjmcmc->getJumpIndices(),
-                        rjmcmc->getDefaultValues()
-                    );
-                    c->proposal = rjmcmc_with_transformation.copyProposal();
+                    auto roundedInternalProposal = hops::StateTransformation(
+                        hopsy::ProposalWrapper(rjmcmc->getProposalImpl()->copyProposal()),
+                        mc->transformation.value());
+                    rjmcmc->setProposalImpl(std::make_unique<decltype(roundedInternalProposal)>(roundedInternalProposal));
 
                     auto markovChain = proposalImplToMarkovChain(
-                            rjmcmc_with_transformation,
+                            hopsy::ProposalWrapper(rjmcmc),
                             mc->model,
                             mc->parallelTemperingSyncRng,
                             exchangeAttemptProbability);
-
                     mc->markovChain = std::move(markovChain);
                     return;
                 }
@@ -443,7 +436,6 @@ namespace hopsy {
                     value
             );
         }
-
     };
 
     MarkovChain createMarkovChain(const Proposal *proposal,

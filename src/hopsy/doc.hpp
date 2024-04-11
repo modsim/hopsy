@@ -131,6 +131,8 @@ namespace hopsy {
             static const char* transformation;
             static const char* shift;
             static const char* slacks;
+            static const char* original_A;
+            static const char* original_b;
         };
 
         struct Proposal {

@@ -1400,11 +1400,13 @@ namespace hopsy {
         // constructor
         reversibleJumpProposal
             //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
-            .def(py::init<std::unique_ptr<Proposal>, const Eigen::VectorXi&, const VectorType&>(),
+            .def(py::init<std::unique_ptr<Proposal>, const Eigen::VectorXi&, const VectorType&, const std::optional<MatrixType>&, const std::optional<VectorType>&>(),
                     doc::ReversibleJumpProposal::__init__,
                     py::arg("proposal"),
                     py::arg("jump_indices"),
-                    py::arg("default_values")
+                    py::arg("default_values"),
+                    py::arg("A") = std::nullopt,
+                    py::arg("b") = std::nullopt
                     );
         // common
         proposal::addCommon<ReversibleJumpProposal, doc::ReversibleJumpProposal>(reversibleJumpProposal);
