@@ -33,6 +33,7 @@ namespace hopsy {
                 const std::shared_ptr <Model> model,
                 std::optional <hopsy::RandomNumberGenerator> parallelTemperingSyncRng,
                 double exchangeAttemptProbability) {
+
             if (model) {
                 if (parallelTemperingSyncRng) {
                     auto wrappedProposalAndModel = hops::ModelMixin(proposalImpl,
@@ -54,19 +55,15 @@ namespace hopsy {
             }
         }
 
-        static inline auto wrapProposal(
-            std::shared_ptr<Proposal> proposal,
-            const LinearTransformation &transformation
-        ) {
+        static inline auto wrapProposal(std::shared_ptr <Proposal> proposal,
+                                        const LinearTransformation &transformation) {
             return hops::StateTransformation(
-            hopsy::ProposalWrapper(proposal),
-            transformation);
+                    hopsy::ProposalWrapper(proposal),
+                    transformation
+            );
         }
 
-        static inline auto wrapProposal(
-            Proposal* proposal,
-            const LinearTransformation &transformation
-        ) {
+        static inline auto wrapProposal(Proposal* proposal, const LinearTransformation &transformation) {
             return hops::StateTransformation(hopsy::ProposalWrapper(proposal), transformation);
         }
 
@@ -275,6 +272,7 @@ namespace hopsy {
             if (mc->model && mc->transformation) {
                 hops::ReversibleJumpProposal* rjmcmc = dynamic_cast<hops::ReversibleJumpProposal*>(mc->proposal.get());
                 if(rjmcmc!=nullptr) {
+                    // case: Proposal is RJMCMC & needs transformation of internal proposal
                     auto roundedInternalProposal = hops::StateTransformation(
                         hopsy::ProposalWrapper(rjmcmc->getProposalImpl()->copyProposal()),
                         mc->transformation.value());
@@ -294,6 +292,7 @@ namespace hopsy {
                                 "Model & Transformation not valid for this proposal type. Try again without rounding the problem.");
                     }
 
+                    // case: Proposal needs transformation
                     auto markovChain = proposalImplToMarkovChain(
                             wrapProposal(mc->proposal, mc->transformation.value()),
                             mc->model,
