@@ -378,7 +378,7 @@ class ProposalTests(unittest.TestCase):
         self.assertAlmostEqual(expected_scale_mean, actual_scale_mean, places=1)
         self.assertAlmostEqual(expected_shape_mean, actual_shape_mean, places=1)
         for i in range(
-                max(len(expected_model_probabilities), len(actual_model_probabilities))
+            max(len(expected_model_probabilities), len(actual_model_probabilities))
         ):
             self.assertAlmostEqual(
                 expected_model_probabilities[i], actual_model_probabilities[i], places=1
@@ -443,7 +443,7 @@ class ProposalTests(unittest.TestCase):
         self.assertAlmostEqual(expected_scale_mean, actual_scale_mean, places=1)
         self.assertAlmostEqual(expected_shape_mean, actual_shape_mean, places=1)
         for i in range(
-                max(len(expected_model_probabilities), len(actual_model_probabilities))
+            max(len(expected_model_probabilities), len(actual_model_probabilities))
         ):
             self.assertAlmostEqual(
                 expected_model_probabilities[i], actual_model_probabilities[i], places=1
@@ -562,7 +562,7 @@ class ProposalTests(unittest.TestCase):
         self.assertAlmostEqual(expected_scale_mean, actual_scale_mean, places=1)
         self.assertAlmostEqual(expected_shape_mean, actual_shape_mean, places=1)
         for i in range(
-                max(len(expected_model_probabilities), len(actual_model_probabilities))
+            max(len(expected_model_probabilities), len(actual_model_probabilities))
         ):
             self.assertAlmostEqual(
                 expected_model_probabilities[i], actual_model_probabilities[i], places=2
