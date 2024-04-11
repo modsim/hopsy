@@ -51,8 +51,8 @@ class GammaPDF:
             if datum - location < 0:
                 continue
             density = (
-                              (datum - location) ** (shape - 1) * np.exp(-(datum - location) / scale)
-                      ) / (gamma(shape) * scale ** shape)
+                (datum - location) ** (shape - 1) * np.exp(-(datum - location) / scale)
+            ) / (gamma(shape) * scale**shape)
             log_density += np.log(density)
 
         return log_density
@@ -387,7 +387,9 @@ class ProposalTests(unittest.TestCase):
     def test_rjmcmc_rounded(self):
         measurements = [1.0]
         gammaPDF = GammaPDF(measurements)
-        problem = Problem(gammaPDF.A, gammaPDF.b, gammaPDF, starting_point=[0.5, 0.5, 0.5])
+        problem = Problem(
+            gammaPDF.A, gammaPDF.b, gammaPDF, starting_point=[0.5, 0.5, 0.5]
+        )
 
         rounded_problem = round(problem)
 
@@ -398,11 +400,13 @@ class ProposalTests(unittest.TestCase):
         # tip: perturb default values with epsilon to ensure they are not on the polytope borders
         defaultValues = np.array([1e-14, 1])
         # RJMCMC requires original polytope A and B to insert correct default values
-        rjmcmc_proposal = ReversibleJumpProposal(proposal,
-                                                 jumpIndices,
-                                                 defaultValues,
-                                                 A=rounded_problem.original_A,
-                                                 b=rounded_problem.original_b)
+        rjmcmc_proposal = ReversibleJumpProposal(
+            proposal,
+            jumpIndices,
+            defaultValues,
+            A=rounded_problem.original_A,
+            b=rounded_problem.original_b,
+        )
 
         mc = MarkovChain(problem=rounded_problem, proposal=rjmcmc_proposal)
 
