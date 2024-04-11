@@ -45,14 +45,14 @@ class GammaPDF:
         scale = x[4]
         shape = x[5]
         if scale <= 0 or shape <= 0:
-            raise ValueError("invalid parameters")
+            raise ValueError(f"invalid parameters! {scale}, {shape}")
         log_density = 0
         for datum in self.data:
             if datum - location < 0:
                 continue
             density = (
-                (datum - location) ** (shape - 1) * np.exp(-(datum - location) / scale)
-            ) / (gamma(shape) * scale**shape)
+                              (datum - location) ** (shape - 1) * np.exp(-(datum - location) / scale)
+                      ) / (gamma(shape) * scale ** shape)
             log_density += np.log(density)
 
         return log_density
@@ -340,6 +340,71 @@ class ProposalTests(unittest.TestCase):
 
         mc = MarkovChain(problem=problem, proposal=rjmcmc_proposal)
         rng = RandomNumberGenerator(5)
+
+        acc, samples = sample(mc, rng, n_samples=500_000, thinning=1)
+
+        location_samples = samples[0, :, 3]
+        scale_samples = samples[0, :, 4]
+        shape_samples = samples[0, :, 5]
+
+        actual_location_mean = np.mean(location_samples)
+        actual_scale_mean = np.mean(scale_samples)
+        actual_shape_mean = np.mean(shape_samples)
+
+        actual_model_visits = [0, 0, 0, 0]
+        for s in samples[0, :, :]:
+            model_index = 0
+            for j in range(jumpIndices.shape[0]):
+                model_index += 2 ** (jumpIndices.shape[0] - 1 - j) * s[jumpIndices[j]]
+            actual_model_visits[int(model_index)] += 1
+        actual_model_probabilities = [
+            float(v) / samples.shape[1] for v in actual_model_visits
+        ]
+
+        expected_location_mean = 0.25381601398469622
+        expected_scale_mean = 1.5811482758198503
+        expected_shape_mean = 1.7883893206783834
+
+        expected_model_probabilities = [
+            0.3147978599901968,
+            0.15325738646688555,
+            0.3485946848672095,
+            0.18335006867570805,
+        ]
+
+        # In order to save time testing, we sample less and receive less accurate results.
+        # The RJMCMC proposal is more rigorously tested in HOPS. Here we test that the python bindings work.
+        self.assertAlmostEqual(expected_location_mean, actual_location_mean, places=1)
+        self.assertAlmostEqual(expected_scale_mean, actual_scale_mean, places=1)
+        self.assertAlmostEqual(expected_shape_mean, actual_shape_mean, places=1)
+        for i in range(
+            max(len(expected_model_probabilities), len(actual_model_probabilities))
+        ):
+            self.assertAlmostEqual(
+                expected_model_probabilities[i], actual_model_probabilities[i], places=1
+            )
+
+    def test_rjmcmc_rounded(self):
+        measurements = [1.0]
+        gammaPDF = GammaPDF(measurements)
+        problem = Problem(gammaPDF.A, gammaPDF.b, gammaPDF, starting_point=[0.5, 0.5, 0.5])
+
+        rounded_problem = round(problem)
+
+        rng = RandomNumberGenerator(42)
+        proposal = UniformHitAndRunProposal(rounded_problem)
+
+        jumpIndices = np.array([0, 1])
+        # tip: perturb default values with epsilon to ensure they are not on the polytope borders
+        defaultValues = np.array([1e-14, 1])
+        # RJMCMC requires original polytope A and B to insert correct default values
+        rjmcmc_proposal = ReversibleJumpProposal(proposal,
+                                                 jumpIndices,
+                                                 defaultValues,
+                                                 A=rounded_problem.original_A,
+                                                 b=rounded_problem.original_b)
+
+        mc = MarkovChain(problem=rounded_problem, proposal=rjmcmc_proposal)
 
         acc, samples = sample(mc, rng, n_samples=500_000, thinning=1)
 

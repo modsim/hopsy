@@ -533,13 +533,13 @@ namespace hopsy {
                 proposal(ProposalImpl(A, b, startingPoint, args...)),
                 isInitialized(true) { }
 
+
         static UninitializedProposalWrapper<ProposalImpl, Args...> createFromProblem(const Problem* problem,
                                                                                      const Args&... args) {
             if (problem) {
                 if (!problem->startingPoint) {
                     throw std::runtime_error("Cannot setup a proposal without starting point.");
                 }
-
                 return UninitializedProposalWrapper<ProposalImpl, Args...>(problem->A, problem->b, *problem->startingPoint, args...);
             } else {
                 throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
@@ -553,7 +553,6 @@ namespace hopsy {
                 if (!(problem->startingPoint || startingPoint)) {
                     throw std::runtime_error("Cannot setup a proposal without starting point.");
                 }
-
                 VectorType _startingPoint = ( startingPoint ? *startingPoint : *problem->startingPoint );
                 return UninitializedProposalWrapper<ProposalImpl, Args...>(problem->A, problem->b, _startingPoint, args...);
             } else {
@@ -1398,11 +1397,13 @@ namespace hopsy {
         // constructor
         reversibleJumpProposal
             //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
-            .def(py::init<std::unique_ptr<Proposal>, const Eigen::VectorXi&, const VectorType&>(),
+            .def(py::init<std::unique_ptr<Proposal>, const Eigen::VectorXi&, const VectorType&, const std::optional<MatrixType>&, const std::optional<VectorType>&>(),
                     doc::ReversibleJumpProposal::__init__,
                     py::arg("proposal"),
                     py::arg("jump_indices"),
-                    py::arg("default_values")
+                    py::arg("default_values"),
+                    py::arg("A") = std::nullopt,
+                    py::arg("b") = std::nullopt
                     );
         // common
         proposal::addCommon<ReversibleJumpProposal, doc::ReversibleJumpProposal>(reversibleJumpProposal);
@@ -1444,7 +1445,7 @@ namespace hopsy {
                         auto proposal = t[0].cast<std::unique_ptr<Proposal>>();
 
                         auto rjmcmcProposal = ReversibleJumpProposal(
-                            std::move(proposal->copyProposal()),
+                            proposal->copyProposal(),
                             t[1].cast<Eigen::VectorXi>(),
                             t[2].cast<VectorType>(),
                             proposal->getA(),

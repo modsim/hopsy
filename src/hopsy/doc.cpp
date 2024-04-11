@@ -898,6 +898,12 @@ const char* hopsy::doc::Problem::A = R"pbdoc(numpy.ndarray[shape[m,n]]: Left-han
 const char* hopsy::doc::Problem::b = R"pbdoc(numpy.ndarray[shape[m,1]]: Right-hand side of the polytope-defining inequality :math:`Ax \leq b`. Note that ``b`` has to match the matrix ``A`` in the number of rows (=constraints).
 )pbdoc";
 
+const char* hopsy::doc::Problem::original_A = R"pbdoc(If the Problem has been transformed, e.g., rounded, then sometimes one wants to reconstruct the original problem. For this purpose, original_A retains the untransformed A. This is more accurate than transforming A back
+)pbdoc";
+
+const char* hopsy::doc::Problem::original_b = R"pbdoc(When the Problem has been transformed, e.g., rounded, then sometimes one wants to reconstruct the original problem. want to obtain the original problem. For this purpose, original_b retains the untransformed b. This is more accurate than transforming b back
+)pbdoc";
+
 
 const char* hopsy::doc::Problem::model = R"pbdoc(object: The ``model`` object defines the target distribution inside the polytope via its :meth:`log_density`. If no model is passed, then a uniform target on the polytope will be assumed. **Note that a uniform distribution on a polytope is only defined for bounded polytopes.**
 )pbdoc";

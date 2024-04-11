@@ -111,7 +111,6 @@ def add_box_constraints(
     """
     if problem.A.shape[1] == 0:
         raise ValueError("Cannot determine dimension for empty inequality Ax <= b.")
-        gggg
 
     if hasattr(lower_bound, "__len__") and len(lower_bound) != problem.A.shape[1]:
         raise TypeError(
@@ -406,6 +405,9 @@ def round(problem: _c.Problem):
             transformation=complete_transform,
             shift=complete_shift,
         )
+
+        _problem.original_A = problem.A
+        _problem.original_b = problem.b
 
         if problem.starting_point is not None:
             _problem.starting_point = transform(_problem, [problem.starting_point])[0]
