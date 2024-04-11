@@ -165,7 +165,7 @@ setup(
         "tqdm",
         "matplotlib",
         "scikit-learn",
-        "scipy<=1.13.0; python_version<='3.9'",
+        "scipy<1.13.0; python_version<='3.9'",
         "scipy; python_version>'3.9'",
     ],
     zip_safe=False,
