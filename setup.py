@@ -157,7 +157,8 @@ setup(
     install_requires=[
         "PolyRound>=0.2.10",
         "optlang>=1.7.0",
-        "arviz",
+        "arviz<=0.17.0; python_version<='3.9'",
+        "arviz; python_version>'3.9'",
         "numpy",
         "mcbackend",
         "pandas",
