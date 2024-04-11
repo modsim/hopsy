@@ -1,7 +1,6 @@
 import pickle
 import unittest
 
-import hopsy.core
 import numpy as np
 from scipy.special import gamma
 
@@ -395,7 +394,6 @@ class ProposalTests(unittest.TestCase):
         rng = RandomNumberGenerator(42)
         proposal = UniformHitAndRunProposal(rounded_problem)
 
-
         jumpIndices = np.array([0, 1])
         # tip: perturb default values with epsilon to ensure they are not on the polytope borders
         defaultValues = np.array([1e-14, 1])
@@ -404,7 +402,7 @@ class ProposalTests(unittest.TestCase):
                                                  jumpIndices,
                                                  defaultValues,
                                                  A=rounded_problem.original_A,
-                                                 b =rounded_problem.original_b)
+                                                 b=rounded_problem.original_b)
 
         mc = MarkovChain(problem=rounded_problem, proposal=rjmcmc_proposal)
 
@@ -564,7 +562,7 @@ class ProposalTests(unittest.TestCase):
         self.assertAlmostEqual(expected_scale_mean, actual_scale_mean, places=1)
         self.assertAlmostEqual(expected_shape_mean, actual_shape_mean, places=1)
         for i in range(
-            max(len(expected_model_probabilities), len(actual_model_probabilities))
+                max(len(expected_model_probabilities), len(actual_model_probabilities))
         ):
             self.assertAlmostEqual(
                 expected_model_probabilities[i], actual_model_probabilities[i], places=2

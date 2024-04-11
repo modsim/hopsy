@@ -533,17 +533,17 @@ namespace hopsy {
                 proposal(ProposalImpl(A, b, startingPoint, args...)),
                 isInitialized(true) { }
 
-        UninitializedProposalWrapper(std::unique_ptr<Proposal> prop) :
-                proposal(std::move(prop)),
-                isInitialized(true) { }
-
 
         static UninitializedProposalWrapper<ProposalImpl, Args...> createFromProblem(const Problem* problem,
                                                                                      const Args&... args) {
-                if (!(problem->startingPoint)) {
-                    throw std::runtime_error("Cannot setup a proposal without starting point");
+            if (problem) {
+                if (!problem->startingPoint) {
+                    throw std::runtime_error("Cannot setup a proposal without starting point.");
                 }
-               return UninitializedProposalWrapper<ProposalImpl, Args...>::create(problem, &(problem->startingPoint.value()), args...);
+                return UninitializedProposalWrapper<ProposalImpl, Args...>(problem->A, problem->b, *problem->startingPoint, args...);
+            } else {
+                throw std::runtime_error(std::string("Internal error in ") + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "!!!");
+            }
         }
 
         static UninitializedProposalWrapper<ProposalImpl, Args...> create(const Problem* problem,
@@ -677,7 +677,6 @@ namespace hopsy {
         }
 
         std::optional<ProposalImpl> proposal;
-
     private:
         std::string uninitializedMethod(const std::string& name) const {
             return "Tried to access " + name + " on an uninitialized proposal.";
@@ -864,7 +863,6 @@ namespace hopsy {
                                               self.proposal->getB(),
                                               self.proposal->getState(),
                                               self.proposal->getCholeskyOfMaximumVolumeEllipsoid(),
-//                                              dynamic_cast<hops::AdaptiveMetropolisProposal<MatrixType>&>(*self.proposal).getCholeskyOfMaximumVolumeEllipsoid(),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::BOUNDARY_CUSHION)),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::EPSILON)),
                                               std::any_cast<unsigned long>(self.proposal->getParameter(ProposalParameter::WARM_UP)));
@@ -983,7 +981,6 @@ namespace hopsy {
                                               self.proposal->getB(),
                                               self.proposal->getState(),
                                               self.proposal->getCholeskyOfMaximumVolumeEllipsoid(),
-//                                              dynamic_cast<hops::BilliardAdaptiveMetropolisProposal<MatrixType>&>(*self.proposal).getCholeskyOfMaximumVolumeEllipsoid(),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::BOUNDARY_CUSHION)),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::EPSILON)),
                                               std::any_cast<unsigned long>(self.proposal->getParameter(ProposalParameter::WARM_UP)),
@@ -1551,7 +1548,6 @@ namespace hopsy {
         proposal::addCommon<TruncatedGaussianProposal, doc::TruncatedGaussianProposal>(truncatedgaussianProposal);
         // pickling
         truncatedgaussianProposal.def(py::pickle([] (const TruncatedGaussianProposal& self) {
-//                                           std::shared_ptr<Model> modelPtr = dynamic_cast<hops::TruncatedGaussianProposal<MatrixType, VectorType>&>(*self.proposal).getModel()->copyModel();
                                            std::shared_ptr<Model> modelPtr = self.proposal->getModel()->copyModel();
                                            auto casted = std::dynamic_pointer_cast<hops::Gaussian>(modelPtr);
                                            if (!casted) {
