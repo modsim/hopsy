@@ -74,7 +74,7 @@ class CMakeBuild(build_ext):
             cmake_args.append("-DHOPSY_BUILD_ID={}".format(commit_hash))
         except Exception as e:
             commit_hash = commit
-            print("Warning: Failed retrieving commit hash. No build ID will be set.")
+            print("ERROR retrieving commit hash. No build ID will be set.")
 
         if self.compiler.compiler_type != "msvc":
             # Using Ninja-build since it a) is available as a wheel and b)
@@ -157,13 +157,16 @@ setup(
     install_requires=[
         "PolyRound>=0.2.10",
         "optlang>=1.7.0",
-        "arviz",
+        "arviz<=0.17.0; python_version<='3.9'",
+        "arviz; python_version>'3.9'",
         "numpy",
         "mcbackend",
         "pandas",
         "tqdm",
         "matplotlib",
         "scikit-learn",
+        "scipy<=1.13.0; python_version<='3.9'",
+        "scipy; python_version>'3.9'",
     ],
     zip_safe=False,
 )
