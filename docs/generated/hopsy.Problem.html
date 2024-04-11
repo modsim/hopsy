@@ -579,6 +579,12 @@ document.write(`
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model</span></code></p></td>
 <td><p>The <code class="docutils literal notranslate"><span class="pre">model</span></code> object defines the target distribution inside the polytope via its <code class="xref py py-meth docutils literal notranslate"><span class="pre">log_density()</span></code>.</p></td>
 </tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">original_A</span></code></p></td>
+<td><p>If the Problem has been transformed, e.g., rounded, then sometimes one wants to reconstruct the original problem.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">original_b</span></code></p></td>
+<td><p>When the Problem has been transformed, e.g., rounded, then sometimes one wants to reconstruct the original problem.</p></td>
+</tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shift</span></code></p></td>
 <td><p>For preconditioning (e.g. polytope rounding) one may wish to transform the polytope defined by <span class="math notranslate nohighlight">\(Ax \leq b\)</span> as <span class="math notranslate nohighlight">\(ATy \leq b - As\)</span> where <cite>x = Ty + s</cite>.</p></td>
 </tr>
