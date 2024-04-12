@@ -538,7 +538,8 @@ namespace hopsy {
                                                                                      const Args&... args) {
             if (problem) {
                 if (!problem->startingPoint) {
-                    throw std::runtime_error("Cannot setup a proposal without starting point.");
+                    VectorType starting_point = computeChebyshevCenter(*problem);
+                    return UninitializedProposalWrapper<ProposalImpl, Args...>(problem->A, problem->b, starting_point, args...);
                 }
                 return UninitializedProposalWrapper<ProposalImpl, Args...>(problem->A, problem->b, *problem->startingPoint, args...);
             } else {
@@ -551,7 +552,8 @@ namespace hopsy {
                                                                           const Args&... args) {
             if (problem) {
                 if (!(problem->startingPoint || startingPoint)) {
-                    throw std::runtime_error("Cannot setup a proposal without starting point.");
+                    VectorType starting_point = computeChebyshevCenter(*problem);
+                    return UninitializedProposalWrapper<ProposalImpl, Args...>(problem->A, problem->b, starting_point, args...);
                 }
                 VectorType _startingPoint = ( startingPoint ? *startingPoint : *problem->startingPoint );
                 return UninitializedProposalWrapper<ProposalImpl, Args...>(problem->A, problem->b, _startingPoint, args...);

@@ -80,6 +80,13 @@ class MiscTests(unittest.TestCase):
         is_empty = is_problem_polytope_empty(problem)
         self.assertEqual(is_empty, True)
 
+    def test_default_starting_point_for_markov_chain(self):
+        A = np.array([[1], [-1]])
+        b = np.array([2, 1])
+        p = Problem(A, b)
+        mc = MarkovChain(p)
+        assert np.all(b - A @ mc.state > 0)
+
     def test_sequential_sampling(self):
         chains = [MarkovChain(problem, GaussianProposal) for i in range(n_chains)]
         rngs = [RandomNumberGenerator(seed, i) for i in range(n_chains)]

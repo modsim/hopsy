@@ -111,6 +111,21 @@ namespace hopsy {
         }
     };
 
+    VectorType computeChebyshevCenter(const Problem& problem) {
+        VectorType chebyshevCenter;
+
+        py::dict local;
+        local["problem"] = problem;
+
+        py::exec(R"(
+            import hopsy
+            chebyshevCenter = hopsy.compute_chebyshev_center(problem)
+        )", local);
+
+        chebyshevCenter = local["chebyshevCenter"].cast<VectorType>();
+        return chebyshevCenter;
+    }
+
     MatrixType computeSqrtMaximumVolumeEllipsoid(const Problem& problem) {
         MatrixType sqrtMve;
 
