@@ -189,6 +189,9 @@ Found insufficient docstring for the following items:
   -- hopsy.examples
   -- hopsy.lp
   -- hopsy.misc
-  -- hopsy.tune
-Found 395 items of which 204 have suffcient docstring.
-Coverage: 51.6%
+  -- hopsy.set_params
+  -- hopsy.tune_acceptance_rate
+  -- hopsy.tune_esjd
+  -- hopsy.tune_old
+Found 405 items of which 211 have suffcient docstring.
+Coverage: 52.1%

@@ -421,7 +421,7 @@ document.write(`
 </pre></div>
 </div>
 </div>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
@@ -431,15 +431,6 @@ document.write(`
 <span class="n">problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">add_box_constraints</span><span class="p">(</span><span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">model</span><span class="p">),</span> <span class="o">-</span><span class="mf">1e3</span><span class="p">,</span> <span class="mf">1e3</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Set parameter Username
-Academic license - for non-commercial use only - expires 2023-11-30
-</pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -454,7 +445,7 @@ Academic license - for non-commercial use only - expires 2023-11-30
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;__main__.CustomModel object at 0x7f09d89bdae0&gt;
+&lt;__main__.CustomModel object at 0x74acb424ffd0&gt;
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -496,16 +487,11 @@ Academic license - for non-commercial use only - expires 2023-11-30
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># tune the markov chain:</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># tune the expected squared jump distance of the  markov chains:</span>
 
-<span class="n">tuning_target</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">AcceptanceRateTarget</span><span class="p">(</span><span class="n">markov_chains</span><span class="p">)</span>
-<span class="n">TS</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">ThompsonSamplingTuning</span><span class="p">()</span>
-<span class="n">stepsize</span><span class="p">,</span> <span class="n">tuning_posterior</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">tune</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">TS</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">tuning_target</span><span class="p">,</span> <span class="n">rngs</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+<span class="n">tuning_target</span> <span class="o">=</span> <span class="s2">&quot;esjd&quot;</span>  <span class="c1"># alternative targets are acc_rate and esjd/s</span>
+<span class="n">hopsy</span><span class="o">.</span><span class="n">tune</span><span class="p">(</span><span class="n">markov_chains</span><span class="p">,</span> <span class="n">rng</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">tuning_target</span><span class="p">,</span> <span class="n">n_tuning</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
 
-
-<span class="c1"># sets stepsize for every markov chain</span>
-<span class="k">for</span> <span class="n">mc</span> <span class="ow">in</span> <span class="n">markov_chains</span><span class="p">:</span>
-    <span class="n">mc</span><span class="o">.</span><span class="n">proposal</span><span class="o">.</span><span class="n">stepsize</span> <span class="o">=</span> <span class="n">stepsize</span>
 
 <span class="c1"># sampling is called using the sample function. In this case we want to sample 4 chains using 4 threads. Of course, you can vary the number of threads according to your CPU.</span>
 <span class="n">acceptance_rates</span><span class="p">,</span> <span class="n">samples</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">markov_chains</span><span class="p">,</span> <span class="n">rng</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">thinning</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">n_threads</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
@@ -526,7 +512,7 @@ Academic license - for non-commercial use only - expires 2023-11-30
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[0.23018200000000003, 0.230638, 0.22964800000000005, 0.231132]
+[0.4636080000000001, 0.46652000000000005, 0.4636660000000001, 0.4646160000000001]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -536,7 +522,7 @@ Academic license - for non-commercial use only - expires 2023-11-30
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># checks convergence and ESS</span>
 <span class="n">rhat</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">rhat</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">rhat</span><span class="p">)</span>
-<span class="k">assert</span><span class="p">((</span><span class="n">rhat</span><span class="o">&lt;=</span><span class="mf">1.1</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">())</span> <span class="c1"># asserts that convergence has been reached. Here we use a strict limit of 1.01</span>
+<span class="k">assert</span><span class="p">((</span><span class="n">rhat</span><span class="o">&lt;=</span><span class="mf">1.01</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">())</span> <span class="c1"># asserts that convergence has been reached. Here we use a strict limit of 1.01</span>
 
 
 <span class="n">ess</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">ess</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
@@ -551,8 +537,8 @@ Academic license - for non-commercial use only - expires 2023-11-30
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[[1.00004714 0.9999576 ]]
-[[35364.96731354 37847.86539577]]
+[[0.99994712 0.99993354]]
+[[39690.03707734 39542.67865878]]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -570,7 +556,7 @@ Academic license - for non-commercial use only - expires 2023-11-30
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 (10000, 2)
-[0.23018200000000003, 0.230638, 0.22964800000000005, 0.231132]
+[0.4636080000000001, 0.46652000000000005, 0.4636660000000001, 0.4646160000000001]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -604,14 +590,6 @@ Academic license - for non-commercial use only - expires 2023-11-30
 </div>
 <div class="output_area docutils container">
 <img alt="../_images/notebooks_SamplingAdvice_12_0.png" src="../_images/notebooks_SamplingAdvice_12_0.png" />
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">

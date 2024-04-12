@@ -564,8 +564,62 @@ document.write(`
 <h1>hopsy.tune<a class="headerlink" href="#hopsy-tune" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="hopsy.tune">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">tune</span></span><a class="headerlink" href="#hopsy.tune" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">tune</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rngs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_tuning</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accrate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.234</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_procs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_burnin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_proposal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['stepsize']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transforms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.tune" title="Link to this definition">#</a></dt>
+<dd><p>Thompson Sampling-based tuning method for specifying meaningful hyperparameters
+for Markov chain proposal distributions. This method supports three different tuning targets,
+namely the commonly used accpetance rate, the Expected Squared Jump Distance (ESJD) and the ESJD
+per second (ESJD/s) rather than per sample.</p>
+<p>Tuning happens over a fixed search domain created from a Sobol sequence of <cite>n_points</cite> grid points
+with lower and upper bound using <cite>lower</cite> and <cite>upper</cite>. Its dimension is automatically adapted to the
+number of parameters that are to be tuned per proposal. Note that constraints are handled by transforming
+the parameters using the transformations stored in the <cite>transforms</cite> dict. Default transforms are available
+for <cite>stepsize</cite>, where an exponential transform is applied (i.e. Thompson Sampling happens in log space)
+and for <cite>fisher_weight</cite>, where a sigmoid function is applied.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mcs</strong> (<em>list</em><em> of </em><em>list</em><em> or </em><em>list</em><em> of </em><a class="reference internal" href="hopsy.MarkovChain.html#hopsy.MarkovChain" title="hopsy.MarkovChain"><em>hopsy.MarkovChain</em></a>) – Markov chains, which will be used to generate samples. If list of lists of <a href="#id1"><span class="problematic" id="id2">``</span></a>hopsy.MarkovChain``s
+are passed, outer lists are expected to share the same proposal algorithm,
+inner lists to be replicas of the same chain.</p></li>
+<li><p><strong>rngs</strong> (<em>list</em><em> of </em><em>list</em><em> or </em><em>list</em><em> of </em><a class="reference internal" href="hopsy.RandomNumberGenerator.html#hopsy.RandomNumberGenerator" title="hopsy.RandomNumberGenerator"><em>hopsy.RandomNumberGenerator</em></a>) – Random number generators required for sampling from the Markov chains. Should match <cite>mcs</cite> in number
+and shape.</p></li>
+<li><p><strong>target</strong> (<em>str</em>) – Tuning target. Choose one of <cite>accrate</cite>, <cite>esjd</cite> or <cite>esjd/s</cite>.</p></li>
+<li><p><strong>n_tuning</strong> (<em>int</em>) – Total budget of samples that may be drawn for tuning per chain.</p></li>
+<li><p><strong>k</strong> (<em>list</em><em> of </em><em>int</em><em>, </em><em>default=</em><em>[</em><em>1</em><em>]</em>) – Lags at which the ESJDs are computed. If more than one lag is passed,
+ESJDs across multiple lags will be summed up.</p></li>
+<li><p><strong>accrate</strong> (<em>float</em><em>, </em><em>default=0.234</em>) – Target accpetance rate for acceptance rate tuning.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>default=42</em>) – RNG seed for the Thompson Sampling procedure.</p></li>
+<li><p><strong>n_procs</strong> (<em>int</em><em>, </em><em>default=1</em>) – Number of parallel chains. Is passed as is to <cite>hopsy.sample</cite>.</p></li>
+<li><p><strong>n_rounds</strong> (<em>int</em><em>, </em><em>default=100</em>) – Number of Thompson Sampling rounds.</p></li>
+<li><p><strong>n_burnin</strong> (<em>int</em><em>, </em><em>default=50</em>) – Number of Thompson Sampling rounds, where it is just naively applied to all proposal distributions.
+This option only makes any difference, if <cite>sample_proposal==True</cite>.</p></li>
+<li><p><strong>sample_proposal</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Choose whether to apply TS also on the discrete choice of proposal algorithm to use. This option
+is only supported if tuning w.r.t. to ESJD or ESJD/s.</p></li>
+<li><p><strong>lower</strong> (<em>float</em><em>, </em><em>default=-5</em>) – Lower bound on the search domain of the transformed hyperparameters.</p></li>
+<li><p><strong>upper</strong> (<em>float</em><em>, </em><em>default=5</em>) – Upper bound on the search domain of the transformed hyperparameters.</p></li>
+<li><p><strong>n_points</strong> (<em>int</em><em>, </em><em>default=256</em>) – Number of points to draw from the Sobol sequence. Should ideally be some power of 2.</p></li>
+<li><p><strong>params</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>default=</em><em>[</em><em>'stepsize'</em><em>]</em>) – Parameters that are to be tuned. They get accessed as attributes of <cite>mc.proposal</cite>.
+If a proposal doesn’t provide the corresponding parameter, then it will just be ignored.</p></li>
+<li><p><strong>transforms</strong> (<em>dict</em><em> of </em><em>callable</em><em>, </em><em>default=None</em>) – Dictonary containing transforms mapping unbounded values to the proper range for a given parameter.
+Default transforms exist for <cite>stepsize</cite>, which gets mapped using an exponential function,
+and <cite>fisher_weight</cite>, which gets mapped using a sigmoid. Default values are overridden if any other
+transforms are passed here for the same parameters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>mcs</strong> (<em>dict of list of hopsy.MarkovChain</em>) – List of tuned Markov chains, where each list of replicas is stored with <cite>key==mc.proposal.__class__.__name__</cite>.</p></li>
+<li><p><strong>rngs</strong> (<em>dict of list of hopsy.RandomNumberGenerator</em>) – List of forwarded random number generators, where corresponding RNGs to the Markov chains in <cite>mcs</cite> are
+also stored with <cite>key==mc.proposal.__class__.__name__</cite>.</p></li>
+<li><p><strong>(gprs, domains)</strong> (<em>tuple of dict</em>) – <cite>gprs</cite> contains the fitted sklearn <cite>GaussianProcessRegressor`s, which were used as surrogate functions
+to the blackbox tuning target. `domains</cite> contains the Sobol sequence domains on which the GPs were
+evaluated to obtain the next hyperparameter choice. Both dicts store using the respective proposal
+names as keys.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 
