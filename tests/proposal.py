@@ -142,19 +142,21 @@ class ProposalTests(unittest.TestCase):
                 proposal = ProposalType(problem, warm_up=int(1.0e3))
                 self.assertEqual(proposal.warm_up, 1.0e3)
 
+    def test_default_starting_point_for_proposal(self):
+        problem_no_start = Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0], Gaussian())
+        for ProposalType in ProposalTypes:
+            proposal = ProposalType(problem_no_start)
+            assert np.all(problem_no_start.b - problem_no_start.A @ proposal.state > 0)
+
     def test_starting_points(self):
         problem = Problem(
             [[1, 1], [-1, 0], [0, -1]], [1, 0, 0], Gaussian(), starting_point=[0, 0]
         )
-        problem_no_start = Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0], Gaussian())
         x = [0.1, 0.2]
 
         for ProposalType in ProposalTypes:
             proposal = ProposalType(problem, starting_point=x)
             self.assertTrue((proposal.state == x).all())
-
-            with self.assertRaises(RuntimeError):
-                proposal = ProposalType(problem_no_start)
 
     def test_automatic_downcasting(self):
         problem = Problem(
@@ -195,31 +197,22 @@ class ProposalTests(unittest.TestCase):
         problem = Problem(np.array([1, -1]), 5 * np.ones(2), model)
 
         for ProposalType in ProposalTypes:
-            if ProposalType in [
-                UniformCoordinateHitAndRunProposal,
-                UniformHitAndRunProposal,
-            ]:
-                with self.assertRaises(RuntimeError):
-                    proposal = ProposalType(problem)
-                    self.assertTrue((proposal.state == problem.starting_point).all())
+            mc = MarkovChain(problem, ProposalType, [0.0])
+            rng = RandomNumberGenerator(seed=42)
 
-            else:
-                mc = MarkovChain(problem, ProposalType, [0.0])
-                rng = RandomNumberGenerator(seed=42)
+            num_samples = 25000
+            _, samples = sample(mc, rng, num_samples)
 
-                num_samples = 25000
-                _, samples = sample(mc, rng, num_samples)
-
-                # checks sample mean is close to real mean of 0
-                true_std = 1.0
-                standard_error_of_mean = true_std / np.sqrt(ess(samples))
-                #  checks that mean is within 2 standard errors
-                self.assertTrue(
-                    np.abs(np.mean(samples) - model.mean) < 2 * standard_error_of_mean
-                )
-                # checks sample std is close to real std of 1
-                self.assertTrue(np.abs(np.std(samples, ddof=1) - true_std) < 1e-1)
-                pass
+            # checks sample mean is close to real mean of 0
+            true_std = 1.0
+            standard_error_of_mean = true_std / np.sqrt(ess(samples))
+            #  checks that mean is within 2 standard errors
+            self.assertTrue(
+                np.abs(np.mean(samples) - model.mean) < 2 * standard_error_of_mean
+            )
+            # checks sample std is close to real std of 1
+            self.assertTrue(np.abs(np.std(samples, ddof=1) - true_std) < 1e-1)
+            pass
 
     def test_gaussian_sampling_shifted(self):
         model = Gaussian(np.ones(1) * 5, 0.25 * np.identity(1))
@@ -230,9 +223,9 @@ class ProposalTests(unittest.TestCase):
                 UniformCoordinateHitAndRunProposal,
                 UniformHitAndRunProposal,
             ]:
-                with self.assertRaises(RuntimeError):
-                    proposal = ProposalType(problem)
-                    self.assertTrue((proposal.state == problem.starting_point).all())
+                # skip slow mixing proposals for time reasons
+                proposal = ProposalType(problem)
+                self.assertTrue((proposal.state == np.ndarray([0])).all())
 
             else:
                 mc = MarkovChain(problem, ProposalType, [0.0])

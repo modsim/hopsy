@@ -115,12 +115,11 @@ namespace hopsy {
         VectorType chebyshevCenter;
 
         py::dict local;
-        local["A"] = problem.A;
-        local["b"] = problem.b;
+        local["problem"] = problem;
 
         py::exec(R"(
             import hopsy
-            chebyshevCenter = hopsy.compute_chebyshev_center(A, b)
+            chebyshevCenter = hopsy.compute_chebyshev_center(problem)
         )", local);
 
         chebyshevCenter = local["chebyshevCenter"].cast<VectorType>();

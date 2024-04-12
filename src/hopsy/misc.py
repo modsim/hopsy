@@ -1,7 +1,6 @@
 """
 
 """
-import hopsy
 
 
 class _core:
@@ -69,9 +68,8 @@ def MarkovChain(
         elif problem.starting_point is not None:
             _proposal = proposal(problem, starting_point=problem.starting_point)
         else:
-            # _starting_point = hopsy.compute_chebyshev_center(problem)
-            # _proposal = proposal(problem, _starting_point)
-            _proposal = proposal(problem)
+            _starting_point = compute_chebyshev_center(problem)
+            _proposal = proposal(problem, starting_point=_starting_point)
     else:
         _proposal = proposal
 

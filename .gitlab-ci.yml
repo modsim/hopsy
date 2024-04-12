@@ -1,6 +1,7 @@
 image: quay.io/pypa/manylinux2014_x86_64
 
 variables:
+  GIT_STRATEGY: clone
   GIT_SUBMODULE_STRATEGY: recursive
 
 stages:
