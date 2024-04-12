@@ -1,6 +1,7 @@
 # Changelog
 
 ## Latest
+- [#133](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/133): Add default starting point when none is given
 - [#128](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/128): Add stepsize tuning with Python TuningTargets
 - [#122](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/122): Fix rounding for Reversible Jump MCMC
 - [#125](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/125): Update Readme.md & Fix automatic docs generation
