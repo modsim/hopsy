@@ -261,7 +261,7 @@ namespace hopsy {
           .def_readwrite("random_seed", &ThompsonSampling::randomSeed, doc::ThompsonSampling::randomSeed)
           .def_readwrite("record_data", &ThompsonSampling::recordData, doc::ThompsonSampling::recordData);
 
-        m.def("tune", &tune<hops::ThompsonSamplingTuner>,
+        m.def("tune_old", &tune<hops::ThompsonSamplingTuner>,
                 doc::tune,
                 py::arg("method"), py::arg("target"), py::arg("rngs"));
     }
