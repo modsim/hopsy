@@ -80,18 +80,24 @@ class TuningTests(unittest.TestCase):
                 for j, _ in enumerate(proposals)
             ]
 
-            _, _, (gprs, domains) = tune(mcs, rngs, target=target, n_tuning=10000, n_rounds=5)
+            _, _, (gprs, domains) = tune(
+                mcs, rngs, target=target, n_tuning=10000, n_rounds=5
+            )
 
             proposal = GaussianProposal
 
             mcs = [MarkovChain(problem, proposal=proposal) for i in range(4)]
             rngs = [RandomNumberGenerator(42, i) for i in range(4)]
 
-            _, _, (gprs, domains) = tune(mcs, rngs, target=target, n_tuning=10000, n_rounds=5)
+            _, _, (gprs, domains) = tune(
+                mcs, rngs, target=target, n_tuning=10000, n_rounds=5
+            )
 
             mcs = MarkovChain(problem, proposal=proposal)
             rngs = RandomNumberGenerator(42)
 
-            _, _, (gprs, domains) = tune(mcs, rngs, target=target, n_tuning=10000, n_rounds=5)
+            _, _, (gprs, domains) = tune(
+                mcs, rngs, target=target, n_tuning=10000, n_rounds=5
+            )
 
         self.assertEqual(True, True)
