@@ -24,6 +24,7 @@ _c = _core
 
 
 class _submodules:
+    import atexit
     import time
     import warnings
 
@@ -59,7 +60,7 @@ class _submodules:
 _s = _submodules
 
 
-def create_shared_memory(state_shape, state_type=_s.numpy.float64):
+def create_shared_memory(state_shape, num_blocks: int, state_type=_s.numpy.float64):
     """
     It is the responsibility of the caller of create_shared_memory to call release_shared_memory.
     Multiprocessing will give a warning if leaked memory exists at the end of the program
@@ -80,9 +81,11 @@ def create_shared_memory(state_shape, state_type=_s.numpy.float64):
     shared_memory_size = _s.numpy.dtype(state_type).itemsize * _s.numpy.prod(shape)
     shared_state_memory = [
         _s.shared_memory.SharedMemory(size=shared_memory_size, create=True)
-        for i in range(2)
+        for i in range(num_blocks)
     ]
-    return [shm.name for shm in shared_state_memory]
+    shared_memory_names = [shm.name for shm in shared_state_memory]
+    _s.atexit.register(lambda: [release_shared_memory(s) for s in shared_memory_names])
+    return shared_memory_names
 
 
 def release_shared_memory(name):
@@ -100,15 +103,18 @@ def release_shared_memory(name):
     None
 
     """
-    shm = _s.shared_memory.SharedMemory(name=name, create=False)
-    shm.close()
-    shm.unlink()
+    try:
+        # If memory was already unlinked, it will throw. Because we register the cleanup with atexit,
+        # we don't know for sure if the memory still exists or not. We just clean up any handle we ever had.
+        shm = _s.shared_memory.SharedMemory(name=name, create=False)
+        shm.close()
+        shm.unlink()
+    except FileNotFoundError:
+        pass
 
 
 class PyParallelTemperingEnsemble:
-    """
-    TODO for context stuff
-    """
+    """ """
 
     def __enter__(self):
         pass
@@ -130,18 +136,19 @@ class PyParallelTemperingChain:
         sync_rng: _c.RandomNumberGenerator,
         barrier: _s.multiprocessing.Barrier,
         shared_memory_names: _s.typing.List[str] = None,
-        exchange_attempt_probability: float = 0.1,
+        draws_per_exchange_attempt: float = 10,
     ):
         self.markov_chain = markov_chain
         self.parallel_tempering_sync_rng = sync_rng
         self.shared_memory_names = shared_memory_names
-        self.exchange_attempt_probability = exchange_attempt_probability
+        self.draw_per_exchange_attempt = draws_per_exchange_attempt
         self.chain_index = chain_index
         self.barrier = barrier
         self.num_chains_in_ensemble = num_chains_in_ensemble
+        self.draw_count = 0
 
     def __del__(self):
-        # self.barrier.wait()
+        self.barrier.wait()
         if self.chain_index == 0:
             for n in self.shared_memory_names:
                 release_shared_memory(n)
@@ -180,35 +187,36 @@ class PyParallelTemperingChain:
         :param thinning:
         :return: acceptance rate, state
         """
-        acceptanceRate = 0.0
+        acceptance_rate = 0.0
         # return self.markov_chain.draw(rng=rng, thinning=thinning)
-        for i in range(thinning):
-            draw = self._draw(rng, barrier=self.barrier)
-            acceptanceRate += draw[0]
-        return acceptanceRate / thinning, draw[1]
+        # self.draw_count = thinning
+        self.draw_count += thinning
+        if self.draw_count >= self.draw_per_exchange_attempt:
+            accepted = self.markov_chain.draw(
+                rng=rng, thinning=self.draw_per_exchange_attempt
+            )[0]
+            acceptance_rate += accepted * self.draw_per_exchange_attempt
+            accepted += self._parallel_tempering_exchange(barrier=self.barrier)[0]
+            acceptance_rate += accepted
+            self.draw_count = thinning - 1 - self.draw_per_exchange_attempt
+            accepted, state = self.markov_chain.draw(rng=rng, thinning=self.draw_count)
+            acceptance_rate += accepted * self.draw_count
+            self.draw_count = 0
+        else:
+            accepted, state = self.markov_chain.draw(rng=rng, thinning=self.draw_count)
+            acceptance_rate += accepted * self.draw_count
+        return acceptance_rate / thinning, state
 
-    def _draw(self, rng: _c.RandomNumberGenerator, barrier: _s.multiprocessing.Barrier):
-        # if (
-        #     _c.Uniform(a=0, b=1)(self.parallel_tempering_sync_rng)
-        #     < self.exchange_attempt_probability
-        # ):
-        #     return self._parallel_tempering_exchange(rng, barrier=barrier)
-        # else:
-        return self._parallel_normal_draw(rng)
-
-    def _parallel_normal_draw(self, rng):
-        return self.markov_chain.draw(rng=rng)
-
-    def _parallel_tempering_exchange(self, rng, barrier):
+    def _parallel_tempering_exchange(self, barrier):
         accepted = False
-        swapping_chains = self._generate_pair_for_exchange()
+        partner_index = self._find_partner_for_swap()
         expected_shape = (
             self.markov_chain.state.shape[0] + 2,
             *self.markov_chain.state.shape[1:],
         )
         barrier.wait()
-        if self.chain_index in swapping_chains:
-            this_index = swapping_chains.index(self.chain_index)
+        if partner_index != -1:
+            this_index = self.chain_index
             shm = _s.shared_memory.SharedMemory(
                 name=self.shared_memory_names[this_index], create=False
             )
@@ -218,39 +226,62 @@ class PyParallelTemperingChain:
             )
             # swaps out cold likelihoods, i.e., original likelihoods
             write_destination[0] = (
-                self.state_log_density / self.coldness if self.coldness != 0.0 else 0.0
+                # TODO This is probabliy wrong:
+                self.state_log_density / self.coldness
+                if self.coldness != 0.0
+                else 0.0
             )
             write_destination[1] = self.coldness
             write_destination[2:] = self.markov_chain.state
 
         barrier.wait()
-        if self.chain_index in swapping_chains:
-            other_index = (swapping_chains.index(self.chain_index) + 1) % 2
-            shm = _s.shared_memory.SharedMemory(
-                name=self.shared_memory_names[other_index], create=False
-            )
-            other_chain = _s.numpy.ndarray(
-                shape=expected_shape, dtype=_s.numpy.float64, buffer=shm.buf
-            )
-            likelihood_difference = self.state_log_density - other_chain[0]
-            coldness_difference = self.coldness - other_chain[1]
-            acceptance_prob = _s.numpy.exp(likelihood_difference * coldness_difference)
-            if _c.Uniform(a=0, b=1)(self.parallel_tempering_sync_rng) < acceptance_prob:
-                self.state = other_chain[2:]
-                accepted = True
-        else:
-            # keeps rngs in sync
-            self.parallel_tempering_sync_rng()
-        return 1.0 if accepted else 0.0
-
-    def _generate_pair_for_exchange(self):
-        first_chain = int(
-            _c.UniformInt(a=0, b=self.num_chains_in_ensemble - 1)(
-                self.parallel_tempering_sync_rng
-            )
+        shm = _s.shared_memory.SharedMemory(
+            name=self.shared_memory_names[partner_index], create=False
         )
-        second_chain = first_chain + 1
-        return first_chain, second_chain
+        other_chain = _s.numpy.ndarray(
+            shape=expected_shape, dtype=_s.numpy.float64, buffer=shm.buf
+        )
+        likelihood_difference = self.state_log_density - other_chain[0]
+        coldness_difference = self.coldness - other_chain[1]
+        acceptance_prob = _s.numpy.exp(likelihood_difference * coldness_difference)
+        if _c.Uniform(a=0, b=1)(self.parallel_tempering_sync_rng) < acceptance_prob:
+            self.state = other_chain[2:]
+            accepted = True
+
+        return 1.0 if accepted else 0.0, self.markov_chain.state
+
+    def _find_partner_for_swap(self):
+        partner_index = -1
+        even_odd = _c.UniformInt(a=0, b=1)(self.parallel_tempering_sync_rng)
+        if even_odd % 2 == 0:
+            # even communication:
+            if self.chain_index % 2 == 0:
+                # this chain is even and communicates with chainIndex +1
+                partner_index = self.chain_index + 1
+            else:
+                # this chain is odd and communicates with chainIndex -1
+                partner_index = self.chain_index - 1
+        else:
+            # odd communication
+            if self.chain_index % 2 == 0:
+                # this chain is even and communicates with chainIndex +1
+                partner_index = self.chain_index - 1
+            else:
+                # this chain is odd and communicates with chainIndex -1
+                partner_index = self.chain_index + 1
+
+        # check if swap partner is valid:
+        if self.num_chains_in_ensemble % 2 == 0:
+            # even number of chains: you can always find a partner
+            if partner_index == -1:
+                partner_index = self.num_chains_in_ensemble - 1
+            partner_index = (partner_index) % self.num_chains_in_ensemble
+        else:
+            # odd number of chains: you can NOT always find a partner
+            if partner_index == self.num_chains_in_ensemble:
+                partner_index = -1
+
+        return partner_index
 
 
 class TemperedModel:
@@ -340,7 +371,7 @@ def create_py_parallel_tempering_ensembles(
     sync_rngs: _s.typing.Union[
         _c.RandomNumberGenerator, _s.typing.List[_c.RandomNumberGenerator]
     ],
-    exchange_attempt_probability: float = 0.1,
+    draws_per_exchange_attempt: float = 10,
 ):
     """
 
@@ -392,7 +423,9 @@ def create_py_parallel_tempering_ensembles(
     pte = []
     m = _s.multiprocessing.Manager()
     for i, markov_chain in enumerate(markov_chains):
-        shm = create_shared_memory(markov_chain.state.shape)
+        shm = create_shared_memory(
+            markov_chain.state.shape, num_blocks=len(temperature_ladder)
+        )
         barrier = m.Barrier(len(temperature_ladder))
 
         for chain_index, coldness in enumerate(temperature_ladder):
@@ -407,7 +440,6 @@ def create_py_parallel_tempering_ensembles(
                     model=cmodel,
                 ),
                 proposal=markov_chain.proposal,
-                # TODO what happens if it is reversibleJump?
             )
             pte.append(
                 PyParallelTemperingChain(
@@ -415,7 +447,7 @@ def create_py_parallel_tempering_ensembles(
                     chain_index=chain_index,
                     num_chains_in_ensemble=len(temperature_ladder),
                     sync_rng=sync_rngs[i],
-                    exchange_attempt_probability=exchange_attempt_probability,
+                    draws_per_exchange_attempt=draws_per_exchange_attempt,
                     barrier=barrier,
                     shared_memory_names=shm,
                 )

@@ -21,9 +21,9 @@ class GaussianMixture:
 
 
 if __name__ == "__main__":
-    replicates = 8
+    replicates = 3
     n_temps = 4
-    n_samples = 600_000
+    n_samples = 10_000
     thinning = 10
 
     A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
@@ -51,7 +51,7 @@ if __name__ == "__main__":
         markov_chains=mcs,
         temperature_ladder=temperature_ladder,
         sync_rngs=sync_rngs,
-        exchange_attempt_probability=0,
+        draws_per_exchange_attempt=50,
     )
     # chains = [m for m in mcs for beta in temperature_ladder]
     print("n chains", len(chains))
@@ -72,8 +72,11 @@ if __name__ == "__main__":
         f"sampling {n_samples} with thinning {thinning} and {len(chains)} chains took {end-start} seconds"
     )
 
-    # plt.figure()
-    # for i, chain in enumerate(chains):
-    #     plt.hist(samples[i, :, 0], density=True, alpha=0.245, bins=10)
-    #
-    # plt.show()
+    plt.figure()
+    for i, chain in enumerate(chains):
+        plt.hist(
+            samples[i, :, 0], density=True, alpha=0.245, bins=100, label=f"chain {i}"
+        )
+
+    plt.legend()
+    plt.show()
