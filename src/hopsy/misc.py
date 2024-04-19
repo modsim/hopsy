@@ -141,13 +141,18 @@ class PyParallelTemperingChain:
         self.markov_chain = markov_chain
         self.parallel_tempering_sync_rng = sync_rng
         self.shared_memory_names = shared_memory_names
-        self.draw_per_exchange_attempt = draws_per_exchange_attempt
+        self.draws_per_exchange_attempt = draws_per_exchange_attempt
         self.chain_index = chain_index
         self.barrier = barrier
         self.num_chains_in_ensemble = num_chains_in_ensemble
-        self.draw_count = 0
+        self.draw_offset = 0
+        self.draw_tracker = 0
+        self.exchange_tracker = 0
 
     def __del__(self):
+        if self.chain_index == 0:
+            print("draws:", self.draw_tracker)
+            print("exchanges:", self.exchange_tracker)
         self.barrier.wait()
         if self.chain_index == 0:
             for n in self.shared_memory_names:
@@ -188,23 +193,19 @@ class PyParallelTemperingChain:
         :return: acceptance rate, state
         """
         acceptance_rate = 0.0
-        # return self.markov_chain.draw(rng=rng, thinning=thinning)
-        # self.draw_count = thinning
-        self.draw_count += thinning
-        if self.draw_count >= self.draw_per_exchange_attempt:
-            accepted = self.markov_chain.draw(
-                rng=rng, thinning=self.draw_per_exchange_attempt
-            )[0]
-            acceptance_rate += accepted * self.draw_per_exchange_attempt
-            accepted += self._parallel_tempering_exchange(barrier=self.barrier)[0]
-            acceptance_rate += accepted
-            self.draw_count = thinning - 1 - self.draw_per_exchange_attempt
-            accepted, state = self.markov_chain.draw(rng=rng, thinning=self.draw_count)
-            acceptance_rate += accepted * self.draw_count
-            self.draw_count = 0
-        else:
-            accepted, state = self.markov_chain.draw(rng=rng, thinning=self.draw_count)
-            acceptance_rate += accepted * self.draw_count
+
+        for i in range(thinning):
+            if (i + self.draw_offset) % self.draws_per_exchange_attempt == 0:
+                acceptance_rate += self._parallel_tempering_exchange(
+                    barrier=self.barrier
+                )[0]
+                self.exchange_tracker += 1
+            acceptance_rate, state = self.markov_chain.draw(rng=rng, thinning=1)
+            acceptance_rate += acceptance_rate
+            self.draw_tracker += 1
+        self.draw_offset = (
+            self.draw_offset + thinning
+        ) % self.draws_per_exchange_attempt
         return acceptance_rate / thinning, state
 
     def _parallel_tempering_exchange(self, barrier):
@@ -214,7 +215,6 @@ class PyParallelTemperingChain:
             self.markov_chain.state.shape[0] + 2,
             *self.markov_chain.state.shape[1:],
         )
-        barrier.wait()
         if partner_index != -1:
             this_index = self.chain_index
             shm = _s.shared_memory.SharedMemory(
@@ -247,6 +247,7 @@ class PyParallelTemperingChain:
         if _c.Uniform(a=0, b=1)(self.parallel_tempering_sync_rng) < acceptance_prob:
             self.state = other_chain[2:]
             accepted = True
+        barrier.wait()
 
         return 1.0 if accepted else 0.0, self.markov_chain.state
 
@@ -1068,12 +1069,11 @@ def _parallel_sampling(
                     finished[chain_idx] = True
                     if progress_bar:
                         pbars[chain_idx].close()
-
+                        print()
             if callback is not None:
                 callback.finish()
             workers.close()
             workers.join()
-            print()
             return result.get()
         else:
             with _s.multiprocessing.Pool(n_procs) as workers:
