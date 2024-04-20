@@ -1,6 +1,7 @@
 # Changelog
 
 ## Latest
+- [#137](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/137): Fix rare bug for users implementing their own PyProposals for non-uniform sampling
 - [#136](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/136): Improve numerical stability of mixture models
 - [#133](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/133): Add default starting point to proposals and markov chains when none is given
 - [#128](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/128): Add stepsize tuning with Python TuningTargets

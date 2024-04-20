@@ -269,8 +269,8 @@ namespace hopsy {
             if(hasattr(pyObj, "log_acceptance_probability")) {
                 return pyObj.attr("log_acceptance_probability")().cast<double>();
             }
-            // default implementation: assumes the acceptance prob is 100%
-            return 1;
+            // default implementation: assumes the acceptance prob is 100%, i.e., log acceptance is 0
+            return 0;
         }
 
         VectorType getProposal() const override {
