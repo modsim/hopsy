@@ -150,9 +150,6 @@ class PyParallelTemperingChain:
         self.exchange_tracker = 0
 
     def __del__(self):
-        if self.chain_index == 0:
-            print("draws:", self.draw_tracker)
-            print("exchanges:", self.exchange_tracker)
         self.barrier.wait()
         if self.chain_index == 0:
             for n in self.shared_memory_names:
@@ -227,9 +224,9 @@ class PyParallelTemperingChain:
             # swaps out cold likelihoods, i.e., original likelihoods
             write_destination[0] = (
                 # TODO This is probabliy wrong:
-                self.state_log_density / self.coldness
-                if self.coldness != 0.0
-                else 0.0
+                self.markov_chain.model.last_cold_likelihood
+                # if self.coldness != 0.0
+                # else 0.0
             )
             write_destination[1] = self.coldness
             write_destination[2:] = self.markov_chain.state
@@ -241,7 +238,9 @@ class PyParallelTemperingChain:
         other_chain = _s.numpy.ndarray(
             shape=expected_shape, dtype=_s.numpy.float64, buffer=shm.buf
         )
-        likelihood_difference = self.state_log_density - other_chain[0]
+        likelihood_difference = (
+            self.markov_chain.model.last_cold_likelihood - other_chain[0]
+        )
         coldness_difference = self.coldness - other_chain[1]
         acceptance_prob = _s.numpy.exp(likelihood_difference * coldness_difference)
         if _c.Uniform(a=0, b=1)(self.parallel_tempering_sync_rng) < acceptance_prob:
@@ -294,6 +293,7 @@ class TemperedModel:
     def __init__(self, model, coldness):
         self.model = model
         self.coldness = coldness
+        self.last_cold_likelihood = None
 
     def log_density(self, state: _s.numpy.ndarray) -> float:
         """
@@ -308,7 +308,8 @@ class TemperedModel:
         float
             The tempered log_density of  model
         """
-        return self.coldness * self.model.log_density(state)
+        self.last_cold_likelihood = self.model.log_density(state)
+        return self.coldness * self.last_cold_likelihood
 
     def log_gradient(self, state: _s.numpy.ndarray) -> _s.numpy.ndarray:
         """
@@ -344,26 +345,17 @@ class TemperedModel:
         return "Cold (beta={}) hopsy.Model({})".format(self.coldness, repr(self.model))
 
 
-def parse_states_from_ensembles(
-    states: _s.numpy.ndarray,
-    coldness: float,
-    parallel_tempering_ensembles: _s.typing.List[PyParallelTemperingChain],
-):
-    """
-    Returns a subset of states that were produced by chains with the given coldness.
-
-    Parameters
-    ----------
-    states
-    coldness
-    parallel_tempering_ensembles
-
-    Returns
-    -------
-
-    """
-    # TODO
-    pass
+def get_samples_with_temperature(
+    temperature: float,
+    temperature_ladder: _s.typing.List[float],
+    samples: _s.numpy.ndarray,
+) -> _s.numpy.ndarray:
+    sample_index = temperature_ladder.index(temperature)
+    if samples.shape[0] % len(temperature_ladder) != 0:
+        raise RuntimeError(
+            "Number of markov chains does not fit to temperature ladder."
+        )
+    return samples[sample_index :: len(temperature_ladder), :, :]
 
 
 def create_py_parallel_tempering_ensembles(
@@ -372,7 +364,7 @@ def create_py_parallel_tempering_ensembles(
     sync_rngs: _s.typing.Union[
         _c.RandomNumberGenerator, _s.typing.List[_c.RandomNumberGenerator]
     ],
-    draws_per_exchange_attempt: float = 10,
+    draws_per_exchange_attempt: float = 100,
 ):
     """
 
@@ -419,6 +411,16 @@ def create_py_parallel_tempering_ensembles(
     ):
         raise RuntimeError(
             "temperature_ladder needs to be sorted in either ascending or descending order."
+        )
+    if 1.0 not in temperature_ladder:
+        raise RuntimeError(
+            "temperature_ladder should contain 1.0, i.e., a chain that samples the original likelihood."
+        )
+    if any(t < 0 for t in temperature_ladder) or any(
+        t > 1.0 for t in temperature_ladder
+    ):
+        raise RuntimeError(
+            "temperature_ladder should only contain values in the interval [0, 1]"
         )
 
     pte = []
