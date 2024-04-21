@@ -125,4 +125,4 @@ if __name__ == "__main__":
         )
     plt.legend()
 
-    plt.show()
+    plt.show(block=False)
