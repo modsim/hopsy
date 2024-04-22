@@ -1044,6 +1044,11 @@ def _parallel_sampling(
 
         if callback is not None or progress_bar:
             workers = _s.multiprocessing.Pool(n_procs)
+            if "SLURM_JOB_ID" in _s.os.environ:
+                print(
+                    "Warning: progress bars or callbacks within SLURM are not officially supported. Proceed with caution and make "
+                    "a feature request in our gitlab, if you require progress bars & SLURM"
+                )
             result = workers.starmap_async(_sample_parallel_chain, args)
             pbars = (
                 [
