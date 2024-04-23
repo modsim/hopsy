@@ -331,8 +331,6 @@ class ProposalTests(unittest.TestCase):
         defaultValues = np.array([0, 1])
         rjmcmc_proposal = ReversibleJumpProposal(proposal, jumpIndices, defaultValues)
 
-        print("p.A", problem.A)
-        print("p.s", problem.starting_point)
         mc = MarkovChain(problem=problem, proposal=rjmcmc_proposal)
         rng = RandomNumberGenerator(5)
 
