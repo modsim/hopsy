@@ -150,14 +150,14 @@ class PyParallelTemperingChain:
         self.exchange_tracker = 0
 
     def __del__(self):
-        self.barrier.wait()
         if self.chain_index == 0:
             for n in self.shared_memory_names:
                 release_shared_memory(n)
+        self.barrier.abort()
 
     @property
     def coldness(self):
-        return self.markov_chain.problem.model.coldness
+        return self.markov_chain.coldness
 
     @property
     def state_log_density(self):
@@ -193,9 +193,7 @@ class PyParallelTemperingChain:
 
         for i in range(thinning):
             if (i + self.draw_offset) % self.draws_per_exchange_attempt == 0:
-                acceptance_rate += self._parallel_tempering_exchange(
-                    barrier=self.barrier
-                )[0]
+                acceptance_rate += self._parallel_tempering_exchange()[0]
                 self.exchange_tracker += 1
             acceptance_rate, state = self.markov_chain.draw(rng=rng, thinning=1)
             acceptance_rate += acceptance_rate
@@ -205,7 +203,7 @@ class PyParallelTemperingChain:
         ) % self.draws_per_exchange_attempt
         return acceptance_rate / thinning, state
 
-    def _parallel_tempering_exchange(self, barrier):
+    def _parallel_tempering_exchange(self):
         accepted = False
         partner_index = self._find_partner_for_swap()
         expected_shape = (
@@ -222,36 +220,31 @@ class PyParallelTemperingChain:
                 shape=expected_shape, dtype=_s.numpy.float64, buffer=shm.buf
             )
             # swaps out cold likelihoods, i.e., original likelihoods
-            write_destination[0] = (
-                # TODO This is probabliy wrong:
-                self.markov_chain.model.last_cold_likelihood
-                # if self.coldness != 0.0
-                # else 0.0
-            )
+            write_destination[0] = self.markov_chain.state_log_density
             write_destination[1] = self.coldness
             write_destination[2:] = self.markov_chain.state
 
-        barrier.wait()
-        shm = _s.shared_memory.SharedMemory(
-            name=self.shared_memory_names[partner_index], create=False
-        )
-        other_chain = _s.numpy.ndarray(
-            shape=expected_shape, dtype=_s.numpy.float64, buffer=shm.buf
-        )
-        likelihood_difference = (
-            self.markov_chain.model.last_cold_likelihood - other_chain[0]
-        )
-        coldness_difference = self.coldness - other_chain[1]
-        acceptance_prob = _s.numpy.exp(likelihood_difference * coldness_difference)
-        if _c.Uniform(a=0, b=1)(self.parallel_tempering_sync_rng) < acceptance_prob:
-            self.state = other_chain[2:]
-            accepted = True
-        barrier.wait()
+        self.barrier.wait()
+        if partner_index != -1:
+            shm = _s.shared_memory.SharedMemory(
+                name=self.shared_memory_names[partner_index], create=False
+            )
+            other_chain = _s.numpy.ndarray(
+                shape=expected_shape, dtype=_s.numpy.float64, buffer=shm.buf
+            )
+            likelihood_difference = self.markov_chain.state_log_density - other_chain[0]
+            coldness_difference = self.coldness - other_chain[1]
+            acceptance_prob = _s.numpy.exp(likelihood_difference * coldness_difference)
+            if _c.Uniform(a=0, b=1)(self.parallel_tempering_sync_rng) < acceptance_prob:
+                self.state = other_chain[2:]
+                accepted = True
+        else:
+            self.parallel_tempering_sync_rng()
 
+        self.barrier.wait()
         return 1.0 if accepted else 0.0, self.markov_chain.state
 
     def _find_partner_for_swap(self):
-        partner_index = -1
         even_odd = _c.UniformInt(a=0, b=1)(self.parallel_tempering_sync_rng)
         if even_odd % 2 == 0:
             # even communication:
@@ -275,7 +268,7 @@ class PyParallelTemperingChain:
             # even number of chains: you can always find a partner
             if partner_index == -1:
                 partner_index = self.num_chains_in_ensemble - 1
-            partner_index = (partner_index) % self.num_chains_in_ensemble
+            partner_index = partner_index % self.num_chains_in_ensemble
         else:
             # odd number of chains: you can NOT always find a partner
             if partner_index == self.num_chains_in_ensemble:
@@ -284,72 +277,27 @@ class PyParallelTemperingChain:
         return partner_index
 
 
-class TemperedModel:
-    """
-    Models used with parallel tempering require an additional hyperparameter: the coldness.
-    This model wraps other models for use with parallel tempering
-    """
-
-    def __init__(self, model, coldness):
-        self.model = model
-        self.coldness = coldness
-        self.last_cold_likelihood = None
-
-    def log_density(self, state: _s.numpy.ndarray) -> float:
-        """
-
-        Parameters
-        ----------
-        state: np.ndarray
-            parameter values used for computing the log_density of the model
-
-        Returns
-        -------
-        float
-            The tempered log_density of  model
-        """
-        self.last_cold_likelihood = self.model.log_density(state)
-        return self.coldness * self.last_cold_likelihood
-
-    def log_gradient(self, state: _s.numpy.ndarray) -> _s.numpy.ndarray:
-        """
-
-        Parameters
-        ----------
-        state: np.ndarray
-
-        Returns
-        -------
-        np.ndarray
-            The tempered gradient of the log_density with respect to the parameters, i.e., state
-
-        """
-        return self.coldness * self.model.log_gradient(state)
-
-    def log_curvature(self, state) -> _s.numpy.ndarray:
-        """
-
-        Parameters
-        ----------
-        state: np.ndarray
-
-        Returns
-        -------
-        np.ndarray
-            The tempered curvature of the model. The curvature is given a matrix.
-
-        """
-        return self.coldness**2 * self.model.curvature(state)
-
-    def __repr__(self):
-        return "Cold (beta={}) hopsy.Model({})".format(self.coldness, repr(self.model))
-
-
 def get_samples_with_temperature(
     temperature: float,
     temperature_ladder: _s.typing.List[float],
     samples: _s.numpy.ndarray,
 ) -> _s.numpy.ndarray:
+    """
+    Given a set of samples, the temperature ladder used for parallel tempering and a temperature value,
+    this function extracts the subset of samples for the given temperature.
+
+    Parameters
+    ----------
+    temperature: float
+    temperature_ladder: _s.typing.List[float]
+    samples: np.ndarray
+
+    Returns
+    -------
+    np.ndarray
+        subset of samples
+
+    """
     sample_index = temperature_ladder.index(temperature)
     if samples.shape[0] % len(temperature_ladder) != 0:
         raise RuntimeError(
@@ -432,7 +380,6 @@ def create_py_parallel_tempering_ensembles(
         barrier = m.Barrier(len(temperature_ladder))
 
         for chain_index, coldness in enumerate(temperature_ladder):
-            cmodel = TemperedModel(model=markov_chain.problem.model, coldness=coldness)
             _pt_mc = MarkovChain(
                 problem=_c.Problem(
                     A=markov_chain.problem.A,
@@ -440,10 +387,11 @@ def create_py_parallel_tempering_ensembles(
                     shift=markov_chain.problem.shift,
                     transformation=markov_chain.problem.transformation,
                     starting_point=markov_chain.problem.starting_point,
-                    model=cmodel,
+                    model=markov_chain.problem.model,
                 ),
                 proposal=markov_chain.proposal,
             )
+            _pt_mc.coldness = coldness
             pte.append(
                 PyParallelTemperingChain(
                     markov_chain=_pt_mc,
@@ -466,6 +414,7 @@ def MarkovChain(
     starting_point: _s.numpy.typing.ArrayLike = None,
     parallel_tempering_sync_rng: _c.RandomNumberGenerator = None,
     exchange_attempt_probability: float = 0.1,
+    coldness: float = 1.0,
 ):
     _proposal = None
     if isinstance(proposal, type):
@@ -484,6 +433,7 @@ def MarkovChain(
         problem,
         parallel_tempering_sync_rng=parallel_tempering_sync_rng,
         exchange_attempt_probability=exchange_attempt_probability,
+        coldness=coldness,
     )
 
 
@@ -1037,10 +987,8 @@ def _parallel_sampling(
 ):
     with _s.multiprocessing.Manager() as manager:
         result_queue = manager.Queue() if callback is not None or progress_bar else None
-        # barrier = manager.Barrier(8)
         for i in range(len(args)):
             args[i] += (result_queue,)
-            # args[i] += (barrier,)
 
         if callback is not None or progress_bar:
             workers = _s.multiprocessing.Pool(n_procs)

@@ -32,12 +32,14 @@ namespace hopsy {
                 const ProposalImpl &proposalImpl,
                 const std::shared_ptr <Model> model,
                 std::optional <hopsy::RandomNumberGenerator> parallelTemperingSyncRng,
-                double exchangeAttemptProbability) {
+                double exchangeAttemptProbability,
+                double coldness) {
 
             if (model) {
                 if (parallelTemperingSyncRng) {
                     auto wrappedProposalAndModel = hops::ModelMixin(proposalImpl,
-                                                                    hops::Coldness(hopsy::ModelWrapper(model)));
+                                                                    hopsy::ModelWrapper(model),
+                                                                    coldness);
                     auto mc = hops::MarkovChainAdapter(
                             hops::ParallelTempering(
                                     hops::MetropolisHastingsFilter(wrappedProposalAndModel),
@@ -46,7 +48,7 @@ namespace hopsy {
                     );
                     return std::make_unique<decltype(mc)>(mc);
                 }
-                auto wrappedProposalAndModel = hops::ModelMixin(proposalImpl, hopsy::ModelWrapper(model));
+                auto wrappedProposalAndModel = hops::ModelMixin(proposalImpl, hopsy::ModelWrapper(model), coldness);
                 auto mc = hops::MarkovChainAdapter(hops::MetropolisHastingsFilter(wrappedProposalAndModel));
                 return std::make_unique<decltype(mc)>(mc);
             } else {
@@ -76,7 +78,8 @@ namespace hopsy {
         MarkovChain(const Proposal *proposal,
                     const std::optional <LinearTransformation> &transformation = std::nullopt,
                     std::optional <RandomNumberGenerator> parallelTemperingSyncRng = std::nullopt,
-                    double exchangeAttemptProbability = 0.1) :
+                    double exchangeAttemptProbability = 0.1,
+                    double coldness = 1.0) :
                 proposal(nullptr),
                 model(nullptr),
                 parallelTemperingSyncRng(parallelTemperingSyncRng),
@@ -87,14 +90,16 @@ namespace hopsy {
                               this->model,
                               this->transformation,
                               this->parallelTemperingSyncRng,
-                              this->exchangeAttemptProbability);
+                              this->exchangeAttemptProbability,
+                              coldness);
         }
 
         MarkovChain(const Proposal *proposal,
                     const std::unique_ptr <Model> &model,
                     const std::optional <LinearTransformation> &transformation = std::nullopt,
                     std::optional <RandomNumberGenerator> parallelTemperingSyncRng = std::nullopt,
-                    double exchangeAttemptProbability = 0.1) :
+                    double exchangeAttemptProbability = 0.1,
+                    double coldness = 1.0) :
                 proposal(nullptr),
                 parallelTemperingSyncRng(parallelTemperingSyncRng),
                 exchangeAttemptProbability(exchangeAttemptProbability),
@@ -105,7 +110,8 @@ namespace hopsy {
                               this->model,
                               transformation,
                               parallelTemperingSyncRng,
-                              exchangeAttemptProbability);
+                              exchangeAttemptProbability,
+                              coldness);
         }
 
         std::pair<double, VectorType>
@@ -161,7 +167,8 @@ namespace hopsy {
                               this->model,
                               this->transformation,
                               this->parallelTemperingSyncRng,
-                              this->exchangeAttemptProbability);
+                              this->exchangeAttemptProbability,
+                              this->getColdness());
         }
 
         /**
@@ -173,7 +180,8 @@ namespace hopsy {
                               this->model,
                               this->transformation,
                               this->parallelTemperingSyncRng,
-                              newExchangeAttemptProbability);
+                              newExchangeAttemptProbability,
+                              this->getColdness());
         }
 
         double getExchangeAttemptProbability() {
@@ -208,7 +216,15 @@ namespace hopsy {
                 modelPtr = std::get < std::shared_ptr < Model >> (model);
             }
             createMarkovChain(this, this->proposal.get(), modelPtr, this->transformation,
-                              this->parallelTemperingSyncRng, this->exchangeAttemptProbability);
+                              this->parallelTemperingSyncRng, this->exchangeAttemptProbability, this->getColdness());
+        }
+
+        double getColdness() const {
+            try {
+                return std::any_cast<double>(this->getParameter(hops::ProposalParameter::COLDNESS));
+            }
+            catch(...) {}
+            return 1;
         }
 
         std::shared_ptr <hops::MarkovChain> &getMarkovChain() {
@@ -259,7 +275,8 @@ namespace hopsy {
                                              const std::shared_ptr <Model> model,
                                              const std::optional <LinearTransformation> &transformation,
                                              std::optional <RandomNumberGenerator> parallelTemperingSyncRng = std::nullopt,
-                                             double exchangeAttemptProbability = 0.1) {
+                                             double exchangeAttemptProbability = 0.1,
+                                             double coldness = 1.0) {
             if (!proposal) {
                 std::invalid_argument("Passing nullptr for proposal is invalid.");
             }
@@ -282,7 +299,8 @@ namespace hopsy {
                             hopsy::ProposalWrapper(rjmcmc),
                             mc->model,
                             mc->parallelTemperingSyncRng,
-                            exchangeAttemptProbability);
+                            exchangeAttemptProbability,
+                            coldness);
                     mc->markovChain = std::move(markovChain);
                     return;
                 }
@@ -297,7 +315,8 @@ namespace hopsy {
                             wrapProposal(mc->proposal, mc->transformation.value()),
                             mc->model,
                             mc->parallelTemperingSyncRng,
-                            exchangeAttemptProbability);
+                            exchangeAttemptProbability,
+                            coldness);
 
                     mc->markovChain = std::move(markovChain);
                     return;
@@ -312,7 +331,8 @@ namespace hopsy {
                     auto markovChain = proposalImplToMarkovChain(hopsy::ProposalWrapper(proposal),
                                                                  nullptr,
                                                                  std::nullopt,
-                                                                 exchangeAttemptProbability);
+                                                                 exchangeAttemptProbability,
+                                                                 coldness);
 
                     mc->markovChain = std::move(markovChain);
                     return;
@@ -321,7 +341,8 @@ namespace hopsy {
                             hopsy::ProposalWrapper(mc->proposal),
                             mc->model,
                             mc->parallelTemperingSyncRng,
-                            exchangeAttemptProbability
+                            exchangeAttemptProbability,
+                            coldness
                     );
 
                     mc->markovChain = std::move(markovChain);
@@ -441,20 +462,10 @@ namespace hopsy {
                                   const Problem &problem,
                                   std::optional <RandomNumberGenerator> parallelTemperingSyncRng = std::nullopt,
                                   double exchangeAttemptProbability = 0.1,
-                                  bool proposalIsReversibleJump=false) {
+                                  double coldness=1.0) {
         if (problem.A.rows() != problem.b.rows()) {
             throw std::runtime_error(
                     "Dimension mismatch between row dimension of right-hand side operator A and row dimension of left-hand side vector b.");
-        }
-
-        if (!proposalIsReversibleJump && (problem.startingPoint && problem.A.cols() != problem.startingPoint->rows()) ) {
-            throw std::runtime_error(
-                    "Dimension mismatch between column dimension of right-hand side operator A and row dimension of vector starting_point.");
-        }
-        else if (proposalIsReversibleJump && (problem.startingPoint && problem.A.cols()*2 != problem.startingPoint->rows()) ) {
-            // With reversible jump the model is also tracking the model space. Therefore, the states are twice the size!
-            throw std::runtime_error(
-                    "Dimension mismatch between column dimension of right-hand side operator A and row dimension of vector starting_point.");
         }
 
         std::optional <LinearTransformation> transformation = std::nullopt;
@@ -466,7 +477,8 @@ namespace hopsy {
                            problem.model,
                            transformation,
                            parallelTemperingSyncRng,
-                           exchangeAttemptProbability);
+                           exchangeAttemptProbability,
+                           coldness);
     }
 
     void addMarkovChain(py::module &m) {
@@ -477,7 +489,7 @@ namespace hopsy {
                      py::arg("problem"),
                      py::arg("parallel_tempering_sync_rng") = std::nullopt,
                      py::arg("exchange_attempt_probability") = 0.1,
-                     py::arg("isReversibleJumpChain") = false)
+                     py::arg("coldness") = 1.0)
         .def("draw", [](MarkovChain &self,
                                 RandomNumberGenerator &rng,
                                 long thinning = 1) -> std::pair<double, VectorType> {
@@ -500,19 +512,33 @@ namespace hopsy {
                                            return -self.getStateNegativeLogLikelihood();
                                        },
                                        doc::MarkovChain::stateLogDensity)
+                .def_property("coldness", &MarkovChain::getColdness,
+                                     [](MarkovChain &self, double value) {
+                                            try {
+                                                self.setParameter(hops::ProposalParameter::COLDNESS, value);
+                                            }
+                                            catch(...) {}
+                                       },
+                                       doc::MarkovChain::coldness)
                 .def(py::pickle([](const MarkovChain &self) {
-                                    return py::make_tuple(self.proposal->copyProposal().release(), self.getProblem(),
-                                                          self.parallelTemperingSyncRng, self.exchangeAttemptProbability);
+                                    double coldness = self.getColdness();
+                                    return py::make_tuple(self.proposal->copyProposal().release(),
+                                                          self.getProblem(),
+                                                          self.parallelTemperingSyncRng, self.exchangeAttemptProbability,
+                                                          coldness);
                                 },
                                 [](py::tuple t) {
-                                    if (t.size() != 4) throw std::runtime_error("Invalid state!");
+                                    if (t.size() != 5) throw std::runtime_error("Invalid state!");
                                     auto proposal = t[0].cast<Proposal *>();
-                                    bool isReversibleJumpChain = proposal->getProposalName().substr(0, 6) == "RJMCMC";
                                     auto markovChain = createMarkovChain(proposal,
                                                                          t[1].cast<Problem>(),
                                                                          t[2].cast<std::optional<RandomNumberGenerator>>(),
                                                                          t[3].cast<double>(),
-                                                                         isReversibleJumpChain);
+                                                                         1.);
+                                    try {
+                                        markovChain.setParameter(hops::ProposalParameter::COLDNESS, t[4].cast<double>());
+                                    }
+                                    catch(...) {}
 
                                     return markovChain;
                                 }));

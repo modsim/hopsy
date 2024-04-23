@@ -101,3 +101,260 @@ class MarkovChainTests(unittest.TestCase):
             except:
                 # skip proposals that require the model
                 pass
+
+    def test_even_chains_parallel_tempering_markovchains_with_multiprocessing(self):
+        replicates = 1
+        n_temps = 4
+        n_samples = 20_000
+        thinning = 10
+        A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
+        b = np.array([2, 2, 2, 2])
+
+        epsilon = 0.05
+        cov = epsilon * np.eye(2, 2)
+        mu1 = np.ones(2).reshape(2, 1)
+        gauss1 = Gaussian(mean=mu1, covariance=cov)
+        mu2 = -np.ones(2).reshape(2, 1)
+        gauss2 = Gaussian(mean=mu2, covariance=cov)
+        model = Mixture([gauss1, gauss2])
+
+        problem = Problem(A, b, model)
+
+        sync_rngs = [RandomNumberGenerator(seed=511 + r) for r in range(replicates)]
+        temperature_ladder = [1.0 - float(n) / (n_temps - 1) for n in range(n_temps)]
+
+        for ProposalType in ProposalTypes:
+            if ProposalType == TruncatedGaussianProposal:
+                continue
+            mcs = [
+                MarkovChain(
+                    proposal=ProposalType,
+                    problem=problem,
+                    starting_point=1 * np.ones(2),
+                )
+                for r in range(replicates)
+            ]
+
+            mcs = create_py_parallel_tempering_ensembles(
+                markov_chains=mcs,
+                temperature_ladder=temperature_ladder,
+                sync_rngs=sync_rngs,
+                draws_per_exchange_attempt=200,
+            )
+
+            rngs = [RandomNumberGenerator(i + 511511) for i, _ in enumerate(mcs)]
+
+            _, samples = sample(
+                markov_chains=mcs,
+                rngs=rngs,
+                n_samples=n_samples,
+                thinning=thinning,
+                n_procs=len(mcs),
+            )
+
+            # mean should be 0 within 3 standard errors for every temp
+            # if parallel tempering fails, mean is -5 or 5 with the coldest chain.
+            for t in temperature_ladder:
+                temp_samples = get_samples_with_temperature(
+                    t, temperature_ladder, samples
+                )
+                expected_std_error = np.std(temp_samples) / np.sqrt(
+                    np.min(ess(temp_samples))
+                )
+                assert np.abs(np.mean(temp_samples)) < 3 * expected_std_error
+
+    def test_odd_chains_parallel_tempering_markovchains_with_multiprocessing(self):
+        replicates = 1
+        n_temps = 5
+        n_samples = 50_000
+        thinning = 10
+        A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
+        b = np.array([2, 2, 2, 2])
+
+        epsilon = 0.05
+        cov = epsilon * np.eye(2, 2)
+        mu1 = np.ones(2).reshape(2, 1)
+        gauss1 = Gaussian(mean=mu1, covariance=cov)
+        mu2 = -np.ones(2).reshape(2, 1)
+        gauss2 = Gaussian(mean=mu2, covariance=cov)
+        model = Mixture([gauss1, gauss2])
+
+        problem = Problem(A, b, model)
+
+        sync_rngs = [RandomNumberGenerator(seed=511 + r) for r in range(replicates)]
+        temperature_ladder = [1.0 - float(n) / (n_temps - 1) for n in range(n_temps)]
+
+        for ProposalType in ProposalTypes:
+            if ProposalType == TruncatedGaussianProposal:
+                continue
+            mcs = [
+                MarkovChain(
+                    proposal=ProposalType,
+                    problem=problem,
+                    starting_point=1 * np.ones(2),
+                )
+                for r in range(replicates)
+            ]
+
+            mcs = create_py_parallel_tempering_ensembles(
+                markov_chains=mcs,
+                temperature_ladder=temperature_ladder,
+                sync_rngs=sync_rngs,
+                draws_per_exchange_attempt=100,
+            )
+
+            rngs = [RandomNumberGenerator(i + 511511) for i, _ in enumerate(mcs)]
+
+            _, samples = sample(
+                markov_chains=mcs,
+                rngs=rngs,
+                n_samples=n_samples,
+                thinning=thinning,
+                n_procs=len(mcs),
+            )
+
+            # mean should be 0 within 3 standard errors for every temp
+            # if parallel tempering fails, mean is -5 or 5 with the coldest chain.
+            for t in temperature_ladder:
+                temp_samples = get_samples_with_temperature(
+                    t, temperature_ladder, samples
+                )
+                expected_std_error = np.std(temp_samples) / np.sqrt(
+                    np.min(ess(temp_samples))
+                )
+                assert np.abs(np.mean(temp_samples)) < 3 * expected_std_error
+
+    def test_even_chains_parallel_tempering_markovchains_with_rounding_and_multiprocessing(
+        self,
+    ):
+        replicates = 1
+        n_temps = 4
+        n_samples = 20_000
+        thinning = 10
+        A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
+        b = np.array([2, 2, 2, 2])
+
+        epsilon = 0.05
+        cov = epsilon * np.eye(2, 2)
+        mu1 = np.ones(2).reshape(2, 1)
+        gauss1 = Gaussian(mean=mu1, covariance=cov)
+        mu2 = -np.ones(2).reshape(2, 1)
+        gauss2 = Gaussian(mean=mu2, covariance=cov)
+        model = Mixture([gauss1, gauss2])
+
+        problem = round(Problem(A, b, model))
+
+        sync_rngs = [RandomNumberGenerator(seed=511 + r) for r in range(replicates)]
+        temperature_ladder = [1.0 - float(n) / (n_temps - 1) for n in range(n_temps)]
+
+        for ProposalType in ProposalTypes:
+            if ProposalType in [
+                TruncatedGaussianProposal,
+                CSmMALAProposal,
+                BilliardMALAProposal,
+            ]:
+                continue
+
+            mcs = [
+                MarkovChain(
+                    proposal=ProposalType,
+                    problem=problem,
+                    starting_point=1 * np.ones(2),
+                )
+                for r in range(replicates)
+            ]
+
+            mcs = create_py_parallel_tempering_ensembles(
+                markov_chains=mcs,
+                temperature_ladder=temperature_ladder,
+                sync_rngs=sync_rngs,
+                draws_per_exchange_attempt=200,
+            )
+
+            rngs = [RandomNumberGenerator(i + 511511) for i, _ in enumerate(mcs)]
+
+            _, samples = sample(
+                markov_chains=mcs,
+                rngs=rngs,
+                n_samples=n_samples,
+                thinning=thinning,
+                n_procs=len(mcs),
+            )
+
+            # mean should be 0 within 3 standard errors for every temp
+            # if parallel tempering fails, mean is -5 or 5 with the coldest chain.
+            for t in temperature_ladder:
+                temp_samples = get_samples_with_temperature(
+                    t, temperature_ladder, samples
+                )
+                expected_std_error = np.std(temp_samples) / np.sqrt(
+                    np.min(ess(temp_samples))
+                )
+                assert np.abs(np.mean(temp_samples)) < 3 * expected_std_error
+
+    def test_odd_chains_parallel_tempering_markovchains_with_rounding_and_multiprocessing(
+        self,
+    ):
+        replicates = 1
+        n_temps = 5
+        n_samples = 50_000
+        thinning = 10
+        A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
+        b = np.array([2, 2, 2, 2])
+
+        epsilon = 0.05
+        cov = epsilon * np.eye(2, 2)
+        mu1 = np.ones(2).reshape(2, 1)
+        gauss1 = Gaussian(mean=mu1, covariance=cov)
+        mu2 = -np.ones(2).reshape(2, 1)
+        gauss2 = Gaussian(mean=mu2, covariance=cov)
+        model = Mixture([gauss1, gauss2])
+
+        problem = round(Problem(A, b, model))
+
+        sync_rngs = [RandomNumberGenerator(seed=511 + r) for r in range(replicates)]
+        temperature_ladder = [1.0 - float(n) / (n_temps - 1) for n in range(n_temps)]
+
+        for ProposalType in ProposalTypes:
+            if ProposalType in [
+                TruncatedGaussianProposal,
+                CSmMALAProposal,
+                BilliardMALAProposal,
+            ]:
+                continue
+            mcs = [
+                MarkovChain(
+                    proposal=ProposalType,
+                    problem=problem,
+                    starting_point=1 * np.ones(2),
+                )
+                for r in range(replicates)
+            ]
+
+            mcs = create_py_parallel_tempering_ensembles(
+                markov_chains=mcs,
+                temperature_ladder=temperature_ladder,
+                sync_rngs=sync_rngs,
+                draws_per_exchange_attempt=100,
+            )
+
+            rngs = [RandomNumberGenerator(i + 511511) for i, _ in enumerate(mcs)]
+
+            _, samples = sample(
+                markov_chains=mcs,
+                rngs=rngs,
+                n_samples=n_samples,
+                thinning=thinning,
+                n_procs=len(mcs),
+            )
+
+            # mean should be 0 within 3 standard errors for every temp
+            # if parallel tempering fails, mean is -5 or 5 with the coldest chain.
+            for t in temperature_ladder:
+                temp_samples = get_samples_with_temperature(
+                    t, temperature_ladder, samples
+                )
+                expected_std_error = np.std(temp_samples) / np.sqrt(
+                    np.min(ess(temp_samples))
+                )
+                assert np.abs(np.mean(temp_samples)) < 3 * expected_std_error

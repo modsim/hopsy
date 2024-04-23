@@ -543,6 +543,7 @@ namespace hopsy {
             static const char* stateLogDensity;
             static const char* parallelTemperingSyncRng;
             static const char* exchangeAttemptProbability;
+            static const char* coldness;
         };
 
         struct TuningTarget {
