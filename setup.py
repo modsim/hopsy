@@ -74,7 +74,10 @@ class CMakeBuild(build_ext):
             cmake_args.append("-DHOPSY_BUILD_ID={}".format(commit_hash))
         except Exception as e:
             commit_hash = commit
-            print("ERROR retrieving commit hash automatically. Build ID is set to", commit_hash)
+            print(
+                "ERROR retrieving commit hash automatically. Build ID is set to",
+                commit_hash,
+            )
 
         if self.compiler.compiler_type != "msvc":
             # Using Ninja-build since it a) is available as a wheel and b)
@@ -112,9 +115,9 @@ class CMakeBuild(build_ext):
             # self.parallel is a Python 3 only way to set parallel jobs by hand
             # using -j in the build_ext call, not supported by pip or PyPA-build.
             build_args += ["-j16"]
-            #if hasattr(self, "parallel") and self.parallel:
-                # CMake 3.12+ only.
-                #build_args += ["-j{}".format(self.parallel)]
+            # if hasattr(self, "parallel") and self.parallel:
+            # CMake 3.12+ only.
+            # build_args += ["-j{}".format(self.parallel)]
 
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
