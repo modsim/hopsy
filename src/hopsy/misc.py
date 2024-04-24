@@ -24,6 +24,7 @@ _c = _core
 
 
 class _submodules:
+    
     import atexit
     import time
     import warnings
@@ -78,7 +79,7 @@ def create_shared_memory(state_shape, num_blocks: int, state_type=_s.numpy.float
         raise ValueError("state_types != np.float64 not yet supported.")
     # add two to first dimension for likelihood and coldness
     shape = (state_shape[0] + 2, *state_shape[1:])
-    shared_memory_size = _s.numpy.dtype(state_type).itemsize * _s.numpy.prod(shape)
+    shared_memory_size = int(_s.numpy.dtype(state_type).itemsize * _s.numpy.prod(shape))
     shared_state_memory = [
         _s.shared_memory.SharedMemory(size=shared_memory_size, create=True)
         for i in range(num_blocks)
@@ -153,7 +154,7 @@ class PyParallelTemperingChain:
         if self.chain_index == 0:
             for n in self.shared_memory_names:
                 release_shared_memory(n)
-        self.barrier.abort()
+        #self.barrier.abort()
 
     @property
     def coldness(self):
