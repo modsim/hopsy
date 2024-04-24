@@ -1554,21 +1554,21 @@ def run_multiphase_sampling(
             for s in starting_points
         ]
 
-        start = _s.time.time()
+        start = _s.time.perf_counter()
         acceptance_rate, _samples = sample(
             markov_chains, rngs, n_samples=steps_per_phase, thinning=1, n_procs=4
         )
-        end = _s.time.time()
+        end = _s.time.perf_counter()
         sampling_time += end - start
 
         if s_ratio > limit_singular_value_ratio:
             samples = _samples
             # also measures the rounding time
-            start = _s.time.time()
+            start = _s.time.perf_counter()
             s_ratio, starting_points, internal_polytope, sub_problem = _svd_rounding(
                 samples, internal_polytope
             )
-            end = _s.time.time()
+            end = _s.time.perf_counter()
             sampling_time += end - start
             last_iteration_did_rounding = True
         else:

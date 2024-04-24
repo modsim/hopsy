@@ -122,9 +122,9 @@ def estimate_esjd(mcs, rngs, n_samples, k=[1], consider_time=False, *args, **kwa
         np.array
             Array of cumulative ESJD over specified lags `k` for every individual chain.
     """
-    start = _s.time.time()
+    start = _s.time.perf_counter()
     _, samples = sample(mcs, rngs, n_samples, *args, **kwargs)
-    time_per_sample = (_s.time.time() - start) / n_samples
+    time_per_sample = (_s.time.perf_counter() - start) / n_samples
     esjds = _s.np.sum(
         [
             _s.np.mean(
