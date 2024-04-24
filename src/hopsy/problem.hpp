@@ -29,13 +29,12 @@ namespace hopsy {
         Problem(const Problem& other) :
                 A(other.A),
                 b(other.b),
-                //model(std::move(other.model->copyModel())),
                 startingPoint(other.startingPoint),
                 transformation(other.transformation),
                 shift(other.shift),
                 original_A(other.original_A),
                 original_b(other.original_b) {
-            if(other.model) this->model = std::move(other.model->copyModel());
+            if(other.model) this->model = other.model->copyModel();
         }
 
         Problem(const MatrixType& A,
@@ -51,7 +50,7 @@ namespace hopsy {
                 shift(shift),
                 original_A(A),
                 original_b(b) {
-            if(model) this->model = std::move(model->copyModel());
+            if(model) this->model = model->copyModel();
         }
 
         Problem(const MatrixType& A,
@@ -72,7 +71,7 @@ namespace hopsy {
 
           std::variant<py::object, std::unique_ptr<Model>> getModel() {
             if(model) {
-                std::shared_ptr<Model> sharedModelPtr = std::move(model->copyModel());
+                std::shared_ptr<Model> sharedModelPtr = model->copyModel();
                 std::shared_ptr<PyModel> pyModelPtr = std::dynamic_pointer_cast<PyModel>(sharedModelPtr);
                 if(pyModelPtr) {
                     return pyModelPtr->pyObj;

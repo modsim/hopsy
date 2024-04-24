@@ -11,7 +11,6 @@ class _core:
         MarkovChain,
         Problem,
         Proposal,
-        PyModel,
         PyProposal,
         RandomNumberGenerator,
         Uniform,
@@ -24,7 +23,7 @@ _c = _core
 
 
 class _submodules:
-    
+
     import atexit
     import time
     import warnings
@@ -154,7 +153,7 @@ class PyParallelTemperingChain:
         if self.chain_index == 0:
             for n in self.shared_memory_names:
                 release_shared_memory(n)
-        #self.barrier.abort()
+        self.barrier.abort()
 
     @property
     def coldness(self):
@@ -986,55 +985,56 @@ def _parallel_sampling(
     callback: _c.Callback,
     progress_bar: bool,
 ):
-    with _s.multiprocessing.Manager() as manager:
-        result_queue = manager.Queue() if callback is not None or progress_bar else None
-        for i in range(len(args)):
-            args[i] += (result_queue,)
+    result_queue = (
+        _s.multiprocessing.Manager().Queue()
+        if callback is not None or progress_bar
+        else None
+    )
+    for i in range(len(args)):
+        args[i] += (result_queue,)
 
-        if callback is not None or progress_bar:
-            workers = _s.multiprocessing.Pool(n_procs)
-            if "SLURM_JOB_ID" in _s.os.environ:
-                print(
-                    "Warning: progress bars or callbacks within SLURM are not officially supported. Proceed with caution and make "
-                    "a feature request in our gitlab, if you require progress bars & SLURM"
-                )
-            result = workers.starmap_async(_sample_parallel_chain, args)
-            pbars = (
-                [
-                    _s.tqdm.trange(args[i][2], desc="chain {}".format(i))
-                    for i in range(len(args))
-                ]
-                if progress_bar
-                else None
+    if callback is not None or progress_bar:
+        workers = _s.multiprocessing.Pool(n_procs)
+        if "SLURM_JOB_ID" in _s.os.environ:
+            print(
+                "Warning: progress bars or callbacks within SLURM are not officially supported. Proceed with caution and make "
+                "a feature request in our gitlab, if you require progress bars & SLURM"
             )
-            finished = [False for i in range(len(args))]
-            while not _s.numpy.all(finished):
-                chain_idx, state, meta = result_queue.get()
-                if state is not None:
-                    if progress_bar:
-                        pbars[chain_idx].update()
-                    if callback is not None:
-                        callback.record(
-                            chain_idx,
-                            state,
-                            meta
-                            if isinstance(meta, dict)
-                            else {"acceptance_rate": meta},
-                        )
-                else:
-                    finished[chain_idx] = True
-                    if progress_bar:
-                        pbars[chain_idx].close()
-                        print()
-            if callback is not None:
-                callback.finish()
-            workers.close()
-            workers.join()
-            return result.get()
-        else:
-            with _s.multiprocessing.Pool(n_procs) as workers:
-                result = workers.starmap(_sample_parallel_chain, args)
-            return result
+        result = workers.starmap_async(_sample_parallel_chain, args)
+        pbars = (
+            [
+                _s.tqdm.trange(args[i][2], desc="chain {}".format(i))
+                for i in range(len(args))
+            ]
+            if progress_bar
+            else None
+        )
+        finished = [False for i in range(len(args))]
+        while not _s.numpy.all(finished):
+            chain_idx, state, meta = result_queue.get()
+            if state is not None:
+                if progress_bar:
+                    pbars[chain_idx].update()
+                if callback is not None:
+                    callback.record(
+                        chain_idx,
+                        state,
+                        meta if isinstance(meta, dict) else {"acceptance_rate": meta},
+                    )
+            else:
+                finished[chain_idx] = True
+                if progress_bar:
+                    pbars[chain_idx].close()
+
+        if callback is not None:
+            callback.finish()
+        workers.close()
+        workers.join()
+        return result.get()
+    else:
+        with _s.multiprocessing.Pool(n_procs) as workers:
+            result = workers.starmap(_sample_parallel_chain, args)
+        return result
 
 
 def sample(
