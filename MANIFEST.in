@@ -1,11 +1,11 @@
 include README.md LICENSE extern/pybind11/LICENSE .version .commit CMakeLists.txt
 recursive-include extern *.cpp *.hpp *.h *.c *.txt
 graft src
-graft extern/hops/
+graft extern/hops
 prune extern/hops/docs
 prune extern/hops/resources
 prune extern/hops/tests
-graft extern/pybind11/
+graft extern/pybind11
 graft extern/eigen3
 prune extern/eigen3/test
 prune extern/eigen3/demos

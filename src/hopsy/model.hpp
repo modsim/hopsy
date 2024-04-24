@@ -492,6 +492,7 @@ namespace hopsy {
                                     if (t.size() != 2) throw std::runtime_error("Invalid state!");
 
                                     /* Create a new C++ instance */
+
                                     Mixture p(t[0].cast<std::vector<std::shared_ptr<Model>>>(),
                                               t[1].cast<std::vector<double>>());
 
