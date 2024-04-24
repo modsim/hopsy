@@ -42,8 +42,8 @@ if __name__ == "__main__":
         hopsy.MarkovChain(
             proposal=hopsy.GaussianCoordinateHitAndRunProposal,
             problem=problem,
-            parallelTemperingSyncRng=syncRng,
-            exchangeAttemptProbability=0.15,
+            parallel_tempering_sync_rng=syncRng,
+            exchange_attempt_probability=0.15,
             starting_point=0.9 * np.ones(2),
         )
         for i in range(num_procs)

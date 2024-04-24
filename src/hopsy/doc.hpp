@@ -19,6 +19,12 @@ namespace hopsy {
             static const char* __call__;
         };
 
+        struct UniformInt {
+            static const char* base;
+            static const char* __init__;
+            static const char* __call__;
+        };
+
         struct Normal {
             static const char* base;
             static const char* __init__;
@@ -535,7 +541,9 @@ namespace hopsy {
             static const char* proposal;
             static const char* stateNegativeLogLikelihood;
             static const char* stateLogDensity;
+            static const char* parallelTemperingSyncRng;
             static const char* exchangeAttemptProbability;
+            static const char* coldness;
         };
 
         struct TuningTarget {

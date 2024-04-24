@@ -13,6 +13,8 @@ class _core:
         Proposal,
         PyProposal,
         RandomNumberGenerator,
+        Uniform,
+        UniformInt,
     )
     from .lp import LP
 
@@ -21,6 +23,8 @@ _c = _core
 
 
 class _submodules:
+
+    import atexit
     import time
     import warnings
 
@@ -35,10 +39,14 @@ class _submodules:
         from PolyRound.mutable_classes import polytope
         from PolyRound.static_classes.lp_utils import ChebyshevFinder
         from PolyRound.static_classes.lp_utils import OptlangInterfacer
+        from PolyRound.static_classes.rounding.maximum_volume_ellipsoid import (
+            MaximumVolumeEllipsoidFinder,
+        )
 
     import multiprocessing
     import os
     import warnings
+    from multiprocessing import shared_memory
 
     if "JPY_PARENT_PID" in os.environ:
         import tqdm.notebook as tqdm
@@ -52,14 +60,345 @@ class _submodules:
 _s = _submodules
 
 
+def create_shared_memory(state_shape, num_blocks: int, state_type=_s.numpy.float64):
+    """
+    It is the responsibility of the caller of create_shared_memory to call release_shared_memory.
+    Multiprocessing will give a warning if leaked memory exists at the end of the program
+
+    Parameters
+    ----------
+    state_shape
+    state_type
+
+    Returns names of shared memory buffers
+    -------
+
+    """
+    if state_type != _s.numpy.float64:
+        raise ValueError("state_types != np.float64 not yet supported.")
+    # add two to first dimension for likelihood and coldness
+    shape = (state_shape[0] + 2, *state_shape[1:])
+    shared_memory_size = int(_s.numpy.dtype(state_type).itemsize * _s.numpy.prod(shape))
+    shared_state_memory = [
+        _s.shared_memory.SharedMemory(size=shared_memory_size, create=True)
+        for i in range(num_blocks)
+    ]
+    _s.atexit.register(lambda: [release_shared_memory(s) for s in shared_state_memory])
+    return shared_state_memory
+
+
+def release_shared_memory(shm):
+    """
+    It is the responsibility of the caller of create_shared_memory to call release_shared_memory
+    Multiprocessing will give a warning if leaked memory exists at the end of the program
+
+    Parameters
+    ----------
+    name: str
+        Name of the shared memory block to release
+
+    Returns
+    -------
+    None
+
+    """
+    try:
+        # If memory was already unlinked, it will throw. Because we register the cleanup with atexit,
+        # we don't know for sure if the memory still exists or not. We just clean up any handle we ever had.
+        shm.close()
+        shm.unlink()
+    except FileNotFoundError:
+        pass
+
+
+class PyParallelTemperingChain:
+    """
+    Wrapper for MarkovChain for performing parallel tempering using Multiprocessing (instead of MPI).
+    """
+
+    def __init__(
+        self,
+        markov_chain: _c.MarkovChain,
+        chain_index: int,
+        num_chains_in_ensemble: int,
+        sync_rng: _c.RandomNumberGenerator,
+        barrier: _s.multiprocessing.Barrier,
+        shared_memory: _s.typing.List[_s.shared_memory.SharedMemory] = None,
+        draws_per_exchange_attempt: float = 10,
+    ):
+        self.markov_chain = markov_chain
+        self.parallel_tempering_sync_rng = sync_rng
+        self.shared_memory = shared_memory
+        self.draws_per_exchange_attempt = draws_per_exchange_attempt
+        self.chain_index = chain_index
+        self.barrier = barrier
+        self.num_chains_in_ensemble = num_chains_in_ensemble
+        self.draw_offset = 0
+        self.draw_tracker = 0
+        self.exchange_tracker = 0
+
+    def __del__(self):
+        if self.chain_index == 0:
+            for n in self.shared_memory:
+                release_shared_memory(n)
+        self.barrier.abort()
+
+    @property
+    def coldness(self):
+        return self.markov_chain.coldness
+
+    @property
+    def state_log_density(self):
+        return self.markov_chain.state_log_density
+
+    @property
+    def state(self):
+        return self.markov_chain.state
+
+    @state.setter
+    def state(self, value):
+        self.markov_chain.state = value
+
+    @property
+    def proposal(self):
+        return self.markov_chain.proposal
+
+    @proposal.setter
+    def proposal(self, value):
+        self.markov_chain.proposal = value
+
+    @property
+    def problem(self):
+        return self.markov_chain.problem
+
+    def draw(self, rng: _c.RandomNumberGenerator, thinning: int = 1):
+        """
+        :param rng:
+        :param thinning:
+        :return: acceptance rate, state
+        """
+        acceptance_rate = 0.0
+
+        for i in range(thinning):
+            if (i + self.draw_offset) % self.draws_per_exchange_attempt == 0:
+                acceptance_rate += self._parallel_tempering_exchange()[0]
+                self.exchange_tracker += 1
+            acceptance_rate, state = self.markov_chain.draw(rng=rng, thinning=1)
+            acceptance_rate += acceptance_rate
+            self.draw_tracker += 1
+        self.draw_offset = (
+            self.draw_offset + thinning
+        ) % self.draws_per_exchange_attempt
+        return acceptance_rate / thinning, state
+
+    def _parallel_tempering_exchange(self):
+        accepted = False
+        partner_index = self._find_partner_for_swap()
+        expected_shape = (
+            self.markov_chain.state.shape[0] + 2,
+            *self.markov_chain.state.shape[1:],
+        )
+        if partner_index != -1:
+            this_index = self.chain_index
+            shm = self.shared_memory[this_index]
+
+            write_destination = _s.numpy.ndarray(
+                shape=expected_shape, dtype=_s.numpy.float64, buffer=shm.buf
+            )
+            # swaps out cold likelihoods, i.e., original likelihoods
+            write_destination[0] = self.markov_chain.state_log_density
+            write_destination[1] = self.coldness
+            write_destination[2:] = self.markov_chain.state
+
+        self.barrier.wait()
+        if partner_index != -1:
+            shm = self.shared_memory[partner_index]
+            other_chain = _s.numpy.ndarray(
+                shape=expected_shape, dtype=_s.numpy.float64, buffer=shm.buf
+            )
+            likelihood_difference = self.markov_chain.state_log_density - other_chain[0]
+            coldness_difference = self.coldness - other_chain[1]
+            acceptance_prob = _s.numpy.exp(likelihood_difference * coldness_difference)
+            if _c.Uniform(a=0, b=1)(self.parallel_tempering_sync_rng) < acceptance_prob:
+                self.state = other_chain[2:]
+                accepted = True
+        else:
+            self.parallel_tempering_sync_rng()
+
+        self.barrier.wait()
+        return 1.0 if accepted else 0.0, self.markov_chain.state
+
+    def _find_partner_for_swap(self):
+        even_odd = _c.UniformInt(a=0, b=1)(self.parallel_tempering_sync_rng)
+        if even_odd % 2 == 0:
+            # even communication:
+            if self.chain_index % 2 == 0:
+                # this chain is even and communicates with chainIndex +1
+                partner_index = self.chain_index + 1
+            else:
+                # this chain is odd and communicates with chainIndex -1
+                partner_index = self.chain_index - 1
+        else:
+            # odd communication
+            if self.chain_index % 2 == 0:
+                # this chain is even and communicates with chainIndex +1
+                partner_index = self.chain_index - 1
+            else:
+                # this chain is odd and communicates with chainIndex -1
+                partner_index = self.chain_index + 1
+
+        # check if swap partner is valid:
+        if self.num_chains_in_ensemble % 2 == 0:
+            # even number of chains: you can always find a partner
+            if partner_index == -1:
+                partner_index = self.num_chains_in_ensemble - 1
+            partner_index = partner_index % self.num_chains_in_ensemble
+        else:
+            # odd number of chains: you can NOT always find a partner
+            if partner_index == self.num_chains_in_ensemble:
+                partner_index = -1
+
+        return partner_index
+
+
+def get_samples_with_temperature(
+    temperature: float,
+    temperature_ladder: _s.typing.List[float],
+    samples: _s.numpy.ndarray,
+) -> _s.numpy.ndarray:
+    """
+    Given a set of samples, the temperature ladder used for parallel tempering and a temperature value,
+    this function extracts the subset of samples for the given temperature.
+
+    Parameters
+    ----------
+    temperature: float
+    temperature_ladder: _s.typing.List[float]
+    samples: np.ndarray
+
+    Returns
+    -------
+    np.ndarray
+        subset of samples
+
+    """
+    sample_index = temperature_ladder.index(temperature)
+    if samples.shape[0] % len(temperature_ladder) != 0:
+        raise RuntimeError(
+            "Number of markov chains does not fit to temperature ladder."
+        )
+    return samples[sample_index :: len(temperature_ladder), :, :]
+
+
+def create_py_parallel_tempering_ensembles(
+    markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.MarkovChain]],
+    temperature_ladder: _s.typing.List[float],
+    sync_rngs: _s.typing.Union[
+        _c.RandomNumberGenerator, _s.typing.List[_c.RandomNumberGenerator]
+    ],
+    draws_per_exchange_attempt: float = 100,
+):
+    """
+
+    Parameters
+    ----------
+    markov_chains: hopsy.MarkovChain
+        markov chain replicates to be used for parallel tempering
+    temperature_ladder: List
+        list of temperatures for parallel tempering. List must be sorted (ascending or descending)
+    parallel_tempering_sync_rng: List[hopsy.RandomNumberGenerator]
+        random number generator used for syncing parallel chains without explicit communication
+    exchange_attempt_probability: float
+        how often parallel chains should attempt to exchange states on average
+
+    Returns
+    -------
+    List[PyParallelTemperingChain]
+        For each markov chain given, this function creates an ensemble of len(temperature_ladder) chains.
+        Each ensemble is an indepedent replicate and can be used for convergence check.
+        All chains of all ensembles are returned in a single list for compatibility with hopsy.sample
+        To parse our states given a temperature/coldness, use  hopsy.parse_states_from_ensembles
+    """
+    if isinstance(markov_chains, _c.MarkovChain) != isinstance(
+        sync_rngs, _c.RandomNumberGenerator
+    ):
+        raise RuntimeError(
+            "markov chains and sync rng need to both be lists or their respective types"
+        )
+
+    if isinstance(markov_chains, _c.MarkovChain):
+        markov_chains = [markov_chains]
+    if isinstance(markov_chains, _c.RandomNumberGenerator):
+        sync_rngs = [sync_rngs]
+
+    if len(markov_chains) != len(sync_rngs):
+        raise RuntimeError(
+            "Exactly one sync rng is required for every ensemble (markov chain replicate)."
+        )
+
+    _sorted_temps = sorted(temperature_ladder)
+    if (
+        _sorted_temps != temperature_ladder
+        and list(reversed(_sorted_temps)) != temperature_ladder
+    ):
+        raise RuntimeError(
+            "temperature_ladder needs to be sorted in either ascending or descending order."
+        )
+    if 1.0 not in temperature_ladder:
+        raise RuntimeError(
+            "temperature_ladder should contain 1.0, i.e., a chain that samples the original likelihood."
+        )
+    if any(t < 0 for t in temperature_ladder) or any(
+        t > 1.0 for t in temperature_ladder
+    ):
+        raise RuntimeError(
+            "temperature_ladder should only contain values in the interval [0, 1]"
+        )
+
+    pte = []
+    m = _s.multiprocessing.Manager()
+    for i, markov_chain in enumerate(markov_chains):
+        shm = create_shared_memory(
+            markov_chain.state.shape, num_blocks=len(temperature_ladder)
+        )
+        barrier = m.Barrier(len(temperature_ladder))
+
+        for chain_index, coldness in enumerate(temperature_ladder):
+            _pt_mc = MarkovChain(
+                problem=_c.Problem(
+                    A=markov_chain.problem.A,
+                    b=markov_chain.problem.b,
+                    shift=markov_chain.problem.shift,
+                    transformation=markov_chain.problem.transformation,
+                    starting_point=markov_chain.problem.starting_point,
+                    model=markov_chain.problem.model,
+                ),
+                proposal=markov_chain.proposal,
+            )
+            _pt_mc.coldness = coldness
+            pte.append(
+                PyParallelTemperingChain(
+                    markov_chain=_pt_mc,
+                    chain_index=chain_index,
+                    num_chains_in_ensemble=len(temperature_ladder),
+                    sync_rng=sync_rngs[i],
+                    draws_per_exchange_attempt=draws_per_exchange_attempt,
+                    barrier=barrier,
+                    shared_memory=shm,
+                )
+            )
+    return pte
+
+
 def MarkovChain(
     problem: _c.Problem,
     proposal: _s.typing.Union[
         _c.Proposal, _s.typing.Type[_c.Proposal]
     ] = _c.GaussianHitAndRunProposal,
     starting_point: _s.numpy.typing.ArrayLike = None,
-    parallelTemperingSyncRng: _c.RandomNumberGenerator = None,
-    exchangeAttemptProbability: float = 0.1,
+    parallel_tempering_sync_rng: _c.RandomNumberGenerator = None,
+    exchange_attempt_probability: float = 0.1,
+    coldness: float = 1.0,
 ):
     _proposal = None
     if isinstance(proposal, type):
@@ -76,8 +415,9 @@ def MarkovChain(
     return _c.MarkovChain(
         _proposal,
         problem,
-        parallelTemperingSyncRng=parallelTemperingSyncRng,
-        exchangeAttemptProbability=exchangeAttemptProbability,
+        parallel_tempering_sync_rng=parallel_tempering_sync_rng,
+        exchange_attempt_probability=exchange_attempt_probability,
+        coldness=coldness,
     )
 
 
@@ -293,7 +633,7 @@ def _compute_maximum_volume_ellipsoid(problem: _c.Problem):
             ]
             polytope.shift = _s.pandas.Series(_s.numpy.zeros(number_of_reactions))
 
-        MaximumVolumeEllipsoidFinder.iterative_solve(polytope, _c.LP().settings)
+        _s.MaximumVolumeEllipsoidFinder.iterative_solve(polytope, _c.LP().settings)
         return polytope.transform.values
 
 
@@ -540,6 +880,7 @@ def _sample_parallel_chain(
     in_memory: bool,
     record_meta=None,
     queue: _s.multiprocessing.Queue = None,
+    # barrier: _s.multiprocessing.Barrier = None,
 ):
     states = [None] * n_samples
 
@@ -637,7 +978,12 @@ def _parallel_sampling(
         args[i] += (result_queue,)
 
     if callback is not None or progress_bar:
-        workers = _s.multiprocessing.Pool(n_procs - 1)
+        workers = _s.multiprocessing.Pool(n_procs)
+        if "SLURM_JOB_ID" in _s.os.environ:
+            print(
+                "Warning: progress bars or callbacks within SLURM are not officially supported. Proceed with caution and make "
+                "a feature request in our gitlab, if you require progress bars & SLURM"
+            )
         result = workers.starmap_async(_sample_parallel_chain, args)
         pbars = (
             [
@@ -747,7 +1093,11 @@ def sample(
     # multiprocessing and mpi (parallel tempering) do not work together yet
     # because forked processes do not get a correct rank.
     if n_procs != 1 and any(
-        [mc.parallelTemperingSyncRng is not None for mc in markov_chains]
+        [
+            not isinstance(mc, PyParallelTemperingChain)
+            and mc.parallel_tempering_sync_rng is not None
+            for mc in markov_chains
+        ]
     ):
         raise ValueError(
             "n_procs>1 does not work together with parallel tempering with is based on mpi."
@@ -795,7 +1145,11 @@ def sample(
 
     result = []
 
-    if n_procs != 1 or n_threads != 1:
+    if (
+        n_procs != 1
+        or n_threads != 1
+        or any([isinstance(mc, PyParallelTemperingChain) for mc in markov_chains])
+    ):
         if n_threads != n_procs and n_threads != 1:
             n_procs = n_threads
 
@@ -1200,21 +1554,21 @@ def run_multiphase_sampling(
             for s in starting_points
         ]
 
-        start = _s.time.time()
+        start = _s.time.perf_counter()
         acceptance_rate, _samples = sample(
             markov_chains, rngs, n_samples=steps_per_phase, thinning=1, n_procs=4
         )
-        end = _s.time.time()
+        end = _s.time.perf_counter()
         sampling_time += end - start
 
         if s_ratio > limit_singular_value_ratio:
             samples = _samples
             # also measures the rounding time
-            start = _s.time.time()
+            start = _s.time.perf_counter()
             s_ratio, starting_points, internal_polytope, sub_problem = _svd_rounding(
                 samples, internal_polytope
             )
-            end = _s.time.time()
+            end = _s.time.perf_counter()
             sampling_time += end - start
             last_iteration_did_rounding = True
         else:

@@ -2,3 +2,4 @@ docov
 pre-commit
 setuptools
 wheel
+docov
