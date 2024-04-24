@@ -83,12 +83,11 @@ def create_shared_memory(state_shape, num_blocks: int, state_type=_s.numpy.float
         _s.shared_memory.SharedMemory(size=shared_memory_size, create=True)
         for i in range(num_blocks)
     ]
-    shared_memory_names = [shm.name for shm in shared_state_memory]
-    _s.atexit.register(lambda: [release_shared_memory(s) for s in shared_memory_names])
-    return shared_memory_names
+    _s.atexit.register(lambda: [release_shared_memory(s) for s in shared_state_memory])
+    return shared_state_memory
 
 
-def release_shared_memory(name):
+def release_shared_memory(shm):
     """
     It is the responsibility of the caller of create_shared_memory to call release_shared_memory
     Multiprocessing will give a warning if leaked memory exists at the end of the program
@@ -106,20 +105,9 @@ def release_shared_memory(name):
     try:
         # If memory was already unlinked, it will throw. Because we register the cleanup with atexit,
         # we don't know for sure if the memory still exists or not. We just clean up any handle we ever had.
-        shm = _s.shared_memory.SharedMemory(name=name, create=False)
         shm.close()
         shm.unlink()
     except FileNotFoundError:
-        pass
-
-
-class PyParallelTemperingEnsemble:
-    """ """
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
         pass
 
 
@@ -135,12 +123,12 @@ class PyParallelTemperingChain:
         num_chains_in_ensemble: int,
         sync_rng: _c.RandomNumberGenerator,
         barrier: _s.multiprocessing.Barrier,
-        shared_memory_names: _s.typing.List[str] = None,
+        shared_memory: _s.typing.List[_s.shared_memory.SharedMemory] = None,
         draws_per_exchange_attempt: float = 10,
     ):
         self.markov_chain = markov_chain
         self.parallel_tempering_sync_rng = sync_rng
-        self.shared_memory_names = shared_memory_names
+        self.shared_memory = shared_memory
         self.draws_per_exchange_attempt = draws_per_exchange_attempt
         self.chain_index = chain_index
         self.barrier = barrier
@@ -151,7 +139,7 @@ class PyParallelTemperingChain:
 
     def __del__(self):
         if self.chain_index == 0:
-            for n in self.shared_memory_names:
+            for n in self.shared_memory:
                 release_shared_memory(n)
         self.barrier.abort()
 
@@ -212,9 +200,7 @@ class PyParallelTemperingChain:
         )
         if partner_index != -1:
             this_index = self.chain_index
-            shm = _s.shared_memory.SharedMemory(
-                name=self.shared_memory_names[this_index], create=False
-            )
+            shm = self.shared_memory[this_index]
 
             write_destination = _s.numpy.ndarray(
                 shape=expected_shape, dtype=_s.numpy.float64, buffer=shm.buf
@@ -226,9 +212,7 @@ class PyParallelTemperingChain:
 
         self.barrier.wait()
         if partner_index != -1:
-            shm = _s.shared_memory.SharedMemory(
-                name=self.shared_memory_names[partner_index], create=False
-            )
+            shm = self.shared_memory[partner_index]
             other_chain = _s.numpy.ndarray(
                 shape=expected_shape, dtype=_s.numpy.float64, buffer=shm.buf
             )
@@ -400,7 +384,7 @@ def create_py_parallel_tempering_ensembles(
                     sync_rng=sync_rngs[i],
                     draws_per_exchange_attempt=draws_per_exchange_attempt,
                     barrier=barrier,
-                    shared_memory_names=shm,
+                    shared_memory=shm,
                 )
             )
     return pte

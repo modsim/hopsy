@@ -291,7 +291,6 @@ class MarkovChainTests(unittest.TestCase):
                     np.min(ess(temp_samples))
                 )
                 assert np.abs(np.mean(temp_samples)) < 0.2
-                print(np.abs(np.mean(temp_samples)))
 
     def test_odd_chains_parallel_tempering_markovchains_with_rounding_and_multiprocessing(
         self,
