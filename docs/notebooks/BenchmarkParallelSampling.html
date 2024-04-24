@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Checking polytope feasibility &#8212; hopsy 1.5.0b0 documentation</title>
+    <title>&lt;no title&gt; &#8212; hopsy 1.5.0b0 documentation</title>
   
   
   
@@ -44,12 +44,10 @@
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/CheckIfPolytopeIsEmpty';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/BenchmarkParallelSampling';</script>
     <link rel="icon" href="../_static/hopsy.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Equality Constraints" href="EqualityConstraints.html" />
-    <link rel="prev" title="Constrained Sampling" href="ConstrainedSampling.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -156,7 +154,7 @@
                     </li>
                 
 
-                    <li class="nav-item current active">
+                    <li class="nav-item">
                       <a class="nav-link nav-internal" href="../examples.html">
                         Examples
                       </a>
@@ -238,7 +236,9 @@ document.write(`
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -265,7 +265,7 @@ document.write(`
                     </li>
                 
 
-                    <li class="nav-item current active">
+                    <li class="nav-item">
                       <a class="nav-link nav-internal" href="../examples.html">
                         Examples
                       </a>
@@ -303,29 +303,6 @@ document.write(`
     
   </div>
   
-    <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item">
-<nav class="bd-docs-nav bd-links"
-     aria-label="Section Navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="SamplingAdvice.html">A Guide to Sampling Your First Model With hopsy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="QuickTutorial.html">A Quick Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ConstrainedSampling.html">Constrained Sampling</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Checking polytope feasibility</a></li>
-<li class="toctree-l1"><a class="reference internal" href="EqualityConstraints.html">Equality Constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="TruncatedGaussianProposal.html">TMVN Sampling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="BenchmarkingMultiphaseMonteCarloSampling.html">Benchmarking Multiphase Monte Carlo Sampling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="BirkhoffPolytope.html">Birkhoff polytope</a></li>
-<li class="toctree-l1"><a class="reference internal" href="MultiphaseMonteCarlo.html">Demo for Multiphase Monte Carlo in hopsy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="eval_pt_samples.html">Visualizing samples from parallel tempering</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Callbacks.html">Callbacks</a></li>
-</ul>
-</div>
-</nav></div>
-    </div>
-  
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
   </div>
@@ -360,10 +337,7 @@ document.write(`
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    
-    <li class="breadcrumb-item"><a href="../examples.html" class="nav-link">Examples</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page">Checking...</li>
+    <li class="breadcrumb-item active" aria-current="page">&lt;no title&gt;</li>
   </ul>
 </nav>
 </div>
@@ -380,33 +354,26 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="Checking-polytope-feasibility">
-<h1>Checking polytope feasibility<a class="headerlink" href="#Checking-polytope-feasibility" title="Link to this heading">#</a></h1>
-<p>It is useful to check problems and polytopes, whether they are empty before sampling or when encountering issues. For this purpose, hopsy provides simple functions, which we will show on examples in this notebook.</p>
-<div class="nbinput nblast docutils container">
+  <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hopsy</span>
+<span class="kn">import</span> <span class="nn">PolyRound</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">time</span>
 </pre></div>
 </div>
 </div>
-<section id="Example-1:-empty-polytope-x-&lt;-1-and-x-&gt;-2">
-<h2>Example 1: empty polytope x &lt; 1 and x &gt; 2<a class="headerlink" href="#Example-1:-empty-polytope-x-<-1-and-x->-2" title="Link to this heading">#</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">empty_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
-<span class="n">empty_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">])</span>
-<span class="n">empty_problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">empty_A</span><span class="p">,</span> <span class="n">empty_b</span><span class="p">)</span>
-
-<span class="c1"># option 1: check np.arrays directly</span>
-<span class="k">assert</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">is_polytope_empty</span><span class="p">(</span><span class="n">empty_A</span><span class="p">,</span> <span class="n">empty_b</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span>
-
-<span class="c1"># option 2: check hopsy.Problem</span>
-<span class="k">assert</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">is_problem_polytope_empty</span><span class="p">(</span><span class="n">empty_problem</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">original_polytope</span> <span class="o">=</span> <span class="n">PolyRound</span><span class="o">.</span><span class="n">static_classes</span><span class="o">.</span><span class="n">parse_sbml_stoichiometry</span><span class="o">.</span><span class="n">StoichiometryParser</span><span class="o">.</span><span class="n">parse_sbml_cobrapy</span><span class="p">(</span><span class="s2">&quot;../extern/hops/resources/e_coli_core/e_coli_core.xml&quot;</span><span class="p">)</span>
+<span class="n">polytope</span> <span class="o">=</span> <span class="n">PolyRound</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">PolyRoundApi</span><span class="o">.</span><span class="n">simplify_polytope</span><span class="p">(</span><span class="n">original_polytope</span><span class="p">)</span>
+<span class="n">polytope</span> <span class="o">=</span> <span class="n">PolyRound</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">PolyRoundApi</span><span class="o">.</span><span class="n">transform_polytope</span><span class="p">(</span><span class="n">polytope</span><span class="p">)</span>
+<span class="n">polytope</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -416,52 +383,55 @@ document.write(`
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Set parameter Username
-Academic license - for non-commercial use only - expires 2023-11-30
+Academic license - for non-commercial use only - expires 2025-03-22
 </pre></div></div>
 </div>
-</section>
-<section id="Example-2:-valid-polytope-x-&lt;-1-and-x-&gt;-0">
-<h2>Example 2: valid polytope x &lt; 1 and x &gt; 0<a class="headerlink" href="#Example-2:-valid-polytope-x-<-1-and-x->-0" title="Link to this heading">#</a></h2>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
-<span class="n">valid_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-<span class="n">valid_problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">valid_A</span><span class="p">,</span> <span class="n">valid_b</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">replicates</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">n_chains</span> <span class="o">=</span> <span class="mi">20</span>
 
-<span class="c1"># option 1: check np.arrays directly</span>
-<span class="k">assert</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">is_polytope_empty</span><span class="p">(</span><span class="n">valid_A</span><span class="p">,</span> <span class="n">valid_b</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span>
-
-<span class="c1"># option 2: check hopsy.Problem</span>
-<span class="k">assert</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">is_problem_polytope_empty</span><span class="p">(</span><span class="n">valid_problem</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span>
+<span class="n">max_log_n_samples</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">thin</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">times</span> <span class="o">=</span> <span class="p">{}</span>
 </pre></div>
 </div>
 </div>
-</section>
-<section id="Example-3:-invalid-polytope-x-&lt;-1-and-x-&gt;-0-and-x=5">
-<h2>Example 3: invalid polytope x &lt; 1 and x &gt; 0 and x=5<a class="headerlink" href="#Example-3:-invalid-polytope-x-<-1-and-x->-0-and-x=5" title="Link to this heading">#</a></h2>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
-<span class="n">valid_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">polytope</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">polytope</span><span class="o">.</span><span class="n">b</span><span class="p">))</span>
 
-<span class="n">invalid_equality_constraint_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">]])</span>
-<span class="n">invalid_equality_bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">replicates</span><span class="p">):</span>
 
-<span class="n">valid_problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">valid_A</span><span class="p">,</span> <span class="n">valid_b</span><span class="p">)</span>
-
-<span class="c1"># option 1: check np.arrays directly</span>
-<span class="k">assert</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">is_polytope_empty</span><span class="p">(</span><span class="n">valid_A</span><span class="p">,</span> <span class="n">valid_b</span><span class="p">,</span> <span class="n">invalid_equality_constraint_matrix</span><span class="p">,</span> <span class="n">invalid_equality_bounds</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span>
-
-<span class="c1"># option 2: There is no way to add invalid equality constraints using add_equality_constraints. hopsy will</span>
-<span class="c1"># directly raise a ValueError, because LP manipulations are required when simplifying added equality constraints, see PolyRound.</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">invalid_problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">add_equality_constraints</span><span class="p">(</span><span class="n">valid_problem</span><span class="p">,</span> <span class="n">A_eq</span><span class="o">=</span><span class="n">invalid_equality_constraint_matrix</span><span class="p">,</span> <span class="n">b_eq</span><span class="o">=</span><span class="n">invalid_equality_bounds</span><span class="p">)</span>
-<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-    <span class="k">pass</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">compute_chebyshev_center</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="n">markov_chains</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">hopsy</span><span class="o">.</span><span class="n">MarkovChain</span><span class="p">(</span><span class="n">problem</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">starting_point</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_chains</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="n">rngs</span> <span class="o">=</span> <span class="p">[</span><span class="n">hopsy</span><span class="o">.</span><span class="n">RandomNumberGenerator</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_chains</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_log_n_samples</span><span class="p">):</span>
+    <span class="n">times</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">replicates</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">samples</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
+            <span class="n">markov_chains</span><span class="p">,</span> <span class="n">rngs</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="n">n</span><span class="o">/</span><span class="mi">10</span><span class="p">),</span> <span class="n">thinning</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_procs</span><span class="o">=</span><span class="n">n_chains</span>
+        <span class="p">)</span>
+        <span class="k">del</span> <span class="n">samples</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="n">times</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">end</span><span class="o">-</span><span class="n">start</span><span class="p">)</span>
+    <span class="n">times</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span>
 </pre></div>
 </div>
 </div>
@@ -470,9 +440,111 @@ Academic license - for non-commercial use only - expires 2023-11-30
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-model in infeasible state, resetting lp
-Solver status: infeasible
+1 : 0.2198675799979052
+2 : 0.2740902796698113
+3 : 0.20827976200477374
+4 : 0.22025225133499285
+5 : 0.5074554303331146
+6 : 3.1844185713319653
+7 : 35.64497386066554
 </pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{1: 0.2198675799979052, 2: 0.2740902796698113, 3: 0.20827976200477374, 4: 0.22025225133499285, 5: 0.5074554303331146, 6: 3.1844185713319653, 7: 35.64497386066554}
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">times</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;matplotlib.lines.Line2D at 0x76e7e1072f10&gt;]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_BenchmarkParallelSampling_6_1.png" src="../_images/notebooks_BenchmarkParallelSampling_6_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">times_</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_log_n_samples</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">times_</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">replicates</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">samples</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
+            <span class="n">markov_chains</span><span class="p">,</span> <span class="n">rngs</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="n">n</span><span class="p">),</span> <span class="n">thinning</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_procs</span><span class="o">=</span><span class="n">n_chains</span>
+        <span class="p">)</span>
+        <span class="k">del</span> <span class="n">samples</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="n">times_</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">end</span><span class="o">-</span><span class="n">start</span><span class="p">)</span>
+    <span class="n">times_</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">times_</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">times_</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1 : 0.2084976479964098
+2 : 0.22400370699566943
+3 : 0.21522518933246224
+4 : 0.33064250666454126
+5 : 1.172161481998046
+6 : 12.323604983335827
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times_</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">times_</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;matplotlib.lines.Line2D at 0x76e85891b210&gt;]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_BenchmarkParallelSampling_8_1.png" src="../_images/notebooks_BenchmarkParallelSampling_8_1.png" />
+</div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -482,8 +554,6 @@ Solver status: infeasible
 </pre></div>
 </div>
 </div>
-</section>
-</section>
 
 
                 </article>
@@ -495,24 +565,6 @@ Solver status: infeasible
                 <footer class="prev-next-footer">
                   
 <div class="prev-next-area">
-    <a class="left-prev"
-       href="ConstrainedSampling.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Constrained Sampling</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="EqualityConstraints.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Equality Constraints</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div>
                 </footer>
               
@@ -532,17 +584,15 @@ Solver status: infeasible
     <i class="fa-solid fa-list"></i> On this page
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Example-1:-empty-polytope-x-&lt;-1-and-x-&gt;-2">Example 1: empty polytope x &lt; 1 and x &gt; 2</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Example-2:-valid-polytope-x-&lt;-1-and-x-&gt;-0">Example 2: valid polytope x &lt; 1 and x &gt; 0</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Example-3:-invalid-polytope-x-&lt;-1-and-x-&gt;-0-and-x=5">Example 3: invalid polytope x &lt; 1 and x &gt; 0 and x=5</a></li>
+    <ul class="simple visible nav section-nav flex-column">
 </ul>
+
   </nav></div>
 
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/notebooks/CheckIfPolytopeIsEmpty.ipynb.txt">
+    <a href="../_sources/notebooks/BenchmarkParallelSampling.ipynb.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
