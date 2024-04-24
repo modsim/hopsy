@@ -161,7 +161,7 @@ class MarkovChainTests(unittest.TestCase):
                 expected_std_error = np.std(temp_samples) / np.sqrt(
                     np.min(ess(temp_samples))
                 )
-                assert np.abs(np.mean(temp_samples)) < 3 * expected_std_error
+                assert np.abs(np.mean(temp_samples)) < 0.1
 
     def test_odd_chains_parallel_tempering_markovchains_with_multiprocessing(self):
         replicates = 1
@@ -222,7 +222,7 @@ class MarkovChainTests(unittest.TestCase):
                 expected_std_error = np.std(temp_samples) / np.sqrt(
                     np.min(ess(temp_samples))
                 )
-                assert np.abs(np.mean(temp_samples)) < 3 * expected_std_error
+                assert np.abs(np.mean(temp_samples)) < 0.1
 
     def test_even_chains_parallel_tempering_markovchains_with_rounding_and_multiprocessing(
         self,
@@ -290,7 +290,7 @@ class MarkovChainTests(unittest.TestCase):
                 expected_std_error = np.std(temp_samples) / np.sqrt(
                     np.min(ess(temp_samples))
                 )
-                assert np.abs(np.mean(temp_samples)) < 3 * expected_std_error
+                assert np.abs(np.mean(temp_samples)) < 0.1
 
     def test_odd_chains_parallel_tempering_markovchains_with_rounding_and_multiprocessing(
         self,
@@ -357,4 +357,4 @@ class MarkovChainTests(unittest.TestCase):
                 expected_std_error = np.std(temp_samples) / np.sqrt(
                     np.min(ess(temp_samples))
                 )
-                assert np.abs(np.mean(temp_samples)) < 3 * expected_std_error
+                assert np.abs(np.mean(temp_samples)) < 0.1

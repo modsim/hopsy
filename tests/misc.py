@@ -489,3 +489,75 @@ class MiscTests(unittest.TestCase):
         )[:, 0]
 
         self.assertEqual(chebychev.shape, chebychev_rounded.shape)
+
+    def test_get_samples_with_temperature(self):
+        temperature_ladder = [1.0, 0.3, 0.0]
+
+        samples = np.array(
+            [
+                [
+                    [1.0, 1.0, 1.0],
+                    [1.1, 1.1, 1.1],
+                ],
+                [
+                    [0.3, 0.3, 0.3],
+                    [1.3, 1.3, 1.3],
+                ],
+                [
+                    [0, 0, 0],
+                    [0.1, 0.1, 0.1],
+                ],
+                [
+                    [1.0, 1.0, 1.0],
+                    [1.1, 1.1, 1.1],
+                ],
+                [
+                    [0.3, 0.3, 0.3],
+                    [1.3, 1.3, 1.3],
+                ],
+                [
+                    [0, 0, 0],
+                    [0.1, 0.1, 0.1],
+                ],
+                [
+                    [1.0, 1.0, 1.0],
+                    [1.1, 1.1, 1.1],
+                ],
+                [
+                    [0.3, 0.3, 0.3],
+                    [1.3, 1.3, 1.3],
+                ],
+                [
+                    [0, 0, 0],
+                    [0.1, 0.1, 0.1],
+                ],
+                [
+                    [1.0, 1.0, 1.0],
+                    [1.1, 1.1, 1.1],
+                ],
+                [
+                    [0.3, 0.3, 0.3],
+                    [1.3, 1.3, 1.3],
+                ],
+                [
+                    [0, 0, 0],
+                    [0.1, 0.1, 0.1],
+                ],
+            ]
+        )
+
+        expected_samples = {}
+        expected_samples[0] = np.array(
+            [[[0.0, 0.0, 0.0], [0.1, 0.1, 0.1]] for i in range(4)]
+        )
+        expected_samples[0.3] = np.array(
+            [[[0.3, 0.3, 0.3], [1.3, 1.3, 1.3]] for i in range(4)]
+        )
+        expected_samples[1] = np.array(
+            [[[1.0, 1.0, 1.0], [1.1, 1.1, 1.1]] for i in range(4)]
+        )
+
+        for t in temperature_ladder:
+            samples_t = get_samples_with_temperature(t, temperature_ladder, samples)
+            assert samples_t.shape == (4, 2, 3)
+            assert np.all(samples_t == expected_samples[t])
