@@ -23,7 +23,6 @@ _c = _core
 
 
 class _submodules:
-
     import atexit
     import time
     import warnings
@@ -53,6 +52,7 @@ class _submodules:
     else:
         import tqdm
     import typing
+    import warnings
 
     import numpy.typing
 
@@ -521,8 +521,12 @@ def add_equality_constraints(
         raise TypeError(
             "Dimensionality missmatch in equality and inequality constraints!"
         )
-
-    dim = problem.A.shape[1]
+    if problem.transformation is not None or problem.shift is not None:
+        raise RuntimeError(
+            "Problem contains transformation and shift. "
+            "This is not supported yet."
+            "Set both to None to continue."
+        )
 
     try:
         polytope = _s.polytope.Polytope(A=problem.A, b=problem.b, S=A_eq, h=b_eq)
@@ -541,6 +545,17 @@ def add_equality_constraints(
             polytope.transformation.values,
             polytope.shift.values,
         )
+
+        if problem.starting_point is not None:
+            _problem.starting_point = transform(_problem, [problem.starting_point])[0]
+
+            if _s.numpy.any((_problem.b - _problem.A @ _problem.starting_point) < 0):
+                _s.warnings.warn(
+                    "Applying equality constraints to starting point in problem failed. "
+                    "Please provide a new starting point."
+                )
+                _problem.starting_point = None
+
         return _problem
     except ValueError as e:
         raise ValueError(
@@ -751,7 +766,15 @@ def round(problem: _c.Problem):
         _problem.original_b = problem.b
 
         if problem.starting_point is not None:
-            _problem.starting_point = transform(_problem, [problem.starting_point])[0]
+            intermediate_problem = _c.Problem(
+                polytope.A.values,
+                polytope.b.values,
+                transformation=polytope.transformation.values,
+                shift=polytope.shift.values,
+            )
+            _problem.starting_point = transform(
+                intermediate_problem, [problem.starting_point]
+            )[0]
 
         return _problem
 
@@ -786,10 +809,17 @@ def transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
     """
     transformed_points = []
 
+    is_square = problem.transformation.shape[0] == problem.transformation.shape[1]
+    solver = (
+        _s.numpy.linalg.solve
+        if is_square
+        else lambda A, b: _s.numpy.linalg.lstsq(A, b, rcond=None)[0]
+    )
+
     for point in points:
         _point = point - problem.shift if problem.shift is not None else point
         _point = (
-            _s.numpy.linalg.solve(problem.transformation, _point)
+            solver(problem.transformation, _point)
             if problem.transformation is not None
             else _point
         )
@@ -980,7 +1010,7 @@ def _parallel_sampling(
     if callback is not None or progress_bar:
         workers = _s.multiprocessing.Pool(n_procs)
         if "SLURM_JOB_ID" in _s.os.environ:
-            print(
+            _s.warnings.warn(
                 "Warning: progress bars or callbacks within SLURM are not officially supported. Proceed with caution and make "
                 "a feature request in our gitlab, if you require progress bars & SLURM"
             )
