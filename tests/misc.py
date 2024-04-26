@@ -4,6 +4,7 @@ import unittest
 import numpy
 import numpy as np
 
+import hopsy
 from hopsy import *
 
 n_chains = 4
@@ -561,3 +562,115 @@ class MiscTests(unittest.TestCase):
             samples_t = get_samples_with_temperature(t, temperature_ladder, samples)
             assert samples_t.shape == (4, 2, 3)
             assert np.all(samples_t == expected_samples[t])
+
+    def test_starting_point_with_equality_constraints(self):
+        A = np.array([]).reshape((0, 3))
+        b = np.array([])
+
+        starting_point = np.array([3, 2, 1])
+
+        problem = Problem(A, b, starting_point=starting_point)
+
+        lb = [-5, -5, -5]
+        ub = [5, 5, 5]
+
+        problem = add_box_constraints(problem, lb, ub, simplify=False)
+
+        A_eq = np.array([[2.0, 1.0, 0]])
+        b_eq = np.array([8])
+
+        problem = add_equality_constraints(problem, A_eq, b_eq)
+
+        self.assertIsNotNone(problem.starting_point)
+        self.assertTrue(np.all((problem.b - problem.A @ problem.starting_point) > 0))
+
+        original_starting_point = back_transform(problem, [problem.starting_point])[0]
+        self.assertTrue(np.all(original_starting_point == starting_point))
+
+    def test_starting_point_with_equality_constraints_when_rounded(self):
+        A = np.array([]).reshape((0, 3))
+        b = np.array([])
+
+        starting_point = np.array([3, 2, 1])
+
+        problem = Problem(A, b, starting_point=starting_point)
+
+        lb = [-5, -5, -5]
+        ub = [5, 5, 5]
+
+        problem = add_box_constraints(problem, lb, ub, simplify=False)
+
+        A_eq = np.array([[2.0, 1.0, 0]])
+        b_eq = np.array([8])
+
+        problem = add_equality_constraints(problem, A_eq, b_eq)
+        problem = round(problem)
+
+        self.assertIsNotNone(problem.starting_point)
+        self.assertTrue(np.all((problem.b - problem.A @ problem.starting_point) > 0))
+
+        original_starting_point = back_transform(problem, [problem.starting_point])[0]
+        self.assertTrue(np.all(original_starting_point == starting_point))
+
+    def test_starting_point_with_equality_constraints_simplify(self):
+        A = np.array([]).reshape((0, 3))
+        b = np.array([])
+
+        starting_point = np.array([3, 2, 1])
+
+        problem = Problem(A, b, starting_point=starting_point)
+
+        lb = [-5, -5, -5]
+        ub = [5, 5, 5]
+
+        problem = add_box_constraints(problem, lb, ub, simplify=True)
+
+        A_eq = np.array([[2.0, 1.0, 0]])
+        b_eq = np.array([8])
+
+        problem = add_equality_constraints(problem, A_eq, b_eq)
+
+        self.assertIsNotNone(problem.starting_point)
+        self.assertTrue(np.all((problem.b - problem.A @ problem.starting_point) > 0))
+
+        original_starting_point = back_transform(problem, [problem.starting_point])[0]
+        self.assertTrue(np.all(original_starting_point == starting_point))
+
+    def test_starting_point_with_equality_constraints_when_rounded_simplify(self):
+        A = np.array([]).reshape((0, 3))
+        b = np.array([])
+
+        starting_point = np.array([3, 2, 1])
+
+        problem = Problem(A, b, starting_point=starting_point)
+
+        lb = [-5, -5, -5]
+        ub = [5, 5, 5]
+
+        problem = add_box_constraints(problem, lb, ub, simplify=True)
+
+        A_eq = np.array([[2.0, 1.0, 0]])
+        b_eq = np.array([8])
+
+        problem = add_equality_constraints(problem, A_eq, b_eq)
+        problem = round(problem)
+
+        self.assertIsNotNone(problem.starting_point)
+        self.assertTrue(np.all((problem.b - problem.A @ problem.starting_point) > 0))
+
+        original_starting_point = back_transform(problem, [problem.starting_point])[0]
+        self.assertTrue(np.all(original_starting_point == starting_point))
+
+        def test_equality_constraints_throw_on_existing_transformation(self):
+            A = np.array([]).reshape((0, 3))
+            b = np.array([])
+
+            starting_point = np.array([3, 2, 1])
+
+            problem = Problem(A, b, starting_point=starting_point, transform=A, shift=b)
+
+            lb = [-5, -5, -5]
+            ub = [5, 5, 5]
+
+            with self.assertRaises(RuntimeError):
+                add_box_constraints(problem, lb, ub, simplify=False)
