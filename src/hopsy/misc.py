@@ -554,7 +554,7 @@ def add_equality_constraints(
                     "Applying equality constraints to starting point in problem failed. "
                     "Please provide a new starting point."
                 )
-                problem._starting_point = None
+                _problem.starting_point = None
 
         return _problem
     except ValueError as e:
