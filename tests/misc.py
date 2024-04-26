@@ -4,7 +4,6 @@ import unittest
 import numpy
 import numpy as np
 
-import hopsy
 from hopsy import *
 
 n_chains = 4
