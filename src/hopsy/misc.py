@@ -1632,3 +1632,27 @@ def run_multiphase_sampling(
         )
 
     return _samples, iterations, current_ess, sampling_time
+
+
+def setup_sampling(problem: _c.Problem, kwargs):
+    if "proposal_options" in kwargs:
+        # class or finished proposal?
+        pass
+    elif problem.model is None:
+        proposal = _c.UniformCoordinateHitAndRunProposal
+    else:
+        proposal = _c.GaussianHitAndRunProposal
+
+    if "tuning_options" in kwargs and proposal.stepsize is not None:
+        mcs, rngs, gprs, domains = tune(**kwargs["tuning_options"])
+        # TODO: also return tuning
+
+    for seed in random_number_seeds:
+        rngs = [_c.RandomNumberGenerator(seeds)]
+
+    markov_chains = [_c.MarkovChain(problem, proposal)]
+    # return mcs, rngs
+    def sample():
+        pass
+
+    return sample
