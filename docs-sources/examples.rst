@@ -9,9 +9,10 @@ Examples
    :caption: Examples
    :maxdepth: 1
 
-   notebooks/SamplingAdvice.ipynb
    notebooks/QuickTutorial.ipynb
+   notebooks/SamplingAdvice.ipynb
    notebooks/ConstrainedSampling.ipynb
+   notebooks/ParallelTemperingMultiprocessing.ipynb
 
    notebooks/CheckIfPolytopeIsEmpty.ipynb
    notebooks/EqualityConstraints.ipynb
