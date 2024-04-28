@@ -122,7 +122,7 @@ rng = hopsy.RandomNumberGenerator(seed=42)
 acceptance_rate, states = hopsy.sample(mc, rng, n_samples=10_000, thinning=2)
 
 # the states have 3 dimensions: number of chains, number of samples, number of dimensions.
-plt.scatter(states[:,:,0].flatten(), states[:,:,1].flatten())
+plt.scatter(states[:, :, 0].flatten(), states[:, :, 1].flatten())
 plt.show()
 ```
 

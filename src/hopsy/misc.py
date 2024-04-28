@@ -7,13 +7,15 @@ class _core:
     from .callback import Callback
     from .core import (
         BilliardWalkProposal,
+        Gaussian,
         GaussianHitAndRunProposal,
         MarkovChain,
         Problem,
         Proposal,
-        PyProposal,
         RandomNumberGenerator,
+        TruncatedGaussianProposal,
         Uniform,
+        UniformCoordinateHitAndRunProposal,
         UniformInt,
     )
     from .lp import LP
@@ -44,7 +46,6 @@ class _submodules:
 
     import multiprocessing
     import os
-    import warnings
     from multiprocessing import shared_memory
 
     if "JPY_PARENT_PID" in os.environ:
@@ -392,15 +393,21 @@ def create_py_parallel_tempering_ensembles(
 
 def MarkovChain(
     problem: _c.Problem,
-    proposal: _s.typing.Union[
-        _c.Proposal, _s.typing.Type[_c.Proposal]
-    ] = _c.GaussianHitAndRunProposal,
+    proposal: _s.typing.Union[_c.Proposal, _s.typing.Type[_c.Proposal]] = None,
     starting_point: _s.numpy.typing.ArrayLike = None,
     parallel_tempering_sync_rng: _c.RandomNumberGenerator = None,
     exchange_attempt_probability: float = 0.1,
     coldness: float = 1.0,
 ):
     _proposal = None
+
+    if proposal is None and isinstance(problem.model, _c.Gaussian):
+        proposal = _c.TruncatedGaussianProposal
+    elif proposal is None and problem.model is None:
+        proposal = _c.UniformCoordinateHitAndRunProposal
+    elif proposal is None:
+        proposal = _c.GaussianHitAndRunProposal
+
     if isinstance(proposal, type):
         if starting_point is not None:
             _proposal = proposal(problem, starting_point=starting_point)
