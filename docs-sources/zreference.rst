@@ -20,6 +20,7 @@ Functions
    hopsy.run_multiphase_sampling
    hopsy.sample
    hopsy.simplify
+   hopsy.setup
    hopsy.transform
    hopsy.tune
 
