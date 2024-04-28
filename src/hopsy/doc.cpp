@@ -2595,10 +2595,28 @@ const char* hopsy::doc::UniformHitAndRunProposal::copyProposal = R"pbdoc(
  *  MarkovChain
  */
 
-const char* hopsy::doc::MarkovChain::base = R"pbdoc(MarkovChain(problem, proposal=hopsy.GaussianHitAndRun, starting_point=None)
+const char* hopsy::doc::MarkovChain::base = R"pbdoc(MarkovChain(problem, proposal=None, starting_point=None)
 
 Given a hopsy.Problem a MarkovChain object can be constructed. The Markov chain keeps track of the internal state and the selected proposal mechanism, see proposal argument.
 Several Markov chain objects can be sampled in parallel by passing them as a list to hopsy.sample.
+
+Parameters
+----------
+problem: hopsy.Problem
+    Problem to sample
+proposal: Proposal type or object (duck-typing). Default None
+    If None is given, the proposal algorithm is heuristically selected.
+    If the problem has no model, the hopsy.UniformCoordinateHitAndRunProposal is selected.
+    If the problem has a hopsy.Gaussian Model, the hopsy.TruncatedGaussianProposal is selected.
+    Otherwise the hopsy.GaussianHitAndRunProposal.
+    Please note, that these defaults are heuristic and work best for no model or hopsy.Gaussian.
+    For the other case, it is worth experimenting with the available proposals to find the most efficient one for the
+    problem at hand
+
+Returns
+    MarkovChain
+-------
+
 )pbdoc";
 
 

@@ -21,7 +21,7 @@ def setup(
     n_chains: int
         Optional, if none is given, will use all cores available on machine
     proposal: hopsy.ProposalType or proposal object (duck typing!)
-        Optional: Will heuristically select fitting algorithm
+        Optional: Will heuristically select fitting algorithm, see MarkovChain documentation
     n_tuning : int, default 1000
         Total budget of samples that may be drawn for tuning per chain.
         Only applicable if selected proposal is tunable, ignored otherwise
