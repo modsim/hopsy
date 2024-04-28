@@ -2614,8 +2614,8 @@ proposal: Proposal type or object (duck-typing). Default None
     problem at hand
 
 Returns
-    MarkovChain
 -------
+    MarkovChain
 
 )pbdoc";
 
