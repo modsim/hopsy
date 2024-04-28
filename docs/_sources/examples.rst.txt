@@ -9,9 +9,10 @@ Examples
    :caption: Examples
    :maxdepth: 1
 
-   notebooks/SamplingAdvice.ipynb
    notebooks/QuickTutorial.ipynb
+   notebooks/SamplingAdvice.ipynb
    notebooks/ConstrainedSampling.ipynb
+   notebooks/ParallelTemperingMultiprocessing.ipynb
 
    notebooks/CheckIfPolytopeIsEmpty.ipynb
    notebooks/EqualityConstraints.ipynb
@@ -20,7 +21,7 @@ Examples
    notebooks/BenchmarkingMultiphaseMonteCarloSampling.ipynb
    notebooks/BirkhoffPolytope.ipynb
    notebooks/MultiphaseMonteCarlo.ipynb
-   notebooks/ParallelTempering.ipynb
+   notebooks/ParallelTemperingMPI.ipynb
    notebooks/eval_pt_samples.ipynb
    notebooks/Callbacks.ipynb
   

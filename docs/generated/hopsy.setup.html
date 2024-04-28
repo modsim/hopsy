@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>hopsy.DikinWalkProposal &#8212; hopsy 1.5.0b0 documentation</title>
+    <title>hopsy.setup &#8212; hopsy 1.5.0b0 documentation</title>
   
   
   
@@ -41,12 +41,12 @@
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/hopsy.DikinWalkProposal';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/hopsy.setup';</script>
     <link rel="icon" href="../_static/hopsy.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="hopsy.DikinWalkProposal.accept_proposal" href="objname/hopsy.DikinWalkProposal.accept_proposal.html" />
-    <link rel="prev" title="hopsy.CSmMALAProposal.propose" href="objname/hopsy.CSmMALAProposal.propose.html" />
+    <link rel="next" title="hopsy.transform" href="hopsy.transform.html" />
+    <link rel="prev" title="hopsy.simplify" href="hopsy.simplify.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -306,7 +306,7 @@ document.write(`
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Functions</span></p>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="hopsy.back_transform.html">hopsy.back_transform</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hopsy.add_box_constraints.html">hopsy.add_box_constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hopsy.add_equality_constraints.html">hopsy.add_equality_constraints</a></li>
@@ -318,7 +318,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="hopsy.run_multiphase_sampling.html">hopsy.run_multiphase_sampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hopsy.sample.html">hopsy.sample</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hopsy.simplify.html">hopsy.simplify</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hopsy.setup.html">hopsy.setup</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">hopsy.setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hopsy.transform.html">hopsy.transform</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hopsy.tune.html">hopsy.tune</a></li>
 </ul>
@@ -385,7 +385,7 @@ document.write(`
 </li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Proposals</span></p>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="hopsy.Proposal.html">hopsy.Proposal</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.AdaptiveMetropolisProposal.html">hopsy.AdaptiveMetropolisProposal</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.AdaptiveMetropolisProposal.accept_proposal.html">hopsy.AdaptiveMetropolisProposal.accept_proposal</a></li>
@@ -411,7 +411,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.CSmMALAProposal.propose.html">hopsy.CSmMALAProposal.propose</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">hopsy.DikinWalkProposal</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.DikinWalkProposal.html">hopsy.DikinWalkProposal</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.DikinWalkProposal.accept_proposal.html">hopsy.DikinWalkProposal.accept_proposal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.DikinWalkProposal.deepcopy.html">hopsy.DikinWalkProposal.deepcopy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.DikinWalkProposal.propose.html">hopsy.DikinWalkProposal.propose</a></li>
@@ -539,12 +539,9 @@ document.write(`
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../userguide.html" class="nav-link">User Guide</a></li>
+    <li class="breadcrumb-item"><a href="../zreference.html" class="nav-link">Reference</a></li>
     
-    
-    <li class="breadcrumb-item"><a href="../userguide/sampling.html" class="nav-link">Markov Chain Monte Carlo Sampling</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page">hopsy.DikinW...</li>
+    <li class="breadcrumb-item active" aria-current="page">hopsy.setup</li>
   </ul>
 </nav>
 </div>
@@ -561,66 +558,37 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="hopsy-dikinwalkproposal">
-<h1>hopsy.DikinWalkProposal<a class="headerlink" href="#hopsy-dikinwalkproposal" title="Link to this heading">#</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="hopsy.DikinWalkProposal">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">DikinWalkProposal</span></span><a class="headerlink" href="#hopsy.DikinWalkProposal" title="Link to this definition">#</a></dt>
-<dd><p class="rubric">Attributes</p>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">boundary_cushion</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_log_density</span></code></p></td>
-<td><p>Returns whether the proposal knows about the log density or not.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_negative_log_likelihood</span></code></p></td>
-<td><p>deprecated:: 1.4 Use <code class="xref py py-attr docutils literal notranslate"><span class="pre">has_log_density</span></code> instead.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_acceptance_probability</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">proposal</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">proposal_log_density</span></code></p></td>
-<td><p>Returns the log density of the proposal.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">proposal_negative_log_likelihood</span></code></p></td>
-<td><p>deprecated:: 1.4 Use -<code class="xref py py-attr docutils literal notranslate"><span class="pre">proposal_log_density</span></code> instead.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">state</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">state_log_density</span></code></p></td>
-<td><p>Returns the log density of the current state of the proposal.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">state_negative_log_likelihood</span></code></p></td>
-<td><p>deprecated:: 1.4 Use -<code class="xref py py-attr docutils literal notranslate"><span class="pre">state_log_density</span></code> instead.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">stepsize</span></code></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Methods</p>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="objname/hopsy.DikinWalkProposal.accept_proposal.html#hopsy.DikinWalkProposal.accept_proposal" title="hopsy.DikinWalkProposal.accept_proposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accept_proposal</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="objname/hopsy.DikinWalkProposal.deepcopy.html#hopsy.DikinWalkProposal.deepcopy" title="hopsy.DikinWalkProposal.deepcopy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deepcopy</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="objname/hopsy.DikinWalkProposal.propose.html#hopsy.DikinWalkProposal.propose" title="hopsy.DikinWalkProposal.propose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propose</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
+  <section id="hopsy-setup">
+<h1>hopsy.setup<a class="headerlink" href="#hopsy-setup" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="hopsy.setup">
+<span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="hopsy.Problem.html#hopsy.Problem" title="hopsy.core.Problem"><span class="pre">Problem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_chains</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_tuning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_tuning_rounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_accrate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.234</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.setup" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>problem</strong></p></li>
+<li><p><strong>random_seed</strong> (<em>int</em>) – To force easier reproducibility of scientific results, the user is forced to specify a random seed</p></li>
+<li><p><strong>n_chains</strong> (<em>int</em>) – Optional, if none is given, will use all cores available on machine</p></li>
+<li><p><strong>proposal</strong> (<em>hopsy.ProposalType</em><em> or </em><em>proposal object</em><em> (</em><em>duck typing!</em><em>)</em>) – Optional: Will heuristically select fitting algorithm, see MarkovChain documentation</p></li>
+<li><p><strong>n_tuning</strong> (<em>int</em><em>, </em><em>default 1000</em>) – Total budget of samples that may be drawn for tuning per chain.
+Only applicable if selected proposal is tunable, ignored otherwise</p></li>
+<li><p><strong>n_tuning_rounds</strong> (<em>int</em><em>, </em><em>default 0</em>) – Number of Thompson Sampling rounds.
+Only applicable if selected proposal is tunable and n_tuning&gt;0, ignored otherwise</p></li>
+<li><p><strong>target_accrate</strong> (<em>float</em><em>, </em><em>default=0.234</em>) – Target accpetance rate for acceptance rate tuning.</p></li>
+<li><p><strong>tuning_target</strong> (<em>str</em>) – What tuning_target to use, if n_tuning&gt;0 Valid tuning targets are “accrate” for acceptance rate tuning,
+“esjd” for expected squared jump distance tuning and “esjd/s” for expected squared jump distance per second tuning.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>tuple containing either 2 or 3 elements</em></p></li>
+<li><p><em>1) markov chains with sensible defaults</em></p></li>
+<li><p><em>2) random number generators</em></p></li>
+<li><p><em>3) tuning results only if tuning_target was not None</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -636,20 +604,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="objname/hopsy.CSmMALAProposal.propose.html"
+       href="hopsy.simplify.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">hopsy.CSmMALAProposal.propose</p>
+        <p class="prev-next-title">hopsy.simplify</p>
       </div>
     </a>
     <a class="right-next"
-       href="objname/hopsy.DikinWalkProposal.accept_proposal.html"
+       href="hopsy.transform.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">hopsy.DikinWalkProposal.accept_proposal</p>
+        <p class="prev-next-title">hopsy.transform</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -673,14 +641,14 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hopsy.DikinWalkProposal"><code class="docutils literal notranslate"><span class="pre">DikinWalkProposal</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hopsy.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/generated/hopsy.DikinWalkProposal.rst.txt">
+    <a href="../_sources/generated/hopsy.setup.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

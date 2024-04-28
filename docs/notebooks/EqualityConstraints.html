@@ -310,15 +310,17 @@ document.write(`
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="SamplingAdvice.html">A Guide to Sampling Your First Model With hopsy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="QuickTutorial.html">A Quick Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SamplingAdvice.html">A Guide to Sampling Your First Model With hopsy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ConstrainedSampling.html">Constrained Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ParallelTemperingMultiprocessing.html">Parallel Tempering using pure Python (Multiprocessing)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CheckIfPolytopeIsEmpty.html">Checking polytope feasibility</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Equality Constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="TruncatedGaussianProposal.html">TMVN Sampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="BenchmarkingMultiphaseMonteCarloSampling.html">Benchmarking Multiphase Monte Carlo Sampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="BirkhoffPolytope.html">Birkhoff polytope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MultiphaseMonteCarlo.html">Demo for Multiphase Monte Carlo in hopsy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ParallelTemperingMPI.html">Parallel Tempering with MPI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="eval_pt_samples.html">Visualizing samples from parallel tempering</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Callbacks.html">Callbacks</a></li>
 </ul>
@@ -420,7 +422,7 @@ document.write(`
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mc</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">MarkovChain</span><span class="p">(</span><span class="n">rectangle</span><span class="p">,</span> <span class="n">starting_point</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mc</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">MarkovChain</span><span class="p">(</span><span class="n">rectangle</span><span class="p">)</span>
 <span class="n">rng</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">RandomNumberGenerator</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 <span class="n">_</span><span class="p">,</span> <span class="n">samples</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">mc</span><span class="p">,</span> <span class="n">rng</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">20000</span><span class="p">,</span> <span class="n">thinning</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
@@ -439,13 +441,13 @@ document.write(`
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[[[ 0.26653144 -1.11889648 -0.17080836]
-  [-0.9418255  -0.33957506  1.98207648]
-  [ 0.80278535  0.47749555  1.12280485]
+[[[-0.43426088  0.42225266  0.10534782]
+  [-0.06525985  0.06436831 -2.46131662]
+  [-0.05369373  1.80750632  0.80462979]
   ...
-  [-0.8399288   0.11007866  2.90024278]
-  [ 0.88967784 -0.61249626  2.00471622]
-  [-0.87693032  1.54067729  1.94710096]]]
+  [ 0.21379724 -1.72031362 -2.44581382]
+  [ 0.98883212 -0.25319745  2.33836859]
+  [-0.71434968 -0.06717306  1.55590868]]]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -489,7 +491,7 @@ document.write(`
 </section>
 <section id="Now-constraint-rectangle-to-2D-by-fixing-third-dimension-at-2.5">
 <h2>Now constraint rectangle to 2D by fixing third dimension at 2.5<a class="headerlink" href="#Now-constraint-rectangle-to-2D-by-fixing-third-dimension-at-2.5" title="Link to this heading">#</a></h2>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
@@ -504,20 +506,11 @@ document.write(`
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Set parameter Username
-Academic license - for non-commercial use only - expires 2023-11-30
-</pre></div></div>
-</div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mc</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">MarkovChain</span><span class="p">(</span><span class="n">constrained_rectangle</span><span class="p">,</span> <span class="n">starting_point</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mc</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">MarkovChain</span><span class="p">(</span><span class="n">constrained_rectangle</span><span class="p">)</span>
 <span class="n">rng</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">RandomNumberGenerator</span><span class="p">(</span><span class="mi">43</span><span class="p">)</span>
 <span class="n">_</span><span class="p">,</span> <span class="n">constrained_samples</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">mc</span><span class="p">,</span> <span class="n">rng</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">20000</span><span class="p">,</span> <span class="n">thinning</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>

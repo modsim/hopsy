@@ -320,6 +320,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="generated/hopsy.run_multiphase_sampling.html">hopsy.run_multiphase_sampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/hopsy.sample.html">hopsy.sample</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/hopsy.simplify.html">hopsy.simplify</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generated/hopsy.setup.html">hopsy.setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/hopsy.transform.html">hopsy.transform</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generated/hopsy.tune.html">hopsy.tune</a></li>
 </ul>
@@ -595,10 +596,17 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.simplify.html#hopsy.simplify" title="hopsy.simplify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.simplify</span></code></a>(problem)</p></td>
 <td><p>Simplifies the polytope defined in the <code class="docutils literal notranslate"><span class="pre">problem</span></code> by removing redundant constraints and refunction inequality constraints to equality constraints in case of dimension width less than thresh.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.transform.html#hopsy.transform" title="hopsy.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.transform</span></code></a>(problem, points)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.setup.html#hopsy.setup" title="hopsy.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.setup</span></code></a>(problem, random_seed[, ...])</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">param problem<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.transform.html#hopsy.transform" title="hopsy.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.transform</span></code></a>(problem, points)</p></td>
 <td><p>Transforms samples from the parameter space to the sampling space (typically rounded).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.tune.html#hopsy.tune" title="hopsy.tune"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.tune</span></code></a>(mcs, rngs, target, n_tuning[, k, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.tune.html#hopsy.tune" title="hopsy.tune"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.tune</span></code></a>(mcs, rngs, target, n_tuning[, k, ...])</p></td>
 <td><p>Thompson Sampling-based tuning method for specifying meaningful hyperparameters for Markov chain proposal distributions.</p></td>
 </tr>
 </tbody>

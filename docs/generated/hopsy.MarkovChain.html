@@ -318,6 +318,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="hopsy.run_multiphase_sampling.html">hopsy.run_multiphase_sampling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hopsy.sample.html">hopsy.sample</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hopsy.simplify.html">hopsy.simplify</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hopsy.setup.html">hopsy.setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hopsy.transform.html">hopsy.transform</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hopsy.tune.html">hopsy.tune</a></li>
 </ul>
@@ -564,9 +565,26 @@ document.write(`
 <h1>hopsy.MarkovChain<a class="headerlink" href="#hopsy-markovchain" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="hopsy.MarkovChain">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">MarkovChain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">hopsy.GaussianHitAndRun</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starting_point</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.MarkovChain" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">MarkovChain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starting_point</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.MarkovChain" title="Link to this definition">#</a></dt>
 <dd><p>Given a hopsy.Problem a MarkovChain object can be constructed. The Markov chain keeps track of the internal state and the selected proposal mechanism, see proposal argument.
 Several Markov chain objects can be sampled in parallel by passing them as a list to hopsy.sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>problem</strong> (<a class="reference internal" href="hopsy.Problem.html#hopsy.Problem" title="hopsy.Problem"><em>hopsy.Problem</em></a>) – Problem to sample</p></li>
+<li><p><strong>proposal</strong> (<em>Proposal type</em><em> or </em><em>object</em><em> (</em><em>duck-typing</em><em>)</em><em>. Default None</em>) – If None is given, the proposal algorithm is heuristically selected.
+If the problem has no model, the hopsy.UniformCoordinateHitAndRunProposal is selected.
+If the problem has a hopsy.Gaussian Model, the hopsy.TruncatedGaussianProposal is selected.
+Otherwise the hopsy.GaussianHitAndRunProposal.
+Please note, that these defaults are heuristic and work best for no model or hopsy.Gaussian.
+For the other case, it is worth experimenting with the available proposals to find the most efficient one for the
+problem at hand</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#hopsy.MarkovChain" title="hopsy.MarkovChain">MarkovChain</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
