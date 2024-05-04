@@ -2,7 +2,6 @@ Found insufficient docstring for the following items:
   -- hopsy.AcceptanceRateTarget
   -- hopsy.AcceptanceRateTarget.acceptance_rate
   -- hopsy.AcceptanceRateTarget.n_test_samples
-  -- hopsy.AdaptiveMetropolisProposal
   -- hopsy.AdaptiveMetropolisProposal.accept_proposal
   -- hopsy.AdaptiveMetropolisProposal.boundary_cushion
   -- hopsy.AdaptiveMetropolisProposal.deepcopy
@@ -13,7 +12,6 @@ Found insufficient docstring for the following items:
   -- hopsy.AdaptiveMetropolisProposal.propose
   -- hopsy.AdaptiveMetropolisProposal.state
   -- hopsy.AdaptiveMetropolisProposal.warm_up
-  -- hopsy.BallWalkProposal
   -- hopsy.BallWalkProposal.accept_proposal
   -- hopsy.BallWalkProposal.deepcopy
   -- hopsy.BallWalkProposal.log_acceptance_probability
@@ -22,7 +20,6 @@ Found insufficient docstring for the following items:
   -- hopsy.BallWalkProposal.propose
   -- hopsy.BallWalkProposal.state
   -- hopsy.BallWalkProposal.stepsize
-  -- hopsy.BilliardAdaptiveMetropolisProposal
   -- hopsy.BilliardAdaptiveMetropolisProposal.accept_proposal
   -- hopsy.BilliardAdaptiveMetropolisProposal.boundary_cushion
   -- hopsy.BilliardAdaptiveMetropolisProposal.deepcopy
@@ -34,7 +31,6 @@ Found insufficient docstring for the following items:
   -- hopsy.BilliardAdaptiveMetropolisProposal.propose
   -- hopsy.BilliardAdaptiveMetropolisProposal.state
   -- hopsy.BilliardAdaptiveMetropolisProposal.warm_up
-  -- hopsy.BilliardMALAProposal
   -- hopsy.BilliardMALAProposal.accept_proposal
   -- hopsy.BilliardMALAProposal.deepcopy
   -- hopsy.BilliardMALAProposal.log_acceptance_probability
@@ -44,7 +40,6 @@ Found insufficient docstring for the following items:
   -- hopsy.BilliardMALAProposal.propose
   -- hopsy.BilliardMALAProposal.state
   -- hopsy.BilliardMALAProposal.stepsize
-  -- hopsy.BilliardWalkProposal
   -- hopsy.BilliardWalkProposal.accept_proposal
   -- hopsy.BilliardWalkProposal.deepcopy
   -- hopsy.BilliardWalkProposal.log_acceptance_probability
@@ -54,7 +49,6 @@ Found insufficient docstring for the following items:
   -- hopsy.BilliardWalkProposal.propose
   -- hopsy.BilliardWalkProposal.state
   -- hopsy.BilliardWalkProposal.stepsize
-  -- hopsy.CSmMALAProposal
   -- hopsy.CSmMALAProposal.accept_proposal
   -- hopsy.CSmMALAProposal.deepcopy
   -- hopsy.CSmMALAProposal.fisher_weight
@@ -64,7 +58,6 @@ Found insufficient docstring for the following items:
   -- hopsy.CSmMALAProposal.propose
   -- hopsy.CSmMALAProposal.state
   -- hopsy.CSmMALAProposal.stepsize
-  -- hopsy.DikinWalkProposal
   -- hopsy.DikinWalkProposal.accept_proposal
   -- hopsy.DikinWalkProposal.boundary_cushion
   -- hopsy.DikinWalkProposal.deepcopy
@@ -78,7 +71,6 @@ Found insufficient docstring for the following items:
   -- hopsy.ExpectedSquaredJumpDistanceTarget.consider_time_cost
   -- hopsy.ExpectedSquaredJumpDistanceTarget.lags
   -- hopsy.ExpectedSquaredJumpDistanceTarget.n_test_samples
-  -- hopsy.GaussianCoordinateHitAndRunProposal
   -- hopsy.GaussianCoordinateHitAndRunProposal.accept_proposal
   -- hopsy.GaussianCoordinateHitAndRunProposal.deepcopy
   -- hopsy.GaussianCoordinateHitAndRunProposal.log_acceptance_probability
@@ -87,7 +79,6 @@ Found insufficient docstring for the following items:
   -- hopsy.GaussianCoordinateHitAndRunProposal.propose
   -- hopsy.GaussianCoordinateHitAndRunProposal.state
   -- hopsy.GaussianCoordinateHitAndRunProposal.stepsize
-  -- hopsy.GaussianHitAndRunProposal
   -- hopsy.GaussianHitAndRunProposal.accept_proposal
   -- hopsy.GaussianHitAndRunProposal.deepcopy
   -- hopsy.GaussianHitAndRunProposal.log_acceptance_probability
@@ -96,7 +87,6 @@ Found insufficient docstring for the following items:
   -- hopsy.GaussianHitAndRunProposal.propose
   -- hopsy.GaussianHitAndRunProposal.state
   -- hopsy.GaussianHitAndRunProposal.stepsize
-  -- hopsy.GaussianProposal
   -- hopsy.GaussianProposal.accept_proposal
   -- hopsy.GaussianProposal.deepcopy
   -- hopsy.GaussianProposal.log_acceptance_probability
@@ -109,10 +99,8 @@ Found insufficient docstring for the following items:
   -- hopsy.Normal.mean
   -- hopsy.Normal.stddev
   -- hopsy.Problem
-  -- hopsy.Proposal
   -- hopsy.ProposalParameter.name
   -- hopsy.ProposalParameter.value
-  -- hopsy.PyProposal
   -- hopsy.PyProposal.accept_proposal
   -- hopsy.PyProposal.deepcopy
   -- hopsy.PyProposal.log_acceptance_probability
@@ -126,7 +114,6 @@ Found insufficient docstring for the following items:
   -- hopsy.RandomNumberGenerator.seed
   -- hopsy.RandomNumberGenerator.state
   -- hopsy.RandomNumberGenerator.stream
-  -- hopsy.ReversibleJumpProposal
   -- hopsy.ReversibleJumpProposal.accept_proposal
   -- hopsy.ReversibleJumpProposal.activation_probability
   -- hopsy.ReversibleJumpProposal.deactivation_probability
@@ -150,7 +137,6 @@ Found insufficient docstring for the following items:
   -- hopsy.ThompsonSamplingTuning.record_data
   -- hopsy.ThompsonSamplingTuning.smoothing_length
   -- hopsy.ThompsonSamplingTuning.upper_bound
-  -- hopsy.TruncatedGaussianProposal
   -- hopsy.TruncatedGaussianProposal.accept_proposal
   -- hopsy.TruncatedGaussianProposal.deepcopy
   -- hopsy.TruncatedGaussianProposal.log_acceptance_probability
@@ -162,7 +148,6 @@ Found insufficient docstring for the following items:
   -- hopsy.Uniform
   -- hopsy.Uniform.a
   -- hopsy.Uniform.b
-  -- hopsy.UniformCoordinateHitAndRunProposal
   -- hopsy.UniformCoordinateHitAndRunProposal.accept_proposal
   -- hopsy.UniformCoordinateHitAndRunProposal.deepcopy
   -- hopsy.UniformCoordinateHitAndRunProposal.log_acceptance_probability
@@ -170,7 +155,6 @@ Found insufficient docstring for the following items:
   -- hopsy.UniformCoordinateHitAndRunProposal.proposal
   -- hopsy.UniformCoordinateHitAndRunProposal.propose
   -- hopsy.UniformCoordinateHitAndRunProposal.state
-  -- hopsy.UniformHitAndRunProposal
   -- hopsy.UniformHitAndRunProposal.accept_proposal
   -- hopsy.UniformHitAndRunProposal.deepcopy
   -- hopsy.UniformHitAndRunProposal.log_acceptance_probability
@@ -195,5 +179,5 @@ Found insufficient docstring for the following items:
   -- hopsy.tune_acceptance_rate
   -- hopsy.tune_esjd
   -- hopsy.tune_old
-Found 415 items of which 219 have suffcient docstring.
-Coverage: 52.8%
+Found 415 items of which 235 have suffcient docstring.
+Coverage: 56.6%

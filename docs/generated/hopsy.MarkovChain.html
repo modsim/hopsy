@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>hopsy.MarkovChain &#8212; hopsy 1.5.0b0 documentation</title>
+    <title>hopsy.MarkovChain &#8212; hopsy 1.5.0 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 
     <script src="../_static/jquery.js?v=5d32c60e"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-    <script src="../_static/documentation_options.js?v=13fada39"></script>
+    <script src="../_static/documentation_options.js?v=e0a75244"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -123,8 +123,8 @@
       
     
     
-    <img src="../_static/hopsy.png" class="logo__image only-light" alt="hopsy 1.5.0b0 documentation - Home"/>
-    <script>document.write(`<img src="../_static/hopsy.png" class="logo__image only-dark" alt="hopsy 1.5.0b0 documentation - Home"/>`);</script>
+    <img src="../_static/hopsy.png" class="logo__image only-light" alt="hopsy 1.5.0 documentation - Home"/>
+    <script>document.write(`<img src="../_static/hopsy.png" class="logo__image only-dark" alt="hopsy 1.5.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -573,12 +573,13 @@ Several Markov chain objects can be sampled in parallel by passing them as a lis
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>problem</strong> (<a class="reference internal" href="hopsy.Problem.html#hopsy.Problem" title="hopsy.Problem"><em>hopsy.Problem</em></a>) – Problem to sample</p></li>
 <li><p><strong>proposal</strong> (<em>Proposal type</em><em> or </em><em>object</em><em> (</em><em>duck-typing</em><em>)</em><em>. Default None</em>) – If None is given, the proposal algorithm is heuristically selected.
-If the problem has no model, the hopsy.UniformCoordinateHitAndRunProposal is selected.
-If the problem has a hopsy.Gaussian Model, the hopsy.TruncatedGaussianProposal is selected.
-Otherwise the hopsy.GaussianHitAndRunProposal.
+If the problem has no model, the hopsy.UniformCoordinateHitAndRunProposal (<a class="reference external" href="https://doi.org/10.1093/bioinformatics/btx052">https://doi.org/10.1093/bioinformatics/btx052</a>) is selected.
+If the problem has a hopsy.Gaussian Model, the hopsy.TruncatedGaussianProposal (<a class="reference external" href="https://doi.org/10.1093/bioinformatics/btz315">https://doi.org/10.1093/bioinformatics/btz315</a>) is selected.
+Otherwise the hopsy.GaussianHitAndRunProposal (<a class="reference external" href="https://deepblue.lib.umich.edu/bitstream/handle/2027.42/3513/bal7884.0001.001.pdf">https://deepblue.lib.umich.edu/bitstream/handle/2027.42/3513/bal7884.0001.001.pdf</a>)  is set as default.
 Please note, that these defaults are heuristic and work best for no model or hopsy.Gaussian.
 For the other case, it is worth experimenting with the available proposals to find the most efficient one for the
-problem at hand</p></li>
+problem at hand. Note, that <cite>Uniform/Gaussian</cite> in a proposal name only indicates a detail of the proposal mechanism.
+These proposals can still be used to sample non-uniform and non-gaussian distributions.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
