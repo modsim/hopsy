@@ -1,7 +1,10 @@
 # Changelog
 
 ## Latest
-- [#27](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/127): Add method to heuristically setup good sampling configurations depending on the problem
+
+## v1.5.0
+- [#145](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/145): Improve docs
+- [#127](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/127): Add method to heuristically setup good sampling configurations depending on the problem
 - [#139](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/139): Add transformation of start points during add\_equality\_constraints
 - [#88](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/88): Fix parallelization for sampling with mcbackend as sample storage
 - [#123](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/123): Add parallel tempering support for non-MPI users
