@@ -12,7 +12,7 @@ python --version
 python -c "import hopsy; print(hopsy.__version__, hopsy.__build__)"
 python -m unittest tests
 conda deactivate
-conda activate py1.11
+conda activate py3.11
 python --version
 python -c "import hopsy; print(hopsy.__version__, hopsy.__build__)"
 python -m unittest tests
