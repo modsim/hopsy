@@ -948,6 +948,7 @@ Returns
 
 
 const char* hopsy::doc::Proposal::base = R"pbdoc(
+Interface for proposal mechanisms.
 )pbdoc";
 
 
@@ -1047,6 +1048,7 @@ const char* hopsy::doc::Proposal::copyProposal = R"pbdoc(
 
 
 const char* hopsy::doc::AdaptiveMetropolisProposal::base = R"pbdoc(
+Adaptive Metropolis Algorithm for convex polytopes, see https://doi.org/10.2307/3318737 for unconstrained version.
 )pbdoc";
 
 
@@ -1157,6 +1159,8 @@ const char* hopsy::doc::AdaptiveMetropolisProposal::warmUp = R"pbdoc(
 
 
 const char* hopsy::doc::BilliardAdaptiveMetropolisProposal::base = R"pbdoc(
+Adaptive Metropolis algorithm for linearly constrained distributions with reflections on the boundary.
+See https://doi.org/10.2307/3318737 for unconstrained Adaptive Metropolis.
 )pbdoc";
 
 
@@ -1272,6 +1276,7 @@ const char* hopsy::doc::BilliardAdaptiveMetropolisProposal::warmUp = R"pbdoc(
 )pbdoc";
 
 const char* hopsy::doc::BallWalkProposal::base = R"pbdoc(
+This proposal is implemented for academic purpose and not recommended for production use, see https://doi.org/10.1007/s12532-015-0097-z for description.
 )pbdoc";
 
 
@@ -1372,6 +1377,10 @@ const char* hopsy::doc::BallWalkProposal::stepSize = R"pbdoc(
 
 
 const char* hopsy::doc::BilliardMALAProposal::base = R"pbdoc(
+Metropolis adjusted langevin algorithm for linearly constrained regions with reflections .
+This walk is not recommended, because it's theoretical properties are not yet well-understood.
+See https://en.wikipedia.org/wiki/Metropolis-adjusted_Langevin_algorithm for a description of the
+unconstrained MALA.
 )pbdoc";
 
 
@@ -1476,6 +1485,8 @@ const char* hopsy::doc::BilliardMALAProposal::stepSize = R"pbdoc(
 )pbdoc";
 
 const char* hopsy::doc::BilliardWalkProposal::base = R"pbdoc(
+See https://doi.org/10.3182/20140824-6-ZA-1003.02312 for descrption.
+This walk is basically hit-and-run but with reflections.
 )pbdoc";
 
 
@@ -1580,6 +1591,9 @@ const char* hopsy::doc::BilliardWalkProposal::stepSize = R"pbdoc(
 )pbdoc";
 
 const char* hopsy::doc::CSmMALAProposal::base = R"pbdoc(
+Do not use when fisher information is expensive for your model.
+Requires gradient and fisher information.
+See https://www.jstor.org/stable/41057430 for unconstrained version.
 )pbdoc";
 
 
@@ -1686,6 +1700,7 @@ const char* hopsy::doc::CSmMALAProposal::stepSize = R"pbdoc(
 
 
 const char* hopsy::doc::DikinWalkProposal::base = R"pbdoc(
+See https://doi.org/10.1016/j.orl.2016.07.005.
 )pbdoc";
 
 
@@ -1792,6 +1807,9 @@ const char* hopsy::doc::DikinWalkProposal::stepSize = R"pbdoc(
 
 
 const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::base = R"pbdoc(
+Mix of https://doi.org/10.1093/bioinformatics/btx052 and
+https://deepblue.lib.umich.edu/bitstream/handle/2027.42/3513/bal7884.0001.001.pdf.
+Works well when sampling a density that aligns with the coordinate directions.
 )pbdoc";
 
 
@@ -1895,6 +1913,8 @@ const char* hopsy::doc::GaussianCoordinateHitAndRunProposal::stepSize = R"pbdoc(
 
 
 const char* hopsy::doc::GaussianHitAndRunProposal::base = R"pbdoc(
+See https://doi.org/10.1093/bioinformatics/btx052.
+Draws random chords and takes gaussian steps on the chords to propose new states.
 )pbdoc";
 
 
@@ -1997,6 +2017,8 @@ const char* hopsy::doc::GaussianHitAndRunProposal::stepSize = R"pbdoc(
 
 
 const char* hopsy::doc::GaussianProposal::base = R"pbdoc(
+Random walk with gaussian steps.
+This proposal is implemented for academic purposes and is not recommended for production ues.
 )pbdoc";
 
 
@@ -2097,6 +2119,7 @@ const char* hopsy::doc::GaussianProposal::stepSize = R"pbdoc(
 )pbdoc";
 
 const char* hopsy::doc::ReversibleJumpProposal::base = R"pbdoc(
+This is the implementation of the algorithm described in https://pubmed.ncbi.nlm.nih.gov/31214716/.
 )pbdoc";
 
 
@@ -2203,6 +2226,8 @@ const char* hopsy::doc::ReversibleJumpProposal::deactivationProbability = R"pbdo
 
 
 const char* hopsy::doc::PyProposal::base = R"pbdoc(
+Wrapper for python proposals. This wrapper allows users to implement their own ideas on the go and
+to integrate them with the rest of hopsy, e.g., parallel tempering or tuning.
 )pbdoc";
 
 
@@ -2299,6 +2324,7 @@ const char* hopsy::doc::PyProposal::copyProposal = R"pbdoc(
 )pbdoc";
 
 const char* hopsy::doc::TruncatedGaussianProposal::base = R"pbdoc(
+This is a gibbs sampler for constrained Gaussians, see  https://doi.org/10.1093/bioinformatics/btz315.
 )pbdoc";
 
 
@@ -2396,6 +2422,9 @@ const char* hopsy::doc::TruncatedGaussianProposal::copyProposal = R"pbdoc(
 
 
 const char* hopsy::doc::UniformCoordinateHitAndRunProposal::base = R"pbdoc(
+See https://doi.org/10.1093/bioinformatics/btx052.
+Rounding the problem using `problem = hopsy.round(problem)` is strongly advised for best
+performance.
 )pbdoc";
 
 
@@ -2494,6 +2523,7 @@ const char* hopsy::doc::UniformCoordinateHitAndRunProposal::copyProposal = R"pbd
 
 
 const char* hopsy::doc::UniformHitAndRunProposal::base = R"pbdoc(
+See: https://dl.acm.org/doi/pdf/10.1145/256562.256619
 )pbdoc";
 
 
@@ -2606,12 +2636,13 @@ problem: hopsy.Problem
     Problem to sample
 proposal: Proposal type or object (duck-typing). Default None
     If None is given, the proposal algorithm is heuristically selected.
-    If the problem has no model, the hopsy.UniformCoordinateHitAndRunProposal is selected.
-    If the problem has a hopsy.Gaussian Model, the hopsy.TruncatedGaussianProposal is selected.
-    Otherwise the hopsy.GaussianHitAndRunProposal.
+    If the problem has no model, the hopsy.UniformCoordinateHitAndRunProposal (https://doi.org/10.1093/bioinformatics/btx052) is selected.
+    If the problem has a hopsy.Gaussian Model, the hopsy.TruncatedGaussianProposal (https://doi.org/10.1093/bioinformatics/btz315) is selected.
+    Otherwise the hopsy.GaussianHitAndRunProposal (https://deepblue.lib.umich.edu/bitstream/handle/2027.42/3513/bal7884.0001.001.pdf)  is set as default.
     Please note, that these defaults are heuristic and work best for no model or hopsy.Gaussian.
     For the other case, it is worth experimenting with the available proposals to find the most efficient one for the
-    problem at hand
+    problem at hand. Note, that `Uniform/Gaussian` in a proposal name only indicates a detail of the proposal mechanism.
+    These proposals can still be used to sample non-uniform and non-gaussian distributions.
 
 Returns
 -------
