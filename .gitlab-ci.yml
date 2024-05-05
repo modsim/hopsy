@@ -3,6 +3,13 @@ image: quay.io/pypa/manylinux2014_x86_64
 variables:
   GIT_STRATEGY: clone
   GIT_SUBMODULE_STRATEGY: recursive
+  # Change pip's cache directory to be inside the project directory since we can
+  # only cache local items.
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - $PIP_CACHE_DIR
 
 stages:
   - build
