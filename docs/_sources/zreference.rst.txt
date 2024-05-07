@@ -79,6 +79,7 @@ Proposals
    hopsy.ReversibleJumpProposal
    hopsy.UniformCoordinateHitAndRunProposal
    hopsy.UniformHitAndRunProposal
+   hopsy.TruncatedGaussianProposal
 
 Random
 """"""

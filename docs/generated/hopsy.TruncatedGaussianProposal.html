@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>hopsy.BirkhoffPolytope &#8212; hopsy 1.5.0 documentation</title>
+    <title>hopsy.TruncatedGaussianProposal &#8212; hopsy 1.5.0 documentation</title>
   
   
   
@@ -41,12 +41,12 @@
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/hopsy.BirkhoffPolytope';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/hopsy.TruncatedGaussianProposal';</script>
     <link rel="icon" href="../_static/hopsy.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="hopsy.BirkhoffPolytope.convert_to_full_space" href="objname/hopsy.BirkhoffPolytope.convert_to_full_space.html" />
-    <link rel="prev" title="hopsy.TruncatedGaussianProposal.propose" href="objname/hopsy.TruncatedGaussianProposal.propose.html" />
+    <link rel="next" title="hopsy.TruncatedGaussianProposal.accept_proposal" href="objname/hopsy.TruncatedGaussianProposal.accept_proposal.html" />
+    <link rel="prev" title="hopsy.ReversibleJumpProposal.propose" href="objname/hopsy.ReversibleJumpProposal.propose.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -385,7 +385,7 @@ document.write(`
 </li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Proposals</span></p>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="hopsy.Proposal.html">hopsy.Proposal</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.AdaptiveMetropolisProposal.html">hopsy.AdaptiveMetropolisProposal</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.AdaptiveMetropolisProposal.accept_proposal.html">hopsy.AdaptiveMetropolisProposal.accept_proposal</a></li>
@@ -459,7 +459,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.UniformHitAndRunProposal.propose.html">hopsy.UniformHitAndRunProposal.propose</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.TruncatedGaussianProposal.html">hopsy.TruncatedGaussianProposal</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">hopsy.TruncatedGaussianProposal</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.TruncatedGaussianProposal.accept_proposal.html">hopsy.TruncatedGaussianProposal.accept_proposal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.TruncatedGaussianProposal.deepcopy.html">hopsy.TruncatedGaussianProposal.deepcopy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.TruncatedGaussianProposal.propose.html">hopsy.TruncatedGaussianProposal.propose</a></li>
@@ -500,8 +500,8 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="hopsy.PyTuningTarget.html">hopsy.PyTuningTarget</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Birkhoff Polytope</span></p>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">hopsy.BirkhoffPolytope</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.BirkhoffPolytope.html">hopsy.BirkhoffPolytope</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.BirkhoffPolytope.convert_to_full_space.html">hopsy.BirkhoffPolytope.convert_to_full_space</a></li>
 </ul>
 </li>
@@ -547,7 +547,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../zreference.html" class="nav-link">Reference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">hopsy.Birkho...</li>
+    <li class="breadcrumb-item active" aria-current="page">hopsy.Trunca...</li>
   </ul>
 </nav>
 </div>
@@ -564,28 +564,58 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="hopsy-birkhoffpolytope">
-<h1>hopsy.BirkhoffPolytope<a class="headerlink" href="#hopsy-birkhoffpolytope" title="Link to this heading">#</a></h1>
+  <section id="hopsy-truncatedgaussianproposal">
+<h1>hopsy.TruncatedGaussianProposal<a class="headerlink" href="#hopsy-truncatedgaussianproposal" title="Link to this heading">#</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="hopsy.BirkhoffPolytope">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">BirkhoffPolytope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.BirkhoffPolytope" title="Link to this definition">#</a></dt>
-<dd><p>Birkhoff polytope helper that manages transformation of states and constraints</p>
+<dt class="sig sig-object py" id="hopsy.TruncatedGaussianProposal">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">TruncatedGaussianProposal</span></span><a class="headerlink" href="#hopsy.TruncatedGaussianProposal" title="Link to this definition">#</a></dt>
+<dd><p>This is a gibbs sampler for constrained Gaussians, see  <a class="reference external" href="https://doi.org/10.1093/bioinformatics/btz315">https://doi.org/10.1093/bioinformatics/btz315</a>.</p>
 <p class="rubric">Attributes</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">A</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_log_density</span></code></p></td>
+<td><p>Returns whether the proposal knows about the log density or not.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_negative_log_likelihood</span></code></p></td>
+<td><p>deprecated:: 1.4 Use <code class="xref py py-attr docutils literal notranslate"><span class="pre">has_log_density</span></code> instead.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_acceptance_probability</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">b</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></p></td>
 <td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">proposal</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">proposal_log_density</span></code></p></td>
+<td><p>Returns the log density of the proposal.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">proposal_negative_log_likelihood</span></code></p></td>
+<td><p>deprecated:: 1.4 Use -<code class="xref py py-attr docutils literal notranslate"><span class="pre">proposal_log_density</span></code> instead.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">state</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">state_log_density</span></code></p></td>
+<td><p>Returns the log density of the current state of the proposal.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">state_negative_log_likelihood</span></code></p></td>
+<td><p>deprecated:: 1.4 Use -<code class="xref py py-attr docutils literal notranslate"><span class="pre">state_log_density</span></code> instead.</p></td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="objname/hopsy.BirkhoffPolytope.convert_to_full_space.html#hopsy.BirkhoffPolytope.convert_to_full_space" title="hopsy.BirkhoffPolytope.convert_to_full_space"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_to_full_space</span></code></a>(samples)</p></td>
-<td><p>Convert reduced space samples to full space samples.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="objname/hopsy.TruncatedGaussianProposal.accept_proposal.html#hopsy.TruncatedGaussianProposal.accept_proposal" title="hopsy.TruncatedGaussianProposal.accept_proposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accept_proposal</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="objname/hopsy.TruncatedGaussianProposal.deepcopy.html#hopsy.TruncatedGaussianProposal.deepcopy" title="hopsy.TruncatedGaussianProposal.deepcopy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deepcopy</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="objname/hopsy.TruncatedGaussianProposal.propose.html#hopsy.TruncatedGaussianProposal.propose" title="hopsy.TruncatedGaussianProposal.propose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propose</span></code></a></p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -604,20 +634,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="objname/hopsy.TruncatedGaussianProposal.propose.html"
+       href="objname/hopsy.ReversibleJumpProposal.propose.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">hopsy.TruncatedGaussianProposal.propose</p>
+        <p class="prev-next-title">hopsy.ReversibleJumpProposal.propose</p>
       </div>
     </a>
     <a class="right-next"
-       href="objname/hopsy.BirkhoffPolytope.convert_to_full_space.html"
+       href="objname/hopsy.TruncatedGaussianProposal.accept_proposal.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">hopsy.BirkhoffPolytope.convert_to_full_space</p>
+        <p class="prev-next-title">hopsy.TruncatedGaussianProposal.accept_proposal</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -641,14 +671,14 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hopsy.BirkhoffPolytope"><code class="docutils literal notranslate"><span class="pre">BirkhoffPolytope</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hopsy.TruncatedGaussianProposal"><code class="docutils literal notranslate"><span class="pre">TruncatedGaussianProposal</span></code></a></li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/generated/hopsy.BirkhoffPolytope.rst.txt">
+    <a href="../_sources/generated/hopsy.TruncatedGaussianProposal.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

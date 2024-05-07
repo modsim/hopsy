@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>hopsy.Gaussian.log_density &#8212; hopsy 1.5.0 documentation</title>
+    <title>hopsy.TruncatedGaussianProposal.propose &#8212; hopsy 1.5.0 documentation</title>
   
   
   
@@ -41,14 +41,12 @@
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/objname/hopsy.Gaussian.log_density';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/objname/hopsy.TruncatedGaussianProposal.propose';</script>
     <link rel="icon" href="../../_static/hopsy.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="hopsy.Gaussian.log_gradient" href="hopsy.Gaussian.log_gradient.html" />
-    <link rel="prev" title="hopsy.Gaussian.log_curvature" href="hopsy.Gaussian.log_curvature.html" />
+    <link rel="next" title="hopsy.BirkhoffPolytope" href="../hopsy.BirkhoffPolytope.html" />
+    <link rel="prev" title="hopsy.TruncatedGaussianProposal.deepcopy" href="hopsy.TruncatedGaussianProposal.deepcopy.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -325,7 +323,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="../hopsy.tune.html">hopsy.tune</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Models</span></p>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../hopsy.Model.html">hopsy.Model</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="hopsy.Model.compute_expected_fisher_information.html">hopsy.Model.compute_expected_fisher_information</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hopsy.Model.compute_log_likelihood_gradient.html">hopsy.Model.compute_log_likelihood_gradient</a></li>
@@ -335,12 +333,12 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="hopsy.Model.log_gradient.html">hopsy.Model.log_gradient</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../hopsy.Gaussian.html">hopsy.Gaussian</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../hopsy.Gaussian.html">hopsy.Gaussian</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="hopsy.Gaussian.compute_expected_fisher_information.html">hopsy.Gaussian.compute_expected_fisher_information</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hopsy.Gaussian.compute_log_likelihood_gradient.html">hopsy.Gaussian.compute_log_likelihood_gradient</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hopsy.Gaussian.compute_negative_log_likelihood.html">hopsy.Gaussian.compute_negative_log_likelihood</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hopsy.Gaussian.log_curvature.html">hopsy.Gaussian.log_curvature</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">hopsy.Gaussian.log_density</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hopsy.Gaussian.log_density.html">hopsy.Gaussian.log_density</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hopsy.Gaussian.log_gradient.html">hopsy.Gaussian.log_gradient</a></li>
 </ul>
 </li>
@@ -387,7 +385,7 @@ document.write(`
 </li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Proposals</span></p>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../hopsy.Proposal.html">hopsy.Proposal</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../hopsy.AdaptiveMetropolisProposal.html">hopsy.AdaptiveMetropolisProposal</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="hopsy.AdaptiveMetropolisProposal.accept_proposal.html">hopsy.AdaptiveMetropolisProposal.accept_proposal</a></li>
@@ -461,10 +459,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="hopsy.UniformHitAndRunProposal.propose.html">hopsy.UniformHitAndRunProposal.propose</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../hopsy.TruncatedGaussianProposal.html">hopsy.TruncatedGaussianProposal</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../hopsy.TruncatedGaussianProposal.html">hopsy.TruncatedGaussianProposal</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="hopsy.TruncatedGaussianProposal.accept_proposal.html">hopsy.TruncatedGaussianProposal.accept_proposal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="hopsy.TruncatedGaussianProposal.deepcopy.html">hopsy.TruncatedGaussianProposal.deepcopy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hopsy.TruncatedGaussianProposal.propose.html">hopsy.TruncatedGaussianProposal.propose</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">hopsy.TruncatedGaussianProposal.propose</a></li>
 </ul>
 </li>
 </ul>
@@ -538,8 +536,6 @@ document.write(`
 
 
 
-
-
 <nav aria-label="Breadcrumb">
   <ul class="bd-breadcrumbs">
     
@@ -549,15 +545,12 @@ document.write(`
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../../userguide.html" class="nav-link">User Guide</a></li>
+    <li class="breadcrumb-item"><a href="../../zreference.html" class="nav-link">Reference</a></li>
     
     
-    <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
+    <li class="breadcrumb-item"><a href="../hopsy.TruncatedGaussianProposal.html" class="nav-link">hopsy.TruncatedGaussianProposal</a></li>
     
-    
-    <li class="breadcrumb-item"><a href="../hopsy.Gaussian.html" class="nav-link">hopsy.Gaussian</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page">hopsy.Gaussi...</li>
+    <li class="breadcrumb-item active" aria-current="page">hopsy.Trunca...</li>
   </ul>
 </nav>
 </div>
@@ -574,25 +567,12 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="hopsy-gaussian-log-density">
-<h1>hopsy.Gaussian.log_density<a class="headerlink" href="#hopsy-gaussian-log-density" title="Link to this heading">#</a></h1>
+  <section id="hopsy-truncatedgaussianproposal-propose">
+<h1>hopsy.TruncatedGaussianProposal.propose<a class="headerlink" href="#hopsy-truncatedgaussianproposal-propose" title="Link to this heading">#</a></h1>
 <dl class="py method">
-<dt class="sig sig-object py" id="hopsy.Gaussian.log_density">
-<span class="sig-prename descclassname"><span class="pre">Gaussian.</span></span><span class="sig-name descname"><span class="pre">log_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.Gaussian.log_density" title="Link to this definition">#</a></dt>
-<dd><p>Computes the probability density function of a multivariate Gaussian model in
-<span class="math notranslate nohighlight">\(m-k\)</span> dimensions at <code class="docutils literal notranslate"><span class="pre">x</span></code>. Note that <cite>x</cite> still has to have dimension <span class="math notranslate nohighlight">\(n\)</span>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>x</strong> (<em>numpy.ndarray</em><em>[</em><em>n</em><em>, </em><em>1</em><em>]</em>) – Input vector</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The (unnormalized) density</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
+<dt class="sig sig-object py" id="hopsy.TruncatedGaussianProposal.propose">
+<span class="sig-prename descclassname"><span class="pre">TruncatedGaussianProposal.</span></span><span class="sig-name descname"><span class="pre">propose</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.TruncatedGaussianProposal.propose" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
 
 </section>
 
@@ -607,20 +587,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="hopsy.Gaussian.log_curvature.html"
+       href="hopsy.TruncatedGaussianProposal.deepcopy.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">hopsy.Gaussian.log_curvature</p>
+        <p class="prev-next-title">hopsy.TruncatedGaussianProposal.deepcopy</p>
       </div>
     </a>
     <a class="right-next"
-       href="hopsy.Gaussian.log_gradient.html"
+       href="../hopsy.BirkhoffPolytope.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">hopsy.Gaussian.log_gradient</p>
+        <p class="prev-next-title">hopsy.BirkhoffPolytope</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -644,14 +624,14 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hopsy.Gaussian.log_density"><code class="docutils literal notranslate"><span class="pre">Gaussian.log_density()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hopsy.TruncatedGaussianProposal.propose"><code class="docutils literal notranslate"><span class="pre">TruncatedGaussianProposal.propose()</span></code></a></li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../../_sources/generated/objname/hopsy.Gaussian.log_density.rst.txt">
+    <a href="../../_sources/generated/objname/hopsy.TruncatedGaussianProposal.propose.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
