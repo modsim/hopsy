@@ -1,6 +1,7 @@
 # Changelog
 
 ## Latest
+- [#149](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/149): update adaptive metropolis to work with RJMCMC
 
 ## v1.5.0
 - [#145](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/145): Improve docs
