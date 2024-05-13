@@ -133,3 +133,82 @@ class BirkhoffPolytope:
         """
 
         return self.kernel_basis @ samples.T + self.particular_sol.reshape((-1, 1))
+
+
+
+
+
+def generate_covariance_mat(
+        dim : int, 
+        n_nonident : int, 
+        scales_range : _s.typing.Tuple[float, float] = (1, 1)
+) -> _s.numpy.ndarray:
+    
+    a = _s.np.random.rand(dim, dim)
+    q,_ = _s.np.linalg.qr(a)
+    # q is othonormal
+    idx_nonident = _s.np.random.choice(dim, n_nonident, replace=False)
+
+    eig = _s.np.identity(dim)
+    scales = _s.np.array([scales_range[0]]*dim)
+    scales[idx_nonident] = scales_range[1]
+
+    eig = _s.np.diag(scales) @ eig
+    cov = q @ eig @ q.T
+
+    return cov
+
+
+
+def generate_gaussian_mixture_toy_problem(
+        polytope : _s.typing.Tuple[_s.np.ndarray, _s.np.ndarray],
+        modes : _s.typing.List[_s.typing.Tuple[_c.Gaussian, float]] = None,
+        n_modes : int = None,
+        non_ident : int = 0,
+        vol : float = 1
+    ) -> _s.hopsy.Problem:
+
+    """
+    Generate a toy problem with a Gaussian mixture model as the objective function.
+    The means and covariances are randomly generated.
+    """
+
+
+    assert (modes is not None and len(modes) > 0) or n_modes > 0, "Either modes or n_modes must be provided"
+
+    A, b = polytope
+
+    if modes is not None and len(modes) > 0:
+        models = modes
+
+    else:
+        dim = A.shape[1]
+
+        mean_sampler = _c.setup(
+            problem = _c.Problem(
+                A=A,b=b
+            ), random_seed=42
+        )
+
+        means = _s.hopsy.sample(mean_sampler[0][0], mean_sampler[1][0],n_modes)
+        means = means[1][0]
+        means = [means[i] for i in range(n_modes)]
+
+
+        covs = [ 
+            generate_covariance_mat(
+                dim=dim, 
+                n_nonident=non_ident,
+                scales_range=(1e-2*vol, 1e6*vol),
+            ) for i in range(n_modes)
+        ]
+
+
+        models = [
+            _c.Gaussian(mean, covariance)
+            for mean, covariance in zip(means, covs)
+        ]
+
+    mixture = _c.Mixture(models)
+
+    return _c.Problem(A=A,b=b, model=mixture)
