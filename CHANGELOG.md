@@ -1,6 +1,7 @@
 # Changelog
 
 ## Latest
+- [#153](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/153): Add tuning target selection to setup function
 
 ## v1.5.0
 - [#145](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/145): Improve docs
