@@ -14,26 +14,26 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="../_static/jquery.js?v=5d32c60e"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
@@ -56,27 +56,23 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -98,18 +94,25 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
   
   <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
 
+  
+    
   
 
 <a class="navbar-brand logo" href="../index.html">
@@ -136,36 +139,36 @@
     <div class="me-auto navbar-header-items__center">
       
         <div class="navbar-item">
-<nav class="navbar-nav">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../firststeps.html">
-                        First Steps
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../firststeps.html">
+    First Steps
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../userguide.html">
-                        User Guide
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../examples.html">
-                        Examples
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../userguide.html">
+    User Guide
+  </a>
+</li>
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../zreference.html">
-                        Reference
-                      </a>
-                    </li>
-                
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../zreference.html">
+    Reference
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -179,7 +182,7 @@
 
  <script>
  document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span class="search-button__default-text">Search</span>
     <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -193,10 +196,10 @@
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script></div>
@@ -210,7 +213,7 @@ document.write(`
 
  <script>
  document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span class="search-button__default-text">Search</span>
     <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -221,9 +224,9 @@ document.write(`
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
-    </label>
+    </button>
   
 </div>
 
@@ -244,39 +247,42 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
-<nav class="navbar-nav">
+          
+          
+            <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../firststeps.html">
-                        First Steps
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../firststeps.html">
+    First Steps
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../userguide.html">
-                        User Guide
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../examples.html">
-                        Examples
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../userguide.html">
+    User Guide
+  </a>
+</li>
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../zreference.html">
-                        Reference
-                      </a>
-                    </li>
-                
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../zreference.html">
+    Reference
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -288,10 +294,10 @@ document.write(`
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script></div>
@@ -324,7 +330,7 @@ document.write(`
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Models</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.Model.html">hopsy.Model</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.Model.html">hopsy.Model</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Model.compute_expected_fisher_information.html">hopsy.Model.compute_expected_fisher_information</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Model.compute_log_likelihood_gradient.html">hopsy.Model.compute_log_likelihood_gradient</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Model.compute_negative_log_likelihood.html">hopsy.Model.compute_negative_log_likelihood</a></li>
@@ -332,8 +338,8 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Model.log_density.html">hopsy.Model.log_density</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Model.log_gradient.html">hopsy.Model.log_gradient</a></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.Gaussian.html">hopsy.Gaussian</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.Gaussian.html">hopsy.Gaussian</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Gaussian.compute_expected_fisher_information.html">hopsy.Gaussian.compute_expected_fisher_information</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Gaussian.compute_log_likelihood_gradient.html">hopsy.Gaussian.compute_log_likelihood_gradient</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Gaussian.compute_negative_log_likelihood.html">hopsy.Gaussian.compute_negative_log_likelihood</a></li>
@@ -341,8 +347,8 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Gaussian.log_density.html">hopsy.Gaussian.log_density</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Gaussian.log_gradient.html">hopsy.Gaussian.log_gradient</a></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.Mixture.html">hopsy.Mixture</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.Mixture.html">hopsy.Mixture</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Mixture.compute_expected_fisher_information.html">hopsy.Mixture.compute_expected_fisher_information</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Mixture.compute_log_likelihood_gradient.html">hopsy.Mixture.compute_log_likelihood_gradient</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Mixture.compute_negative_log_likelihood.html">hopsy.Mixture.compute_negative_log_likelihood</a></li>
@@ -350,8 +356,8 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Mixture.log_density.html">hopsy.Mixture.log_density</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Mixture.log_gradient.html">hopsy.Mixture.log_gradient</a></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.PyModel.html">hopsy.PyModel</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.PyModel.html">hopsy.PyModel</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.PyModel.compute_expected_fisher_information.html">hopsy.PyModel.compute_expected_fisher_information</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.PyModel.compute_log_likelihood_gradient.html">hopsy.PyModel.compute_log_likelihood_gradient</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.PyModel.compute_negative_log_likelihood.html">hopsy.PyModel.compute_negative_log_likelihood</a></li>
@@ -359,8 +365,8 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.PyModel.log_density.html">hopsy.PyModel.log_density</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.PyModel.log_gradient.html">hopsy.PyModel.log_gradient</a></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.Rosenbrock.html">hopsy.Rosenbrock</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.Rosenbrock.html">hopsy.Rosenbrock</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Rosenbrock.compute_expected_fisher_information.html">hopsy.Rosenbrock.compute_expected_fisher_information</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Rosenbrock.compute_log_likelihood_gradient.html">hopsy.Rosenbrock.compute_log_likelihood_gradient</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Rosenbrock.compute_negative_log_likelihood.html">hopsy.Rosenbrock.compute_negative_log_likelihood</a></li>
@@ -368,118 +374,118 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Rosenbrock.log_density.html">hopsy.Rosenbrock.log_density</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Rosenbrock.log_gradient.html">hopsy.Rosenbrock.log_gradient</a></li>
 </ul>
-</li>
+</details></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Problem</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.Problem.html">hopsy.Problem</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.Problem.html">hopsy.Problem</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Problem.slacks.html">hopsy.Problem.slacks</a></li>
 </ul>
-</li>
+</details></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Problem</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.LP.html">hopsy.LP</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.LP.html">hopsy.LP</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.LP.reset.html">hopsy.LP.reset</a></li>
 </ul>
-</li>
+</details></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Proposals</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="hopsy.Proposal.html">hopsy.Proposal</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.AdaptiveMetropolisProposal.html">hopsy.AdaptiveMetropolisProposal</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.AdaptiveMetropolisProposal.html">hopsy.AdaptiveMetropolisProposal</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.AdaptiveMetropolisProposal.accept_proposal.html">hopsy.AdaptiveMetropolisProposal.accept_proposal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.AdaptiveMetropolisProposal.deepcopy.html">hopsy.AdaptiveMetropolisProposal.deepcopy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.AdaptiveMetropolisProposal.propose.html">hopsy.AdaptiveMetropolisProposal.propose</a></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.BallWalkProposal.html">hopsy.BallWalkProposal</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.BallWalkProposal.html">hopsy.BallWalkProposal</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.BallWalkProposal.accept_proposal.html">hopsy.BallWalkProposal.accept_proposal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.BallWalkProposal.deepcopy.html">hopsy.BallWalkProposal.deepcopy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.BallWalkProposal.propose.html">hopsy.BallWalkProposal.propose</a></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.BilliardWalkProposal.html">hopsy.BilliardWalkProposal</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.BilliardWalkProposal.html">hopsy.BilliardWalkProposal</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.BilliardWalkProposal.accept_proposal.html">hopsy.BilliardWalkProposal.accept_proposal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.BilliardWalkProposal.deepcopy.html">hopsy.BilliardWalkProposal.deepcopy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.BilliardWalkProposal.propose.html">hopsy.BilliardWalkProposal.propose</a></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.CSmMALAProposal.html">hopsy.CSmMALAProposal</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.CSmMALAProposal.html">hopsy.CSmMALAProposal</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.CSmMALAProposal.accept_proposal.html">hopsy.CSmMALAProposal.accept_proposal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.CSmMALAProposal.deepcopy.html">hopsy.CSmMALAProposal.deepcopy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.CSmMALAProposal.propose.html">hopsy.CSmMALAProposal.propose</a></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.DikinWalkProposal.html">hopsy.DikinWalkProposal</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.DikinWalkProposal.html">hopsy.DikinWalkProposal</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.DikinWalkProposal.accept_proposal.html">hopsy.DikinWalkProposal.accept_proposal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.DikinWalkProposal.deepcopy.html">hopsy.DikinWalkProposal.deepcopy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.DikinWalkProposal.propose.html">hopsy.DikinWalkProposal.propose</a></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.GaussianCoordinateHitAndRunProposal.html">hopsy.GaussianCoordinateHitAndRunProposal</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.GaussianCoordinateHitAndRunProposal.html">hopsy.GaussianCoordinateHitAndRunProposal</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.GaussianCoordinateHitAndRunProposal.accept_proposal.html">hopsy.GaussianCoordinateHitAndRunProposal.accept_proposal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.GaussianCoordinateHitAndRunProposal.deepcopy.html">hopsy.GaussianCoordinateHitAndRunProposal.deepcopy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.GaussianCoordinateHitAndRunProposal.propose.html">hopsy.GaussianCoordinateHitAndRunProposal.propose</a></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.GaussianHitAndRunProposal.html">hopsy.GaussianHitAndRunProposal</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-14"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.GaussianHitAndRunProposal.html">hopsy.GaussianHitAndRunProposal</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.GaussianHitAndRunProposal.accept_proposal.html">hopsy.GaussianHitAndRunProposal.accept_proposal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.GaussianHitAndRunProposal.deepcopy.html">hopsy.GaussianHitAndRunProposal.deepcopy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.GaussianHitAndRunProposal.propose.html">hopsy.GaussianHitAndRunProposal.propose</a></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.GaussianProposal.html">hopsy.GaussianProposal</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-15"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.GaussianProposal.html">hopsy.GaussianProposal</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.GaussianProposal.accept_proposal.html">hopsy.GaussianProposal.accept_proposal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.GaussianProposal.deepcopy.html">hopsy.GaussianProposal.deepcopy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.GaussianProposal.propose.html">hopsy.GaussianProposal.propose</a></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.PyProposal.html">hopsy.PyProposal</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-16"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.PyProposal.html">hopsy.PyProposal</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.PyProposal.accept_proposal.html">hopsy.PyProposal.accept_proposal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.PyProposal.deepcopy.html">hopsy.PyProposal.deepcopy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.PyProposal.propose.html">hopsy.PyProposal.propose</a></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.ReversibleJumpProposal.html">hopsy.ReversibleJumpProposal</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-17"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.ReversibleJumpProposal.html">hopsy.ReversibleJumpProposal</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.ReversibleJumpProposal.accept_proposal.html">hopsy.ReversibleJumpProposal.accept_proposal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.ReversibleJumpProposal.deepcopy.html">hopsy.ReversibleJumpProposal.deepcopy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.ReversibleJumpProposal.propose.html">hopsy.ReversibleJumpProposal.propose</a></li>
 </ul>
-</li>
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">hopsy.UniformCoordinateHitAndRunProposal</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-18"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">hopsy.UniformCoordinateHitAndRunProposal</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.UniformCoordinateHitAndRunProposal.accept_proposal.html">hopsy.UniformCoordinateHitAndRunProposal.accept_proposal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.UniformCoordinateHitAndRunProposal.deepcopy.html">hopsy.UniformCoordinateHitAndRunProposal.deepcopy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.UniformCoordinateHitAndRunProposal.propose.html">hopsy.UniformCoordinateHitAndRunProposal.propose</a></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.UniformHitAndRunProposal.html">hopsy.UniformHitAndRunProposal</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-19"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.UniformHitAndRunProposal.html">hopsy.UniformHitAndRunProposal</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.UniformHitAndRunProposal.accept_proposal.html">hopsy.UniformHitAndRunProposal.accept_proposal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.UniformHitAndRunProposal.deepcopy.html">hopsy.UniformHitAndRunProposal.deepcopy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.UniformHitAndRunProposal.propose.html">hopsy.UniformHitAndRunProposal.propose</a></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.TruncatedGaussianProposal.html">hopsy.TruncatedGaussianProposal</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.TruncatedGaussianProposal.html">hopsy.TruncatedGaussianProposal</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.TruncatedGaussianProposal.accept_proposal.html">hopsy.TruncatedGaussianProposal.accept_proposal</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.TruncatedGaussianProposal.deepcopy.html">hopsy.TruncatedGaussianProposal.deepcopy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.TruncatedGaussianProposal.propose.html">hopsy.TruncatedGaussianProposal.propose</a></li>
 </ul>
-</li>
+</details></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Random</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.RandomNumberGenerator.html">hopsy.RandomNumberGenerator</a><input class="toctree-checkbox" id="toctree-checkbox-21" name="toctree-checkbox-21" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-21"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.RandomNumberGenerator.html">hopsy.RandomNumberGenerator</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.RandomNumberGenerator.__call__.html">hopsy.RandomNumberGenerator.__call__</a></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.Uniform.html">hopsy.Uniform</a><input class="toctree-checkbox" id="toctree-checkbox-22" name="toctree-checkbox-22" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-22"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.Uniform.html">hopsy.Uniform</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Uniform.__call__.html">hopsy.Uniform.__call__</a></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.Normal.html">hopsy.Normal</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-23"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.Normal.html">hopsy.Normal</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.Normal.__call__.html">hopsy.Normal.__call__</a></li>
 </ul>
-</li>
+</details></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Markov Chain</span></p>
 <ul class="nav bd-sidenav">
@@ -501,10 +507,10 @@ document.write(`
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Birkhoff Polytope</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.BirkhoffPolytope.html">hopsy.BirkhoffPolytope</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-24"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="hopsy.BirkhoffPolytope.html">hopsy.BirkhoffPolytope</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="objname/hopsy.BirkhoffPolytope.convert_to_full_space.html">hopsy.BirkhoffPolytope.convert_to_full_space</a></li>
 </ul>
-</li>
+</details></li>
 </ul>
 </div>
 </nav></div>
@@ -519,7 +525,7 @@ document.write(`
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
   
@@ -527,7 +533,7 @@ document.write(`
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
@@ -536,7 +542,7 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
@@ -576,7 +582,7 @@ document.write(`
 Rounding the problem using <cite>problem = hopsy.round(problem)</cite> is strongly advised for best
 performance.</p>
 <p class="rubric">Attributes</p>
-<table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_log_density</span></code></p></td>
 <td><p>Returns whether the proposal knows about the log density or not.</p></td>
@@ -610,8 +616,9 @@ performance.</p>
 </tr>
 </tbody>
 </table>
+</div>
 <p class="rubric">Methods</p>
-<table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="objname/hopsy.UniformCoordinateHitAndRunProposal.accept_proposal.html#hopsy.UniformCoordinateHitAndRunProposal.accept_proposal" title="hopsy.UniformCoordinateHitAndRunProposal.accept_proposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accept_proposal</span></code></a></p></td>
 <td><p></p></td>
@@ -624,6 +631,7 @@ performance.</p>
 </tr>
 </tbody>
 </table>
+</div>
 </dd></dl>
 
 </section>
@@ -635,7 +643,7 @@ performance.</p>
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -706,8 +714,8 @@ performance.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -740,7 +748,7 @@ performance.</p>
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
 </p></div>
       
     </div>
