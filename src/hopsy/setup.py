@@ -10,6 +10,7 @@ def setup(
     n_tuning=0,
     n_tuning_rounds=100,
     target_accrate=0.234,
+    tuning_target="accrate",
 ):
     """
 
@@ -61,7 +62,7 @@ def setup(
         mcs, rngs, tuning_results = tune(
             markov_chains,
             rngs,
-            target="accrate",
+            target=tuning_target,
             n_tuning=n_tuning,
             n_rounds=n_tuning_rounds,
             n_burnin=int(n_tuning_rounds / 2),
