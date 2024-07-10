@@ -1,6 +1,7 @@
 # Changelog
 
 ## Latest
+- [#155](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/155): increase numerical accuracy for parallel tempering when using python multiprocessing
 - [#153](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/153): Add tuning target selection to setup function
 
 ## v1.5.0

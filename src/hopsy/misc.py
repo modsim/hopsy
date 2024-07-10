@@ -219,8 +219,11 @@ class PyParallelTemperingChain:
             )
             likelihood_difference = self.markov_chain.state_log_density - other_chain[0]
             coldness_difference = self.coldness - other_chain[1]
-            acceptance_prob = _s.numpy.exp(likelihood_difference * coldness_difference)
-            if _c.Uniform(a=0, b=1)(self.parallel_tempering_sync_rng) < acceptance_prob:
+            log_acceptance_prob = likelihood_difference * coldness_difference
+            if (
+                _s.numpy.log(_c.Uniform(a=0, b=1)(self.parallel_tempering_sync_rng))
+                < log_acceptance_prob
+            ):
                 self.state = other_chain[2:]
                 accepted = True
         else:
