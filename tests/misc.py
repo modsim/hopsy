@@ -673,3 +673,38 @@ class MiscTests(unittest.TestCase):
 
             with self.assertRaises(RuntimeError):
                 add_box_constraints(problem, lb, ub, simplify=False)
+
+    def test_equality_constraints_are_correctly_constrained(self):
+        A = np.zeros((0, 2))
+        b = np.zeros((0,))
+        lower_bounds = [0, -0.5]
+        upper_bounds = [1, 2.0]
+        Aeq = np.array([[2.0, 1.0]])
+        beq = np.array([1])
+        x0 = [0.0, 1]
+
+        problem = Problem(
+            A,
+            b,
+        )
+
+        problem = add_box_constraints(
+            problem,
+            lower_bounds,
+            upper_bounds,
+            simplify=False,
+        )
+
+        problem = add_equality_constraints(problem, Aeq, beq)
+
+        seed = 42
+        rng = np.random.default_rng(seed)
+        # important! transform the startpoint into the equality space
+        x0 = transform(problem, [x0])
+
+        mc = MarkovChain(
+            problem, proposal=UniformCoordinateHitAndRunProposal, starting_point=x0
+        )
+        rng_hopsy = RandomNumberGenerator(seed=seed)
+
+        acceptance_rate, states = sample(mc, rng_hopsy, n_samples=10000, thinning=2)
