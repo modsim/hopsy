@@ -699,8 +699,9 @@ class MiscTests(unittest.TestCase):
 
         seed = 42
         rng = np.random.default_rng(seed)
-        # important! transform the startpoint into the equality space
-        x0 = transform(problem, [x0])
+        # important! transform the startpoint into the equality space. Transform takes list of
+        # points. We only want the first one
+        x0 = transform(problem, [x0])[0]
 
         mc = MarkovChain(
             problem, proposal=UniformCoordinateHitAndRunProposal, starting_point=x0
