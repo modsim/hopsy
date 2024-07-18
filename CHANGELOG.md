@@ -1,6 +1,7 @@
 # Changelog
 
 ## Latest
+- [#141](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/152): Add minimal example for genome-scale sampling
 - [#152](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/152): Add test-case for selecting start point with equality constraints
 - [#69](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/69): Add CLA
 - [#155](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/155): Increase numerical accuracy for parallel tempering when using python multiprocessing
