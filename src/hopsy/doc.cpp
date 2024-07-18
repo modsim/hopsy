@@ -2630,6 +2630,11 @@ const char* hopsy::doc::MarkovChain::base = R"pbdoc(MarkovChain(problem, proposa
 Given a hopsy.Problem a MarkovChain object can be constructed. The Markov chain keeps track of the internal state and the selected proposal mechanism, see proposal argument.
 Several Markov chain objects can be sampled in parallel by passing them as a list to hopsy.sample.
 
+Warning: If the problem has been rounded or equality constraints have been added, this constructor expects
+the optional starting point to be in the space of the effective polytope,
+i.e., it should fulfill problem.b-problem.A@starting_point<0.
+Given a point x in the full space, hopsy.transform(problem. [x])[0] returns a point in the effective polytope.
+
 Parameters
 ----------
 problem: hopsy.Problem
@@ -2643,6 +2648,8 @@ proposal: Proposal type or object (duck-typing). Default None
     For the other case, it is worth experimenting with the available proposals to find the most efficient one for the
     problem at hand. Note, that `Uniform/Gaussian` in a proposal name only indicates a detail of the proposal mechanism.
     These proposals can still be used to sample non-uniform and non-gaussian distributions.
+starting_point: numpy.ndarray[float64[n,1]]
+    If none is given hopsy automatically uses the chebyshev center as a starting point.
 
 Returns
 -------
