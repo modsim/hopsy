@@ -580,6 +580,10 @@ document.write(`
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">MarkovChain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starting_point</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.MarkovChain" title="Link to this definition">#</a></dt>
 <dd><p>Given a hopsy.Problem a MarkovChain object can be constructed. The Markov chain keeps track of the internal state and the selected proposal mechanism, see proposal argument.
 Several Markov chain objects can be sampled in parallel by passing them as a list to hopsy.sample.</p>
+<p>Warning: If the problem has been rounded or equality constraints have been added, this constructor expects
+the optional starting point to be in the space of the effective polytope,
+i.e., it should fulfill problem.b-problem.A&#64;starting_point&lt;0.
+Given a point x in the full space, hopsy.transform(problem. [x])[0] returns a point in the effective polytope.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -592,6 +596,7 @@ Please note, that these defaults are heuristic and work best for no model or hop
 For the other case, it is worth experimenting with the available proposals to find the most efficient one for the
 problem at hand. Note, that <cite>Uniform/Gaussian</cite> in a proposal name only indicates a detail of the proposal mechanism.
 These proposals can still be used to sample non-uniform and non-gaussian distributions.</p></li>
+<li><p><strong>starting_point</strong> (<em>numpy.ndarray</em><em>[</em><em>float64</em><em>[</em><em>n</em><em>,</em><em>1</em><em>]</em><em>]</em>) – If none is given hopsy automatically uses the chebyshev center as a starting point.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -701,7 +706,7 @@ These proposals can still be used to sample non-uniform and non-gaussian distrib
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.5.
     <br/>
   </p>
 </div>
