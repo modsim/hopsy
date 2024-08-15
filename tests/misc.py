@@ -213,7 +213,6 @@ class MiscTests(unittest.TestCase):
 
     def test_ess(self):
         states = [[[0, 1, 2, 3, 4]] * 100] * 4
-        states = [[[0, 1, 2, 3, 4]] * 100] * 4
         neff = ess(states)
         self.assertListEqual([1, 1, 1, 1, 1], neff[0].tolist())
 
@@ -232,9 +231,7 @@ class MiscTests(unittest.TestCase):
         rel_ess = 1 / 400
 
         states = [[[0, 1, 2, 3, 4]] * 100] * 4
-        states = [[[0, 1, 2, 3, 4]] * 100] * 4
         neff = ess(states, relative=True)
-        self.assertListEqual([rel_ess] * 5, neff[0].tolist())
         self.assertListEqual([rel_ess] * 5, neff[0].tolist())
 
         states = numpy.concatenate(
@@ -242,13 +239,11 @@ class MiscTests(unittest.TestCase):
         )
         neff = ess(states, series=100, relative=True)
         self.assertListEqual([rel_ess] * 5, neff[0].tolist())
-        self.assertListEqual([rel_ess] * 5, neff[0].tolist())
 
         states = numpy.concatenate(
             [[[[0, 1, 2, 3, 4]] * 100] * 4, numpy.random.rand(4, 100, 5)], axis=1
         )
         neff = ess(states, series=100, relative=True, n_procs=-1)
-        self.assertListEqual([rel_ess] * 5, neff[0].tolist())
         self.assertListEqual([rel_ess] * 5, neff[0].tolist())
 
     def test_recording_meta_data(self):
@@ -709,3 +704,51 @@ class MiscTests(unittest.TestCase):
         rng_hopsy = RandomNumberGenerator(seed=seed)
 
         acceptance_rate, states = sample(mc, rng_hopsy, n_samples=10000, thinning=2)
+
+    def test_rhat(self):
+        expected_rhat = [[0.99999259, 1.00001659, 1.0000062]]
+        n_chains = 4
+        A = np.array(
+            [
+                [1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0],
+                [0.0, 0.0, 1.0],
+                [-1.0, 0.0, 0.0],
+                [0.0, -1.0, 0.0],
+                [0.0, 0.0, -1.0],
+            ]
+        )
+        b = np.array([1.0, 2.0, 3.0, 1.0, 2.0, 3.0])
+        rectangle = Problem(A=A, b=b)
+
+        mcs = [MarkovChain(rectangle) for n in range(n_chains)]
+        rngs = [RandomNumberGenerator(43) for n in range(n_chains)]
+        _, samples = sample(mcs, rngs, n_samples=20000, thinning=10)
+        actual_rhat = rhat(samples)
+        self.assertTrue(np.all(np.isclose(actual_rhat, expected_rhat)))
+
+    def test_rhat_some_dimension_constant(self):
+        expected_rhat = [[0.99995272, 1.00000211, 1.0]]
+        n_chains = 4
+        A = np.array(
+            [
+                [1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0],
+                [0.0, 0.0, 1.0],
+                [-1.0, 0.0, 0.0],
+                [0.0, -1.0, 0.0],
+                [0.0, 0.0, -1.0],
+            ]
+        )
+        b = np.array([1.0, 2.0, 3.0, 1.0, 2.0, 3.0])
+        rectangle = Problem(A=A, b=b)
+        A_eq = np.array([[0.0, 0.0, 1.0]])
+        b_eq = np.array([2.5])
+        constrained_rectangle = add_equality_constraints(
+            rectangle, A_eq=A_eq, b_eq=b_eq
+        )
+        mcs = [MarkovChain(constrained_rectangle) for n in range(n_chains)]
+        rngs = [RandomNumberGenerator(43) for n in range(n_chains)]
+        _, samples = sample(mcs, rngs, n_samples=20000, thinning=10)
+        actual_rhat = rhat(samples)
+        self.assertTrue(np.all(np.isclose(actual_rhat, expected_rhat)))
