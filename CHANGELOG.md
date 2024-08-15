@@ -1,6 +1,6 @@
 # Changelog
 
-## Latest
+## v1.5.1
 - [#138](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/138): Ignore fixed dimensions when computing ESS & rhat
 - [#157](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/157): Pin numpy<2.0
 - [#141](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/141): Add minimal example for genome-scale sampling
