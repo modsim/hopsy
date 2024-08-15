@@ -1457,7 +1457,7 @@ def mcse(*args, **kwargs):
     return _arviz(_s.arviz.mcse, *args, **kwargs)
 
 
-def rhat(*args, **kwargs):
+def rhat(data, *args, **kwargs):
     r"""rhat(data, series=0, method="rank", dask_kwargs=None)
 
     Compute estimate of rank normalized splitR-hat for a set of traces.
@@ -1508,6 +1508,9 @@ def rhat(*args, **kwargs):
     Rank values are calculated over all the chains with `scipy.stats.rankdata`.
     Each chain is split in two and normalized with the z-transform following Vehtari et al. (2019).
 
+    Note that if all chains contain the same constant for some parameter (due to equality constraints),
+    rhat will be 1 for this parameter.
+
     References
     ----------
     * Vehtari et al. (2019) see https://arxiv.org/abs/1903.08008
@@ -1517,7 +1520,19 @@ def rhat(*args, **kwargs):
     * https://arviz-devs.github.io/arviz/api/generated/arviz.rhat.html
 
     """
-    return _arviz(_s.arviz.rhat, *args, **kwargs)
+    # next lines finds dimensions where samples for all chains are constant
+    s = data.reshape(-1, data.shape[2])
+    diff = _s.numpy.isclose(_s.numpy.diff(s, axis=0), 0)
+    to_drop = _s.numpy.all(diff, axis=0)
+    for i in reversed(range(len(to_drop))):
+        if to_drop[i]:
+            data = _s.numpy.delete(data, i, axis=2)
+    rhat = _arviz(_s.arviz.rhat, data, *args, **kwargs)
+    # reinclude rhat=1 for constant dimensions
+    for i in range(len(to_drop)):
+        if to_drop[i]:
+            rhat = _s.numpy.insert(rhat, i, 1.0, axis=1)
+    return rhat
 
 
 def _svd_rounding(samples, polytope):
