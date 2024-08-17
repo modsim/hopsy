@@ -158,6 +158,8 @@ test-integration-release:
     - rm examples/ParallelTemperingMPI.ipynb examples/parallel_tempering_MPI.py # mpi not compatible with manylinux
     - rm examples/Callbacks.ipynb # somehow samples go missing in CI but not locally? For now we skip this test
     - rm examples/BenchmarkingMultiphaseMonteCarloSampling.ipynb # too slow for CI
+    - rm examples/ParallelTemperingMultiprocessing.ipynb # requires manual converting to python and the manual conversion already exists
+    - rm examples/SamplingAdvice.ipynb # requires manual converting to python and the manual conversion already exists
   script:
     - VERSION=$(cat .version); for PY in "cp312-cp312"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
     - for PY in "cp312-cp312"; do for f in examples/*.py; do /opt/python/$PY/bin/python $f || exit 1; done ;done
