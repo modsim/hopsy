@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>A Guide to Sampling Your First Model With hopsy &#8212; hopsy 1.5.1 documentation</title>
+    <title>A Guide to Sampling Your First Model With hopsy &#8212; hopsy 1.5.2b0 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 
     <script src="../_static/jquery.js?v=5d32c60e"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-    <script src="../_static/documentation_options.js?v=44dfd65d"></script>
+    <script src="../_static/documentation_options.js?v=f0504e8b"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -129,8 +129,8 @@
       
     
     
-    <img src="../_static/hopsy.png" class="logo__image only-light" alt="hopsy 1.5.1 documentation - Home"/>
-    <script>document.write(`<img src="../_static/hopsy.png" class="logo__image only-dark" alt="hopsy 1.5.1 documentation - Home"/>`);</script>
+    <img src="../_static/hopsy.png" class="logo__image only-light" alt="hopsy 1.5.2b0 documentation - Home"/>
+    <script>document.write(`<img src="../_static/hopsy.png" class="logo__image only-dark" alt="hopsy 1.5.2b0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -397,37 +397,15 @@ document.write(`
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CustomModel</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The custom model is created by you and its implementation is determined by your domain.</span>
-<span class="sd">    If you have a simulator for your problem domain, you can interface with it in this class, which should adapt your simulator to the interface that hopsy expects.</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## Important note:</span>
+<span class="c1"># Functionality within multiprocessing requires that the __main__ module be importable by the children. See https://docs.python.org/3/library/multiprocessing.html#using-a-pool-of-workers.</span>
+<span class="c1"># Therefore, we have to define our custom model in a different file and import it</span>
 
-<span class="sd">    Note, that this model does NOT have to inheret from anything, as long as it has the correct methods.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">compute_negative_log_likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">           computes the negative log likelihood of a parameter vector according to your custom model</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># dummy implementation, in this case a gaussian</span>
-        <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mi">10</span><span class="p">],</span>  <span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
-        <span class="n">cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">10</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mi">10</span><span class="p">]])</span>
-        <span class="k">return</span> <span class="p">((</span><span class="n">parameter</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">mu</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">cov</span><span class="p">)</span> <span class="o">@</span> <span class="p">(</span><span class="n">parameter</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">mu</span><span class="p">))[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-
-
-
-
-    <span class="c1"># The properties A and b and not mandatory, but for convenience we put them here into the model. They define the polytope as Ax &lt; b. In this example, A and b will shape a 2d simplex.</span>
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">A</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]);</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">b</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">]);</span>
+<span class="kn">from</span> <span class="nn">custom_models</span> <span class="kn">import</span> <span class="n">CustomModel</span>
 </pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
@@ -437,6 +415,15 @@ document.write(`
 <span class="n">problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">add_box_constraints</span><span class="p">(</span><span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="n">model</span><span class="p">),</span> <span class="o">-</span><span class="mf">1e3</span><span class="p">,</span> <span class="mf">1e3</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Set parameter Username
+Academic license - for non-commercial use only - expires 2025-03-22
+</pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -451,7 +438,7 @@ document.write(`
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;__main__.CustomModel object at 0x74acb424ffd0&gt;
+&lt;custom_models.CustomModel object at 0x73625ad74830&gt;
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -499,8 +486,8 @@ document.write(`
 <span class="n">hopsy</span><span class="o">.</span><span class="n">tune</span><span class="p">(</span><span class="n">markov_chains</span><span class="p">,</span> <span class="n">rng</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">tuning_target</span><span class="p">,</span> <span class="n">n_tuning</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
 
 
-<span class="c1"># sampling is called using the sample function. In this case we want to sample 4 chains using 4 threads. Of course, you can vary the number of threads according to your CPU.</span>
-<span class="n">acceptance_rates</span><span class="p">,</span> <span class="n">samples</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">markov_chains</span><span class="p">,</span> <span class="n">rng</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">thinning</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">n_threads</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="c1"># sampling is called using the sample function. In this case we want to sample 4 chains using 4 parallel processes. Of course, you can vary the number of threads according to your CPU.</span>
+<span class="n">acceptance_rates</span><span class="p">,</span> <span class="n">samples</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">markov_chains</span><span class="p">,</span> <span class="n">rng</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">thinning</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">n_procs</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -518,7 +505,7 @@ document.write(`
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[0.4636080000000001, 0.46652000000000005, 0.4636660000000001, 0.4646160000000001]
+[0.4558040000000001, 0.458176, 0.45604800000000006, 0.45741400000000004]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -543,8 +530,8 @@ document.write(`
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[[0.99994712 0.99993354]]
-[[39690.03707734 39542.67865878]]
+[[0.9999551  1.00004789]]
+[[39386.55923423 39555.2000093 ]]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -562,7 +549,7 @@ document.write(`
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 (10000, 2)
-[0.4636080000000001, 0.46652000000000005, 0.4636660000000001, 0.4646160000000001]
+[0.4558040000000001, 0.458176, 0.45604800000000006, 0.45741400000000004]
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">

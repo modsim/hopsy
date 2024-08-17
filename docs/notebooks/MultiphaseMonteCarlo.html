@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Demo for Multiphase Monte Carlo in hopsy &#8212; hopsy 1.5.1 documentation</title>
+    <title>Demo for Multiphase Monte Carlo in hopsy &#8212; hopsy 1.5.2b0 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 
     <script src="../_static/jquery.js?v=5d32c60e"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-    <script src="../_static/documentation_options.js?v=44dfd65d"></script>
+    <script src="../_static/documentation_options.js?v=f0504e8b"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -129,8 +129,8 @@
       
     
     
-    <img src="../_static/hopsy.png" class="logo__image only-light" alt="hopsy 1.5.1 documentation - Home"/>
-    <script>document.write(`<img src="../_static/hopsy.png" class="logo__image only-dark" alt="hopsy 1.5.1 documentation - Home"/>`);</script>
+    <img src="../_static/hopsy.png" class="logo__image only-light" alt="hopsy 1.5.2b0 documentation - Home"/>
+    <script>document.write(`<img src="../_static/hopsy.png" class="logo__image only-dark" alt="hopsy 1.5.2b0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -404,7 +404,7 @@ document.write(`
 </div>
 <section id="define-problem-and-run-sampling">
 <h2>define problem and run sampling<a class="headerlink" href="#define-problem-and-run-sampling" title="Link to this heading">#</a></h2>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
@@ -416,15 +416,6 @@ document.write(`
 <span class="n">samples</span><span class="p">,</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">ess</span><span class="p">,</span> <span class="n">runtime</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">run_multiphase_sampling</span><span class="p">(</span><span class="n">problem</span><span class="o">=</span><span class="n">problem</span><span class="p">,</span> <span class="n">seeds</span><span class="o">=</span><span class="n">seeds</span><span class="p">,</span> <span class="n">steps_per_phase</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">starting_points</span><span class="o">=</span><span class="p">[</span><span class="n">start</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">seeds</span><span class="p">],</span> <span class="n">n_procs</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">seeds</span><span class="p">))</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Set parameter Username
-Academic license - for non-commercial use only - expires 2023-11-30
-</pre></div></div>
 </div>
 </section>
 <section id="visualize-samples">

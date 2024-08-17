@@ -175,9 +175,20 @@ Found insufficient docstring for the following items:
   -- hopsy.examples
   -- hopsy.lp
   -- hopsy.misc
+  -- hopsy.multiprocessing_context
+  -- hopsy.multiprocessing_context.AuthenticationError
+  -- hopsy.multiprocessing_context.BufferTooShort
+  -- hopsy.multiprocessing_context.Process
+  -- hopsy.multiprocessing_context.ProcessError
+  -- hopsy.multiprocessing_context.TimeoutError
+  -- hopsy.multiprocessing_context.get_context
+  -- hopsy.multiprocessing_context.get_start_method
+  -- hopsy.multiprocessing_context.reducer
+  -- hopsy.multiprocessing_context.reducer.context
+  -- hopsy.multiprocessing_context.set_start_method
   -- hopsy.set_params
   -- hopsy.tune_acceptance_rate
   -- hopsy.tune_esjd
   -- hopsy.tune_old
-Found 415 items of which 235 have suffcient docstring.
-Coverage: 56.6%
+Found 474 items of which 283 have suffcient docstring.
+Coverage: 59.7%
