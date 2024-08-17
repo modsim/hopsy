@@ -1011,7 +1011,7 @@ def _parallel_sampling(
     progress_bar: bool,
 ):
     result_queue = (
-        _s.multiprocessing.Manager().Queue()
+        _c.multiprocessing_context.Manager().Queue()
         if callback is not None or progress_bar
         else None
     )

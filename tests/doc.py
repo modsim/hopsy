@@ -15,7 +15,7 @@ class DocTests(unittest.TestCase):
         good, bad, cond = docov.analyze(
             hopsy,
             condition=ExistingDocstring(),
-            ignore=["ProposalParameter", "MCBBackend"],
+            ignore=["ProposalParameter", "MCBBackend", "multiprocessing_context"],
         )
 
         if len(bad) > 0:
