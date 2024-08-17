@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
     # In[7]:
 
-    from gaussian_mixture import GaussianMixture
+    from custom_models import GaussianMixture
 
     # <!-- ## Setup problem and sampling configuration -->
     # In[8]:
