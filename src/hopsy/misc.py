@@ -61,7 +61,21 @@ class _submodules:
 _s = _submodules
 
 
-def create_shared_memory(state_shape, num_blocks: int, state_type=_s.numpy.float64):
+def check_shared_memory_exists(name):
+    try:
+        print("exists??")
+        shared_memory = _s.shared_memory.SharedMemory(name=name)
+        print("exists", shared_memory)
+        shared_memory.close()
+        return True
+    except FileNotFoundError:
+        print("!!!does not exists")
+        return False
+
+
+def create_shared_memory(
+    state_shape, num_blocks: int, state_type=_s.numpy.float64, names=None, create=True
+):
     """
     It is the responsibility of the caller of create_shared_memory to call release_shared_memory.
     Multiprocessing will give a warning if leaked memory exists at the end of the program
@@ -81,7 +95,11 @@ def create_shared_memory(state_shape, num_blocks: int, state_type=_s.numpy.float
     shape = (state_shape[0] + 2, *state_shape[1:])
     shared_memory_size = int(_s.numpy.dtype(state_type).itemsize * _s.numpy.prod(shape))
     shared_state_memory = [
-        _s.shared_memory.SharedMemory(size=shared_memory_size, create=True)
+        _s.shared_memory.SharedMemory(
+            size=shared_memory_size,
+            create=create,
+            name=None if names is None else names[i],
+        )
         for i in range(num_blocks)
     ]
     _s.atexit.register(lambda: [release_shared_memory(s) for s in shared_state_memory])
@@ -143,6 +161,44 @@ class PyParallelTemperingChain:
             for n in self.shared_memory:
                 release_shared_memory(n)
         self.barrier.abort()
+
+    # def __getstate__(self):
+    #     pickled = dict(self.__dict__)
+    #     pickled["shared_memory"] = []
+    #     pickled["barrier"] = None
+    #     # shared_memory = pickled.pop("shared_memory")
+    #     # print(f"chain {self.chain_index} pickles {[s.name for s in shared_memory]}")
+    #     # shared_memory_names = [s.name for s in shared_memory]
+    #     # pickled["shared_memory_names"] = shared_memory_names
+    #     print('keeping', [s.name for s in self.shared_memory], 'intact')
+    #     print('pickling', [s.name for s in pickled['shared_memory']], 'intact')
+    #     return pickled
+    #
+    # def __setstate__(self, d):
+    #     # names = [n + "1" for n in d.pop("shared_memory_names")]
+    #     # d["shared_memory"] = []
+    #     # for name in names:
+    #     #     exists = check_shared_memory_exists(name)
+    #     #     if exists:
+    #     #         print(d["chain_index"], "is loading shared memory")
+    #     #         d["shared_memory"] += create_shared_memory(
+    #     #             d["markov_chain"].state.shape,
+    #     #             num_blocks=1,
+    #     #             names=[name],
+    #     #             create=False,
+    #     #         )
+    #     #     else:
+    #     #         print(d["chain_index"], "is creating shared memory")
+    #     #         d["shared_memory"] += create_shared_memory(
+    #     #             d["markov_chain"].state.shape,
+    #     #             num_blocks=1,
+    #     #             names=[name],
+    #     #             create=True,
+    #     #         )
+    #     self.__dict__.update(d)
+    #     self.shared_memory = []
+    #     self.barrier = None
+    #     # print(f"chain {self.chain_index} knows {[s.name for s in self.shared_memory]}")
 
     @property
     def coldness(self):
@@ -1300,7 +1356,7 @@ def _arviz(
     series: int = 0,
     n_procs: int = 1,
     *args,
-    **kwargs
+    **kwargs,
 ):
     data = _s.numpy.array(data)
     assert len(data.shape) == 3
