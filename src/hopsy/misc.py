@@ -18,6 +18,7 @@ class _core:
         UniformCoordinateHitAndRunProposal,
         UniformInt,
     )
+    from .definitions import multiprocessing_context
     from .lp import LP
 
 
@@ -360,7 +361,7 @@ def create_py_parallel_tempering_ensembles(
         )
 
     pte = []
-    m = _s.multiprocessing.Manager()
+    m = _c.multiprocessing_context.Manager()
     for i, markov_chain in enumerate(markov_chains):
         shm = create_shared_memory(
             markov_chain.state.shape, num_blocks=len(temperature_ladder)
@@ -1010,7 +1011,7 @@ def _parallel_sampling(
     progress_bar: bool,
 ):
     result_queue = (
-        _s.multiprocessing.Manager().Queue()
+        _c.multiprocessing_context.Manager().Queue()
         if callback is not None or progress_bar
         else None
     )
@@ -1018,7 +1019,7 @@ def _parallel_sampling(
         args[i] += (result_queue,)
 
     if callback is not None or progress_bar:
-        workers = _s.multiprocessing.Pool(n_procs)
+        workers = _c.multiprocessing_context.Pool(n_procs)
         if "SLURM_JOB_ID" in _s.os.environ:
             _s.warnings.warn(
                 "Warning: progress bars or callbacks within SLURM are not officially supported. Proceed with caution and make "
@@ -1056,7 +1057,7 @@ def _parallel_sampling(
         workers.join()
         return result.get()
     else:
-        with _s.multiprocessing.Pool(n_procs) as workers:
+        with _c.multiprocessing_context.Pool(n_procs) as workers:
             result = workers.starmap(_sample_parallel_chain, args)
         return result
 
@@ -1261,7 +1262,7 @@ def sample(
 def _parallel_execution(
     func: _s.typing.Callable, args: _s.typing.List[_s.typing.Any], n_procs: int
 ):
-    with _s.multiprocessing.Pool(n_procs) as workers:
+    with _c.multiprocessing_context.Pool(n_procs) as workers:
         return workers.starmap(func, args)
 
 

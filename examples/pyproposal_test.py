@@ -19,8 +19,8 @@ class PyProposalWithFullBoilerplate:
         self.proposal = state.flatten()
 
     def propose(self, rng):
-        mean = np.zeros((len(cov),))
-        y = np.random.multivariate_normal(mean, cov).reshape(-1, 1).flatten()
+        mean = np.zeros((len(self.cov),))
+        y = np.random.multivariate_normal(mean, self.cov).reshape(-1, 1).flatten()
         self.proposal = self.state + self.stepsize * y
         return self.proposal
 
@@ -55,8 +55,8 @@ class PyProposalMinimalBoilerplate:
         self.cov = cov
 
     def propose(self, rng):
-        mean = np.zeros((len(cov),))
-        y = np.random.multivariate_normal(mean, cov).reshape(-1, 1).flatten()
+        mean = np.zeros((len(self.cov),))
+        y = np.random.multivariate_normal(mean, self.cov).reshape(-1, 1).flatten()
         self.proposal = self.state + y
         return self.proposal
 
