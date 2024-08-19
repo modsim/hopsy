@@ -4,7 +4,7 @@ import unittest
 import numpy as np
 
 from hopsy import *
-
+import hopsy
 
 class ModelTests(unittest.TestCase):
     def test_gaussian_pickling(self):
@@ -30,7 +30,7 @@ class ModelTests(unittest.TestCase):
         self.assertListEqual(model.components[0].inactives, new.components[0].inactives)
 
     def test_pymodel_pickling(self):
-        model = PyModel("abc")
+        model = hopsy.core.PyModel("abc")
         data = pickle.dumps(model)
         new = pickle.loads(data)
         self.assertEqual(model.model, new.model)

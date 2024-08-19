@@ -144,16 +144,16 @@ class ProposalTests(unittest.TestCase):
 
     def test_minimalistic_custom_proposal(self):
         class CubeProposal:
-            uniform = hopsy.Uniform(-1, 1)
+            uniform = Uniform(-1, 1)
             def propose(self, rng):
                 return [self.state[0] + self.uniform(rng), self.state[1] + self.uniform(rng)]
 
-        problem = hopsy.Problem(A=[[1, 1], [-1, 0], [0, -1]], b=[5, 0, 0])
+        problem = Problem(A=[[1, 1], [-1, 0], [0, -1]], b=[5, 0, 0])
             
-        chain = hopsy.MarkovChain(problem, proposal=CubeProposal, starting_point=[.5, .5])
-        rng = hopsy.RandomNumberGenerator(seed=42)
+        chain = MarkovChain(problem, proposal=CubeProposal, starting_point=[.5, .5])
+        rng = RandomNumberGenerator(seed=42)
 
-        accrate, samples = hopsy.sample(chain, rng, n_samples=1000, thinning=10)
+        accrate, samples = sample(chain, rng, n_samples=1000, thinning=10)
 
 
     def test_default_starting_point_for_proposal(self):
