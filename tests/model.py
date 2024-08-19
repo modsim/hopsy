@@ -3,8 +3,9 @@ import unittest
 
 import numpy as np
 
-from hopsy import *
 import hopsy
+from hopsy import *
+
 
 class ModelTests(unittest.TestCase):
     def test_gaussian_pickling(self):

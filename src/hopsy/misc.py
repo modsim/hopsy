@@ -400,27 +400,33 @@ def _propose(self, rng: _c.RandomNumberGenerator):
     self.proposal = self._propose(rng)
     return self.proposal
 
+
 def _log_acceptance_probability(self):
     slacks = self.A @ self.proposal <= self.b
     log_indicator = 0 if (slacks).all() else -_s.numpy.inf
     return log_indicator + self._log_acceptance_probability
 
+
 def to_pyproposal(proposal, problem, starting_point):
     """
-    Converts a minimalistic custom proposal into a valid PyProposal by assigning ``state``, ``proposal`` and 
+    Converts a minimalistic custom proposal into a valid PyProposal by assigning ``state``, ``proposal`` and
     valid ``propose`` and ``log_acceptance_probability`` methods.
     """
     _proposal = proposal()
-    
+
     _proposal.state = starting_point
     _proposal.proposal = starting_point
     _proposal._propose = _proposal.propose
     proposal.propose = _propose
-    
-    _proposal._log_acceptance_probability = _proposal.log_acceptance_probability if hasattr(_proposal, 'log_acceptance_probability') else 0
+
+    _proposal._log_acceptance_probability = (
+        _proposal.log_acceptance_probability
+        if hasattr(_proposal, "log_acceptance_probability")
+        else 0
+    )
     _proposal.A, _proposal.b = problem.A, problem.b
     proposal.log_acceptance_probability = _log_acceptance_probability
-    
+
     return _c.PyProposal(_proposal)
 
 
@@ -434,7 +440,7 @@ def MarkovChain(
 ):
     _proposal = None
 
-    # default samplers 
+    # default samplers
     if proposal is None and isinstance(problem.model, _c.Gaussian):
         proposal = _c.TruncatedGaussianProposal
     elif proposal is None and problem.model is None:
@@ -453,7 +459,7 @@ def MarkovChain(
         else:
             starting_point = compute_chebyshev_center(problem)
 
-        if issubclass(proposal, _c.Proposal): 
+        if issubclass(proposal, _c.Proposal):
             # hopsy native proposal
             _proposal = proposal(problem, starting_point=starting_point)
         else:
