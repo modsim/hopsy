@@ -246,8 +246,7 @@ namespace hopsy {
 		PyProposal(py::object pyObj) : pyObj(std::move(pyObj)) {};
 
         VectorType& propose(hops::RandomNumberGenerator& rng) override {
-            pyObj.attr("propose")(std::nullopt);
-            rng();
+            pyObj.attr("propose")(rng);
             proposal = pyObj.attr("proposal").cast<VectorType>();
             return proposal;
         }
