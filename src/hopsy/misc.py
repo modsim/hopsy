@@ -12,6 +12,7 @@ class _core:
         MarkovChain,
         Problem,
         Proposal,
+        PyProposal,
         RandomNumberGenerator,
         TruncatedGaussianProposal,
         Uniform,
@@ -395,7 +396,7 @@ def create_py_parallel_tempering_ensembles(
     return pte
 
 
-def _propose(self, rng: RandomNumberGenerator):
+def _propose(self, rng: _c.RandomNumberGenerator):
     self.proposal = self._propose(rng)
     return self.proposal
 
@@ -414,7 +415,7 @@ def to_pyproposal(proposal, problem, starting_point):
     _proposal.state = starting_point
     _proposal.proposal = starting_point
     _proposal._propose = _proposal.propose
-    proposal.propose = _new_propose
+    proposal.propose = _propose
     
     _proposal._log_acceptance_probability = _proposal.log_acceptance_probability if hasattr(_proposal, 'log_acceptance_probability') else 0
     _proposal.A, _proposal.b = problem.A, problem.b
