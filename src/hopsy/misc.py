@@ -402,7 +402,7 @@ def _propose(self, rng: _c.RandomNumberGenerator):
 
 def _log_acceptance_probability(self):
     slacks = self.A @ self.proposal <= self.b
-    log_indicator = 0 if (slacks).all() else -_s.np.inf
+    log_indicator = 0 if (slacks).all() else -_s.numpy.inf
     return log_indicator + self._log_acceptance_probability
 
 def to_pyproposal(proposal, problem, starting_point):

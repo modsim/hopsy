@@ -143,12 +143,13 @@ class ProposalTests(unittest.TestCase):
                 self.assertEqual(proposal.warm_up, 1.0e3)
 
     def test_minimalistic_custom_proposal(self):
-        import random
-
         class CubeProposal:
+            uniform = hopsy.Uniform(-1, 1)
             def propose(self, rng):
-                return [self.state[0] + random.uniform(-1, 1), self.state[1] + random.uniform(-1, 1)]
+                return [self.state[0] + self.uniform(rng), self.state[1] + self.uniform(rng)]
 
+        problem = hopsy.Problem(A=[[1, 1], [-1, 0], [0, -1]], b=[5, 0, 0])
+            
         chain = hopsy.MarkovChain(problem, proposal=CubeProposal, starting_point=[.5, .5])
         rng = hopsy.RandomNumberGenerator(seed=42)
 
