@@ -142,6 +142,19 @@ class ProposalTests(unittest.TestCase):
                 proposal = ProposalType(problem, warm_up=int(1.0e3))
                 self.assertEqual(proposal.warm_up, 1.0e3)
 
+    def test_minimalistic_custom_proposal(self):
+        import random
+
+        class CubeProposal:
+            def propose(self, rng):
+                return [self.state[0] + random.uniform(-1, 1), self.state[1] + random.uniform(-1, 1)]
+
+        chain = hopsy.MarkovChain(problem, proposal=CubeProposal, starting_point=[.5, .5])
+        rng = hopsy.RandomNumberGenerator(seed=42)
+
+        accrate, samples = hopsy.sample(chain, rng, n_samples=1000, thinning=10)
+
+
     def test_default_starting_point_for_proposal(self):
         problem_no_start = Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0], Gaussian())
         for ProposalType in ProposalTypes:
