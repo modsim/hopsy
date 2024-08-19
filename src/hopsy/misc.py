@@ -395,6 +395,34 @@ def create_py_parallel_tempering_ensembles(
     return pte
 
 
+def _propose(self, rng: RandomNumberGenerator):
+    self.proposal = self._propose(rng)
+    return self.proposal
+
+def _log_acceptance_probability(self):
+    slacks = self.A @ self.proposal <= self.b
+    log_indicator = 0 if (slacks).all() else -_s.np.inf
+    return log_indicator + self._log_acceptance_probability
+
+def to_pyproposal(proposal, problem, starting_point):
+    """
+    Converts a minimalistic custom proposal into a valid PyProposal by assigning ``state``, ``proposal`` and 
+    valid ``propose`` and ``log_acceptance_probability`` methods.
+    """
+    _proposal = proposal()
+    
+    _proposal.state = starting_point
+    _proposal.proposal = starting_point
+    _proposal._propose = _proposal.propose
+    proposal.propose = _new_propose
+    
+    _proposal._log_acceptance_probability = _proposal.log_acceptance_probability if hasattr(_proposal, 'log_acceptance_probability') else 0
+    _proposal.A, _proposal.b = problem.A, problem.b
+    proposal.log_acceptance_probability = _log_acceptance_probability
+    
+    return _c.PyProposal(_proposal)
+
+
 def MarkovChain(
     problem: _c.Problem,
     proposal: _s.typing.Union[_c.Proposal, _s.typing.Type[_c.Proposal]] = None,
@@ -405,6 +433,7 @@ def MarkovChain(
 ):
     _proposal = None
 
+    # default samplers 
     if proposal is None and isinstance(problem.model, _c.Gaussian):
         proposal = _c.TruncatedGaussianProposal
     elif proposal is None and problem.model is None:
@@ -412,14 +441,25 @@ def MarkovChain(
     elif proposal is None:
         proposal = _c.GaussianHitAndRunProposal
 
+    # convenience setup, where the proposal is just a type
     if isinstance(proposal, type):
+
+        # determine a starting point
         if starting_point is not None:
-            _proposal = proposal(problem, starting_point=starting_point)
+            pass
         elif problem.starting_point is not None:
-            _proposal = proposal(problem, starting_point=problem.starting_point)
+            starting_point = problem.starting_point
         else:
-            _starting_point = compute_chebyshev_center(problem)
-            _proposal = proposal(problem, starting_point=_starting_point)
+            starting_point = compute_chebyshev_center(problem)
+
+        if issubclass(proposal, _c.Proposal): 
+            # hopsy native proposal
+            _proposal = proposal(problem, starting_point=starting_point)
+        else:
+            # plain python object which gets converted to pyproposal
+            _proposal = to_pyproposal(proposal, problem, starting_point)
+
+    # the users knows it all
     else:
         _proposal = proposal
 
