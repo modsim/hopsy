@@ -35,7 +35,6 @@ Models
    hopsy.Model
    hopsy.Gaussian
    hopsy.Mixture
-   hopsy.PyModel
    hopsy.Rosenbrock
 
 Problem
@@ -47,16 +46,6 @@ Problem
    :template: ../_templates/autosummary/class.rst
 
    hopsy.Problem
-
-Linear Programming
-""""""""""""""""""
-
-.. autosummary::
-   :caption: Problem
-   :toctree: generated/
-   :template: ../_templates/autosummary/class.rst
-
-   hopsy.LP
 
 Proposals
 """""""""
@@ -75,7 +64,6 @@ Proposals
    hopsy.GaussianCoordinateHitAndRunProposal
    hopsy.GaussianHitAndRunProposal
    hopsy.GaussianProposal
-   hopsy.PyProposal
    hopsy.ReversibleJumpProposal
    hopsy.UniformCoordinateHitAndRunProposal
    hopsy.UniformHitAndRunProposal
@@ -129,19 +117,14 @@ Tuning
    hopsy.ExpectedSquaredJumpDistanceTarget
    hopsy.PyTuningTarget
 
-
-
-Birkhoff Polytope
-"""""""""""""""""
+Miscellaenous
+"""""""""""""
 
 .. autosummary::
-   :caption: Birkhoff Polytope
+   :caption: Miscellaneous
    :toctree: generated/
    :template: ../_templates/autosummary/class.rst
 
    hopsy.BirkhoffPolytope
-
-
-
-
+   hopsy.LP
 
