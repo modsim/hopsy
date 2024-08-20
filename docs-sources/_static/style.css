@@ -1,0 +1,5 @@
+
+.toctree-wrapper:not(:last-child) ul {
+   margin-bottom: 0;
+}
+

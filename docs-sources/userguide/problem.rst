@@ -69,7 +69,6 @@ Models
    hopsy.Model
    hopsy.Gaussian
    hopsy.Mixture
-   hopsy.PyModel
    hopsy.Rosenbrock
 
 Problem

@@ -83,7 +83,6 @@ visit us `on our Gitter <https://gitter.im/modsim/hopsy>`_!
 .. code::
 
    import hopsy
-   import matplotlib.pyplot as plt
 
    problem = hopsy.Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0])
 
@@ -99,11 +98,19 @@ visit us `on our Gitter <https://gitter.im/modsim/hopsy>`_!
 
 
 .. toctree::
+   :maxdepth: 1
+
+   FirstSteps.ipynb
+
+.. toctree::
    :maxdepth: 2
 
-   firststeps.rst
    userguide.rst
    examples.rst
+
+.. toctree::
+   :maxdepth: 1
+
    zreference.rst
 
 
