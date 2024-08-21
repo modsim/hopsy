@@ -55,7 +55,7 @@ If you encounter bugs, please feel free to open an issue `on GitHub <https://git
 where you can also find the `source code <https://github.com/modsim/hopsy>`_.
 For questions, help or feedback regarding :doc:`hopsy <index>`, 
 visit us `on our Gitter <https://gitter.im/modsim/hopsy>`_!
-
+Finally, if you like :doc:`hopsy <index>` and used it in a scientific publication, make sure to cite our `paper <https://doi.org/10.1093/bioinformatics/btae430>`_
 
 .. raw:: html
 
