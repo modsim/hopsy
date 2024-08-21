@@ -466,7 +466,7 @@ def MarkovChain(
             # plain python object which gets converted to pyproposal
             _proposal = to_pyproposal(proposal, problem, starting_point)
 
-    # the users knows it all
+    # user constructed proposal. no more actions needed
     else:
         _proposal = proposal
 
