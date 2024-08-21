@@ -69,7 +69,6 @@ Proposals
    hopsy.GaussianCoordinateHitAndRunProposal
    hopsy.GaussianHitAndRunProposal
    hopsy.GaussianProposal
-   hopsy.PyProposal
    hopsy.UniformCoordinateHitAndRunProposal
    hopsy.UniformHitAndRunProposal
 

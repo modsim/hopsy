@@ -1,28 +1,27 @@
 Reference
 =========
 
-Functions
+Helpers
 """""""""
 
 .. autosummary::
-   :caption: Functions
+   :caption: Helpers
    :toctree: generated/
    :template: ../_templates/autosummary/base.rst
 
-   hopsy.back_transform
-   hopsy.add_box_constraints
-   hopsy.add_equality_constraints
    hopsy.compute_chebyshev_center
    hopsy.generate_unit_hypercube
    hopsy.generate_unit_simplex
    hopsy.is_polytope_empty
-   hopsy.round
    hopsy.run_multiphase_sampling
-   hopsy.sample
    hopsy.simplify
-   hopsy.setup
-   hopsy.transform
-   hopsy.tune
+
+.. autosummary::
+   :toctree: generated/
+   :template: ../_templates/autosummary/class.rst
+
+   hopsy.BirkhoffPolytope
+   hopsy.LP
 
 Models
 """"""
@@ -35,7 +34,6 @@ Models
    hopsy.Model
    hopsy.Gaussian
    hopsy.Mixture
-   hopsy.PyModel
    hopsy.Rosenbrock
 
 Problem
@@ -48,15 +46,15 @@ Problem
 
    hopsy.Problem
 
-Linear Programming
-""""""""""""""""""
-
 .. autosummary::
-   :caption: Problem
    :toctree: generated/
-   :template: ../_templates/autosummary/class.rst
+   :template: ../_templates/autosummary/base.rst
 
-   hopsy.LP
+   hopsy.round
+   hopsy.add_box_constraints
+   hopsy.add_equality_constraints
+   hopsy.back_transform
+   hopsy.transform
 
 Proposals
 """""""""
@@ -75,7 +73,6 @@ Proposals
    hopsy.GaussianCoordinateHitAndRunProposal
    hopsy.GaussianHitAndRunProposal
    hopsy.GaussianProposal
-   hopsy.PyProposal
    hopsy.ReversibleJumpProposal
    hopsy.UniformCoordinateHitAndRunProposal
    hopsy.UniformHitAndRunProposal
@@ -93,8 +90,8 @@ Random
    hopsy.Uniform
    hopsy.Normal
 
-Markov Chain
-""""""""""""
+Sampling
+""""""""
 
 .. autosummary::
    :caption: Markov Chain
@@ -102,6 +99,13 @@ Markov Chain
    :template: ../_templates/autosummary/class.rst
 
    hopsy.MarkovChain
+
+.. autosummary::
+   :toctree: generated/
+   :template: ../_templates/autosummary/base.rst
+
+   hopsy.setup
+   hopsy.sample
 
 Diagnostics
 """""""""""
@@ -119,29 +123,8 @@ Tuning
 """"""
 
 .. autosummary::
-   :caption: Tuning
    :toctree: generated/
-   :template: ../_templates/autosummary/class.rst
+   :template: ../_templates/autosummary/base.rst
 
-   hopsy.ThompsonSamplingTuning
-   hopsy.TuningTarget
-   hopsy.AcceptanceRateTarget
-   hopsy.ExpectedSquaredJumpDistanceTarget
-   hopsy.PyTuningTarget
-
-
-
-Birkhoff Polytope
-"""""""""""""""""
-
-.. autosummary::
-   :caption: Birkhoff Polytope
-   :toctree: generated/
-   :template: ../_templates/autosummary/class.rst
-
-   hopsy.BirkhoffPolytope
-
-
-
-
+   hopsy.tune
 
