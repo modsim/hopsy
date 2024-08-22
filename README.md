@@ -156,8 +156,28 @@ docs-sources$ git add ../ docs && git commit -m "updated docs" && git push  # an
 - Github Mirror: https://github.com/modsim/hopsy
 - TestPyPI: https://test.pypi.org/project/hopsy/
 - HOPS (C++ backend): https://gitlab-public.fz-juelich.de/IBG-1/ModSim/hops
+- Publication: https://academic.oup.com/bioinformatics/article/40/7/btae430/7702329
 
+## Citing
+
+If you like `hopsy` and used it in your scientific work, please cite our [paper](https://academic.oup.com/bioinformatics/article/40/7/btae430/7702329)
+```
+@article{10.1093/bioinformatics/btae430,
+    author = {Paul, Richard D and Jadebeck, Johann F and Stratmann, Anton and Wiechert, Wolfgang and Nöh, Katharina},
+    title = "{hopsy — a methods marketplace for convex polytope sampling in Python}",
+    journal = {Bioinformatics},
+    volume = {40},
+    number = {7},
+    pages = {btae430},
+    year = {2024},
+    month = {07},
+    issn = {1367-4811},
+    doi = {10.1093/bioinformatics/btae430},
+    url = {https://doi.org/10.1093/bioinformatics/btae430},
+}
+```
 
 ## License
 
 hopsy is licensed under the [MIT license](LICENSE).
+

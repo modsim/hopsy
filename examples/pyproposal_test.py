@@ -6,6 +6,10 @@ import numpy as np
 
 import hopsy
 
+"""
+IMPORTANT: this code is mostly deprecated!
+"""
+
 
 class PyProposalWithFullBoilerplate:
     def __init__(
@@ -126,12 +130,12 @@ if __name__ == "__main__":
     hopsy.sample(mc, hopsy.RandomNumberGenerator(42), n_samples=10)
 
     # Wrapping proposal in python in order to fill in boilerplate code
-    proposal = hopsy.PyProposal(PyProposalMinimalBoilerplate(A, b, x0, cov))
-    assert proposal.name == "PyProposalMinimalBoilerplate"
+    proposal = PyProposalMinimalBoilerplate(A, b, x0, cov)
+    # assert proposal.name == "PyProposalMinimalBoilerplate"
     mc.proposal = proposal
     for i in range(4):
         mcs[i].proposal = mc.proposal
-    assert mc.proposal.name == "PyProposalMinimalBoilerplate"
+    # assert mc.proposal.name == "PyProposalMinimalBoilerplate"
 
     _, samples = hopsy.sample(mc, hopsy.RandomNumberGenerator(42), n_samples=10)
     _, samples = hopsy.sample(
@@ -148,7 +152,7 @@ if __name__ == "__main__":
     for i in range(4):
         mcs[i].proposal = mc.proposal
     # mc.proposal.name is default generated in C++ backend and is just the class name
-    assert mc.proposal.name == "PyProposalMinimalBoilerplate"
+    # assert mc.proposal.name == "PyProposalMinimalBoilerplate"
 
     # # tests sequential sampling
     _, samples = hopsy.sample(

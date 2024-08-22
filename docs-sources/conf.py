@@ -61,7 +61,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "hopsy"
-copyright = "2021-2023, Forschungszentrum Jülich GmbH, authors: Richard D. Paul, Johann F. Jadebeck, Anton Stratmann, Katharina Nöh"
+copyright = "2021-2024, Forschungszentrum Jülich GmbH, authors: Richard D. Paul, Johann F. Jadebeck, Anton Stratmann, Katharina Nöh"
 author = "Richard D. Paul, Johann F. Jadebeck, Anton Stratmann, Katharina Nöh"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -153,6 +153,7 @@ html_favicon = "_static/hopsy.ico"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+html_css_files = ["style.css"]
 
 html_logo = "_static/hopsy.png"
 

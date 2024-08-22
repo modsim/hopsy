@@ -142,6 +142,23 @@ class ProposalTests(unittest.TestCase):
                 proposal = ProposalType(problem, warm_up=int(1.0e3))
                 self.assertEqual(proposal.warm_up, 1.0e3)
 
+    def test_minimalistic_custom_proposal(self):
+        class CubeProposal:
+            uniform = Uniform(-1, 1)
+
+            def propose(self, rng):
+                return [
+                    self.state[0] + self.uniform(rng),
+                    self.state[1] + self.uniform(rng),
+                ]
+
+        problem = Problem(A=[[1, 1], [-1, 0], [0, -1]], b=[5, 0, 0])
+
+        chain = MarkovChain(problem, proposal=CubeProposal, starting_point=[0.5, 0.5])
+        rng = RandomNumberGenerator(seed=42)
+
+        accrate, samples = sample(chain, rng, n_samples=1000, thinning=10)
+
     def test_default_starting_point_for_proposal(self):
         problem_no_start = Problem([[1, 1], [-1, 0], [0, -1]], [1, 0, 0], Gaussian())
         for ProposalType in ProposalTypes:
