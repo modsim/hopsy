@@ -180,4 +180,3 @@ If you like `hopsy` and used it in your scientific work, please cite our [paper]
 ## License
 
 hopsy is licensed under the [MIT license](LICENSE).
-

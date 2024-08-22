@@ -1,7 +1,8 @@
 # Changelog
 
-## Latest
-- [#159](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/159): Fix fork warning
+## v1.5.2
+- [#115](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/115): Improve initialization of custom PyProposals in MarkovChain
+- [#114](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/114): Disable inheriting from PyProposal and PyModel
 
 ## v1.5.1
 - [#138](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/138): Ignore fixed dimensions when computing ESS & rhat
