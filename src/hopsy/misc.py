@@ -1028,7 +1028,7 @@ def _sample_parallel_chain(
     return (
         meta,
         _s.numpy.array(states),
-        markov_chain.proposal.state,
+        markov_chain.proposal,
         rng.state,
         markov_chain.model,
     )
@@ -1278,10 +1278,16 @@ def sample(
         )
         for i, chain_result in enumerate(result_states):
             result.append((chain_result[0], chain_result[1]))
-            markov_chains[i].proposal.state = chain_result[2]
+            markov_chains[i].proposal = chain_result[2]
             rngs[i].state = chain_result[3]
-            # updates model in case the model was tracking some statistics
-            markov_chains[i].model = chain_result[4]
+            # updates model/markov_chain in case the model was tracking some statistics
+            try:
+                markov_chains[i].model = chain_result[4]
+            except RuntimeError:
+                # updating was not possible but it is also not necessary.
+                # this is because model is part of the proposal and was updated by chain_result[2]
+                pass
+
     else:
         for chain_idx in range(len(markov_chains)):
             _accrates, _states = _sequential_sampling(
