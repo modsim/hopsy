@@ -51,6 +51,7 @@ class CMakeBuild(build_ext):
         cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
 
         with_mpi = os.environ.get("HOPS_MPI", "OFF")
+        print("MPI support is", with_mpi)
 
         # Set Python_EXECUTABLE instead if you use PYBIND11_FINDPYTHON
         # EXAMPLE_VERSION_INFO shows you how to pass a value into the C++ code
