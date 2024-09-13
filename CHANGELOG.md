@@ -1,5 +1,8 @@
 # Changelog
 
+## Latest
+- [#161](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/161): return markov chain after parallel sampling
+
 ## v1.5.2
 - [#115](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/115): Improve initialization of custom PyProposals in MarkovChain
 - [#114](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/114): Disable inheriting from PyProposal and PyModel

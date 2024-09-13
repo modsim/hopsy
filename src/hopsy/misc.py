@@ -174,6 +174,14 @@ class PyParallelTemperingChain:
     def problem(self):
         return self.markov_chain.problem
 
+    @property
+    def model(self):
+        return self.markov_chain.model
+
+    @model.setter
+    def model(self, model):
+        self.markov_chain.model = model
+
     def draw(self, rng: _c.RandomNumberGenerator, thinning: int = 1):
         """
         :param rng:
@@ -1017,7 +1025,13 @@ def _sample_parallel_chain(
     if queue is not None:
         queue.put((chain_idx, None, None))
 
-    return meta, _s.numpy.array(states), markov_chain.proposal.state, rng.state
+    return (
+        meta,
+        _s.numpy.array(states),
+        markov_chain.proposal.state,
+        rng.state,
+        markov_chain.model,
+    )
 
 
 def _process_record_meta(
@@ -1266,6 +1280,8 @@ def sample(
             result.append((chain_result[0], chain_result[1]))
             markov_chains[i].proposal.state = chain_result[2]
             rngs[i].state = chain_result[3]
+            # updates model in case the model was tracking some statistics
+            markov_chains[i].model = chain_result[4]
     else:
         for chain_idx in range(len(markov_chains)):
             _accrates, _states = _sequential_sampling(
