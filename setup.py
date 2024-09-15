@@ -50,6 +50,9 @@ class CMakeBuild(build_ext):
         # Can be set with Conda-Build, for example.
         cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
 
+        with_mpi = os.environ.get("HOPS_MPI", "OFF")
+        print("MPI support is", with_mpi)
+
         # Set Python_EXECUTABLE instead if you use PYBIND11_FINDPYTHON
         # EXAMPLE_VERSION_INFO shows you how to pass a value into the C++ code
         # from Python.
@@ -59,6 +62,7 @@ class CMakeBuild(build_ext):
             "-DHOPSY_VERSION_INFO={}".format(self.distribution.get_version()),
             "-DHOPSY_BUILD_INFO={}".format(commit),
             "-DCMAKE_BUILD_TYPE={}".format(cfg),  # not used on MSVC, but no harm
+            "-DHOPS_MPI={}".format(with_mpi),
         ]
         build_args = []
 

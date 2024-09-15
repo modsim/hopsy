@@ -174,25 +174,29 @@ class PyParallelTemperingChain:
     def problem(self):
         return self.markov_chain.problem
 
+    @property
+    def model(self):
+        return self.markov_chain.model
+
+    @model.setter
+    def model(self, model):
+        self.markov_chain.model = model
+
     def draw(self, rng: _c.RandomNumberGenerator, thinning: int = 1):
         """
         :param rng:
         :param thinning:
         :return: acceptance rate, state
         """
-        acceptance_rate = 0.0
-
-        for i in range(thinning):
-            if (i + self.draw_offset) % self.draws_per_exchange_attempt == 0:
-                acceptance_rate += self._parallel_tempering_exchange()[0]
-                self.exchange_tracker += 1
-            acceptance_rate, state = self.markov_chain.draw(rng=rng, thinning=1)
-            acceptance_rate += acceptance_rate
-            self.draw_tracker += 1
-        self.draw_offset = (
-            self.draw_offset + thinning
-        ) % self.draws_per_exchange_attempt
-        return acceptance_rate / thinning, state
+        # acceptance_rate = 0.0
+        while self.draw_offset > self.draws_per_exchange_attempt:
+            self.draw_offset -= self.draws_per_exchange_attempt
+            self._parallel_tempering_exchange()
+            self.exchange_tracker += 1
+        alpha, state = self.markov_chain.draw(rng=rng, thinning=thinning)
+        acceptance_rate = alpha
+        self.draw_offset += thinning
+        return acceptance_rate, state
 
     def _parallel_tempering_exchange(self):
         accepted = False
@@ -1017,7 +1021,13 @@ def _sample_parallel_chain(
     if queue is not None:
         queue.put((chain_idx, None, None))
 
-    return meta, _s.numpy.array(states), markov_chain.proposal.state, rng.state
+    return (
+        meta,
+        _s.numpy.array(states),
+        markov_chain.proposal,
+        rng.state,
+        markov_chain.model,
+    )
 
 
 def _process_record_meta(
@@ -1264,8 +1274,16 @@ def sample(
         )
         for i, chain_result in enumerate(result_states):
             result.append((chain_result[0], chain_result[1]))
-            markov_chains[i].proposal.state = chain_result[2]
+            markov_chains[i].proposal = chain_result[2]
             rngs[i].state = chain_result[3]
+            # updates model/markov_chain in case the model was tracking some statistics
+            try:
+                markov_chains[i].model = chain_result[4]
+            except RuntimeError:
+                # updating was not possible but it is also not necessary.
+                # this is because model is part of the proposal and was updated by chain_result[2]
+                pass
+
     else:
         for chain_idx in range(len(markov_chains)):
             _accrates, _states = _sequential_sampling(
