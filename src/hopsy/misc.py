@@ -188,19 +188,15 @@ class PyParallelTemperingChain:
         :param thinning:
         :return: acceptance rate, state
         """
-        acceptance_rate = 0.0
-
-        for i in range(thinning):
-            if (i + self.draw_offset) % self.draws_per_exchange_attempt == 0:
-                acceptance_rate += self._parallel_tempering_exchange()[0]
-                self.exchange_tracker += 1
-            acceptance_rate, state = self.markov_chain.draw(rng=rng, thinning=1)
-            acceptance_rate += acceptance_rate
-            self.draw_tracker += 1
-        self.draw_offset = (
-            self.draw_offset + thinning
-        ) % self.draws_per_exchange_attempt
-        return acceptance_rate / thinning, state
+        # acceptance_rate = 0.0
+        while self.draw_offset > self.draws_per_exchange_attempt:
+            self.draw_offset -= self.draws_per_exchange_attempt
+            self._parallel_tempering_exchange()
+            self.exchange_tracker += 1
+        alpha, state = self.markov_chain.draw(rng=rng, thinning=thinning)
+        acceptance_rate = alpha
+        self.draw_offset += thinning
+        return acceptance_rate, state
 
     def _parallel_tempering_exchange(self):
         accepted = False
