@@ -290,7 +290,6 @@ class MarkovChainTests(unittest.TestCase):
                 expected_std_error = np.std(temp_samples) / np.sqrt(
                     np.min(ess(temp_samples))
                 )
-                print(t, expected_std_error, np.mean(temp_samples))
                 assert np.abs(np.mean(temp_samples)) < 4 * expected_std_error
 
     def test_odd_chains_parallel_tempering_markovchains_with_rounding_and_multiprocessing(
