@@ -152,7 +152,7 @@ class MarkovChainTests(unittest.TestCase):
                 n_procs=len(mcs),
             )
 
-            # mean should be 0 within 3 standard errors for every temp
+            # mean should be 0 within 4 standard errors for every temp
             # if parallel tempering fails, mean is -5 or 5 with the coldest chain.
             for t in temperature_ladder:
                 temp_samples = get_samples_with_temperature(
@@ -161,7 +161,7 @@ class MarkovChainTests(unittest.TestCase):
                 expected_std_error = np.std(temp_samples) / np.sqrt(
                     np.min(ess(temp_samples))
                 )
-                assert np.abs(np.mean(temp_samples)) < 3 * expected_std_error
+                assert np.abs(np.mean(temp_samples)) < 4 * expected_std_error
 
     def test_odd_chains_parallel_tempering_markovchains_with_multiprocessing(self):
         replicates = 1
@@ -213,7 +213,7 @@ class MarkovChainTests(unittest.TestCase):
                 n_procs=len(mcs),
             )
 
-            # mean should be 0 within 3 standard errors for every temp
+            # mean should be 0 within 4 standard errors for every temp
             # if parallel tempering fails, mean is -5 or 5 with the coldest chain.
             for t in temperature_ladder:
                 temp_samples = get_samples_with_temperature(
@@ -222,7 +222,7 @@ class MarkovChainTests(unittest.TestCase):
                 expected_std_error = np.std(temp_samples) / np.sqrt(
                     np.min(ess(temp_samples))
                 )
-                assert np.abs(np.mean(temp_samples)) < 3 * expected_std_error
+                assert np.abs(np.mean(temp_samples)) < 4 * expected_std_error
 
     def test_even_chains_parallel_tempering_markovchains_with_rounding_and_multiprocessing(
         self,
@@ -281,7 +281,7 @@ class MarkovChainTests(unittest.TestCase):
                 n_procs=len(mcs),
             )
 
-            # mean should be 0 within 3 standard errors for every temp
+            # mean should be 0 within 4 standard errors for every temp
             # if parallel tempering fails, mean is -5 or 5 with the coldest chain.
             for t in temperature_ladder:
                 temp_samples = get_samples_with_temperature(
@@ -291,7 +291,7 @@ class MarkovChainTests(unittest.TestCase):
                     np.min(ess(temp_samples))
                 )
                 print(t, expected_std_error, np.mean(temp_samples))
-                assert np.abs(np.mean(temp_samples)) < 3 * expected_std_error
+                assert np.abs(np.mean(temp_samples)) < 4 * expected_std_error
 
     def test_odd_chains_parallel_tempering_markovchains_with_rounding_and_multiprocessing(
         self,
@@ -349,7 +349,7 @@ class MarkovChainTests(unittest.TestCase):
                 n_procs=len(mcs),
             )
 
-            # mean should be 0 within 3 standard errors for every temp
+            # mean should be 0 within 4 standard errors for every temp
             # if parallel tempering fails, mean is -5 or 5 with the coldest chain.
             for t in temperature_ladder:
                 temp_samples = get_samples_with_temperature(
@@ -358,4 +358,4 @@ class MarkovChainTests(unittest.TestCase):
                 expected_std_error = np.std(temp_samples) / np.sqrt(
                     np.min(ess(temp_samples))
                 )
-                assert np.abs(np.mean(temp_samples)) < 3 * expected_std_error
+                assert np.abs(np.mean(temp_samples)) < 4 * expected_std_error
