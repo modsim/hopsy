@@ -105,7 +105,7 @@ class MarkovChainTests(unittest.TestCase):
     def test_even_chains_parallel_tempering_markovchains_with_multiprocessing(self):
         replicates = 1
         n_temps = 4
-        n_samples = 5_000
+        n_samples = 25_000
         thinning = 10
         A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
         b = np.array([2, 2, 2, 2])
@@ -139,7 +139,7 @@ class MarkovChainTests(unittest.TestCase):
                 markov_chains=mcs,
                 temperature_ladder=temperature_ladder,
                 sync_rngs=sync_rngs,
-                draws_per_exchange_attempt=200,
+                draws_per_exchange_attempt=20,
             )
 
             rngs = [RandomNumberGenerator(i + 511511) for i, _ in enumerate(mcs)]
@@ -161,12 +161,12 @@ class MarkovChainTests(unittest.TestCase):
                 expected_std_error = np.std(temp_samples) / np.sqrt(
                     np.min(ess(temp_samples))
                 )
-                assert np.abs(np.mean(temp_samples)) < 0.3
+                assert np.abs(np.mean(temp_samples)) < 3 * expected_std_error
 
     def test_odd_chains_parallel_tempering_markovchains_with_multiprocessing(self):
         replicates = 1
         n_temps = 5
-        n_samples = 5_000
+        n_samples = 25_000
         thinning = 10
         A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
         b = np.array([2, 2, 2, 2])
@@ -200,7 +200,7 @@ class MarkovChainTests(unittest.TestCase):
                 markov_chains=mcs,
                 temperature_ladder=temperature_ladder,
                 sync_rngs=sync_rngs,
-                draws_per_exchange_attempt=100,
+                draws_per_exchange_attempt=20,
             )
 
             rngs = [RandomNumberGenerator(i + 511511) for i, _ in enumerate(mcs)]
@@ -222,14 +222,14 @@ class MarkovChainTests(unittest.TestCase):
                 expected_std_error = np.std(temp_samples) / np.sqrt(
                     np.min(ess(temp_samples))
                 )
-                assert np.abs(np.mean(temp_samples)) < 0.3
+                assert np.abs(np.mean(temp_samples)) < 3 * expected_std_error
 
     def test_even_chains_parallel_tempering_markovchains_with_rounding_and_multiprocessing(
         self,
     ):
         replicates = 1
         n_temps = 4
-        n_samples = 5_000
+        n_samples = 25_000
         thinning = 10
         A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
         b = np.array([2, 2, 2, 2])
@@ -268,7 +268,7 @@ class MarkovChainTests(unittest.TestCase):
                 markov_chains=mcs,
                 temperature_ladder=temperature_ladder,
                 sync_rngs=sync_rngs,
-                draws_per_exchange_attempt=200,
+                draws_per_exchange_attempt=20,
             )
 
             rngs = [RandomNumberGenerator(i + 511511) for i, _ in enumerate(mcs)]
@@ -290,14 +290,15 @@ class MarkovChainTests(unittest.TestCase):
                 expected_std_error = np.std(temp_samples) / np.sqrt(
                     np.min(ess(temp_samples))
                 )
-                assert np.abs(np.mean(temp_samples)) < 0.3
+                print(t, expected_std_error, np.mean(temp_samples))
+                assert np.abs(np.mean(temp_samples)) < 3 * expected_std_error
 
     def test_odd_chains_parallel_tempering_markovchains_with_rounding_and_multiprocessing(
         self,
     ):
         replicates = 1
         n_temps = 5
-        n_samples = 5_000
+        n_samples = 25_000
         thinning = 10
         A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
         b = np.array([2, 2, 2, 2])
@@ -335,7 +336,7 @@ class MarkovChainTests(unittest.TestCase):
                 markov_chains=mcs,
                 temperature_ladder=temperature_ladder,
                 sync_rngs=sync_rngs,
-                draws_per_exchange_attempt=100,
+                draws_per_exchange_attempt=20,
             )
 
             rngs = [RandomNumberGenerator(i + 511511) for i, _ in enumerate(mcs)]
@@ -357,4 +358,4 @@ class MarkovChainTests(unittest.TestCase):
                 expected_std_error = np.std(temp_samples) / np.sqrt(
                     np.min(ess(temp_samples))
                 )
-                assert np.abs(np.mean(temp_samples)) < 0.3
+                assert np.abs(np.mean(temp_samples)) < 3 * expected_std_error
