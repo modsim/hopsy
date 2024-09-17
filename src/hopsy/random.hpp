@@ -23,27 +23,11 @@
 namespace py = pybind11;
 
 namespace hopsy {
-    namespace {
-	std::array<unsigned char, 16> stateToBytes(hops::RandomNumberGenerator::state_type state) {
-         std::array<unsigned char, 16> bytes;
-	     std::memcpy(bytes.data(), &state, 16);
-	     return bytes;
-	}
 
-	hops::RandomNumberGenerator::state_type bytesToState(const std::array<unsigned char, 16> &bytes) {
-	     hops::RandomNumberGenerator::state_type state = 0;
-         std::memcpy(&state, bytes.data(), 16);
-	     return state;
-	}
-    }
     struct RandomNumberGenerator {
-        unsigned int seed;
-        unsigned int stream;
         hops::RandomNumberGenerator rng;
 
         RandomNumberGenerator(unsigned int seed = 0, unsigned int stream = 0) :
-            seed(seed),
-            stream(stream),
             rng(seed, stream) {
             //
         }
@@ -53,29 +37,27 @@ namespace hopsy {
       }
 
         unsigned int getSeed() const {
-            return seed;
+            return rng.getSeed();
         }
 
         unsigned int getStream() const {
-            return stream;
+            return rng.getStream();
         }
 
-        std::array<unsigned char, 16> getState() const {
-            return stateToBytes(rng - hops::RandomNumberGenerator(seed, stream));
+        std::array<char, 16> getState() const {
+            return rng.getStateInBytes();
         }
 
         void setSeed(unsigned int seed) {
-            RandomNumberGenerator::seed = seed;
-            rng.seed(this->seed);
+            rng.setSeed(seed);
         }
 
         void setStream(unsigned int stream) {
-            RandomNumberGenerator::stream = stream;
-            rng.set_stream(this->stream);
+            rng.setStream(stream);
         }
 
-        void setState(const std::array<unsigned char, 16> &bytes) {
-            rng.advance(bytesToState(bytes));
+        void setState(const std::array<char, 16> &bytes) {
+            rng.setState(bytes);
         }
 
         unsigned int operator()() {
@@ -84,9 +66,11 @@ namespace hopsy {
 
         std::string __repr__() const {
             std::string repr = "hopsy.RandomNumberGenerator(";
-            repr += (seed ? "seed=" + std::to_string(seed) : "");
+            auto seed = rng.getSeed();
+            repr += (seed ? "seed=" + hops::RandomNumberGenerator::stringRepresentation(seed) : "");
+            auto stream = rng.getStream();
             repr += (seed && stream ? ", " : "");
-            repr += (stream ? "stream=" + std::to_string(stream) : "");
+            repr += (stream ? "stream=" + hops::RandomNumberGenerator::stringRepresentation(stream) : "");
             repr += ")";
             return repr;
         }
@@ -113,13 +97,13 @@ namespace hopsy {
                     doc::RandomNumberGenerator::__call__)
             .def("__repr__", &RandomNumberGenerator::__repr__)
             .def(py::pickle([] (const RandomNumberGenerator& self) {
-                        return py::make_tuple(self.seed, self.stream, self.getState());
+                        return py::make_tuple(self.rng.getSeed(), self.getStream(), self.getState());
                     },
                     [] (py::tuple t) {
                         if (t.size() != 3) throw std::runtime_error("Tried to build hopsy.RandomNumberGenerator with invalid state.");
 
                         RandomNumberGenerator rng(t[0].cast<unsigned int>(), t[1].cast<unsigned int>());
-                        rng.setState(t[2].cast<std::array<unsigned char, 16>>());
+                        rng.setState(t[2].cast<std::array<char, 16>>());
                         return rng;
                     }))
         ;
