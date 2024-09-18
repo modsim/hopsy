@@ -23,7 +23,7 @@ class GaussianMixture:
 if __name__ == "__main__":
     replicates = 3
     n_temps = 4
-    n_samples = 20_000
+    n_samples = 40_000
     thinning = 10
 
     A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
@@ -51,7 +51,7 @@ if __name__ == "__main__":
         markov_chains=mcs,
         temperature_ladder=temperature_ladder,
         sync_rngs=sync_rngs,
-        draws_per_exchange_attempt=100,
+        draws_per_exchange_attempt=20,
     )
 
     rngs = [hopsy.RandomNumberGenerator(i + 1234) for i, _ in enumerate(chains)]
