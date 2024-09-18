@@ -223,9 +223,11 @@ class PyParallelTemperingChain:
             other_chain = _s.numpy.ndarray(
                 shape=expected_shape, dtype=_s.numpy.float64, buffer=shm.buf
             )
-            likelihood_difference = self.markov_chain.state_log_density - other_chain[0]
+            negative_likelihood_difference = -(
+                self.markov_chain.state_log_density - other_chain[0]
+            )
             coldness_difference = self.coldness - other_chain[1]
-            log_acceptance_prob = likelihood_difference * coldness_difference
+            log_acceptance_prob = negative_likelihood_difference * coldness_difference
             if (
                 _s.numpy.log(_c.Uniform(a=0, b=1)(self.parallel_tempering_sync_rng))
                 < log_acceptance_prob
