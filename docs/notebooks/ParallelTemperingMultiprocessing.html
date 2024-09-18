@@ -452,7 +452,7 @@ states on to the colder chains, other modes can be explored.</p>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">replicates</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">n_temps</span> <span class="o">=</span> <span class="mi">4</span>
-<span class="n">n_samples</span> <span class="o">=</span> <span class="mi">20_000</span>
+<span class="n">n_samples</span> <span class="o">=</span> <span class="mi">40_000</span>
 <span class="n">thinning</span> <span class="o">=</span> <span class="mi">10</span>
 
 <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
@@ -467,12 +467,19 @@ states on to the colder chains, other modes can be explored.</p>
 
 <span class="n">mcs</span> <span class="o">=</span> <span class="p">[</span>
     <span class="n">hopsy</span><span class="o">.</span><span class="n">MarkovChain</span><span class="p">(</span>
-        <span class="n">proposal</span><span class="o">=</span><span class="n">hopsy</span><span class="o">.</span><span class="n">UniformCoordinateHitAndRunProposal</span><span class="p">,</span>
+        <span class="n">proposal</span><span class="o">=</span><span class="n">hopsy</span><span class="o">.</span><span class="n">GaussianHitAndRunProposal</span><span class="p">,</span>
         <span class="n">problem</span><span class="o">=</span><span class="n">problem</span><span class="p">,</span>
         <span class="n">starting_point</span><span class="o">=</span><span class="mf">0.9</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
     <span class="p">)</span>
     <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">replicates</span><span class="p">)</span>
 <span class="p">]</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="k">for</span> <span class="n">mc</span> <span class="ow">in</span> <span class="n">mcs</span><span class="p">:</span>
+        <span class="n">mc</span><span class="o">.</span><span class="n">proposal</span><span class="o">.</span><span class="n">stepsize</span> <span class="o">=</span> <span class="n">epsilon</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="k">pass</span>
 
 <span class="c1"># Creates one parallel tempering ensemble for each replicate.</span>
 <span class="c1"># Each ensemble will have len(temperature_ladder) chains.</span>
@@ -480,7 +487,7 @@ states on to the colder chains, other modes can be explored.</p>
     <span class="n">markov_chains</span><span class="o">=</span><span class="n">mcs</span><span class="p">,</span>
     <span class="n">temperature_ladder</span><span class="o">=</span><span class="n">temperature_ladder</span><span class="p">,</span>
     <span class="n">sync_rngs</span><span class="o">=</span><span class="n">sync_rngs</span><span class="p">,</span>
-    <span class="n">draws_per_exchange_attempt</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+    <span class="n">draws_per_exchange_attempt</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">rngs</span> <span class="o">=</span> <span class="p">[</span><span class="n">hopsy</span><span class="o">.</span><span class="n">RandomNumberGenerator</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1234</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chains</span><span class="p">)]</span>
@@ -514,7 +521,7 @@ states on to the colder chains, other modes can be explored.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-sampling 20000 samples with thinning 10 and 12 chains took 35.92662278499847 seconds
+sampling 40000 samples with thinning 10 and 12 chains took 100.14002706602332 seconds
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -596,9 +603,9 @@ sampling 20000 samples with thinning 10 and 12 chains took 35.92662278499847 sec
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 convergence check for hot samples (rhat&lt;1.01 &amp; ess &gt; 400 means converged)
-min ess 59333.67460630127 rhat:  1.0000329555037726
+min ess 117989.07529181667 rhat:  1.0000070989126177
 convergence check for cold samples (rhat&lt;1.01 &amp; ess &gt; 400 means converged)
-min ess: 1278.5290891084687 , rhat:  1.001030330662912
+min ess: 25741.320276520106 , rhat:  1.0002144991000597
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -620,6 +627,14 @@ min ess: 1278.5290891084687 , rhat:  1.001030330662912
 </div>
 <div class="output_area docutils container">
 <img alt="../_images/notebooks_ParallelTemperingMultiprocessing_11_3.png" src="../_images/notebooks_ParallelTemperingMultiprocessing_11_3.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
