@@ -1,7 +1,8 @@
 # Changelog
 
 ## Latest
-- [#161](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/161): return markov chain after parallel sampling
+- [#162](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/162): fix sign error in python implementation of parallel tempering
+- [#161](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/161): persist markov chain proposal after parallel sampling
 
 ## v1.5.2
 - [#115](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/115): Improve initialization of custom PyProposals in MarkovChain
