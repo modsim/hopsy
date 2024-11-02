@@ -5,6 +5,8 @@
 
 class _core:
     from .core import Problem
+    from .core import Gaussian
+    from .core import Mixture
 
 
 _c = _core
@@ -18,6 +20,9 @@ class _submodules:
     import scipy
 
 
+from .misc import (
+    add_box_constraints
+)
 
 
 _s = _submodules
@@ -166,7 +171,7 @@ def spike(dim, gamma):
             k += 1
             
     prob = _c.Problem(A, b)
-    prob = _c.add_box_constraints(prob, 0, 1)
+    prob = add_box_constraints(prob, 0, 1)
     return prob.A, prob.b
 
 
@@ -287,7 +292,7 @@ class GaussianMixtureToyProblemGenerator:
             self.mode_locs = [_s.np.random.rand(self.dim) for i in range(self.n_modes)]
 
         if self.A is None and self.b is None:
-            self.A, self.b = _c.generate_unit_hypercube(self.dim)
+            self.A, self.b = generate_unit_hypercube(self.dim)
 
         
 
