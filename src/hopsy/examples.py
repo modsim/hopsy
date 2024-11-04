@@ -24,7 +24,7 @@ _s = _submodules
 
 
 def generate_unit_hypercube(
-    dimension: int, 
+    dimension: int,
 ) -> _s.typing.Tuple[_s.numpy.ndarray, _s.numpy.ndarray]:
     r"""
     Generate matrix A and vector b of the unit N-dimensional hypercube.
