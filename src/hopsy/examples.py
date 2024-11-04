@@ -24,7 +24,7 @@ _s = _submodules
 
 
 def generate_unit_hypercube(
-    dimension: int,
+    dimension: int, 
 ) -> _s.typing.Tuple[_s.numpy.ndarray, _s.numpy.ndarray]:
     r"""
     Generate matrix A and vector b of the unit N-dimensional hypercube.
@@ -138,14 +138,54 @@ class BirkhoffPolytope:
 
 
 def to_angle(gamma):
+    r"""
+    turn radian to degree
+
+    Parameters
+    ----------
+    gamma : float
+
+
+    Returns
+    -------
+    float
+        angle in degree
+    """
     return gamma * 90
 
 
 def to_rad(gamma):
+    r"""
+    generate radians from a given gamma
+
+    Parameters
+    ----------
+    gamma : float
+
+
+    Returns
+    -------
+    float
+        angle in radian
+    """
     return (0.25 + 0.25 * gamma) * _s.np.pi
 
 
 def spike(dim, gamma):
+    r"""
+    generate a spike polytope with given complexity
+
+    Parameters
+    ----------
+    dim : int
+    gamma : float
+
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray]
+        A,b of polytope
+    """
     angle = to_rad(gamma)
     x, y = _s.np.cos(angle), _s.np.sin(angle)
     A = _s.np.zeros((int(dim * (dim - 1)), dim))
