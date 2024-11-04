@@ -4,9 +4,7 @@
 
 
 class _core:
-    from .core import Problem
-    from .core import Gaussian
-    from .core import Mixture
+    from .core import Gaussian, Mixture, Problem
 
 
 _c = _core
@@ -20,10 +18,7 @@ class _submodules:
     import scipy
 
 
-from .misc import (
-    add_box_constraints
-)
-
+from .misc import add_box_constraints
 
 _s = _submodules
 
@@ -142,41 +137,33 @@ class BirkhoffPolytope:
         return self.kernel_basis @ samples.T + self.particular_sol.reshape((-1, 1))
 
 
-
-
-
 def to_angle(gamma):
     return gamma * 90
 
 
 def to_rad(gamma):
-    return (0.25 + .25 * gamma) * _s.np.pi
-
+    return (0.25 + 0.25 * gamma) * _s.np.pi
 
 
 def spike(dim, gamma):
     angle = to_rad(gamma)
     x, y = _s.np.cos(angle), _s.np.sin(angle)
-    A = _s.np.zeros((int(dim*(dim-1)), dim))
-    b = _s.np.zeros(int(dim*(dim-1)))
-    
+    A = _s.np.zeros((int(dim * (dim - 1)), dim))
+    b = _s.np.zeros(int(dim * (dim - 1)))
+
     l = _s.np.sqrt(x**2 + y**2)
-    
+
     k = 0
     for i in range(dim):
         for j in range(1, dim):
-            A[k,i] = x / l
-            A[k,(i+j) % dim] = -y / l
-            
+            A[k, i] = x / l
+            A[k, (i + j) % dim] = -y / l
+
             k += 1
-            
+
     prob = _c.Problem(A, b)
     prob = add_box_constraints(prob, 0, 1)
     return prob.A, prob.b
-
-
-
-
 
 
 class GaussianMixtureToyProblemGenerator:
@@ -224,11 +211,17 @@ class GaussianMixtureToyProblemGenerator:
     """
 
     def __init__(
-        self, n_modes=None, 
-        mode_locs=None, scales=None, 
-        polytope_type=None, angle=None,
-        A=None, b=None, dim=None, 
-        n_nonident=0, seed=None
+        self,
+        n_modes=None,
+        mode_locs=None,
+        scales=None,
+        polytope_type=None,
+        angle=None,
+        A=None,
+        b=None,
+        dim=None,
+        n_nonident=0,
+        seed=None,
     ):
         self.n_modes = n_modes
         self.mode_locs = mode_locs if mode_locs is not None else []
@@ -244,10 +237,9 @@ class GaussianMixtureToyProblemGenerator:
 
         if self.n_modes is None and len(self.scales) == 0:
             raise ValueError("Either n_modes or scales must be provided")
-        
+
         if self.n_modes is not None and len(self.scales) > 0:
             raise ValueError("Only one of n_modes or scales can be provided")
-        
 
         if self.dim is None:
             if self.A is None:
@@ -268,7 +260,7 @@ class GaussianMixtureToyProblemGenerator:
 
         if self.A is not None and self.polytope_type is not None:
             raise ValueError("A and polytope_type must not be provided together")
-        
+
         self.polytope_type = polytope_type
 
         if self.polytope_type is not None:
@@ -276,9 +268,8 @@ class GaussianMixtureToyProblemGenerator:
                 if angle is None:
                     raise ValueError("angle must be provided for spike polytope")
                 self.A, self.b = spike(self.dim, angle)
-            else :
+            else:
                 raise ValueError("Unknown polytope type")
-            
 
         if self.dim is None:
             self.dim = self.A.shape[1]
@@ -294,32 +285,27 @@ class GaussianMixtureToyProblemGenerator:
         if self.A is None and self.b is None:
             self.A, self.b = generate_unit_hypercube(self.dim)
 
-        
-
-
     """
     Genrate a random covariance matrix with n_nonident non-identifiable directions
     """
+
     def generate_covariance_mat(
-            self,
-            scales_range : _s.typing.Tuple[float, float] = (1, 1)
+        self, scales_range: _s.typing.Tuple[float, float] = (1, 1)
     ) -> _s.np.ndarray:
-        
+
         a = _s.np.random.rand(self.dim, self.dim)
-        q,_ = _s.np.linalg.qr(a)
+        q, _ = _s.np.linalg.qr(a)
         # q is othonormal
         idx_nonident = _s.np.random.choice(self.dim, self.n_nonident, replace=False)
         # print(idx_nonident)
         eig = _s.np.identity(self.dim)
-        scales = _s.np.array([scales_range[0]]*self.dim)
+        scales = _s.np.array([scales_range[0]] * self.dim)
         scales[idx_nonident] = scales_range[1]
 
         eig = _s.np.diag(scales) @ eig
         cov = q @ eig @ q.T
 
         return cov
-
-        
 
     def generate_problem(self) -> _c.Problem:
 
@@ -330,15 +316,10 @@ class GaussianMixtureToyProblemGenerator:
 
         mixture = _c.Mixture(models)
 
-        return _c.Problem(
-            A=self.A,
-            b=self.b,
-            model=mixture
-        )
-
+        return _c.Problem(A=self.A, b=self.b, model=mixture)
 
     def get_gassian_mixture(self):
         return [
-                _s.scipy.stats.multivariate_normal(mean, covariance)
-                for mean, covariance in zip(self.mode_locs, self.scales)
-            ]
+            _s.scipy.stats.multivariate_normal(mean, covariance)
+            for mean, covariance in zip(self.mode_locs, self.scales)
+        ]
