@@ -249,6 +249,51 @@ def spike(dim, gamma):
     return prob.A, prob.b
 
 
+
+def diamond(dim, gamma):
+    r"""
+    generate a cone polytope with given complexity
+
+    Parameters
+    ----------
+    dim : int
+    gamma : float
+
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray]
+        A,b of polytope
+    """
+    angle = to_rad(gamma)
+    x, y = _s.np.cos(angle), _s.np.sin(angle)
+    A = _s.np.zeros((2*int(dim*(dim-1)), dim))
+    b = _s.np.zeros(2*int(dim*(dim-1)))
+    
+    l = _s.np.sqrt(x**2 + y**2)
+    
+    k = 0
+    for i in range(dim):
+        for j in range(1, dim):
+            A[k,i] = x / l
+            A[k,(i+j) % dim] = -y / l
+            
+            k += 1
+            
+    for i in range(dim):
+        for j in range(1, dim):
+            A[k,i] = -x / l
+            A[k,(i+j) % dim] = y / l
+            b[k] = y-x
+            
+            k += 1
+     
+    prob = _c.Problem(A, b)
+    return prob.A, prob.b
+
+
+
+
 class GaussianMixtureToyProblemGenerator:
     """
     A generator for toy problems using Gaussian Mixture Models.
@@ -355,6 +400,10 @@ class GaussianMixtureToyProblemGenerator:
                 if angle is None:
                     raise ValueError("angle must be provided for spike polytope")
                 self.A, self.b = cone(self.dim, angle)
+            elif self.polytope_type == "diamond":
+                if angle is None:
+                    raise ValueError("angle must be provided for spike polytope")
+                self.A, self.b = diamond(self.dim, angle)
             else:
                 raise ValueError("Unknown polytope type")
 
