@@ -23,6 +23,7 @@ from .misc import add_box_constraints
 _s = _submodules
 
 
+
 def generate_unit_hypercube(
     dimension: int,
 ) -> _s.typing.Tuple[_s.numpy.ndarray, _s.numpy.ndarray]:
@@ -171,6 +172,48 @@ def to_rad(gamma):
     return (0.25 + 0.25 * gamma) * _s.np.pi
 
 
+
+def cone(dim, gamma):
+    r"""
+    generate a cone polytope with given complexity
+
+    Parameters
+    ----------
+    dim : int
+    gamma : float
+
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray]
+        A,b of polytope
+    """
+    angle = to_rad(gamma)
+    x, y = _s.np.cos(angle), _s.np.sin(angle)
+    A = _s.np.zeros(( int( dim*(dim-1))+1, dim))
+    b = _s.np.zeros(int(dim*(dim-1))+1)
+    
+    l = _s.np.sqrt(x**2 + y**2)
+    
+    # ax - by = 0
+    # y = ax/b
+    # 
+    
+    k = 0
+    for i in range(dim):
+        for j in range(1, dim):
+            A[k,i] = x / l
+            A[k,(i+j) % dim] = -y / l
+            
+            k += 1
+            
+    A[k] = _s.np.ones(dim)
+    b[k] = x / y + 1
+            
+    return A, b
+
+
+
 def spike(dim, gamma):
     r"""
     generate a spike polytope with given complexity
@@ -308,6 +351,10 @@ class GaussianMixtureToyProblemGenerator:
                 if angle is None:
                     raise ValueError("angle must be provided for spike polytope")
                 self.A, self.b = spike(self.dim, angle)
+            elif self.polytope_type == "cone":
+                if angle is None:
+                    raise ValueError("angle must be provided for spike polytope")
+                self.A, self.b = cone(self.dim, angle)
             else:
                 raise ValueError("Unknown polytope type")
 
