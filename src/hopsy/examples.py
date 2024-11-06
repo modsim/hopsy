@@ -20,8 +20,8 @@ class _submodules:
 
 from .misc import add_box_constraints, sample
 from .setup import setup
-_s = _submodules
 
+_s = _submodules
 
 
 def generate_unit_hypercube(
@@ -172,7 +172,6 @@ def to_rad(gamma):
     return (0.25 + 0.25 * gamma) * _s.np.pi
 
 
-
 def cone(dim, gamma):
     r"""
     generate a cone polytope with given complexity
@@ -190,28 +189,27 @@ def cone(dim, gamma):
     """
     angle = to_rad(gamma)
     x, y = _s.np.cos(angle), _s.np.sin(angle)
-    A = _s.np.zeros(( int( dim*(dim-1))+1, dim))
-    b = _s.np.zeros(int(dim*(dim-1))+1)
-    
+    A = _s.np.zeros((int(dim * (dim - 1)) + 1, dim))
+    b = _s.np.zeros(int(dim * (dim - 1)) + 1)
+
     l = _s.np.sqrt(x**2 + y**2)
-    
+
     # ax - by = 0
     # y = ax/b
-    # 
-    
+    #
+
     k = 0
     for i in range(dim):
         for j in range(1, dim):
-            A[k,i] = x / l
-            A[k,(i+j) % dim] = -y / l
-            
+            A[k, i] = x / l
+            A[k, (i + j) % dim] = -y / l
+
             k += 1
-            
+
     A[k] = _s.np.ones(dim)
     b[k] = x / y + 1
-            
-    return A, b
 
+    return A, b
 
 
 def spike(dim, gamma):
@@ -249,7 +247,6 @@ def spike(dim, gamma):
     return prob.A, prob.b
 
 
-
 def diamond(dim, gamma):
     r"""
     generate a cone polytope with given complexity
@@ -267,31 +264,29 @@ def diamond(dim, gamma):
     """
     angle = to_rad(gamma)
     x, y = _s.np.cos(angle), _s.np.sin(angle)
-    A = _s.np.zeros((2*int(dim*(dim-1)), dim))
-    b = _s.np.zeros(2*int(dim*(dim-1)))
-    
+    A = _s.np.zeros((2 * int(dim * (dim - 1)), dim))
+    b = _s.np.zeros(2 * int(dim * (dim - 1)))
+
     l = _s.np.sqrt(x**2 + y**2)
-    
+
     k = 0
     for i in range(dim):
         for j in range(1, dim):
-            A[k,i] = x / l
-            A[k,(i+j) % dim] = -y / l
-            
+            A[k, i] = x / l
+            A[k, (i + j) % dim] = -y / l
+
             k += 1
-            
+
     for i in range(dim):
         for j in range(1, dim):
-            A[k,i] = -x / l
-            A[k,(i+j) % dim] = y / l
-            b[k] = y-x
-            
+            A[k, i] = -x / l
+            A[k, (i + j) % dim] = y / l
+            b[k] = y - x
+
             k += 1
-     
+
     prob = _c.Problem(A, b)
     return prob.A, prob.b
-
-
 
 
 class GaussianMixtureToyProblemGenerator:
@@ -417,39 +412,29 @@ class GaussianMixtureToyProblemGenerator:
             self.dim = self.A.shape[1]
 
         if self.cov is not None:
-            self.cov = [
-                self.generate_covariance_mat() for i in range(self.n_modes)
-            ]
+            self.cov = [self.generate_covariance_mat() for i in range(self.n_modes)]
 
         if len(self.mode_locs) == 0:
             # sample modes
             problem = _c.Problem(A=self.A, b=self.b)
             num_samples = 10_000
-            chains, seeds = setup(
-                        problem = problem,
-                        random_seed = self.seed
-            )
+            chains, seeds = setup(problem=problem, random_seed=self.seed)
 
             _, samples = sample(
-                chains[0], 
-                seeds[1],
-                n_samples=num_samples,
-                n_procs=1,
-                thinning=1_000
+                chains[0], seeds[1], n_samples=num_samples, n_procs=1, thinning=1_000
             )
 
-            self.mode_locs = samples[0, :self.n_modes, :]
-            #self.mode_locs = [_s.np.random.rand(self.dim) for i in range(self.n_modes)]
-
+            self.mode_locs = samples[0, : self.n_modes, :]
+            # self.mode_locs = [_s.np.random.rand(self.dim) for i in range(self.n_modes)]
 
     """
     Genrate a random covariance matrix with n_nonident non-identifiable directions
     """
 
     def generate_covariance_mat(
-        self, 
+        self,
         scales_range: _s.typing.Tuple[float, float] = (-3, 1),
-        nonident_scale: float = 1e6
+        nonident_scale: float = 1e6,
     ) -> _s.np.ndarray:
 
         a = _s.np.random.rand(self.dim, self.dim)
@@ -458,11 +443,11 @@ class GaussianMixtureToyProblemGenerator:
         idx_nonident = _s.np.random.choice(self.dim, self.n_nonident, replace=False)
         # print(idx_nonident)
         eig = _s.np.identity(self.dim)
-        
-        log_scles = _s.np.random.uniform(scales_range[0], scales_range[1], self.dim)
-        scales = 10 ** log_scles
 
-        #scales = _s.np.array([10**scales_range[0]] * self.dim)
+        log_scles = _s.np.random.uniform(scales_range[0], scales_range[1], self.dim)
+        scales = 10**log_scles
+
+        # scales = _s.np.array([10**scales_range[0]] * self.dim)
         scales[idx_nonident] = nonident_scale
         self.scales = scales
 
