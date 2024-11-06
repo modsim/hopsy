@@ -18,8 +18,8 @@ class _submodules:
     import scipy
 
 
-from .misc import add_box_constraints
-
+from .misc import add_box_constraints, sample
+from .setup import setup
 _s = _submodules
 
 
@@ -323,8 +323,8 @@ class GaussianMixtureToyProblemGenerator:
         Number of Gaussian modes in the mixture.
     mode_locs : list
         Locations of each Gaussian mode.
-    scales : list
-        Scale values for each Gaussian mode.
+    cov : list(array-like)
+        Covariance matrices values for each Gaussian mode.
     A : array-like
         Transformation matrix.
     b : array-like
@@ -342,7 +342,7 @@ class GaussianMixtureToyProblemGenerator:
         self,
         n_modes=None,
         mode_locs=None,
-        scales=None,
+        cov=None,
         polytope_type=None,
         angle=None,
         A=None,
@@ -353,20 +353,23 @@ class GaussianMixtureToyProblemGenerator:
     ):
         self.n_modes = n_modes
         self.mode_locs = mode_locs if mode_locs is not None else []
-        self.scales = scales if scales is not None else []
+        self.cov = cov if cov is not None else []
         self.A = A
         self.b = b
         self.dim = dim
         self.n_nonident = n_nonident
         self.seed = seed
 
+        if self.seed is None:
+            self.seed = _s.np.random.randint(0, 2_147_483_647)
+
         if self.seed is not None:
             _s.np.random.seed(self.seed)
 
-        if self.n_modes is None and len(self.scales) == 0:
+        if self.n_modes is None and len(self.cov) == 0:
             raise ValueError("Either n_modes or scales must be provided")
 
-        if self.n_modes is not None and len(self.scales) > 0:
+        if self.n_modes is not None and len(self.cov) > 0:
             raise ValueError("Only one of n_modes or scales can be provided")
 
         if self.dim is None:
@@ -407,26 +410,46 @@ class GaussianMixtureToyProblemGenerator:
             else:
                 raise ValueError("Unknown polytope type")
 
+        if self.A is None and self.b is None:
+            self.A, self.b = generate_unit_hypercube(self.dim)
+
         if self.dim is None:
             self.dim = self.A.shape[1]
 
-        if self.scales is not None:
-            self.scales = [
-                self.generate_covariance_mat((1e-2, 1e6)) for i in range(self.n_modes)
+        if self.cov is not None:
+            self.cov = [
+                self.generate_covariance_mat() for i in range(self.n_modes)
             ]
 
         if len(self.mode_locs) == 0:
-            self.mode_locs = [_s.np.random.rand(self.dim) for i in range(self.n_modes)]
+            # sample modes
+            problem = _c.Problem(A=self.A, b=self.b)
+            num_samples = 10_000
+            chains, seeds = setup(
+                        problem = problem,
+                        random_seed = self.seed
+            )
 
-        if self.A is None and self.b is None:
-            self.A, self.b = generate_unit_hypercube(self.dim)
+            _, samples = sample(
+                chains[0], 
+                seeds[1],
+                n_samples=num_samples,
+                n_procs=1,
+                thinning=1_000
+            )
+
+            self.mode_locs = samples[0, :self.n_modes, :]
+            #self.mode_locs = [_s.np.random.rand(self.dim) for i in range(self.n_modes)]
+
 
     """
     Genrate a random covariance matrix with n_nonident non-identifiable directions
     """
 
     def generate_covariance_mat(
-        self, scales_range: _s.typing.Tuple[float, float] = (1, 1)
+        self, 
+        scales_range: _s.typing.Tuple[float, float] = (-3, 1),
+        nonident_scale: float = 1e6
     ) -> _s.np.ndarray:
 
         a = _s.np.random.rand(self.dim, self.dim)
@@ -435,8 +458,13 @@ class GaussianMixtureToyProblemGenerator:
         idx_nonident = _s.np.random.choice(self.dim, self.n_nonident, replace=False)
         # print(idx_nonident)
         eig = _s.np.identity(self.dim)
-        scales = _s.np.array([scales_range[0]] * self.dim)
-        scales[idx_nonident] = scales_range[1]
+        
+        log_scles = _s.np.random.uniform(scales_range[0], scales_range[1], self.dim)
+        scales = 10 ** log_scles
+
+        #scales = _s.np.array([10**scales_range[0]] * self.dim)
+        scales[idx_nonident] = nonident_scale
+        self.scales = scales
 
         eig = _s.np.diag(scales) @ eig
         cov = q @ eig @ q.T
@@ -447,7 +475,7 @@ class GaussianMixtureToyProblemGenerator:
 
         models = [
             _c.Gaussian(mean, covariance)
-            for mean, covariance in zip(self.mode_locs, self.scales)
+            for mean, covariance in zip(self.mode_locs, self.cov)
         ]
 
         mixture = _c.Mixture(models)
