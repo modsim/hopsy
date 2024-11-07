@@ -138,7 +138,7 @@ class BirkhoffPolytope:
         return self.kernel_basis @ samples.T + self.particular_sol.reshape((-1, 1))
 
 
-def to_angle(gamma):
+def _to_angle(gamma):
     r"""
     turn radian to degree
 
@@ -155,7 +155,7 @@ def to_angle(gamma):
     return gamma * 90
 
 
-def to_rad(gamma):
+def _to_rad(gamma):
     r"""
     generate radians from a given gamma
 
@@ -187,7 +187,7 @@ def cone(dim, gamma):
     tuple[np.ndarray, np.ndarray]
         A,b of polytope
     """
-    angle = to_rad(gamma)
+    angle = _to_rad(gamma)
     x, y = _s.np.cos(angle), _s.np.sin(angle)
     A = _s.np.zeros((int(dim * (dim - 1)) + 1, dim))
     b = _s.np.zeros(int(dim * (dim - 1)) + 1)
@@ -227,7 +227,7 @@ def spike(dim, gamma):
     tuple[np.ndarray, np.ndarray]
         A,b of polytope
     """
-    angle = to_rad(gamma)
+    angle = _to_rad(gamma)
     x, y = _s.np.cos(angle), _s.np.sin(angle)
     A = _s.np.zeros((int(dim * (dim - 1)), dim))
     b = _s.np.zeros(int(dim * (dim - 1)))
@@ -262,7 +262,7 @@ def diamond(dim, gamma):
     tuple[np.ndarray, np.ndarray]
         A,b of polytope
     """
-    angle = to_rad(gamma)
+    angle = _to_rad(gamma)
     x, y = _s.np.cos(angle), _s.np.sin(angle)
     A = _s.np.zeros((2 * int(dim * (dim - 1)), dim))
     b = _s.np.zeros(2 * int(dim * (dim - 1)))
@@ -467,8 +467,4 @@ class GaussianMixtureToyProblemGenerator:
 
         return _c.Problem(A=self.A, b=self.b, model=mixture)
 
-    def get_gassian_mixture(self):
-        return [
-            _s.scipy.stats.multivariate_normal(mean, covariance)
-            for mean, covariance in zip(self.mode_locs, self.scales)
-        ]
+
