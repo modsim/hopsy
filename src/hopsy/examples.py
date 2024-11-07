@@ -24,6 +24,43 @@ from .setup import setup
 _s = _submodules
 
 
+
+def _to_angle(gamma):
+    r"""
+    turn radian to degree
+
+    Parameters
+    ----------
+    gamma : float
+
+
+    Returns
+    -------
+    float
+        angle in degree
+    """
+    return gamma * 90
+
+
+def _to_rad(gamma):
+    r"""
+    generate radians from a given gamma
+
+    Parameters
+    ----------
+    gamma : float
+
+
+    Returns
+    -------
+    float
+        angle in radian
+    """
+    return (0.25 + 0.25 * gamma) * _s.np.pi
+
+
+
+
 def generate_unit_hypercube(
     dimension: int,
 ) -> _s.typing.Tuple[_s.numpy.ndarray, _s.numpy.ndarray]:
@@ -138,155 +175,151 @@ class BirkhoffPolytope:
         return self.kernel_basis @ samples.T + self.particular_sol.reshape((-1, 1))
 
 
-def _to_angle(gamma):
+class ConePolytope:
     r"""
-    turn radian to degree
-
-    Parameters
-    ----------
-    gamma : float
-
-
-    Returns
-    -------
-    float
-        angle in degree
+    Conic polytope with specified angle and dimension
     """
-    return gamma * 90
+
+    def __init__(self, dim: int, gamma: float) -> None:
+        r"""
+        Construct Conic polytope class.
+
+        :param dim : int
+            Dimensionality of the problem
+        :param gamma : float
+            Control problem complexity by changing the angle of the cone: 0 <= gamma <= 1
+        """
+        angle = _to_rad(gamma)
+        x, y = _s.np.cos(angle), _s.np.sin(angle)
+        A = _s.np.zeros((int(dim * (dim - 1)) + 1, dim))
+        b = _s.np.zeros(int(dim * (dim - 1)) + 1)
+
+        l = _s.np.sqrt(x**2 + y**2)
+
+        # ax - by = 0
+        # y = ax/b
+        #
+
+        k = 0
+        for i in range(dim):
+            for j in range(1, dim):
+                A[k, i] = x / l
+                A[k, (i + j) % dim] = -y / l
+
+                k += 1
+
+        A[k] = _s.np.ones(dim)
+        b[k] = x / y + 1
+
+        self.angle = angle
+        self.ineq_matrix = A
+        self.ineq_bounds = b
+
+    @property
+    def A(self):
+        return self.ineq_matrix
+
+    @property
+    def b(self):
+        return self.ineq_bounds
 
 
-def _to_rad(gamma):
+class SpikePolytope:
     r"""
-    generate radians from a given gamma
-
-    Parameters
-    ----------
-    gamma : float
-
-
-    Returns
-    -------
-    float
-        angle in radian
+    Spike polytope with specified angle and dimension
     """
-    return (0.25 + 0.25 * gamma) * _s.np.pi
+
+    def __init__(self, dim: int, gamma: float) -> None:
+        r"""
+        Construct Conic polytope class.
+
+        :param dim : int
+            Dimensionality of the problem
+        :param gamma : float
+            Control problem complexity by changing the angle of the cone: 0 <= gamma <= 1
+        """
+        angle = _to_rad(gamma)
+        x, y = _s.np.cos(angle), _s.np.sin(angle)
+        A = _s.np.zeros((int(dim * (dim - 1)), dim))
+        b = _s.np.zeros(int(dim * (dim - 1)))
+
+        l = _s.np.sqrt(x**2 + y**2)
+
+        k = 0
+        for i in range(dim):
+            for j in range(1, dim):
+                A[k, i] = x / l
+                A[k, (i + j) % dim] = -y / l
+
+                k += 1
+
+        prob = _c.Problem(A, b)
+        prob = add_box_constraints(prob, 0, 1)
+
+        self.angle = angle
+        self.ineq_matrix = prob.A
+        self.ineq_bounds = prob.b
+
+    @property
+    def A(self):
+        return self.ineq_matrix
+
+    @property
+    def b(self):
+        return self.ineq_bounds
 
 
-def cone(dim, gamma):
+class DianmondPolytope:
     r"""
-    generate a cone polytope with given complexity
-
-    Parameters
-    ----------
-    dim : int
-    gamma : float
-
-
-    Returns
-    -------
-    tuple[np.ndarray, np.ndarray]
-        A,b of polytope
+    Diamond-shaped polytope with specified angle and dimension
     """
-    angle = _to_rad(gamma)
-    x, y = _s.np.cos(angle), _s.np.sin(angle)
-    A = _s.np.zeros((int(dim * (dim - 1)) + 1, dim))
-    b = _s.np.zeros(int(dim * (dim - 1)) + 1)
 
-    l = _s.np.sqrt(x**2 + y**2)
+    def __init__(self, dim: int, gamma: float) -> None:
+        r"""
+        Construct Conic polytope class.
 
-    # ax - by = 0
-    # y = ax/b
-    #
+        :param dim : int
+            Dimensionality of the problem
+        :param gamma : float
+            Control problem complexity by changing the angle of the cone: 0 <= gamma <= 1
+        """
 
-    k = 0
-    for i in range(dim):
-        for j in range(1, dim):
-            A[k, i] = x / l
-            A[k, (i + j) % dim] = -y / l
+        angle = _to_rad(gamma)
+        x, y = _s.np.cos(angle), _s.np.sin(angle)
+        A = _s.np.zeros((2 * int(dim * (dim - 1)), dim))
+        b = _s.np.zeros(2 * int(dim * (dim - 1)))
 
-            k += 1
+        l = _s.np.sqrt(x**2 + y**2)
 
-    A[k] = _s.np.ones(dim)
-    b[k] = x / y + 1
+        k = 0
+        for i in range(dim):
+            for j in range(1, dim):
+                A[k, i] = x / l
+                A[k, (i + j) % dim] = -y / l
 
-    return A, b
+                k += 1
 
+        for i in range(dim):
+            for j in range(1, dim):
+                A[k, i] = -x / l
+                A[k, (i + j) % dim] = y / l
+                b[k] = y - x
 
-def spike(dim, gamma):
-    r"""
-    generate a spike polytope with given complexity
+                k += 1
 
-    Parameters
-    ----------
-    dim : int
-    gamma : float
+        prob = _c.Problem(A, b)
 
+        self.angle = angle
+        self.ineq_matrix = prob.A
+        self.ineq_bounds = prob.b
 
-    Returns
-    -------
-    tuple[np.ndarray, np.ndarray]
-        A,b of polytope
-    """
-    angle = _to_rad(gamma)
-    x, y = _s.np.cos(angle), _s.np.sin(angle)
-    A = _s.np.zeros((int(dim * (dim - 1)), dim))
-    b = _s.np.zeros(int(dim * (dim - 1)))
+    @property
+    def A(self):
+        return self.ineq_matrix
 
-    l = _s.np.sqrt(x**2 + y**2)
-
-    k = 0
-    for i in range(dim):
-        for j in range(1, dim):
-            A[k, i] = x / l
-            A[k, (i + j) % dim] = -y / l
-
-            k += 1
-
-    prob = _c.Problem(A, b)
-    prob = add_box_constraints(prob, 0, 1)
-    return prob.A, prob.b
-
-
-def diamond(dim, gamma):
-    r"""
-    generate a cone polytope with given complexity
-
-    Parameters
-    ----------
-    dim : int
-    gamma : float
-
-
-    Returns
-    -------
-    tuple[np.ndarray, np.ndarray]
-        A,b of polytope
-    """
-    angle = _to_rad(gamma)
-    x, y = _s.np.cos(angle), _s.np.sin(angle)
-    A = _s.np.zeros((2 * int(dim * (dim - 1)), dim))
-    b = _s.np.zeros(2 * int(dim * (dim - 1)))
-
-    l = _s.np.sqrt(x**2 + y**2)
-
-    k = 0
-    for i in range(dim):
-        for j in range(1, dim):
-            A[k, i] = x / l
-            A[k, (i + j) % dim] = -y / l
-
-            k += 1
-
-    for i in range(dim):
-        for j in range(1, dim):
-            A[k, i] = -x / l
-            A[k, (i + j) % dim] = y / l
-            b[k] = y - x
-
-            k += 1
-
-    prob = _c.Problem(A, b)
-    return prob.A, prob.b
+    @property
+    def b(self):
+        return self.ineq_bounds
 
 
 class GaussianMixtureToyProblemGenerator:
@@ -393,15 +426,18 @@ class GaussianMixtureToyProblemGenerator:
             if self.polytope_type == "spike":
                 if angle is None:
                     raise ValueError("angle must be provided for spike polytope")
-                self.A, self.b = spike(self.dim, angle)
+                polytope = SpikePolytope(self.dim, angle)
+                self.A, self.b = polytope.A, polytope.b
             elif self.polytope_type == "cone":
                 if angle is None:
                     raise ValueError("angle must be provided for spike polytope")
-                self.A, self.b = cone(self.dim, angle)
+                polytope = ConePolytope(self.dim, angle)
+                self.A, self.b = polytope.A, polytope.b
             elif self.polytope_type == "diamond":
                 if angle is None:
                     raise ValueError("angle must be provided for spike polytope")
-                self.A, self.b = diamond(self.dim, angle)
+                polytope = DianmondPolytope(self.dim, angle)
+                self.A, self.b = polytope.A, polytope.b
             else:
                 raise ValueError("Unknown polytope type")
 
@@ -466,5 +502,3 @@ class GaussianMixtureToyProblemGenerator:
         mixture = _c.Mixture(models)
 
         return _c.Problem(A=self.A, b=self.b, model=mixture)
-
-
