@@ -24,7 +24,6 @@ from .setup import setup
 _s = _submodules
 
 
-
 def _to_angle(gamma):
     r"""
     turn radian to degree
@@ -57,8 +56,6 @@ def _to_rad(gamma):
         angle in radian
     """
     return (0.25 + 0.25 * gamma) * _s.np.pi
-
-
 
 
 def generate_unit_hypercube(
