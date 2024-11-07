@@ -269,7 +269,7 @@ class SpikePolytope:
         return self.ineq_bounds
 
 
-class DianmondPolytope:
+class DiamondPolytope:
     r"""
     Diamond-shaped polytope with specified angle and dimension
     """
@@ -436,7 +436,7 @@ class GaussianMixtureToyProblemGenerator:
             elif self.polytope_type == "diamond":
                 if angle is None:
                     raise ValueError("angle must be provided for spike polytope")
-                polytope = DianmondPolytope(self.dim, angle)
+                polytope = DiamondPolytope(self.dim, angle)
                 self.A, self.b = polytope.A, polytope.b
             else:
                 raise ValueError("Unknown polytope type")
