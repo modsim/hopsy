@@ -106,6 +106,52 @@ def generate_unit_simplex(
     return A, b
 
 
+def generate_gaussian_mixture_toy_problem(
+    n_modes=None,
+    mode_locs=None,
+    cov=None,
+    polytope_type=None,
+    angle=None,
+    A=None,
+    b=None,
+    dim=None,
+    n_nonident=0,
+    seed=None,
+):
+    r"""
+        n_modes : int, optional
+        Number of Gaussian modes in the mixture. Default is None.
+    mode_locs : list, optional
+        A list of locations for each Gaussian mode in the mixture. Default is an empty list.
+    scales : list, optional
+        A list of scale values (e.g., standard deviations) for each Gaussian mode in the mixture. Default is an empty list.
+    A : array-like, optional
+        A transformation matrix applied to the Gaussian mixture. Default is None.
+    b : array-like, optional
+        A translation vector applied to the Gaussian mixture. Default is None.
+    dim : int, optional
+        The dimensionality of the Gaussian modes. Default is None.
+    n_nonident : int, optional
+        Number of non-identifiable parameters in the problem. Default is 0.
+    seed : int, optional
+        A seed for random number generation to ensure reproducibility. Default is None.
+    """
+    generator = GaussianMixtureToyProblemGenerator(
+        n_modes=n_modes,
+        mode_locs=mode_locs,
+        cov=cov,
+        polytope_type=polytope_type,
+        angle=angle,
+        A=A,
+        b=b,
+        dim=dim,
+        n_nonident=n_nonident,
+        seed=seed,
+    )
+
+    return generator.generate_problem()
+
+
 class BirkhoffPolytope:
     r"""
     Birkhoff polytope helper that manages transformation of states and constraints

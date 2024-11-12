@@ -29,3 +29,7 @@ class TestGMToyProblemGenerator(unittest.TestCase):
         )
         problem = generator.generate_problem()
         self.assertEqual(generator.dim, 10)
+
+    def test_generate_gaussian_mixture_toy_problem(self):
+        problem = generate_gaussian_mixture_toy_problem(n_modes=3, dim=10, n_nonident=1)
+        self.assertEqual(problem.A.shape[1], 10)
