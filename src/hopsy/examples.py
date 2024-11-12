@@ -106,9 +106,9 @@ def generate_unit_simplex(
     return A, b
 
 
-def generate_gaussian_mixture_toy_problem(
-    n_modes=None,
-    mode_locs=None,
+def generate_gaussian_mixture(
+    n_modes: int =None,
+    mode_locs: _s.typing.List[] = None,
     cov=None,
     polytope_type=None,
     angle=None,
@@ -136,7 +136,7 @@ def generate_gaussian_mixture_toy_problem(
     seed : int, optional
         A seed for random number generation to ensure reproducibility. Default is None.
     """
-    generator = GaussianMixtureToyProblemGenerator(
+    generator = GaussianMixtureGenerator(
         n_modes=n_modes,
         mode_locs=mode_locs,
         cov=cov,
@@ -365,7 +365,7 @@ class DiamondPolytope:
         return self.ineq_bounds
 
 
-class GaussianMixtureToyProblemGenerator:
+class GaussianMixtureGenerator:
     """
     A generator for toy problems using Gaussian Mixture Models.
 
