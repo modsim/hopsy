@@ -59,7 +59,7 @@ def _to_rad(gamma):
 
 
 def generate_unit_hypercube(
-    dimension: int,
+        dimension: int,
 ) -> _s.typing.Tuple[_s.numpy.ndarray, _s.numpy.ndarray]:
     r"""
     Generate matrix A and vector b of the unit N-dimensional hypercube.
@@ -83,7 +83,7 @@ def generate_unit_hypercube(
 
 
 def generate_unit_simplex(
-    dimension: int,
+        dimension: int,
 ) -> _s.typing.Tuple[_s.numpy.ndarray, _s.numpy.ndarray]:
     r"""
     Generate matrix A and vector b of the unit N-dimensional simplex.
@@ -107,16 +107,16 @@ def generate_unit_simplex(
 
 
 def generate_gaussian_mixture(
-    n_modes: int =None,
-    mode_locs: _s.typing.List[] = None,
-    cov=None,
-    polytope_type=None,
-    angle=None,
-    A=None,
-    b=None,
-    dim=None,
-    n_nonident=0,
-    seed=None,
+        n_modes: _s.typing.Optional[int] = None,
+        mode_locs: _s.typing.Optional[_s.typing.List[_s.numpy.ndarray]] = None,
+        covs: _s.typing.Optional[_s.typing.List[_s.numpy.ndarray]] = None,
+        polytope_type: _s.typing.Optional[str] = None,
+        angle: _s.typing.Optional[float] = None,
+        A: _s.typing.Optional[_s.numpy.ndarray] = None,
+        b: _s.typing.Optional[_s.numpy.ndarray] = None,
+        dim: _s.typing.Optional[float] = None,
+        n_nonident: _s.typing.Optional[int] = 0,
+        seed: _s.typing.Optional[int] = None,
 ):
     r"""
     Generate Gaussian mixture distribution on a certain polytope type.
@@ -152,7 +152,7 @@ def generate_gaussian_mixture(
     generator = GaussianMixtureGenerator(
         n_modes=n_modes,
         mode_locs=mode_locs,
-        cov=cov,
+        covs=covs,
         polytope_type=polytope_type,
         angle=angle,
         A=A,
@@ -192,7 +192,7 @@ class BirkhoffPolytope:
             (self.size, self.size_squared)
         ), _s.numpy.ones(self.size)
         for i in range(size):
-            row_sums_mat[i, i * self.size : (i + 1) * self.size] = 1.0
+            row_sums_mat[i, i * self.size: (i + 1) * self.size] = 1.0
         col_sums_mat, col_sums_rhs = _s.numpy.zeros(
             (self.size, self.size_squared)
         ), _s.numpy.ones(self.size)
@@ -250,7 +250,7 @@ class ConePolytope:
         A = _s.np.zeros((int(dim * (dim - 1)) + 1, dim))
         b = _s.np.zeros(int(dim * (dim - 1)) + 1)
 
-        l = _s.np.sqrt(x**2 + y**2)
+        l = _s.np.sqrt(x ** 2 + y ** 2)
 
         # ax - by = 0
         # y = ax/b
@@ -299,7 +299,7 @@ class SpikePolytope:
         A = _s.np.zeros((int(dim * (dim - 1)), dim))
         b = _s.np.zeros(int(dim * (dim - 1)))
 
-        l = _s.np.sqrt(x**2 + y**2)
+        l = _s.np.sqrt(x ** 2 + y ** 2)
 
         k = 0
         for i in range(dim):
@@ -345,7 +345,7 @@ class DiamondPolytope:
         A = _s.np.zeros((2 * int(dim * (dim - 1)), dim))
         b = _s.np.zeros(2 * int(dim * (dim - 1)))
 
-        l = _s.np.sqrt(x**2 + y**2)
+        l = _s.np.sqrt(x ** 2 + y ** 2)
 
         k = 0
         for i in range(dim):
@@ -384,17 +384,17 @@ class GaussianMixtureGenerator:
     """
 
     def __init__(
-        self,
-        n_modes=None,
-        mode_locs=None,
-        cov=None,
-        polytope_type=None,
-        angle=None,
-        A=None,
-        b=None,
-        dim=None,
-        n_nonident=0,
-        seed=None,
+            self,
+            n_modes: _s.typing.Optional[int] = None,
+            mode_locs: _s.typing.Optional[_s.typing.List[_s.numpy.ndarray]] = None,
+            covs: _s.typing.Optional[_s.typing.List[_s.numpy.ndarray]] = None,
+            polytope_type: _s.typing.Optional[str] = None,
+            angle: _s.typing.Optional[float] = None,
+            A: _s.typing.Optional[_s.numpy.ndarray] = None,
+            b: _s.typing.Optional[_s.numpy.ndarray] = None,
+            dim: _s.typing.Optional[float] = None,
+            n_nonident: _s.typing.Optional[int] = 0,
+            seed: _s.typing.Optional[int] = None,
     ):
         """
         Creates Gaussian mixture model. If the number of modes
@@ -424,7 +424,7 @@ class GaussianMixtureGenerator:
     """
         self.n_modes = n_modes
         self.mode_locs = mode_locs if mode_locs is not None else []
-        self.cov = cov if cov is not None else []
+        self.covs = covs if covs is not None else []
         self.A = A
         self.b = b
         self.dim = dim
@@ -437,10 +437,10 @@ class GaussianMixtureGenerator:
         if self.seed is not None:
             _s.np.random.seed(self.seed)
 
-        if self.n_modes is None and len(self.cov) == 0:
+        if self.n_modes is None and len(self.covs) == 0:
             raise ValueError("Either n_modes or scales must be provided")
 
-        if self.n_modes is not None and len(self.cov) > 0:
+        if self.n_modes is not None and len(self.covs) > 0:
             raise ValueError("Only one of n_modes or scales can be provided")
 
         if self.dim is None:
@@ -490,8 +490,8 @@ class GaussianMixtureGenerator:
         if self.dim is None:
             self.dim = self.A.shape[1]
 
-        if self.cov is not None:
-            self.cov = [self.generate_covariance_mat() for i in range(self.n_modes)]
+        if self.covs is not None:
+            self.covs = [self.generate_covariance_mat() for i in range(self.n_modes)]
 
         if len(self.mode_locs) == 0:
             # sample modes
@@ -511,9 +511,9 @@ class GaussianMixtureGenerator:
     """
 
     def generate_covariance_mat(
-        self,
-        scales_range: _s.typing.Tuple[float, float] = (-3, 1),
-        nonident_scale: float = 1e6,
+            self,
+            scales_range: _s.typing.Tuple[float, float] = (-3, 1),
+            nonident_scale: float = 1e6,
     ) -> _s.np.ndarray:
 
         a = _s.np.random.rand(self.dim, self.dim)
@@ -524,7 +524,7 @@ class GaussianMixtureGenerator:
         eig = _s.np.identity(self.dim)
 
         log_scles = _s.np.random.uniform(scales_range[0], scales_range[1], self.dim)
-        scales = 10**log_scles
+        scales = 10 ** log_scles
 
         # scales = _s.np.array([10**scales_range[0]] * self.dim)
         scales[idx_nonident] = nonident_scale
@@ -539,7 +539,7 @@ class GaussianMixtureGenerator:
 
         models = [
             _c.Gaussian(mean, covariance)
-            for mean, covariance in zip(self.mode_locs, self.cov)
+            for mean, covariance in zip(self.mode_locs, self.covs)
         ]
 
         mixture = _c.Mixture(models)
