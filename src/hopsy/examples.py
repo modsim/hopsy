@@ -119,7 +119,13 @@ def generate_gaussian_mixture(
         seed: _s.typing.Optional[int] = None,
 ):
     r"""
-    Generate Gaussian mixture distribution on a certain polytope type.
+    Generate Gaussian mixture distribution on a certain polytope type. The Gaussian mixtures model can be fully
+    specified by setting means and covariances of the individual Gaussians. However, it can also be generated partially
+    or fully by specifying the following characteristics:
+    - Dimension of the problem
+    - Number of mixture components
+    - Number of non-identifiable parameters (very large variance)
+    - Polytope type (spike, cone, diamond) and its angle
 
     Parameters
     ----------
@@ -393,7 +399,7 @@ class GaussianMixtureGenerator:
             seed: _s.typing.Optional[int] = None,
     ):
         """
-        Creates Gaussian mixture model. If the number of modes
+        Creates Gaussian mixture model.
 
         Parameters
         ----------
