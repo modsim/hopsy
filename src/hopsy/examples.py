@@ -119,12 +119,20 @@ def generate_gaussian_mixture(
     seed=None,
 ):
     r"""
-        n_modes : int, optional
+    Generate Gaussian mixture distribution on a certain polytope type.
+
+    Parameters
+    ----------
+    n_modes : int, optional
         Number of Gaussian modes in the mixture. Default is None.
     mode_locs : list, optional
         A list of locations for each Gaussian mode in the mixture. Default is an empty list.
-    scales : list, optional
-        A list of scale values (e.g., standard deviations) for each Gaussian mode in the mixture. Default is an empty list.
+    covs : list, optional
+         A list of covariance matrices for each Gaussian mode in the mixture. Default is an empty list.
+    polytope_type : str, optional
+        Can be either of "spike", "cone" or "diamond" polytope. Default is None (equivalent with unit hypercube).
+    angle : float, optional
+        Parameter that must be supplied if polytope type is not the unit hypercube. Default is None.
     A : array-like, optional
         A transformation matrix applied to the Gaussian mixture. Default is None.
     b : array-like, optional
@@ -135,6 +143,11 @@ def generate_gaussian_mixture(
         Number of non-identifiable parameters in the problem. Default is 0.
     seed : int, optional
         A seed for random number generation to ensure reproducibility. Default is None.
+
+    Returns
+    -------
+    hopsy.Problem
+        Gaussian mixture model on a polytope
     """
     generator = GaussianMixtureGenerator(
         n_modes=n_modes,
@@ -366,47 +379,8 @@ class DiamondPolytope:
 
 
 class GaussianMixtureGenerator:
-    """
-    A generator for toy problems using Gaussian Mixture Models.
-
-    Parameters
-    ----------
-    n_modes : int, optional
-        Number of Gaussian modes in the mixture. Default is None.
-    mode_locs : list, optional
-        A list of locations for each Gaussian mode in the mixture. Default is an empty list.
-    scales : list, optional
-        A list of scale values (e.g., standard deviations) for each Gaussian mode in the mixture. Default is an empty list.
-    A : array-like, optional
-        A transformation matrix applied to the Gaussian mixture. Default is None.
-    b : array-like, optional
-        A translation vector applied to the Gaussian mixture. Default is None.
-    dim : int, optional
-        The dimensionality of the Gaussian modes. Default is None.
-    n_nonident : int, optional
-        Number of non-identifiable parameters in the problem. Default is 0.
-    seed : int, optional
-        A seed for random number generation to ensure reproducibility. Default is None.
-
-    Attributes
-    ----------
-    n_modes : int
-        Number of Gaussian modes in the mixture.
-    mode_locs : list
-        Locations of each Gaussian mode.
-    cov : list(array-like)
-        Covariance matrices values for each Gaussian mode.
-    A : array-like
-        Transformation matrix.
-    b : array-like
-        Translation vector.
-    dim : int
-        Dimensionality of the Gaussian modes.
-    n_nonident : int
-        Number of non-identifiable parameters.
-    seed : int
-        Random seed for reproducibility.
-
+    r"""
+    Generator class for Gaussian Mixtures on different types of polytopes
     """
 
     def __init__(
@@ -422,6 +396,32 @@ class GaussianMixtureGenerator:
         n_nonident=0,
         seed=None,
     ):
+        """
+        Creates Gaussian mixture model. If the number of modes
+
+        Parameters
+        ----------
+        n_modes : int, optional
+            Number of Gaussian modes in the mixture. Default is None.
+        mode_locs : list, optional
+            A list of locations for each Gaussian mode in the mixture. Default is an empty list.
+        covs : list, optional
+            A list of covariance matrices for each Gaussian mode in the mixture. Default is an empty list.
+        polytope_type : str, optional
+            Can be either of "spike", "cone" or "diamond" polytope. Default is None (equivalent with unit hypercube).
+        angle : float, optional
+            Parameter that must be supplied if polytope type is not the unit hypercube. Default is None.
+        A : array-like, optional
+            A transformation matrix applied to the Gaussian mixture. Default is None.
+        b : array-like, optional
+            A translation vector applied to the Gaussian mixture. Default is None.
+        dim : int, optional
+            The dimensionality of the Gaussian modes. Default is None.
+        n_nonident : int, optional
+            Number of non-identifiable parameters in the problem. Default is 0.
+        seed : int, optional
+            A seed for random number generation to ensure reproducibility. Default is None.
+    """
         self.n_modes = n_modes
         self.mode_locs = mode_locs if mode_locs is not None else []
         self.cov = cov if cov is not None else []
