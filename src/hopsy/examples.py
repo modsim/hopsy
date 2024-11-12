@@ -108,9 +108,9 @@ def generate_unit_simplex(
 
 def generate_gaussian_mixture(
         dim: _s.typing.Optional[int] = None,
-        n_modes: _s.typing.Optional[int] = None,
+        n_mix: _s.typing.Optional[int] = None,
         n_nonident: _s.typing.Optional[int] = 0,
-        mode_locs: _s.typing.Optional[_s.typing.List[_s.numpy.ndarray]] = None,
+        means: _s.typing.Optional[_s.typing.List[_s.numpy.ndarray]] = None,
         covs: _s.typing.Optional[_s.typing.List[_s.numpy.ndarray]] = None,
         polytope_type: _s.typing.Optional[str] = None,
         angle: _s.typing.Optional[float] = None,
@@ -131,12 +131,12 @@ def generate_gaussian_mixture(
     ----------
     dim : int, optional
         The dimensionality of the Gaussian modes. Default is None.
-    n_modes : int, optional
+    n_mix : int, optional
         Number of Gaussian modes in the mixture. Default is None.
     n_nonident : int, optional
         Number of non-identifiable parameters in the problem. Default is 0.
-    mode_locs : list, optional
-        A list of locations for each Gaussian mode in the mixture. Default is an empty list.
+    means : list, optional
+        A list of means for each Gaussian mode in the mixture. Default is an empty list.
     covs : list, optional
         A list of covariance matrices for each Gaussian mode in the mixture. Default is an empty list.
     polytope_type : str, optional
@@ -157,9 +157,9 @@ def generate_gaussian_mixture(
     """
     generator = GaussianMixtureGenerator(
         dim=dim,
-        n_modes=n_modes,
+        n_mix=n_mix,
         n_nonident=n_nonident,
-        mode_locs=mode_locs,
+        means=means,
         covs=covs,
         polytope_type=polytope_type,
         angle=angle,
@@ -388,9 +388,9 @@ class GaussianMixtureGenerator:
     def __init__(
             self,
             dim: _s.typing.Optional[int] = None,
-            n_modes: _s.typing.Optional[int] = None,
+            n_mix: _s.typing.Optional[int] = None,
             n_nonident: _s.typing.Optional[int] = 0,
-            mode_locs: _s.typing.Optional[_s.typing.List[_s.numpy.ndarray]] = None,
+            means: _s.typing.Optional[_s.typing.List[_s.numpy.ndarray]] = None,
             covs: _s.typing.Optional[_s.typing.List[_s.numpy.ndarray]] = None,
             polytope_type: _s.typing.Optional[str] = None,
             angle: _s.typing.Optional[float] = None,
@@ -405,11 +405,11 @@ class GaussianMixtureGenerator:
         ----------
         dim : int, optional
             The dimensionality of the Gaussian modes. Default is None.
-        n_modes : int, optional
-            Number of Gaussian modes in the mixture. Default is None.
+        n_mix : int, optional
+            Number of Gaussian in the mixture. Default is None.
         n_nonident : int, optional
             Number of non-identifiable parameters in the problem. Default is 0.
-        mode_locs : list, optional
+        means : list, optional
             A list of locations for each Gaussian mode in the mixture. Default is an empty list.
         covs : list, optional
             A list of covariance matrices for each Gaussian mode in the mixture. Default is an empty list.
@@ -425,9 +425,9 @@ class GaussianMixtureGenerator:
             A seed for random number generation to ensure reproducibility. Default is None.
     """
         self.dim = dim
-        self.n_modes = n_modes
+        self.n_mix = n_mix
         self.n_nonident = n_nonident
-        self.mode_locs = mode_locs if mode_locs is not None else []
+        self.means = means if means is not None else []
         self.covs = covs if covs is not None else []
         self.A = A
         self.b = b
@@ -439,11 +439,11 @@ class GaussianMixtureGenerator:
         if self.seed is not None:
             _s.np.random.seed(self.seed)
 
-        if self.n_modes is None and len(self.covs) == 0:
-            raise ValueError("Either n_modes or scales must be provided")
+        if self.n_mix is None and len(self.covs) == 0:
+            raise ValueError("Either n_mix or covs must be provided")
 
-        if self.n_modes is not None and len(self.covs) > 0:
-            raise ValueError("Only one of n_modes or scales can be provided")
+        if self.n_mix is not None and len(self.covs) > 0:
+            raise ValueError("Only one of n_mix or covs can be provided")
 
         if self.dim is None:
             if self.A is None:
@@ -493,9 +493,9 @@ class GaussianMixtureGenerator:
             self.dim = self.A.shape[1]
 
         if self.covs is not None:
-            self.covs = [self.generate_covariance_mat() for i in range(self.n_modes)]
+            self.covs = [self.generate_covariance_mat() for i in range(self.n_mix)]
 
-        if len(self.mode_locs) == 0:
+        if len(self.means) == 0:
             # sample modes
             problem = _c.Problem(A=self.A, b=self.b)
             num_samples = 10_000
@@ -505,7 +505,7 @@ class GaussianMixtureGenerator:
                 chains[0], seeds[1], n_samples=num_samples, n_procs=1, thinning=1_000
             )
 
-            self.mode_locs = samples[0, : self.n_modes, :]
+            self.means = samples[0, : self.n_mix, :]
             # self.mode_locs = [_s.np.random.rand(self.dim) for i in range(self.n_modes)]
 
     r"""
@@ -545,7 +545,7 @@ class GaussianMixtureGenerator:
 
         models = [
             _c.Gaussian(mean, covariance)
-            for mean, covariance in zip(self.mode_locs, self.covs)
+            for mean, covariance in zip(self.means, self.covs)
         ]
 
         mixture = _c.Mixture(models)
