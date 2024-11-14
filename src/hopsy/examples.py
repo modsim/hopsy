@@ -482,7 +482,7 @@ class GaussianMixtureToyProblemGenerator:
                 polytope = DiamondPolytope(self.dim, angle)
                 self.A, self.b = polytope.A, polytope.b
             else:
-                raise ValueError("Unknown polytope type")
+                raise ValueError(f"Unknown polytope type")
 
         if self.A is None and self.b is None:
             self.A, self.b = generate_unit_hypercube(self.dim)
@@ -491,7 +491,8 @@ class GaussianMixtureToyProblemGenerator:
             self.dim = self.A.shape[1]
 
         if self.cov is not None:
-            self.cov = [self.generate_covariance_mat() for i in range(self.n_modes)]
+            covariances = [self.generate_covariance_mat() for i in range(self.n_modes)]
+            self.cov, self.scales = map(list, zip(*covariances))
 
         if len(self.mode_locs) == 0:
             # sample modes
@@ -506,10 +507,10 @@ class GaussianMixtureToyProblemGenerator:
             self.mode_locs = samples[0, : self.n_modes, :]
             # self.mode_locs = [_s.np.random.rand(self.dim) for i in range(self.n_modes)]
 
+    
     """
     Genrate a random covariance matrix with n_nonident non-identifiable directions
     """
-
     def generate_covariance_mat(
         self,
         scales_range: _s.typing.Tuple[float, float] = (-3, 1),
@@ -519,21 +520,20 @@ class GaussianMixtureToyProblemGenerator:
         a = _s.np.random.rand(self.dim, self.dim)
         q, _ = _s.np.linalg.qr(a)
         # q is othonormal
-        idx_nonident = _s.np.random.choice(self.dim, self.n_nonident, replace=False)
-        # print(idx_nonident)
         eig = _s.np.identity(self.dim)
 
-        log_scles = _s.np.random.uniform(scales_range[0], scales_range[1], self.dim)
-        scales = 10**log_scles
-
-        # scales = _s.np.array([10**scales_range[0]] * self.dim)
-        scales[idx_nonident] = nonident_scale
-        self.scales = scales
+        log_scales = _s.np.random.uniform(scales_range[0], scales_range[1], self.dim)
+        scales = 10**log_scales
+        
+        if self.n_nonident > 0:
+            idx_nonident = _s.np.random.choice(self.dim, self.n_nonident, replace=False)
+            scales[idx_nonident] = nonident_scale
 
         eig = _s.np.diag(scales) @ eig
         cov = q @ eig @ q.T
 
-        return cov
+        return cov,scales
+
 
     def generate_problem(self) -> _c.Problem:
 
