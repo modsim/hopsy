@@ -492,9 +492,9 @@ class GaussianMixtureGenerator:
         if self.dim is None:
             self.dim = self.A.shape[1]
 
-        if self.cov is not None:
-            covariances = [self.generate_covariance_mat() for i in range(self.n_modes)]
-            self.cov, self.scales = map(list, zip(*covariances))
+        if self.covs is not None:
+            covariances = [self.generate_covariance_mat() for i in range(self.n_mix)]
+            self.covs, self.scales = map(list, zip(*covariances))
 
         if len(self.means) == 0:
             # sample modes
@@ -507,8 +507,6 @@ class GaussianMixtureGenerator:
             )
 
             self.means = samples[0, : self.n_mix, :]
-            # self.mode_locs = [_s.np.random.rand(self.dim) for i in range(self.n_modes)]
-
     
     """
     Genrate a random covariance matrix with n_nonident non-identifiable directions
