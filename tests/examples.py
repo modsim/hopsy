@@ -19,7 +19,7 @@ class TestGMToyProblemGenerator(unittest.TestCase):
     def test_gm_toy_problem_generator(self):
         for params in self.test_cases:
             with self.subTest(params=params):
-                generator = GaussianMixtureToyProblemGenerator(**params)
+                generator = GaussianMixtureGenerator(**params)
                 problem = generator.generate_problem()
                 self.assertEqual(problem.A.shape[1], params["dim"])
 
