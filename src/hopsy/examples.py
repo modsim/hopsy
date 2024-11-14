@@ -514,7 +514,7 @@ class GaussianMixtureGenerator:
 
     def generate_covariance_mat(
         self,
-        scales_range: _s.typing.Tuple[float, float] = (-3, 1),
+        scales_range: _s.typing.Tuple[float, float] = (-3, -0.5),
         nonident_scale: float = 1e6,
     ) -> _s.np.ndarray:
 
