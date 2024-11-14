@@ -1,35 +1,31 @@
 import unittest
-
+import numpy as np
 from hopsy.examples import *
 
 
+
+
+
 class TestGMToyProblemGenerator(unittest.TestCase):
-    def test_box(self):
-        generator = GaussianMixtureToyProblemGenerator(n_modes=3, dim=10, n_nonident=1)
-        problem = generator.generate_problem()
-        self.assertEqual(generator.dim, 10)
+    def setUp(self):
+        # Define the parameter sets for each test case
+        self.test_cases = [
+            {"dim": 10, "n_modes": 3, "n_nonident": 1},
+            {"polytope_type": "spike", "dim": 10, "angle": 0.4, "n_modes": 10},
+            {"polytope_type": "cone", "dim": 10, "angle": 0.4, "n_modes": 10},
+            {"polytope_type": "diamond", "dim": 10, "angle": 0.4, "n_modes": 10}
+        ]
 
-    def test_spike(self):
-        generator = GaussianMixtureToyProblemGenerator(
-            polytope_type="spike", dim=10, angle=0.4, n_modes=10
-        )
-        problem = generator.generate_problem()
-        self.assertEqual(generator.dim, 10)
+    def test_gm_toy_problem_generator(self):
+        for params in self.test_cases:
+            with self.subTest(params=params):
+                generator = GaussianMixtureToyProblemGenerator(**params)
+                problem = generator.generate_problem()
+                self.assertEqual(problem.A.shape[1], params["dim"])
 
-    def test_cone(self):
-        generator = GaussianMixtureToyProblemGenerator(
-            polytope_type="cone", dim=10, angle=0.4, n_modes=10
-        )
-        problem = generator.generate_problem()
-        self.assertEqual(generator.dim, 10)
-
-    def test_diamond(self):
-        generator = GaussianMixtureToyProblemGenerator(
-            polytope_type="diamond", dim=10, angle=0.4, n_modes=10
-        )
-        problem = generator.generate_problem()
-        self.assertEqual(generator.dim, 10)
-
-    def test_generate_gaussian_mixture_toy_problem(self):
-        problem = generate_gaussian_mixture_toy_problem(n_modes=3, dim=10, n_nonident=1)
-        self.assertEqual(problem.A.shape[1], 10)
+                for i in range(params["n_modes"]):
+                    eigenvalues, eigenvectors = np.linalg.eig(generator.cov[i])
+                    self.assertTrue(np.all(eigenvalues > 0))
+                    self.assertTrue(np.allclose(sorted(eigenvalues), sorted(generator.scales[i]), atol=1e-6))
+                    n_nonident = params["n_nonident"] if "n_nonident" in params else 0
+                    self.assertEqual(np.sum(eigenvalues >= (1e6 - 1e-6)), n_nonident)
