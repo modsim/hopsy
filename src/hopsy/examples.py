@@ -518,10 +518,10 @@ class GaussianMixtureGenerator:
         nonident_scale: float = 1e6,
     ) -> _s.np.ndarray:
 
-        a = _s.np.random.rand(self.dim, self.dim)
-        q, _ = _s.np.linalg.qr(a)
-        # q is othonormal
-        eig = _s.np.identity(self.dim)
+        # Generate random correlation matrix
+        w = _s.np.random.rand(self.dim, self.dim)
+        s = w @ w.T + _s.np.diag(_s.np.random.randint(0, self.dim, self.dim))
+        r = _s.np.diag(1 / _s.np.sqrt(_s.np.diag(s))) @ s @ _s.np.diag(1 / _s.np.sqrt(_s.np.diag(s)))
 
         log_scales = _s.np.random.uniform(scales_range[0], scales_range[1], self.dim)
         scales = 10**log_scales
@@ -530,8 +530,7 @@ class GaussianMixtureGenerator:
             idx_nonident = _s.np.random.choice(self.dim, self.n_nonident, replace=False)
             scales[idx_nonident] = nonident_scale
 
-        eig = _s.np.diag(scales) @ eig
-        cov = q @ eig @ q.T
+        cov = _s.np.diag(scales) @ r @ _s.np.diag(scales)
 
         return cov, scales
 
