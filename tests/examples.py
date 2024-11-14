@@ -1,9 +1,8 @@
 import unittest
+
 import numpy as np
+
 from hopsy.examples import *
-
-
-
 
 
 class TestGMToyProblemGenerator(unittest.TestCase):
@@ -13,7 +12,7 @@ class TestGMToyProblemGenerator(unittest.TestCase):
             {"dim": 10, "n_mix": 3, "n_nonident": 1},
             {"polytope_type": "spike", "dim": 10, "angle": 0.4, "n_mix": 10},
             {"polytope_type": "cone", "dim": 10, "angle": 0.4, "n_mix": 10},
-            {"polytope_type": "diamond", "dim": 10, "angle": 0.4, "n_mix": 10}
+            {"polytope_type": "diamond", "dim": 10, "angle": 0.4, "n_mix": 10},
         ]
 
     def test_gm_toy_problem_generator(self):
@@ -24,12 +23,16 @@ class TestGMToyProblemGenerator(unittest.TestCase):
                 self.assertEqual(problem.A.shape[1], params["dim"])
 
                 for i in range(params["n_mix"]):
-                    
+
                     eigenvalues, eigenvectors = np.linalg.eig(generator.covs[i])
 
                     self.assertTrue(np.all(eigenvalues > 0))
-                    self.assertTrue(np.allclose(sorted(eigenvalues), sorted(generator.scales[i]), atol=1e-6))
-                    
+                    self.assertTrue(
+                        np.allclose(
+                            sorted(eigenvalues), sorted(generator.scales[i]), atol=1e-6
+                        )
+                    )
+
                     n_nonident = params["n_nonident"] if "n_nonident" in params else 0
-                    
+
                     self.assertEqual(np.sum(eigenvalues >= (1e6 - 1e-6)), n_nonident)

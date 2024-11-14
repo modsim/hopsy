@@ -59,7 +59,7 @@ def _to_rad(gamma):
 
 
 def generate_unit_hypercube(
-        dimension: int,
+    dimension: int,
 ) -> _s.typing.Tuple[_s.numpy.ndarray, _s.numpy.ndarray]:
     r"""
     Generate matrix A and vector b of the unit N-dimensional hypercube.
@@ -83,7 +83,7 @@ def generate_unit_hypercube(
 
 
 def generate_unit_simplex(
-        dimension: int,
+    dimension: int,
 ) -> _s.typing.Tuple[_s.numpy.ndarray, _s.numpy.ndarray]:
     r"""
     Generate matrix A and vector b of the unit N-dimensional simplex.
@@ -107,16 +107,16 @@ def generate_unit_simplex(
 
 
 def generate_gaussian_mixture(
-        dim: _s.typing.Optional[int] = None,
-        n_mix: _s.typing.Optional[int] = None,
-        n_nonident: _s.typing.Optional[int] = 0,
-        means: _s.typing.Optional[_s.typing.List[_s.numpy.ndarray]] = None,
-        covs: _s.typing.Optional[_s.typing.List[_s.numpy.ndarray]] = None,
-        polytope_type: _s.typing.Optional[str] = None,
-        angle: _s.typing.Optional[float] = None,
-        A: _s.typing.Optional[_s.numpy.ndarray] = None,
-        b: _s.typing.Optional[_s.numpy.ndarray] = None,
-        seed: _s.typing.Optional[int] = None,
+    dim: _s.typing.Optional[int] = None,
+    n_mix: _s.typing.Optional[int] = None,
+    n_nonident: _s.typing.Optional[int] = 0,
+    means: _s.typing.Optional[_s.typing.List[_s.numpy.ndarray]] = None,
+    covs: _s.typing.Optional[_s.typing.List[_s.numpy.ndarray]] = None,
+    polytope_type: _s.typing.Optional[str] = None,
+    angle: _s.typing.Optional[float] = None,
+    A: _s.typing.Optional[_s.numpy.ndarray] = None,
+    b: _s.typing.Optional[_s.numpy.ndarray] = None,
+    seed: _s.typing.Optional[int] = None,
 ):
     r"""
     Generate Gaussian mixture distribution on a certain polytope type. The Gaussian mixtures model can be fully
@@ -198,7 +198,7 @@ class BirkhoffPolytope:
             (self.size, self.size_squared)
         ), _s.numpy.ones(self.size)
         for i in range(size):
-            row_sums_mat[i, i * self.size: (i + 1) * self.size] = 1.0
+            row_sums_mat[i, i * self.size : (i + 1) * self.size] = 1.0
         col_sums_mat, col_sums_rhs = _s.numpy.zeros(
             (self.size, self.size_squared)
         ), _s.numpy.ones(self.size)
@@ -256,7 +256,7 @@ class ConePolytope:
         A = _s.np.zeros((int(dim * (dim - 1)) + 1, dim))
         b = _s.np.zeros(int(dim * (dim - 1)) + 1)
 
-        l = _s.np.sqrt(x ** 2 + y ** 2)
+        l = _s.np.sqrt(x**2 + y**2)
 
         # ax - by = 0
         # y = ax/b
@@ -305,7 +305,7 @@ class SpikePolytope:
         A = _s.np.zeros((int(dim * (dim - 1)), dim))
         b = _s.np.zeros(int(dim * (dim - 1)))
 
-        l = _s.np.sqrt(x ** 2 + y ** 2)
+        l = _s.np.sqrt(x**2 + y**2)
 
         k = 0
         for i in range(dim):
@@ -351,7 +351,7 @@ class DiamondPolytope:
         A = _s.np.zeros((2 * int(dim * (dim - 1)), dim))
         b = _s.np.zeros(2 * int(dim * (dim - 1)))
 
-        l = _s.np.sqrt(x ** 2 + y ** 2)
+        l = _s.np.sqrt(x**2 + y**2)
 
         k = 0
         for i in range(dim):
@@ -386,17 +386,17 @@ class DiamondPolytope:
 
 class GaussianMixtureGenerator:
     def __init__(
-            self,
-            dim: _s.typing.Optional[int] = None,
-            n_mix: _s.typing.Optional[int] = None,
-            n_nonident: _s.typing.Optional[int] = 0,
-            means: _s.typing.Optional[_s.typing.List[_s.numpy.ndarray]] = None,
-            covs: _s.typing.Optional[_s.typing.List[_s.numpy.ndarray]] = None,
-            polytope_type: _s.typing.Optional[str] = None,
-            angle: _s.typing.Optional[float] = None,
-            A: _s.typing.Optional[_s.numpy.ndarray] = None,
-            b: _s.typing.Optional[_s.numpy.ndarray] = None,
-            seed: _s.typing.Optional[int] = None,
+        self,
+        dim: _s.typing.Optional[int] = None,
+        n_mix: _s.typing.Optional[int] = None,
+        n_nonident: _s.typing.Optional[int] = 0,
+        means: _s.typing.Optional[_s.typing.List[_s.numpy.ndarray]] = None,
+        covs: _s.typing.Optional[_s.typing.List[_s.numpy.ndarray]] = None,
+        polytope_type: _s.typing.Optional[str] = None,
+        angle: _s.typing.Optional[float] = None,
+        A: _s.typing.Optional[_s.numpy.ndarray] = None,
+        b: _s.typing.Optional[_s.numpy.ndarray] = None,
+        seed: _s.typing.Optional[int] = None,
     ):
         """
         Creates Gaussian mixture model.
@@ -423,7 +423,7 @@ class GaussianMixtureGenerator:
             A translation vector applied to the Gaussian mixture. Default is None.
         seed : int, optional
             A seed for random number generation to ensure reproducibility. Default is None.
-    """
+        """
         self.dim = dim
         self.n_mix = n_mix
         self.n_nonident = n_nonident
@@ -507,14 +507,15 @@ class GaussianMixtureGenerator:
             )
 
             self.means = samples[0, : self.n_mix, :]
-    
+
     """
     Genrate a random covariance matrix with n_nonident non-identifiable directions
     """
+
     def generate_covariance_mat(
-            self,
-            scales_range: _s.typing.Tuple[float, float] = (-3, 1),
-            nonident_scale: float = 1e6,
+        self,
+        scales_range: _s.typing.Tuple[float, float] = (-3, 1),
+        nonident_scale: float = 1e6,
     ) -> _s.np.ndarray:
 
         a = _s.np.random.rand(self.dim, self.dim)
@@ -524,7 +525,7 @@ class GaussianMixtureGenerator:
 
         log_scales = _s.np.random.uniform(scales_range[0], scales_range[1], self.dim)
         scales = 10**log_scales
-        
+
         if self.n_nonident > 0:
             idx_nonident = _s.np.random.choice(self.dim, self.n_nonident, replace=False)
             scales[idx_nonident] = nonident_scale
@@ -532,8 +533,7 @@ class GaussianMixtureGenerator:
         eig = _s.np.diag(scales) @ eig
         cov = q @ eig @ q.T
 
-        return cov,scales
-
+        return cov, scales
 
     def generate_problem(self) -> _c.Problem:
 
