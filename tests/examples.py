@@ -19,7 +19,7 @@ class TestGMGenerator(unittest.TestCase):
         for params in self.test_cases:
             with self.subTest(params=params):
                 generator = GaussianMixtureGenerator(**params)
-                problem = generator.generate_problem()
+                problem = generator.get_problem()
                 self.assertEqual(problem.A.shape[1], params["dim"])
 
                 for i in range(params["n_mix"]):
