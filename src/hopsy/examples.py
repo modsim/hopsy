@@ -533,7 +533,11 @@ class GaussianMixtureGenerator:
         # Generate random correlation matrix
         w = _s.np.random.rand(self.dim, self.dim)
         s = w @ w.T + _s.np.diag(_s.np.random.randint(0, self.dim, self.dim))
-        r = _s.np.diag(1 / _s.np.sqrt(_s.np.diag(s))) @ s @ _s.np.diag(1 / _s.np.sqrt(_s.np.diag(s)))
+        r = (
+            _s.np.diag(1 / _s.np.sqrt(_s.np.diag(s)))
+            @ s
+            @ _s.np.diag(1 / _s.np.sqrt(_s.np.diag(s)))
+        )
 
         log_scales = _s.np.random.uniform(scales_range[0], scales_range[1], self.dim)
         scales = 10**log_scales

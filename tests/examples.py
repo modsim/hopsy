@@ -26,10 +26,14 @@ class TestGMGenerator(unittest.TestCase):
                     self.assertTrue(np.all(np.diag(generator.covs[i]) > 0))
                     self.assertTrue(
                         np.allclose(
-                            sorted(np.sqrt(np.diag(generator.covs[i]))), sorted(generator.scales[i]), atol=1e-6
+                            sorted(np.sqrt(np.diag(generator.covs[i]))),
+                            sorted(generator.scales[i]),
+                            atol=1e-6,
                         )
                     )
 
                     n_nonident = params["n_nonident"] if "n_nonident" in params else 0
 
-                    self.assertEqual(np.sum(np.diag(generator.covs[i]) >= (1e6 - 1e-6)), n_nonident)
+                    self.assertEqual(
+                        np.sum(np.diag(generator.covs[i]) >= (1e6 - 1e-6)), n_nonident
+                    )
