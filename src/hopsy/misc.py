@@ -765,7 +765,7 @@ def simplify(problem: _c.Problem):
 _simplify = simplify
 
 
-def round(problem: _c.Problem):
+def round(problem: _c.Problem, simplify=True):
     """
     Rounds the polytope defined by the inequality :math:`Ax \leq b` using
     `PolyRound <https://pypi.org/project/PolyRound/>`_.
@@ -785,7 +785,8 @@ def round(problem: _c.Problem):
 
         polytope = _s.polytope.Polytope(problem.A, problem.b)
 
-        polytope = _s.PolyRoundApi.simplify_polytope(polytope, _c.LP().settings)
+        if simplify:
+            polytope = _s.PolyRoundApi.simplify_polytope(polytope, _c.LP().settings)
 
         existing_transform = problem.transformation
         existing_shift = problem.shift
