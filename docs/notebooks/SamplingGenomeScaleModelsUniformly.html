@@ -16,31 +16,34 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-  
-  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
-
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css?v=e9d09571" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../_static/jquery.js?v=5d32c60e"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="../_static/documentation_options.js?v=cf1b9db2"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
@@ -51,6 +54,7 @@
     <link rel="search" title="Search" href="../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.6.0b0" />
   </head>
   
   
@@ -66,19 +70,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../search.html"
       method="get">
@@ -86,7 +79,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -94,8 +86,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -129,7 +121,7 @@
     
     
     <img src="../_static/hopsy.png" class="logo__image only-light" alt="hopsy 1.6.0b0 documentation - Home"/>
-    <script>document.write(`<img src="../_static/hopsy.png" class="logo__image only-dark" alt="hopsy 1.6.0b0 documentation - Home"/>`);</script>
+    <img src="../_static/hopsy.png" class="logo__image only-dark pst-js-only" alt="hopsy 1.6.0b0 documentation - Home"/>
   
   
 </a></div>
@@ -182,29 +174,21 @@
         <div class="navbar-item navbar-persistent--container">
           
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
       
     </div>
     
@@ -213,15 +197,11 @@ document.write(`
   
     <div class="navbar-persistent--mobile">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
@@ -242,7 +222,8 @@ document.write(`
       
         
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -296,15 +277,11 @@ document.write(`
         
           <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
         
       </div>
     
@@ -312,9 +289,14 @@ document.write(`
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -334,8 +316,6 @@ document.write(`
       
         <div class="header-article-item">
 
-
-
 <nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
@@ -344,7 +324,7 @@ document.write(`
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page">Sampling...</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Sampling Genome-Scale Models</span></li>
   </ul>
 </nav>
 </div>
@@ -364,17 +344,17 @@ document.write(`
   <section id="Sampling-Genome-Scale-Models">
 <h1>Sampling Genome-Scale Models<a class="headerlink" href="#Sampling-Genome-Scale-Models" title="Link to this heading">#</a></h1>
 <p>In this notebook we demonstrate a few tricks to to sampling genome-scale models defined in SBML with maximum efficiency. To keep the compute times minimal in this demo, we demonstrate the required API calls using e_coli_core.</p>
-<p>Note, that we have used code similar to this to sample Recon3D.</p>
+<p>Note, that we have used code similar to this to sample Recon3D. In this example we sample a high number of samples to exagerate the time savings of the expert mode for the small e_coli_core model. For larger models, the time saving becomes much more important.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hopsy</span>
-<span class="kn">from</span> <span class="nn">PolyRound.api</span> <span class="kn">import</span> <span class="n">PolyRoundApi</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">copy</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hopsy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PolyRound.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">PolyRoundApi</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
 </pre></div>
 </div>
 </div>
@@ -409,6 +389,7 @@ Academic license - for non-commercial use only - expires 2025-03-22
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">polytope</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">polytope</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
+<span class="n">problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">add_equality_constraints</span><span class="p">(</span><span class="n">problem</span><span class="o">=</span><span class="n">problem</span><span class="p">,</span> <span class="n">A_eq</span><span class="o">=</span><span class="n">polytope</span><span class="o">.</span><span class="n">S</span><span class="p">,</span> <span class="n">b_eq</span><span class="o">=</span><span class="n">polytope</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>
 <span class="n">problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">add_box_constraints</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">upper_bound</span><span class="o">=</span><span class="mi">10_000</span><span class="p">,</span> <span class="n">lower_bound</span><span class="o">=-</span><span class="mi">10_000</span><span class="p">,</span> <span class="n">simplify</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
 <span class="n">problem</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">problem</span><span class="p">)</span>
@@ -421,29 +402,7 @@ Academic license - for non-commercial use only - expires 2025-03-22
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Computing rounding transformation took 13.144249270000728 seconds
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">polytope</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">polytope</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-(190, 95)
-(190,)
-(190, 95)
-(190,)
+Computing rounding transformation took 0.5767995659989538 seconds
 </pre></div></div>
 </div>
 </section>
@@ -451,12 +410,12 @@ Computing rounding transformation took 13.144249270000728 seconds
 <h1>Setup markov chains and random number generators<a class="headerlink" href="#Setup-markov-chains-and-random-number-generators" title="Link to this heading">#</a></h1>
 <p>We require to manually specify a seed, because it improves awareness of the seed. Specifically, the seed is required for scientific reproducibility.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">seed</span> <span class="o">=</span> <span class="mi">511</span>
 <span class="n">chains</span><span class="p">,</span> <span class="n">rngs</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">n_chains</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-<span class="n">n_samples</span> <span class="o">=</span> <span class="mi">10_000</span>
+<span class="n">n_samples</span> <span class="o">=</span> <span class="mi">1_000_000</span>
 <span class="c1"># Either use thinning rule, see  10.1371/journal.pcbi.1011378</span>
 <span class="c1"># or use one-shot transformation (for expert users). We show one-shot transformation at the end.</span>
 <span class="n">thinning</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="mi">6</span><span class="o">*</span><span class="n">problem</span><span class="o">.</span><span class="n">transformation</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -464,7 +423,7 @@ Computing rounding transformation took 13.144249270000728 seconds
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
@@ -479,22 +438,21 @@ Computing rounding transformation took 13.144249270000728 seconds
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-sampling with internal trafo took 0.6255351759973564 seconds
+sampling with internal trafo took 10.757782746997691 seconds
 </pre></div></div>
 </div>
 </section>
-<section id="Evaluate-sampe-quality">
-<h1>Evaluate sampe quality<a class="headerlink" href="#Evaluate-sampe-quality" title="Link to this heading">#</a></h1>
+<section id="Evaluate-sample-quality">
+<h1>Evaluate sample quality<a class="headerlink" href="#Evaluate-sample-quality" title="Link to this heading">#</a></h1>
 <p>For highest statistical quality, it is advised to check rhat &lt; 1.01 and ess / n_chains &gt; 100</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-<span class="n">rhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">hopsy</span><span class="o">.</span><span class="n">rhat</span><span class="p">(</span><span class="n">samples</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">hopsy</span><span class="o">.</span><span class="n">rhat</span><span class="p">(</span><span class="n">samples</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;rhat:&quot;</span><span class="p">,</span> <span class="n">rhat</span><span class="p">)</span>
 <span class="n">ess</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">hopsy</span><span class="o">.</span><span class="n">ess</span><span class="p">(</span><span class="n">samples</span><span class="p">))</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ess:&quot;</span><span class="p">,</span> <span class="n">ess</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ess per chain:&quot;</span><span class="p">,</span> <span class="n">ess</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -503,9 +461,8 @@ sampling with internal trafo took 0.6255351759973564 seconds
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-(4, 10000, 95)
-rhat: 1.0019304367129511
-ess: 1426.2729062496408
+rhat: 1.0001914177286262
+ess per chain: 8080.7111918300825
 </pre></div></div>
 </div>
 </section>
@@ -513,7 +470,7 @@ ess: 1426.2729062496408
 <h1>Expert mode for speed: one shot backtransform<a class="headerlink" href="#Expert-mode-for-speed:-one-shot-backtransform" title="Link to this heading">#</a></h1>
 <p>By postponing the back transformation from rounded space to original space, we can obtain better performance for high-dimensional models</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">problem</span><span class="o">.</span><span class="n">transformation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -521,7 +478,7 @@ ess: 1426.2729062496408
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># deep copy enures that we do not edit the original problem</span>
@@ -530,7 +487,7 @@ ess: 1426.2729062496408
 <span class="n">problem2</span><span class="o">.</span><span class="n">shift</span><span class="o">=</span><span class="kc">None</span>
 <span class="n">seed</span> <span class="o">=</span> <span class="mi">512</span>
 <span class="n">chains</span><span class="p">,</span> <span class="n">rngs</span> <span class="o">=</span> <span class="n">hopsy</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">problem2</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">n_chains</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-<span class="n">n_samples</span> <span class="o">=</span> <span class="mi">10_000</span>
+<span class="n">n_samples</span> <span class="o">=</span> <span class="mi">1_000_000</span>
 <span class="c1"># thinning is still advised when hard drive memory is limisted to not to store too many samples</span>
 <span class="n">thinning</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="mi">6</span><span class="o">*</span><span class="n">problem</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
@@ -538,25 +495,18 @@ ess: 1426.2729062496408
 <span class="c1"># accrate is 1 for uniform samples with the default chains given by hopsy.setup()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sampling took&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span><span class="o">-</span><span class="n">start</span><span class="p">,</span><span class="s2">&quot;seconds&quot;</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;sample shape&#39;</span><span class="p">,</span> <span class="n">sample_stack</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-<span class="n">rhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">hopsy</span><span class="o">.</span><span class="n">rhat</span><span class="p">(</span><span class="n">sample_stack</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;rhat:&quot;</span><span class="p">,</span> <span class="n">rhat</span><span class="p">)</span>
-<span class="n">ess</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">hopsy</span><span class="o">.</span><span class="n">ess</span><span class="p">(</span><span class="n">sample_stack</span><span class="p">))</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ess:&quot;</span><span class="p">,</span> <span class="n">ess</span><span class="p">)</span>
-
 <span class="c1"># transform samples back all at once</span>
 <span class="n">shift_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">problem</span><span class="o">.</span><span class="n">shift</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
 <span class="n">start_trafo</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-<span class="n">full_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">),</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">sample_stack</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+<span class="n">full_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">),</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">transformation</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">)):</span>
     <span class="n">full_samples</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">transformation</span><span class="nd">@sample_stack</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">shift_t</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;transformation took&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span><span class="o">-</span><span class="n">start_trafo</span><span class="p">,</span><span class="s2">&quot;seconds&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;sample stats are the same (save numerics) before and after the linear transformation:&#39;</span><span class="p">)</span>
 <span class="n">rhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">hopsy</span><span class="o">.</span><span class="n">rhat</span><span class="p">(</span><span class="n">full_samples</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;rhat:&quot;</span><span class="p">,</span> <span class="n">rhat</span><span class="p">)</span>
 <span class="n">ess</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">hopsy</span><span class="o">.</span><span class="n">ess</span><span class="p">(</span><span class="n">full_samples</span><span class="p">))</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ess:&quot;</span><span class="p">,</span> <span class="n">ess</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ess per chain:&quot;</span><span class="p">,</span> <span class="n">ess</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -565,14 +515,10 @@ ess: 1426.2729062496408
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-sampling took 0.1338847849983722 seconds
-sample shape (4, 10000, 95)
-rhat: 1.0017171320252791
-ess: 1429.2896264045694
-transformation took 0.028482576002716087 seconds
-sample stats are the same (save numerics) before and after the linear transformation:
-rhat: 1.0017171320252791
-ess: 1429.2896264045694
+sampling took 4.001171977000922 seconds
+transformation took 1.9443963669982622 seconds
+rhat: 1.000132523823901
+ess per chain: 8083.021746779217
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -604,7 +550,8 @@ ess: 1429.2896264045694
   
     
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
   <div class="sidebar-secondary-item">
@@ -619,20 +566,20 @@ ess: 1429.2896264045694
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Load-model">Load model</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Generate-hopsy-problem">Generate hopsy problem</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Setup-markov-chains-and-random-number-generators">Setup markov chains and random number generators</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Evaluate-sampe-quality">Evaluate sampe quality</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Evaluate-sample-quality">Evaluate sample quality</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#Expert-mode-for-speed:-one-shot-backtransform">Expert mode for speed: one shot backtransform</a></li>
 </ul>
 
   </nav></div>
 
   <div class="sidebar-secondary-item">
-
-  <div class="tocsection sourcelink">
-    <a href="../_sources/notebooks/SamplingGenomeScaleModelsUniformly.ipynb.txt">
-      <i class="fa-solid fa-file-lines"></i> Show Source
-    </a>
-  </div>
-</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/notebooks/SamplingGenomeScaleModelsUniformly.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
 
 </div></div>
               
@@ -651,8 +598,8 @@ ess: 1429.2896264045694
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -672,7 +619,7 @@ ess: 1429.2896264045694
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.7.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
     <br/>
   </p>
 </div>
@@ -685,7 +632,8 @@ ess: 1429.2896264045694
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>
