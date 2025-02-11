@@ -1,5 +1,6 @@
 import typing
 import unittest
+import warnings
 
 import numpy
 import numpy as np
@@ -605,6 +606,27 @@ class MiscTests(unittest.TestCase):
 
         original_starting_point = back_transform(problem, [problem.starting_point])[0]
         self.assertTrue(np.all(original_starting_point == starting_point))
+
+    def test_warning_when_adding_box_constraints_after_equality_constraints(self):
+        with warnings.catch_warnings(record=True) as w:
+            # Cause all warnings to always be triggered.
+            warnings.simplefilter("always")
+            A = np.vstack([np.identity(3), -np.identity(3)])
+            b = np.array([100, 100, 100, 100, 100, 100])
+
+            problem = Problem(A, b)
+
+            A_eq = np.array([[2.0, 1.0, 0]])
+            b_eq = np.array([8])
+
+            problem = add_equality_constraints(problem, A_eq, b_eq)
+
+            lb = [-5, -5]
+            ub = [5, 5]
+
+            problem = add_box_constraints(problem, lb, ub, simplify=False)
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[-1].category, UserWarning))
 
     def test_starting_point_with_equality_constraints_simplify(self):
         A = np.array([]).reshape((0, 3))

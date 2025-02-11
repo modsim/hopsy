@@ -503,6 +503,10 @@ def add_box_constraints(
     :math:`lb \leq x_i \leq ub`. If `lower_bound`` and ``upper_bound`` are both ``numpy.ndarray`` with
     appropriate length, then every dimension :math:`i` will be bound as :math:`lb_i \leq x_i \leq ub_i`.
 
+    Note: if equality constraints have already been added, the box constraints only apply to the reduced, full space.
+    To apply box constraints to the full space, apply box constraints before equality constraints.
+    This function will print a warning if it detects that equality constraints have already been added.
+
     :param hopsy.Problem problem: Problem which should be constrained and which contains the matrix :math:`A` and vector :math:`b` in :math:`Ax \leq b`.
 
     :param lower_bound: Specifies the lower bound(s).
@@ -514,6 +518,17 @@ def add_box_constraints(
     :return: A :class:`hopsy.Problem` bounded in all dimensions.
     :rtype: hopsy.Problem
     """
+    has_equality_constraints = (
+        problem.transformation is not None or problem.shift is not None
+    )
+    if has_equality_constraints:
+        _s.warnings.warn(
+            "Note that box constraints applied after equality constraints/rounding are only applied to the "
+            "reduced space. Apply box constraints first, if you want them to be applied to the full "
+            "space.",
+            UserWarning,
+        )
+
     if problem.A.shape[1] == 0:
         raise ValueError("Cannot determine dimension for empty inequality Ax <= b.")
 

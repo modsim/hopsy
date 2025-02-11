@@ -1,8 +1,9 @@
 # Changelog
 
 ## v1.5.3
+- [#168](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/168): Add warning to help users avoid unintended constraint violations
 - [#167](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/167): Fix example code for GEM sampling
-- [#166](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/165): Add `simplify` kwarg to `hopsy.round`
+- [#166](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/166): Add `simplify` kwarg to `hopsy.round`
 - [#165](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/165): Treat thinning=0 as no thinning instead of producing NaNs
 - [#162](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/162): Fix sign error in python implementation of parallel tempering
 - [#161](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/161): Persist markov chain proposal after parallel sampling
