@@ -1191,6 +1191,9 @@ def sample(
 
     """
 
+    if thinning == 0:
+        # treats thinning = 0 as no thinning
+        thinning = 1
     # multiprocessing and mpi (parallel tempering) do not work together yet
     # because forked processes do not get a correct rank.
     if n_procs != 1 and any(
