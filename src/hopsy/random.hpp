@@ -37,11 +37,11 @@ namespace hopsy {
       }
 
         unsigned int getSeed() const {
-            return rng.getSeed();
+            return static_cast<unsigned int>(rng.getSeed());
         }
 
         unsigned int getStream() const {
-            return rng.getStream();
+            return static_cast<unsigned int>(rng.getStream());
         }
 
         std::array<char, 16> getState() const {
@@ -61,14 +61,14 @@ namespace hopsy {
         }
 
         unsigned int operator()() {
-            return rng();
+            return static_cast<unsigned int>(rng());
         }
 
         std::string __repr__() const {
             std::string repr = "hopsy.RandomNumberGenerator(";
-            auto seed = rng.getSeed();
+            auto seed = this->getSeed();
             repr += (seed ? "seed=" + hops::RandomNumberGenerator::stringRepresentation(seed) : "");
-            auto stream = rng.getStream();
+            auto stream = this->getStream();
             repr += (seed && stream ? ", " : "");
             repr += (stream ? "stream=" + hops::RandomNumberGenerator::stringRepresentation(stream) : "");
             repr += ")";
@@ -97,7 +97,7 @@ namespace hopsy {
                     doc::RandomNumberGenerator::__call__)
             .def("__repr__", &RandomNumberGenerator::__repr__)
             .def(py::pickle([] (const RandomNumberGenerator& self) {
-                        return py::make_tuple(self.rng.getSeed(), self.getStream(), self.getState());
+                        return py::make_tuple(self.getSeed(), self.getStream(), self.getState());
                     },
                     [] (py::tuple t) {
                         if (t.size() != 3) throw std::runtime_error("Tried to build hopsy.RandomNumberGenerator with invalid state.");
