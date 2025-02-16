@@ -7,7 +7,7 @@ conda deactivate
 conda activate py3.9 && python -m pip uninstall --yes hopsy
 python -m pip install -r requirements-dev.txt
 python setup.py bdist_wheel
-python -m pip install --no-input --user dist/hopsy1.5.3-cp39-cp39-win_amd64.whl --force-reinstall  --no-deps
+python -m pip install --no-input --user dist/hopsy-1.5.3-cp39-cp39-win_amd64.whl --force-reinstall  --no-deps
 python -c "import hopsy; print(hopsy.__version__, hopsy.__build__)"
 conda deactivate
 conda activate py3.10
