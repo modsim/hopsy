@@ -76,7 +76,7 @@ def generate_unit_hypercube(
     """
     assert 1 <= dimension
 
-    A = _s.np.row_stack((_s.np.identity(dimension), -_s.np.identity(dimension)))
+    A = _s.np.vstack((_s.np.identity(dimension), -_s.np.identity(dimension)))
     b = _s.np.concatenate((_s.np.repeat(1, dimension), _s.np.repeat(0, dimension)))
 
     return A, b
@@ -100,7 +100,7 @@ def generate_unit_simplex(
     """
     assert 1 <= dimension
 
-    A = _s.np.row_stack((_s.np.ones(dimension), -_s.np.identity(dimension)))
+    A = _s.np.vstack((_s.np.ones(dimension), -_s.np.identity(dimension)))
     b = _s.np.concatenate(([1], _s.np.repeat(0, dimension)))
 
     return A, b
@@ -187,7 +187,7 @@ class BirkhoffPolytope:
         self.size = size
         self.size_squared = size * size
 
-        self.ineq_matrix_full = _s.numpy.row_stack(
+        self.ineq_matrix_full = _s.numpy.vstack(
             (_s.numpy.eye(self.size_squared), -_s.numpy.eye(self.size_squared))
         )
         self.ineq_bounds_full = _s.numpy.concatenate(
@@ -205,7 +205,7 @@ class BirkhoffPolytope:
         for i in range(size):
             col_sums_mat[i, [i + j * self.size for j in range(self.size)]] = 1.0
 
-        self.eq_matrix = _s.numpy.row_stack((row_sums_mat, col_sums_mat))
+        self.eq_matrix = _s.numpy.vstack((row_sums_mat, col_sums_mat))
         self.eq_rhs = _s.numpy.concatenate((row_sums_rhs, col_sums_rhs))
 
         self.kernel_basis = _s.scipy.linalg.null_space(self.eq_matrix, rcond=None)

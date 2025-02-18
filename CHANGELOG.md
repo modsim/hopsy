@@ -1,7 +1,10 @@
 # Changelog
 
+## Latest
+- [#154](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/154): Add support for numpy 2.0 and newer
+
 ## v1.5.3
-- [#169](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/168): Move RandomNumberGenerator to hops (backend)
+- [#169](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/169): Move RandomNumberGenerator to hops (backend)
 - [#168](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/168): Add warning to help users avoid unintended constraint violations
 - [#167](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/167): Fix example code for GEM sampling
 - [#166](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/166): Add `simplify` kwarg to `hopsy.round`
