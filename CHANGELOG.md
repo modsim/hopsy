@@ -1,6 +1,6 @@
 # Changelog
 
-## Latest
+## v1.6.0
 - [#132](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/132): Add support for Python 3.13
 - [#154](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/154): Add support for numpy 2.0 and newer
 

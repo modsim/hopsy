@@ -167,7 +167,7 @@ setup(
         "optlang>=1.7.0",
         "arviz<=0.17.0; python_version<='3.9'",
         "arviz; python_version>'3.9'",
-        "numpy<2",
+        "numpy",
         "mcbackend",
         "pandas",
         "tqdm",
