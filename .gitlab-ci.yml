@@ -24,7 +24,7 @@ build-release:
     - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   parallel:
     matrix:
-      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
+      - PYTHON_VERSION: ["cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313"]
   environment: $PYTHON_VERSION
   script:
     - /opt/python/cp310-cp310/bin/python .check_version.py
@@ -44,7 +44,7 @@ build-release-macos:
       - macos
   parallel:
     matrix:
-      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
+      - PYTHON_VERSION: ["cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313"]
   environment: $PYTHON_VERSION
   before_script:
     - eval "$(pyenv init -)" && eval "$(pyenv virtualenv-init -)"
@@ -64,7 +64,7 @@ build-debug:
     - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   parallel:
     matrix:
-      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
+      - PYTHON_VERSION: ["cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313"]
   environment: $PYTHON_VERSION
   script:
     - /opt/python/cp310-cp310/bin/python .check_version.py
@@ -87,7 +87,7 @@ test-release:
     - build-release
   parallel:
     matrix:
-      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
+      - PYTHON_VERSION: ["cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313"]
   environment: $PYTHON_VERSION
   before_script:
     - /opt/python/$PYTHON_VERSION/bin/python -m pip install docov
@@ -109,7 +109,7 @@ test-release-macos:
     - build-release-macos
   parallel:
     matrix:
-      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
+      - PYTHON_VERSION: ["cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313"]
   environment: $PYTHON_VERSION
   before_script:
     - eval "$(pyenv init -)" && eval "$(pyenv virtualenv-init -)"
@@ -132,7 +132,7 @@ test-debug:
     - build-debug
   parallel:
     matrix:
-      - PYTHON_VERSION: ["cp38-cp38", "cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312"]
+      - PYTHON_VERSION: ["cp39-cp39", "cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313"]
   environment: $PYTHON_VERSION
   before_script:
     - /opt/python/$PYTHON_VERSION/bin/python -m pip install docov
@@ -152,7 +152,7 @@ test-integration-release:
     - build-release
   before_script:
     # for time reasons we only test the latest python version. Otherwise the tests take more than 1h.
-    - for PY in "cp312-cp312"; do /opt/python/$PY/bin/python -m pip install docov jupyter nbconvert clickhouse-driver hagelkorn ipyparallel 'polyround[extras]'; done
+    - for PY in "cp313-cp313"; do /opt/python/$PY/bin/python -m pip install docov jupyter nbconvert clickhouse-driver hagelkorn ipyparallel 'polyround[extras]'; done
     - curl https://clickhouse.com/ | sh
     - ./clickhouse server &> clickhouse.log &
     - rm examples/ParallelTemperingMPI.ipynb examples/parallel_tempering_MPI.py # mpi not compatible with manylinux
@@ -161,9 +161,9 @@ test-integration-release:
     - rm examples/ParallelTemperingMultiprocessing.ipynb # requires manual converting to python and the manual conversion already exists
     - rm examples/SamplingAdvice.ipynb # requires manual converting to python and the manual conversion already exists
   script:
-    - VERSION=$(cat .version); for PY in "cp312-cp312"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
-    - for PY in "cp312-cp312"; do for f in examples/*.py; do /opt/python/$PY/bin/python $f || exit 1; done ;done
-    - for PY in "cp312-cp312"; do for f in examples/*.ipynb; do /opt/python/$PY/bin/python -m jupyter nbconvert --to notebook --execute $f || exit 1; done;done
+    - VERSION=$(cat .version); for PY in "cp313-cp313"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
+    - for PY in "cp313-cp313"; do for f in examples/*.py; do /opt/python/$PY/bin/python $f || exit 1; done ;done
+    - for PY in "cp313-cp313"; do for f in examples/*.ipynb; do /opt/python/$PY/bin/python -m jupyter nbconvert --to notebook --execute $f || exit 1; done;done
   after_script:
     - pkill clickhouse
   artifacts:
