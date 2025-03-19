@@ -3,6 +3,13 @@
 """
 
 
+from typing import Optional
+
+import numpy as np
+import numpy.typing as npt
+import matplotlib.pyplot as plt
+
+
 class _core:
     from .callback import Callback
     from .core import (
@@ -1744,3 +1751,111 @@ def run_multiphase_sampling(
         )
 
     return _samples, iterations, current_ess, sampling_time
+
+
+def plot_pairwise(
+        population: npt.ArrayLike,
+        variable_names: Optional[list[str]] = None,
+        n_bins: int = 20,
+        autoscale: bool = True,
+        ) -> tuple[plt.Figure, np.ndarray]:
+    """
+    Create a pairwise scatter plot for all variables of a population.
+
+    Parameters
+    ----------
+    population : npt.ArrayLike
+        2D array-like structure containing numerical variables.
+    variable_names : list of str, optional
+        list of variable names corresponding to columns in the data.
+        If None, default names will be assigned.
+    n_bins : int, default=20
+        Number of bins for histogram plots.
+    autoscale : bool, default=True
+        If True, automatically adjust the scaling of the axes.
+    Returns
+    -------
+    tuple
+        A tuple containing:
+        - plt.Figure: The Matplotlib Figure object.
+        - np.ndarray: An array of Axes objects representing the subplot grid.
+    """
+    population = np.array(population, ndmin=2)
+    n_variables = population.shape[1]
+
+    if variable_names is None:
+        variable_names = [f"$x_{i}$" for i in range(n_variables)]
+
+    fig, axes = plt.subplots(
+        n_variables, n_variables,
+        figsize=(6 * n_variables, 5 * n_variables),
+        sharex='col', sharey='row',
+        squeeze=False
+    )
+
+    for i in range(n_variables):
+        scale_i = False
+        for j in range(n_variables):
+            scale_variable = False
+
+            ax = axes[i, j]
+
+            if i == j:
+                # Create a twin axis for histograms to avoid sharing y-axis
+                ax_hist = ax.twinx()
+
+                # Determine binning strategy
+                if autoscale and np.all(population[:, i] > 0):
+                    value_range = population[:, i].max() / population[:, i].min()
+                    if value_range > 100.0:
+                        scale_variable = True
+
+                if scale_variable:
+                    bins = np.geomspace(
+                        population[:, i].min(), population[:, i].max(), n_bins+1
+                    )
+                else:
+                    bins = np.linspace(
+                        population[:, i].min(),
+                        population[:, i].max(),
+                        n_bins+1
+                    )
+
+                ax_hist.hist(
+                    population[:, i],
+                    bins=bins,
+                    alpha=0.7,
+                    color='blue',
+                    edgecolor='black',
+                    align='mid'
+                )
+                ax_hist.set_yticks([])  # Hide y-ticks for the histogram
+            else:
+                # Scatter plot for non-diagonal elements
+                ax.scatter(population[:, j], population[:, i], alpha=0.5, s=10)
+
+            # Apply log scale based on autoscale logic
+            if autoscale and np.all(population[:, j] > 0):
+                ax.set_xscale('log')
+            if autoscale and np.all(population[:, i] > 0):
+                ax.set_yscale('log')
+
+            # Ensure axis labels and ticks are visible only on the first column and last row
+            if j == 0:
+                ax.yaxis.set_tick_params(labelleft=True)
+            else:
+                ax.yaxis.set_tick_params(labelleft=False)
+
+            if i == n_variables - 1:
+                ax.xaxis.set_tick_params(labelbottom=True)
+            else:
+                ax.xaxis.set_tick_params(labelbottom=False)
+
+            # Set axis labels on the edges
+            if i == n_variables - 1:
+                ax.set_xlabel(variable_names[j])
+            if j == 0:
+                ax.set_ylabel(variable_names[i])
+
+    plt.tight_layout()
+    return fig, axes
