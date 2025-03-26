@@ -8,6 +8,7 @@ from typing import Optional
 import numpy as np
 import numpy.typing as npt
 import matplotlib.pyplot as plt
+from matplotlib.colors import to_rgba
 
 
 class _core:
@@ -1752,20 +1753,24 @@ def run_multiphase_sampling(
 
     return _samples, iterations, current_ess, sampling_time
 
-
 def plot_pairwise(
-        population: npt.ArrayLike,
+        data: npt.ArrayLike,
         variable_names: Optional[list[str]] = None,
         n_bins: int = 20,
         autoscale: bool = True,
-        ) -> tuple[plt.Figure, np.ndarray]:
+        fig: Optional[plt.Figure] = None,
+        axs: Optional[npt.NDArray[plt.Axes]] = None,
+        figsize: Optional[tuple[float, float]] = None,
+        ) -> tuple[plt.Figure, npt.NDArray[plt.Axes]]:
     """
-    Create a pairwise scatter plot for all variables of a population.
+    Create a pairwise scatter plot for all variables of a data.
 
     Parameters
     ----------
-    population : npt.ArrayLike
-        2D array-like structure containing numerical variables.
+
+    data : npt.ArrayLike
+        3D array-like structure containing numerical variables with shape
+        (n_chains, n_samples, n_variables)
     variable_names : list of str, optional
         list of variable names corresponding to columns in the data.
         If None, default names will be assigned.
@@ -1773,31 +1778,61 @@ def plot_pairwise(
         Number of bins for histogram plots.
     autoscale : bool, default=True
         If True, automatically adjust the scaling of the axes.
+    fig : Optional[plt.Figure], default=None
+        An optional Matplotlib Figure object. If none is provided, a new figure will be
+        created.
+    axs : Optional[npt.NDArray[plt.Axes]], default=None
+        An optional array of Matplotlib Axes. If none is provided, new axes will be
+        created.
+    figsize : Optional[tuple[float, float]], default=None
+        The size of the figure. If none is provided, the size is dynamically adjusted
+        depending on the number of variables.
+
     Returns
     -------
     tuple
         A tuple containing:
         - plt.Figure: The Matplotlib Figure object.
-        - np.ndarray: An array of Axes objects representing the subplot grid.
+        - npt.NDArray[plt.Axes]: An array of Axes objects representing the subplot grid.
+
+    Raises
+    ------
+    ValueError
+        If the array is not a 3D array.
+        If the provided axes array does not have the correct shape.
     """
-    population = np.array(population, ndmin=2)
-    n_variables = population.shape[1]
+    data = np.array(data)
+
+    if data.ndim != 3:
+        raise ValueError(f"Expected 3D array, got array with ndim={data.ndim}")
+
+    n_chains, n_samples, n_variables = data.shape
 
     if variable_names is None:
         variable_names = [f"$x_{i}$" for i in range(n_variables)]
 
-    fig, axes = plt.subplots(
-        n_variables, n_variables,
-        figsize=(6 * n_variables, 5 * n_variables),
-        sharex='col', sharey='row',
-        squeeze=False
-    )
+    if fig is None and axs is None:
+        if figsize is None:
+            figsize = (6 * n_variables, 5 * n_variables)
+
+        fig, axes = plt.subplots(
+            n_variables, n_variables,
+            figsize=figsize,
+            sharex="col", sharey="row",
+            squeeze=False
+        )
+
+    if axes.shape != (n_variables, n_variables):
+        raise ValueError(
+            "Inconsistent shape for provided axes. "
+            f"Expected {(n_variables, n_variables)}, got {axes.shape}."
+        )
+
+    # Define colormap for chains
+    colormap = plt.colormaps["tab10"]
 
     for i in range(n_variables):
-        scale_i = False
         for j in range(n_variables):
-            scale_variable = False
-
             ax = axes[i, j]
 
             if i == j:
@@ -1805,42 +1840,65 @@ def plot_pairwise(
                 ax_hist = ax.twinx()
 
                 # Determine binning strategy
-                if autoscale and np.all(population[:, i] > 0):
-                    value_range = population[:, i].max() / population[:, i].min()
+                if autoscale and np.all(data[:, :, i] > 0):
+                    value_range = data[:, :, i].max() / data[:, :, i].min()
                     if value_range > 100.0:
-                        scale_variable = True
-
-                if scale_variable:
-                    bins = np.geomspace(
-                        population[:, i].min(), population[:, i].max(), n_bins+1
-                    )
+                        bins = np.geomspace(
+                            data[:, :, i].min(),
+                            data[:, :, i].max(),
+                            n_bins+1
+                        )
+                    else:
+                        bins = np.linspace(
+                            data[:, :, i].min(),
+                            data[:, :, i].max(),
+                            n_bins+1
+                        )
                 else:
                     bins = np.linspace(
-                        population[:, i].min(),
-                        population[:, i].max(),
+                        data[:, :, i].min(),
+                        data[:, :, i].max(),
                         n_bins+1
                     )
 
+                # Plot combined histogram in grey
                 ax_hist.hist(
-                    population[:, i],
+                    data[:, :, i].flatten(),
                     bins=bins,
-                    alpha=0.7,
-                    color='blue',
-                    edgecolor='black',
-                    align='mid'
+                    alpha=0.3,
+                    color="grey",
+                    edgecolor="black",
+                    align="mid"
                 )
+
+                # Plot individual chain histograms
+                for chain in range(n_chains):
+                    ax_hist.hist(
+                        data[chain, :, i],
+                        bins=bins,
+                        alpha=0.5,
+                        color=to_rgba(colormap(chain)),
+                        edgecolor="black",
+                        align="mid"
+                    )
+
                 ax_hist.set_yticks([])  # Hide y-ticks for the histogram
             else:
                 # Scatter plot for non-diagonal elements
-                ax.scatter(population[:, j], population[:, i], alpha=0.5, s=10)
+                for chain in range(n_chains):
+                    ax.scatter(
+                        data[chain, :, j], data[chain, :, i],
+                        alpha=0.5, s=10, color=colormap(chain)
+                    )
 
             # Apply log scale based on autoscale logic
-            if autoscale and np.all(population[:, j] > 0):
-                ax.set_xscale('log')
-            if autoscale and np.all(population[:, i] > 0):
-                ax.set_yscale('log')
+            if autoscale and np.all(data[:, :, j] > 0):
+                ax.set_xscale("log")
+            if autoscale and np.all(data[:, :, i] > 0):
+                ax.set_yscale("log")
 
-            # Ensure axis labels and ticks are visible only on the first column and last row
+            # Ensure axis labels and ticks are visible only on the first column and
+            # last row
             if j == 0:
                 ax.yaxis.set_tick_params(labelleft=True)
             else:
@@ -1857,5 +1915,7 @@ def plot_pairwise(
             if j == 0:
                 ax.set_ylabel(variable_names[i])
 
-    plt.tight_layout()
+    fig.tight_layout()
+
     return fig, axes
+
