@@ -152,7 +152,7 @@ test-integration-release:
     - build-release
   before_script:
     # for time reasons we only test the latest python version. Otherwise the tests take more than 1h.
-    - for PY in "cp313-cp313"; do /opt/python/$PY/bin/python -m pip install docov jupyter nbconvert clickhouse-driver hagelkorn ipyparallel 'polyround[extras]'; done
+    - for PY in "cp313-cp313"; do /opt/python/$PY/bin/python -m pip install docov jupyter nbconvert clickhouse-driver hagelkorn mcbackend ipyparallel 'polyround[extras]'; done
     - curl https://clickhouse.com/ | sh
     - ./clickhouse server &> clickhouse.log &
     - rm examples/ParallelTemperingMPI.ipynb examples/parallel_tempering_MPI.py # mpi not compatible with manylinux
