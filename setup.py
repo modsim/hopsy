@@ -168,7 +168,6 @@ setup(
         "arviz<=0.17.0; python_version<='3.9'",
         "arviz; python_version>'3.9'",
         "numpy",
-        "mcbackend",
         "pandas",
         "tqdm",
         "matplotlib",
