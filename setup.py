@@ -175,5 +175,11 @@ setup(
         "scipy<1.13.0; python_version<='3.9'",
         "scipy; python_version>'3.9'",
     ],
+    extras_require={
+        "blackjax": [
+            "blackjax",
+            "jaxkineticmodel@git+https://github.com/AbeelLab/jaxkineticmodel.git",
+        ],
+    },
     zip_safe=False,
 )

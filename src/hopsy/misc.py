@@ -1137,7 +1137,7 @@ def _parallel_sampling(
         return result
 
 
-def sample(
+def _sample_hops_backend(
     markov_chains: _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.MarkovChain]],
     rngs: _s.typing.Union[
         _c.RandomNumberGenerator, _s.typing.List[_c.RandomNumberGenerator]
@@ -1387,7 +1387,7 @@ def _arviz(
     series: int = 0,
     n_procs: int = 1,
     *args,
-    **kwargs
+    **kwargs,
 ):
     data = _s.numpy.array(data)
     assert len(data.shape) == 3
@@ -1430,6 +1430,63 @@ def _arviz(
         result.append(_result)
 
     return _s.numpy.array(result)
+
+
+def _sample_blackjax_backend(**kwargs):
+    import blackjax
+    import jax
+    import jax.numpy as jnp
+
+    mc = kwargs["markov_chains"]
+    state = mc.init(kwargs["starting_point"])
+    rng = 0
+
+    @jax.jit
+    def one_step(carry, k):
+        s, _ = mc.step(k, carry)
+        return s, s.position
+
+    rng_key = jax.random.PRNGKey(rng)
+    keys = jax.random.split(rng_key, kwargs["n_samples"])
+    final_state, samples = jax.lax.scan(one_step, state, keys)
+    samples = jnp.array([samples])
+    numpy_samples = _s.numpy.asarray(jax.device_get(samples))
+    return None, numpy_samples
+
+
+def sample(
+    markov_chains,  # TODO add jax type : _s.typing.Union[_c.MarkovChain, _s.typing.List[_c.MarkovChain]],
+    rngs: _s.typing.Union[
+        _c.RandomNumberGenerator, _s.typing.List[_c.RandomNumberGenerator]
+    ],
+    n_samples: int,
+    thinning: int = 1,
+    n_threads: int = 1,
+    n_procs: int = 1,
+    record_meta=None,
+    in_memory: bool = True,
+    callback: _c.Callback = None,
+    progress_bar: bool = False,
+    backend: str = "hops",
+    **kwargs,
+):
+    sampling_backends = {
+        "hops": _sample_hops_backend,
+        "blackjax": _sample_blackjax_backend,
+    }
+    return sampling_backends[backend](
+        markov_chains=markov_chains,
+        rngs=rngs,
+        n_samples=n_samples,
+        thinning=thinning,
+        n_threads=n_threads,
+        n_procs=n_procs,
+        record_meta=record_meta,
+        in_memory=in_memory,
+        callback=callback,
+        progress_bar=progress_bar,
+        **kwargs,
+    )
 
 
 def ess(*args, **kwargs):
