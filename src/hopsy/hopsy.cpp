@@ -44,4 +44,8 @@ PYBIND11_MODULE(core, m) {
     hopsy::addProposals(m);
     hopsy::addMarkovChain(m);
     hopsy::addTuning(m);
+// TODO Harris
+#if CUDA
+    hopsy::addGPUSupport(m);
+#endif
 }
