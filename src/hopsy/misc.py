@@ -877,9 +877,10 @@ def back_transform(problem, samples):
     np.array
       Transformed samples of shape `(..., m)`
     """
+    samples = _s.numpy.array(samples)
     S, h = problem.transformation, problem.shift
     transformed = samples @ S.T if S is not None else samples
-    shifted = transformed - h if h is not None else transformed
+    shifted = transformed + h if h is not None else transformed
     return shifted
 
 def transform(problem, samples):
@@ -905,6 +906,8 @@ def transform(problem, samples):
     Depending on the condition number of `problem.transformation`, this method can
     lead to numerical issues.
     """
+    samples = _s.numpy.array(samples)
+
     shape = samples.shape
     dim = shape[-1]
     samples = samples.reshape(-1, dim) # ... x d -> n x d
@@ -913,7 +916,7 @@ def transform(problem, samples):
     shifted = (samples - problem.shift)  if problem.shift is not None else samples
 
     if problem.transformation is not None:
-        U, S, Vh = np.linalg.svd(problem.transformation, full_matrices=False)
+        U, S, Vh = _s.numpy.linalg.svd(problem.transformation, full_matrices=False)
         transformed = Vh.T @ ((U.T @ shifted.T) / S.reshape(-1, 1))
         transformed = transformed.T # m x n -> n x m
         transformed = transformed.reshape(*shape[:-1], transformed.shape[-1]) # 
