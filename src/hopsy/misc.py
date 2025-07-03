@@ -861,7 +861,21 @@ def round(problem: _c.Problem, simplify=True):
 
 def back_transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
     """
-    Transforms samples back from the sampling space (typically rounded) to the original parameter space.
+    Transform samples from the sampling space to the original parameter space.
+
+    Parameters
+    ----------
+    problem : hopsy.Problem
+      A hopsy.Problem with populated `problem.transformation` and `problem.shift` of
+      shape `(m, d)` and `(d, )`, respectively. If not populated, the identity operation
+      is performed.
+    samples : np.array
+      Parameter samples of shape `(..., d)` which are to be transformed.
+
+    Returns
+    -------
+    np.array
+      Transformed samples of shape `(..., m)`
     """
     samples = _s.numpy.array(samples)
     S, h = problem.transformation, problem.shift
@@ -869,24 +883,25 @@ def back_transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
     shifted = transformed + h if h is not None else transformed
     return shifted
 
+
 def transform(problem, samples):
     """
     Transform samples from the original parameter space to the sampling space.
-    
+
     Parameters
     ----------
     problem : hopsy.Problem
       A hopsy.Problem with populated `problem.transformation` and `problem.shift` of
-      shape `(m, d)` and `(d, )`, respectively. If not populated, the identity operation 
+      shape `(m, d)` and `(d, )`, respectively. If not populated, the identity operation
       is performed.
     samples : np.array
-      Parameter samples of shape `(..., d)` which are to be transformed. 
-    
+      Parameter samples of shape `(..., d)` which are to be transformed.
+
     Returns
     -------
     np.array
       Transformed samples of shape `(..., m)`
-      
+
     Notes
     -----
     Depending on the condition number of `problem.transformation`, this method can
@@ -896,18 +911,19 @@ def transform(problem, samples):
 
     shape = samples.shape
     dim = shape[-1]
-    samples = samples.reshape(-1, dim) # ... x d -> n x d
-    
+    samples = samples.reshape(-1, dim)  # ... x d -> n x d
+
     # n x d,d -> n x d
-    shifted = (samples - problem.shift)  if problem.shift is not None else samples
+    shifted = (samples - problem.shift) if problem.shift is not None else samples
 
     if problem.transformation is not None:
         U, S, Vh = _s.numpy.linalg.svd(problem.transformation, full_matrices=False)
         transformed = Vh.T @ ((U.T @ shifted.T) / S.reshape(-1, 1))
-        transformed = transformed.T # m x n -> n x m
-        transformed = transformed.reshape(*shape[:-1], transformed.shape[-1]) # 
+        transformed = transformed.T  # m x n -> n x m
+        transformed = transformed.reshape(*shape[:-1], transformed.shape[-1])  #
     else:
         transformed = shifted
+
 
 
 def _sequential_sampling(
