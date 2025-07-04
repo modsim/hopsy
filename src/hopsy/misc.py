@@ -877,7 +877,9 @@ def back_transform(problem, samples=None, points=None):
     np.array
       Transformed samples of shape `(..., m)`
     """
-    assert samples is not None or points is not None, "Need samples or points, not both though."
+    assert (
+        samples is not None or points is not None
+    ), "Need samples or points, not both though."
     assert samples is None or points is None, "Pass samples or points, not both."
 
     samples = _s.numpy.array(samples) if points is None else _s.numpy.array(points)
@@ -911,7 +913,9 @@ def transform(problem, samples=None, points=None):
     Depending on the condition number of `problem.transformation`, this method can
     lead to numerical issues.
     """
-    assert samples is not None or points is not None, "Need samples or points, not both though."
+    assert (
+        samples is not None or points is not None
+    ), "Need samples or points, not both though."
     assert samples is None or points is None, "Pass samples or points, not both."
 
     samples = _s.numpy.array(samples) if points is None else _s.numpy.array(points)
