@@ -859,7 +859,7 @@ def round(problem: _c.Problem, simplify=True):
         return _problem
 
 
-def back_transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
+def back_transform(problem, samples=None, points=None):
     """
     Transform samples from the sampling space to the original parameter space.
 
@@ -877,14 +877,18 @@ def back_transform(problem: _c.Problem, points: _s.numpy.typing.ArrayLike):
     np.array
       Transformed samples of shape `(..., m)`
     """
-    samples = _s.numpy.array(samples)
+    assert samples is not None or points is not None, "Need samples or points, not both though."
+    assert samples is None or points is None, "Pass samples or points, not both."
+
+    samples = _s.numpy.array(samples) if points is None else _s.numpy.array(points)
+
     S, h = problem.transformation, problem.shift
     transformed = samples @ S.T if S is not None else samples
     shifted = transformed + h if h is not None else transformed
     return shifted
 
 
-def transform(problem, samples):
+def transform(problem, samples=None, points=None):
     """
     Transform samples from the original parameter space to the sampling space.
 
@@ -907,7 +911,10 @@ def transform(problem, samples):
     Depending on the condition number of `problem.transformation`, this method can
     lead to numerical issues.
     """
-    samples = _s.numpy.array(samples)
+    assert samples is not None or points is not None, "Need samples or points, not both though."
+    assert samples is None or points is None, "Pass samples or points, not both."
+
+    samples = _s.numpy.array(samples) if points is None else _s.numpy.array(points)
 
     shape = samples.shape
     dim = shape[-1]
