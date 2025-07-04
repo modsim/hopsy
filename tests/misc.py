@@ -482,7 +482,7 @@ class MiscTests(unittest.TestCase):
 
         chebychev_rounded = compute_chebyshev_center(
             problem_rounded, original_space=True
-        )[:, 0]
+        )
 
         self.assertEqual(chebychev.shape, chebychev_rounded.shape)
 
