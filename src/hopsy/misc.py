@@ -692,7 +692,7 @@ def compute_chebyshev_center(problem: _c.Problem, original_space: bool = False):
     """
     polytope = _s.polytope.Polytope(problem.A, problem.b)
     cheby_result = _s.ChebyshevFinder.chebyshev_center(polytope, _c.LP().settings)
-    chebyshev_center = cheby_result[0]
+    chebyshev_center = cheby_result[0].flatten()
     distance_to_border = cheby_result[1]
     if distance_to_border <= 0:
         raise ValueError(
