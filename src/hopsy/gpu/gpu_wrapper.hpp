@@ -1,5 +1,5 @@
-#ifndef HOPSY_PROBLEM_HPP
-#define HOPSY_PROBLEM_HPP
+#ifndef GPU_WRAPPER_HPP
+#define GPU_WRAPPER_HPP
 
 
 #include <pybind11/detail/common.h>
@@ -8,100 +8,93 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+
+#include "dvector.h"
+#include "dmatrix.h"
+#include "gpusamplers.h"
+
 namespace hopsy {
-    namespace GPU {
-    // TODO Harris: Add code for GPU CHAR
 
-        template <typename Real>
-        HMatrix<Real> CoordinatedHitAndRun(const HMatrix<Real>& A, const HVector<Real>& b, const HVector<Real>& x0, const Config& config) {}
+    void addGPUSupport(py::module& m) {
+
+        /*****Expose CUDA device selection with available devices*******/
+        // TODO: Implement device selection logic
+
+        /*****Expose GPU Vector Class*******/
+
+        py::class_<hopsy::GPU::DVector<double>, std::shared_ptr<hopsy::GPU::DVector<double>>>(m, "DVector", "GPU vector of doubles")
+        
+        // DVector(int len) construct from length
+        .def(py::init<int>(), py::arg("length"))
+
+        // DVector(int len, double value) construct from length and value
+        .def(py::init<int, double>(), py::arg("length"), py::arg("value"))
+
+        // DVector(const HVector& v) construct from Eigen vector
+        .def(py::init<const hopsy::GPU::HVector<double>&>(), py::arg("host_vector"))
+
+        // toHost() method to copy data back to host
+        .def("toHost", &hopsy::GPU::DVector<double>::toHost)
+
+        // length as read-only attribute
+        .def_readonly("len", &hopsy::GPU::DVector<double>::len)
+
+        // Expose the copy constructor explicitly (copying the DVector object)
+        .def(py::init<const hopsy::GPU::DVector<double>&>(), "Copy constructor");
 
 
+        /*****Expose GPU Matrix Class*******/
 
-        // TODO Harris: add function for adding GPU support
-        void addGPUSupport(py::module& m) {
+        py::class_<hopsy::GPU::DMatrix<double>, std::shared_ptr<hopsy::GPU::DMatrix<double>>>(m, "DMatrix", "GPU matrix of doubles")
 
-            m.def("gpu_uniform_coordinate_hit_and_run", &CoordinateHitAndRun)
+        // DMatrix(const HMatrix& m) construct from Eigen matrix
+        .def(py::init<const hopsy::GPU::HMatrix<double>&>(), py::arg("host_matrix"))
+
+        // DMatrix(int rows, int cols) construct from rows and columns
+        .def(py::init<int, int>(), py::arg("rows"), py::arg("cols"))
+
+        // DMatrix(const HVector& v, int cols) construct from Eigen vector and number of columns
+        .def(py::init<const hopsy::GPU::HVector<double>&, int>(), py::arg("host_vector"), py::arg("cols"))
+
+        // DMatrix(const DVector& v, int cols) construct from GPU vector and number of columns
+        .def(py::init<const hopsy::GPU::DVector<double>&, int>(), py::arg("device_vector"), py::arg("cols"))
+
+        // Copy constructor
+        .def(py::init<const hopsy::GPU::DMatrix<double>&>(), "Copy constructor")
+
+        // toHost() method
+        .def("toHost", &hopsy::GPU::DMatrix<double>::toHost)
+
+        // Read-only attributes
+        .def_readonly("rows", &hopsy::GPU::DMatrix<double>::rows)
+        .def_readonly("cols", &hopsy::GPU::DMatrix<double>::cols);
 
 
+        /*****Expose samplers******/
 
-            // TODO: replace Problem by CHAR
-            py::class_<CONFIG>(m, "CHARgpuConfig")
-                .def()
-                ;
-            py::class_<Problem>(m, "Problem")
-                .def(py::init<const MatrixType&,
-                              const VectorType&,
-                              const Model*,
-                              const std::optional<VectorType>,
-                              const std::optional<MatrixType>,
-                              const std::optional<VectorType>>(),
-                        doc::Problem::__init__,
-                        py::arg("A"),
-                        py::arg("b"),
-                        py::arg("model") = static_cast<Model*>(nullptr),
-                        py::arg("starting_point") = py::none(),
-                        py::arg("transformation") = py::none(),
-                        py::arg("shift") = py::none()
-                )
-                .def(py::init([] (const MatrixType& A,
-                              const VectorType& b,
-                              const py::object model,
-                              const std::optional<VectorType> startingPoint,
-                              const std::optional<MatrixType> transformation,
-                              const std::optional<VectorType> shift) {
-                            return Problem(A, b, std::make_unique<PyModel>(PyModel(model)), startingPoint, transformation, shift);
-                        }),
-                        doc::Problem::__init__,
-                        py::arg("A"),
-                        py::arg("b"),
-                        py::arg("model").none(false),
-                        py::arg("starting_point") = py::none(),
-                        py::arg("transformation") = py::none(),
-                        py::arg("shift") = py::none()
-                )
-                .def("slacks", [] (const Problem& self, const VectorType& point) {
-                   return self.b - self.A * point;
-                }, doc::Problem::slacks)
-                .def_readwrite("A", &Problem::A, doc::Problem::A)
-                .def_readwrite("b", &Problem::b, doc::Problem::b)
-                .def_readwrite("starting_point", &Problem::startingPoint, doc::Problem::startingPoint)
-                .def_property("model", &Problem::getModel, &Problem::setModel, doc::Problem::model)
-                .def_readwrite("transformation", &Problem::transformation, doc::Problem::transformation)
-                .def_readwrite("shift", &Problem::shift, doc::Problem::shift)
-                .def_readwrite("original_A", &Problem::original_A, doc::Problem::original_A)
-                .def_readwrite("original_b", &Problem::original_b, doc::Problem::original_b)
-                .def("__repr__", &Problem::__repr__)
-                .def(py::pickle([] (const Problem& self) { // __getstate__
-                                    /* Return a tuple that fully encodes the state of the object */
-                                    return py::make_tuple(self.A,
-                                                          self.b,
-                                                          static_cast<hopsy::Model*>(self.model.get()),
-                                                          self.startingPoint,
-                                                          self.transformation,
-                                                          self.shift,
-                                                          self.original_A,
-                                                          self.original_b
-                                                          );
-                                },
-                                [] (py::tuple t) { // __setstate__
-                                    if (t.size() != 8) throw std::runtime_error("Tried to build hopsy.Model with invalid state.");
+        m.def(  "GPUWarmUp",
+                &hopsy::GPU::WarumUp,
+                py::return_value_policy::move,
+                py::arg("A_d"),
+                py::arg("b_d"),
+                py::arg("x0_d"),
+                py::arg("nwarmup"),
+                py::arg("nchains"),
+                py::arg("tpb_rd") = -1,
+                py::arg("tpb_ss") = -1);
 
-                                    /* Create a new C++ instance */
-                                    Problem p(t[0].cast<MatrixType>(),
-                                              t[1].cast<VectorType>(),
-                                              t[2].cast<Model*>(),
-                                              t[3].cast<std::optional<VectorType>>(),
-                                              t[4].cast<std::optional<MatrixType>>(),
-                                              t[5].cast<std::optional<VectorType>>());
-                                    p.original_A = t[6].cast<MatrixType>();
-                                    p.original_b = t[7].cast<VectorType>();
+        m.def(  "GPUCoordinateHitAndRun",
+                &hopsy::GPU::CoordinateHitAndRun,
+                py::return_value_policy::move,
+                py::arg("A_d"),
+                py::arg("b_d"),
+                py::arg("X_d"),
+                py::arg("nspc"),
+                py::arg("thinningfactor"),
+                py::arg("nchains"),
+                py::arg("tpb_ss") = -1);
 
-                                    return p;
-                                }
-                        ))
-            ;
-        }
     }
 }
 
-#endif // HOPSY_PROBLEM_HPP
+#endif // GPU_WRAPPER_HPP

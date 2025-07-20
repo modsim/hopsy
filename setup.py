@@ -63,6 +63,7 @@ class CMakeBuild(build_ext):
             "-DHOPSY_BUILD_INFO={}".format(commit),
             "-DCMAKE_BUILD_TYPE={}".format(cfg),  # not used on MSVC, but no harm
             "-DHOPS_MPI={}".format(with_mpi),
+            "-DHOPSY_BUILD_GPU=ON",
         ]
         build_args = []
 

@@ -16,6 +16,7 @@
 #include "proposal.hpp"
 #include "random.hpp"
 #include "tuning.hpp"
+#include "gpu/gpu_wrapper.hpp"
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
