@@ -12,13 +12,15 @@
 #include "dvector.h"
 #include "dmatrix.h"
 #include "gpusamplers.h"
+#include "device_utils.h"
 
 namespace hopsy {
 
     void addGPUSupport(py::module& m) {
 
         /*****Expose CUDA device selection with available devices*******/
-        // TODO: Implement device selection logic
+        m.def("set_device", &hopsy::GPU::set_device, py::arg("device"));
+        m.def("list_devices", &hopsy::GPU::list_devices);
 
         /*****Expose GPU Vector Class*******/
 
