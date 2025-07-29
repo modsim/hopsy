@@ -774,3 +774,21 @@ class MiscTests(unittest.TestCase):
         _, samples = sample(mcs, rngs, n_samples=20000, thinning=10)
         actual_rhat = rhat(samples)
         self.assertTrue(np.all(np.isclose(actual_rhat, expected_rhat)))
+
+    def test_setup_gaussian(self):
+        mean_0 = np.zeros(3)
+        var_0 = np.eye(3)
+        A = np.array(
+            [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]]
+        )
+        b = np.array([0, 1, 1, 0, 1, 1])
+
+        # Equality constraint
+        A_eq = np.array([[1, 1, 1]])
+        b_eq = np.array([0])
+
+        # Problem and model setup
+        model = Gaussian(mean=mean_0, covariance=var_0)
+        problem = Problem(A, b, model)
+        problem = add_equality_constraints(problem, A_eq, b_eq)
+        mcs, rngs = setup(problem, random_seed=42, n_chains=4)
