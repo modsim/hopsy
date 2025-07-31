@@ -4,7 +4,7 @@
 
 
 class _core:
-    from hopsy import (
+    from .core import (
         MarkovChain,
         Problem,
         Proposal,
