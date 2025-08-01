@@ -939,6 +939,7 @@ def transform(problem, samples=None, points=None):
     else:
         transformed = shifted
 
+    return transformed
 
 
 def _sequential_sampling(
