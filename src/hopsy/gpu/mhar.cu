@@ -49,10 +49,14 @@ namespace hopsy {
                 CUDA_CHECK(cudaGraphLaunch(warumup_graph, 0));
             }
 
+            // Cleanup
+            CUDA_CHECK(cudaGraphExecDestroy(warumup_graph));
+            CUDA_CHECK(cudaGraphDestroy(WarmupGraph));
+
             return X_d;
         }
 
-        DMatrix<double> MatrixHitandRunSampler( DMatrix<double>& A_d,
+        DMatrix<double> MatrixHitAndRun     ( DMatrix<double>& A_d,
                                                 DVector<double>& b_d,
                                                 DMatrix<double>& X_d,
                                                 int nspc,
@@ -66,8 +70,49 @@ namespace hopsy {
             // Dimensions
             int N = A_d.cols;       // Flux Dimension
             int M = A_d.rows;       // Constraint Dimension
-            DMatrix<double> samples_d(N, nspc * nchains);
+            int thinning = (thinningfactor > 0) ? thinningfactor * N : 1;
 
+            DMatrix<double> samples_d(N, nspc * nchains), D_d(N, nchains), AD_d(M, nchains), slack_d(b_d, nchains);
+            DVector<double> alpha_d(nchains);
+
+            // Initialize random states
+            PRNGState<curandStateMRG32k3a> gen(tpb_rd*nchains);
+            initPrngStates<<<nchains, tpb_rd>>>(gen.states, 1234);
+            CUDA_CHECK(cudaGetLastError());
+
+            // Init Library handles
+            CUBLASHandle handle;
+
+            // Setup graphs
+            CudaStream captureStream;
+            cudaGraph_t FinalSamplingGraph;             //class
+            cudaGraphExec_t final_sampling_graph;    //instance
+            bool final_sampling_g_created = false;
+            CUBLAS_CHECK(cublasSetStream(handle, captureStream));
+            // Create Final Sampling graph
+            DVector<int> t_d(nchains, 0);
+            if (!final_sampling_g_created)
+            {
+                CUDA_CHECK(cudaStreamBeginCapture(captureStream, cudaStreamCaptureModeGlobal));
+                launchGenRndDir(D_d.dmat, D_d.rows, D_d.cols, gen.states, tpb_rd, nchains, captureStream);
+                handle.GeMM(A_d, D_d, AD_d, 1.0, 0.0);
+                handle.GeMM(A_d, X_d, slack_d, -1.0, 1.0);
+                launchSampleStepSize(AD_d.dmat, slack_d.dmat, alpha_d.dvec, b_d.dvec, AD_d.rows, AD_d.cols, gen.states, tpb_ss, nchains, captureStream);
+                XupdateWithSaveIterantArray<<<nchains, tpb_rd, 0, captureStream>>>(X_d.dmat, D_d.dmat, alpha_d.dvec, samples_d.dmat, X_d.rows, X_d.cols, t_d.dvec, thinning);
+                CUDA_CHECK(cudaStreamEndCapture(captureStream, &FinalSamplingGraph));
+                CUDA_CHECK(cudaGraphInstantiate(&final_sampling_graph, FinalSamplingGraph, NULL, NULL, 0));
+                final_sampling_g_created = true;
+            }
+
+            // Launch the sampling graph
+            for (int i = 0; i < nspc * thinning; i++)
+            {
+                CUDA_CHECK(cudaGraphLaunch(final_sampling_graph, 0));
+            }
+
+            CUDA_CHECK(cudaGraphExecDestroy(final_sampling_graph));
+            CUDA_CHECK(cudaGraphDestroy(FinalSamplingGraph));
+            
             return samples_d;
         }  
         

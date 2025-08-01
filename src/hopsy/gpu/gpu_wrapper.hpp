@@ -18,13 +18,17 @@ namespace hopsy {
 
     void addGPUSupport(py::module& m) {
 
+        // Create a submodule for GPU support
+        // Create a submodule named "gpu"
+        py::module gpu = m.def_submodule("gpu", "GPU support submodule");
+
         /*****Expose CUDA device selection with available devices*******/
-        m.def("set_device", &hopsy::GPU::set_device, py::arg("device"));
-        m.def("list_devices", &hopsy::GPU::list_devices);
+        gpu.def("set_device", &hopsy::GPU::set_device, py::arg("device"));
+        gpu.def("list_devices", &hopsy::GPU::list_devices);
 
         /*****Expose GPU Vector Class*******/
 
-        py::class_<hopsy::GPU::DVector<double>, std::shared_ptr<hopsy::GPU::DVector<double>>>(m, "DVector", "GPU vector of doubles")
+        py::class_<hopsy::GPU::DVector<double>, std::shared_ptr<hopsy::GPU::DVector<double>>>(gpu, "DVector", "GPU vector of doubles")
         
         // DVector(int len) construct from length
         .def(py::init<int>(), py::arg("length"))
@@ -47,9 +51,9 @@ namespace hopsy {
 
         /*****Expose GPU Matrix Class*******/
 
-        py::class_<hopsy::GPU::DMatrix<double>, std::shared_ptr<hopsy::GPU::DMatrix<double>>>(m, "DMatrix", "GPU matrix of doubles")
+        py::class_<hopsy::GPU::DMatrix<double>, std::shared_ptr<hopsy::GPU::DMatrix<double>>>(gpu, "DMatrix", "GPU matrix of doubles")
 
-        // DMatrix(const HMatrix& m) construct from Eigen matrix
+        // DMatrix(const HMatrix& gpu) construct from Eigen matrix
         .def(py::init<const hopsy::GPU::HMatrix<double>&>(), py::arg("host_matrix"))
 
         // DMatrix(int rows, int cols) construct from rows and columns
@@ -74,7 +78,7 @@ namespace hopsy {
 
         /*****Expose samplers******/
 
-        m.def(  "GPUWarmUp",
+        gpu.def(  "WarmUp",
                 &hopsy::GPU::WarumUp,
                 py::return_value_policy::move,
                 py::arg("A_d"),
@@ -85,7 +89,7 @@ namespace hopsy {
                 py::arg("tpb_rd") = -1,
                 py::arg("tpb_ss") = -1);
 
-        m.def(  "GPUCoordinateHitAndRun",
+        gpu.def(  "CoordinateHitAndRun",
                 &hopsy::GPU::CoordinateHitAndRun,
                 py::return_value_policy::move,
                 py::arg("A_d"),
@@ -96,6 +100,25 @@ namespace hopsy {
                 py::arg("nchains"),
                 py::arg("tpb_ss") = -1);
 
+        gpu.def( "MatrixHitAndRun",
+                &hopsy::GPU::MatrixHitAndRun,
+                py::return_value_policy::move,
+                py::arg("A_d"),
+                py::arg("b_d"),
+                py::arg("X_d"),
+                py::arg("nspc"),
+                py::arg("thinningfactor"),
+                py::arg("nchains"),
+                py::arg("tpb_rd") = -1,
+                py::arg("tpb_ss") = -1);
+
+        gpu.def( "rhat",
+                &hopsy::GPU::rhat,
+                py::return_value_policy::move,
+                py::arg("samples_d"),
+                py::arg("nspc"),
+                py::arg("nchains"),
+                py::arg("dim"));
     }
 }
 
