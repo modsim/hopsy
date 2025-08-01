@@ -20,7 +20,7 @@ namespace hopsy {
                                                 DVector<double>& b_d,
                                                 DMatrix<double>& X_d,
                                                 int nspc,
-                                                int thinningfactor,
+                                                int thinning,
                                                 int nchains,
                                                 int tpb_rd = -1,
                                                 int tpb_ss = -1);
@@ -29,7 +29,7 @@ namespace hopsy {
                                                 DVector<double>& b_d,
                                                 DMatrix<double>& X_d,
                                                 int nspc,
-                                                int thinningfactor,
+                                                int thinning,
                                                 int nchains,
                                                 int tpb_ss = -1);
 

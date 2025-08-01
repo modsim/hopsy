@@ -60,7 +60,7 @@ namespace hopsy {
                                                 DVector<double>& b_d,
                                                 DMatrix<double>& X_d,
                                                 int nspc,
-                                                int thinningfactor,
+                                                int thinning,
                                                 int nchains,
                                                 int tpb_rd,
                                                 int tpb_ss)
@@ -70,7 +70,6 @@ namespace hopsy {
             // Dimensions
             int N = A_d.cols;       // Flux Dimension
             int M = A_d.rows;       // Constraint Dimension
-            int thinning = (thinningfactor > 0) ? thinningfactor * N : 1;
 
             DMatrix<double> samples_d(N, nspc * nchains), D_d(N, nchains), AD_d(M, nchains), slack_d(b_d, nchains);
             DVector<double> alpha_d(nchains);

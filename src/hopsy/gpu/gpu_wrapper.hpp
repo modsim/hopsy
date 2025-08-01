@@ -96,7 +96,7 @@ namespace hopsy {
                 py::arg("b_d"),
                 py::arg("X_d"),
                 py::arg("nspc"),
-                py::arg("thinningfactor"),
+                py::arg("thinning"),
                 py::arg("nchains"),
                 py::arg("tpb_ss") = -1);
 
@@ -107,7 +107,7 @@ namespace hopsy {
                 py::arg("b_d"),
                 py::arg("X_d"),
                 py::arg("nspc"),
-                py::arg("thinningfactor"),
+                py::arg("thinning"),
                 py::arg("nchains"),
                 py::arg("tpb_rd") = -1,
                 py::arg("tpb_ss") = -1);

@@ -8,13 +8,12 @@ namespace hopsy {
                                         DVector<double>& b_d,
                                         DMatrix<double>& X_d,
                                         int nspc,
-                                        int thinningfactor,
+                                        int thinning,
                                         int nchains,
                                         int tpb_ss)
         {
             // TODO: Implement logic for launch config when tpb_ss are not provided
             int N = A_d.cols;
-            int thinning = (thinningfactor > 0) ? thinningfactor * N : 1;
 
             DMatrix<double> samples_d(N, nchains * nspc), slack_d(b_d, nchains);
 
@@ -33,6 +32,7 @@ namespace hopsy {
 
             // Launch CHR kernel
             launchChrKernel(A_d, slack_d, X_d, samples_d, gen.states, nspc, thinning, tpb_ss, nchains);
+
 
             return samples_d;
         }
