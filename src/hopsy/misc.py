@@ -871,6 +871,8 @@ def back_transform(problem, samples=None, points=None):
       is performed.
     samples : np.array
       Parameter samples of shape `(..., d)` which are to be transformed.
+    points : np.array
+      Parameter samples of shape `(..., d)` which are to be transformed. To be deprecated.
 
     Returns
     -------
@@ -902,6 +904,8 @@ def transform(problem, samples=None, points=None):
       is performed.
     samples : np.array
       Parameter samples of shape `(..., d)` which are to be transformed.
+    points : np.array
+      Parameter samples of shape `(..., d)` which are to be transformed. To be deprecated.
 
     Returns
     -------
