@@ -477,12 +477,12 @@ class MiscTests(unittest.TestCase):
 
         problem = add_equality_constraints(problem, A_eq, b_eq)
 
-        chebychev = compute_chebyshev_center(problem, original_space=True)[:, 0]
+        chebychev = compute_chebyshev_center(problem, original_space=True)
         problem_rounded = round(problem)
 
         chebychev_rounded = compute_chebyshev_center(
             problem_rounded, original_space=True
-        )[:, 0]
+        )
 
         self.assertEqual(chebychev.shape, chebychev_rounded.shape)
 
