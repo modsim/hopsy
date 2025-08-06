@@ -7,5 +7,4 @@ from .definitions import *
 from .examples import *
 from .lp import *
 from .misc import *
-from .setup import *
 from .tuning import *

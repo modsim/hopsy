@@ -1,19 +1,22 @@
 # Changelog
 
+## Latest
+- [#176](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/176): Fix setup function for Gaussian models
+
 ## v1.6.1
-- [#171](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/171): Make mcbackend optional dependency
+- [#171](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/171): Make mcbackend optional dependency
 
 ## v1.6.0
-- [#132](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/132): Add support for Python 3.13
-- [#154](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/154): Add support for numpy 2.0 and newer
+- [#132](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/132): Add support for Python 3.13
+- [#154](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/154): Add support for numpy 2.0 and newer
 
 ## v1.5.3
-- [#169](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/169): Move RandomNumberGenerator to hops (backend)
-- [#168](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/168): Add warning to help users avoid unintended constraint violations
-- [#167](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/167): Fix example code for GEM sampling
-- [#166](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/166): Add `simplify` kwarg to `hopsy.round`
-- [#165](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/165): Treat thinning=0 as no thinning instead of producing NaNs
-- [#162](https://jugit.fz-juelich.de/IBG0/ModSim/hopsy/-/issues/162): Fix sign error in python implementation of parallel tempering
+- [#169](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/169): Move RandomNumberGenerator to hops (backend)
+- [#168](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/168): Add warning to help users avoid unintended constraint violations
+- [#167](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/167): Fix example code for GEM sampling
+- [#166](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/166): Add `simplify` kwarg to `hopsy.round`
+- [#165](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/165): Treat thinning=0 as no thinning instead of producing NaNs
+- [#162](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/162): Fix sign error in python implementation of parallel tempering
 - [#161](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/161): Persist markov chain proposal after parallel sampling
 
 ## v1.5.2
