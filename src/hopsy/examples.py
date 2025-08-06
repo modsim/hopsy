@@ -18,8 +18,7 @@ class _submodules:
     import scipy
 
 
-from .misc import add_box_constraints, sample
-from .setup import setup
+from .misc import add_box_constraints, sample, setup
 
 _s = _submodules
 
