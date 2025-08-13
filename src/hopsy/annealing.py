@@ -444,6 +444,7 @@ def sample_pt(
                     rejection_rates[round_idx], temperatures[round_idx]
                 )
                 global_comm_barriers[round_idx] = comm_barrier
+                temperatures[round_idx + 1] = temperatures_next
 
         # Save the results
         result_stats = shared_data.to_numpy()
