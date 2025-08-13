@@ -15,6 +15,7 @@ class _core:
         round,
         transform,
     )
+    from .definitions import multiprocessing_context
 
 
 _c = _core
