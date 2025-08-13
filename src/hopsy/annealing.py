@@ -213,8 +213,8 @@ def _worker_sample(
     samples: _s.ArrayLike,
     acc_rates: _s.ArrayLike,
 ):
-    chain_id = machine_idx[scan_idx][process_id]
-    beta = temperatures[round_idx, chain_id]
+    chain_idx = _s.numpy.where(machine_idx[scan_idx] == process_id)[0][0]
+    beta = temperatures[round_idx, chain_idx]
 
     if beta <= 1e-9:
         thinning_factor = max(len(chain.state), int(len(chain.state) ** 2 // 6))
@@ -226,8 +226,8 @@ def _worker_sample(
         acceptance_rate, new_state = chain.draw(rng, thinning)
 
     # 5. Safe write to shared arrays
-    samples[scan_idx, chain_id] = new_state
-    acc_rates[scan_idx, chain_id] = acceptance_rate
+    samples[scan_idx, chain_idx] = new_state
+    acc_rates[scan_idx, chain_idx] = acceptance_rate
 
 
 def _launch_worker(
