@@ -5,17 +5,14 @@
 
 class _core:
     from .core import (
-        MarkovChain,
         Problem,
         Proposal,
         RandomNumberGenerator,
         Uniform,
         UniformCoordinateHitAndRunProposal,
-        multiprocessing_context,
-        round,
-        transform,
     )
     from .definitions import multiprocessing_context
+    from .misc import MarkovChain, round, transform
 
 
 _c = _core
