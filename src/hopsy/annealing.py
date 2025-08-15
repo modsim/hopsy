@@ -40,12 +40,14 @@ _s = _submodules
 
 @_s.dataclass
 class SharedMemoryArray:
+    r"""Storage for a numpy array in shared memory"""
     name: str
     shared_memory: _s.SharedMemory
     shape: _s.Tuple[int, ...]
     dtype: _s.numpy.dtype
 
     def view(self) -> _s.ArrayLike:
+        r""""""
         return _s.numpy.ndarray(
             self.shape, dtype=_s.numpy.dtype(self.dtype), buffer=self.shared_memory.buf
         )
@@ -53,6 +55,8 @@ class SharedMemoryArray:
 
 @_s.dataclass
 class SharedData:
+    r"""Shared data for parallel tempering"""
+
     samples: SharedMemoryArray
     densities: SharedMemoryArray
     acceptance_rates: SharedMemoryArray
@@ -62,7 +66,7 @@ class SharedData:
     global_comm_barriers: SharedMemoryArray
 
     def to_numpy(self) -> _s.Dict[str, _s.ArrayLike]:
-        """
+        r"""
         Return a dict mapping each shared-data attribute name
         to its NumPy array view.
         """
@@ -288,7 +292,7 @@ def _launch_worker(
         task_queue.task_done()
 
 
-def scan(
+def _scan(
     scan_idx: int,
     round_idx: int,
     executors: _s.List[_c.multiprocessing_context.JoinableQueue],
@@ -296,6 +300,16 @@ def scan(
     shared_data: SharedData,
     even: bool = False,
 ):
+    r"""
+
+    :param scan_idx:
+    :param round_idx:
+    :param executors:
+    :param sync_rng:
+    :param shared_data:
+    :param even:
+    :return:
+    """
     n_chains = len(executors)
 
     # local step
@@ -360,6 +374,20 @@ def sample_pt(
     deo: bool = True,
     progress_bar: bool = False,
 ):
+    r"""
+
+    :param n_chains:
+    :param n_rounds:
+    :param target:
+    :param starting_point:
+    :param proposal_cls:
+    :param seed:
+    :param proposal_args:
+    :param thinning:
+    :param deo:
+    :param progress_bar:
+    :return:
+    """
     assert target.model is not None
 
     # Setup random number generator for synchronization
@@ -429,7 +457,7 @@ def sample_pt(
                 shared_data.densities.view().fill(_s.numpy.nan)
 
                 even = (t % 2) if deo else (_c.Uniform()(sync_rng) < 0.5)
-                scan(scan_idx, round_idx, executors, sync_rng, shared_data, even=even)
+                _scan(scan_idx, round_idx, executors, sync_rng, shared_data, even=even)
                 scan_idx += 1
 
             # Compute rejection rates (until now, the array contains the total number of rejections)
