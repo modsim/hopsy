@@ -96,7 +96,7 @@ def _initialize_shared_arrays(
     samples = make_block(
         "samples", (n_scans + 1, n_chains, state_dim), starting_point.dtype
     )
-    densities = make_block("densities", (n_chains, n_chains), _s.numpy.float64)
+    densities = make_block("densities", (1, n_chains), _s.numpy.float64)
     acc_rates = make_block(
         "acceptance_rates", (n_scans + 1, n_chains), _s.numpy.float64
     )
@@ -130,75 +130,15 @@ def _initialize_shared_arrays(
     )
 
 
-def _likelihood_idx(n_chains: int, even: bool):
-    groups = []
-    cur_group = []
-    for i in range(n_chains):
-        cur_group.append(i)
-        if i % 2 != even:
-            groups.append(cur_group)
-            cur_group = []
-
-        if i == n_chains - 1 and len(cur_group) > 0:
-            groups.append(cur_group)
-
-    cur_group_idx = 0
-    cur_machine_idx = 0
-
-    samples_idx = []
-
-    while cur_machine_idx < n_chains:
-        samples_to_consider_for_current_machine = list(groups[cur_group_idx])
-
-        if cur_group_idx > 0:
-            samples_to_consider_for_current_machine += groups[cur_group_idx - 1]
-        if cur_group_idx < len(groups) - 1:
-            samples_to_consider_for_current_machine += [groups[cur_group_idx + 1][0]]
-
-        if cur_machine_idx == groups[cur_group_idx][-1]:
-            cur_group_idx += 1
-
-        cur_machine_idx += 1
-
-        samples_idx.append(samples_to_consider_for_current_machine)
-
-    pairs = []
-
-    for i in range(n_chains):
-        for j in samples_idx[i]:
-            pairs.append((i, j))
-            pairs.append((j, i))
-
-    return list(set(pairs))
-
-
-def _swap_probability(densities, idx_curr: int, idx_next: int):
+def _swap_probability(densities, temperatures, idx_curr: int, idx_next: int):
     log_likelihood_ratio = (
-        densities[idx_curr, idx_next]
-        + densities[idx_next, idx_curr]
-        - densities[idx_curr, idx_curr]
-        - densities[idx_next, idx_next]
+        temperatures[idx_curr] * densities[idx_next]
+        + temperatures[idx_next] * densities[idx_curr]
+        - temperatures[idx_curr] * densities[idx_curr]
+        - temperatures[idx_next] * densities[idx_next]
     )
 
-    if _s.numpy.isnan(log_likelihood_ratio):
-        raise ValueError("log_likelihood_ratio is nan")
-
     return 1 if log_likelihood_ratio > 0 else min(1, _s.numpy.exp(log_likelihood_ratio))
-
-
-def _worker_density(
-    target_id: int,
-    sample_id: int,
-    scan_idx: int,
-    round_idx: int,
-    chain: _c.MarkovChain,
-    temperatures: _s.ArrayLike,
-    samples: _s.ArrayLike,
-    transition_probs: _s.ArrayLike,
-):
-    transition_probs[target_id, sample_id] = temperatures[
-        round_idx, target_id
-    ] * chain.model.log_density(samples[scan_idx, sample_id])
 
 
 def _worker_sample(
@@ -245,9 +185,9 @@ def _launch_worker(
 ):
     machine_idx = shared_data.machine_idx.view()
     temperatures = shared_data.temperatures.view()
-    transition_probs = shared_data.densities.view()
     samples = shared_data.samples.view()
     acc_rates = shared_data.acceptance_rates.view()
+    densities = shared_data.densities.view()
 
     reference_chain = _c.MarkovChain(reference, _c.UniformCoordinateHitAndRunProposal)
 
@@ -260,34 +200,24 @@ def _launch_worker(
     while True:
         task = task_queue.get()
 
-        # Check if you want the work to sample or to compute the transition probabilities
-        if len(task) == 2:
-            scan_idx, round_idx = task
-            _worker_sample(
-                scan_idx,
-                round_idx,
-                process_id,
-                reference_chain,
-                chain,
-                rng,
-                thinning,
-                machine_idx,
-                temperatures,
-                samples,
-                acc_rates,
-            )
+        scan_idx, round_idx = task
+
+        chain_idx = _s.numpy.where(machine_idx[scan_idx] == process_id)[0][0]
+        beta = temperatures[round_idx, chain_idx]
+
+        if beta <= 1e-9:
+            thinning_factor = max(len(chain.state), int(len(chain.state) ** 2 // 6))
+            reference_chain.state = chain.state
+            acceptance_rate, new_state = reference_chain.draw(rng, thinning_factor)
+            chain.state = new_state
         else:
-            target_id, sample_id, scan_idx, round_idx = task
-            _worker_density(
-                target_id,
-                sample_id,
-                scan_idx,
-                round_idx,
-                chain,
-                temperatures,
-                samples,
-                transition_probs,
-            )
+            chain.coldness = beta
+            acceptance_rate, new_state = chain.draw(rng, thinning)
+
+        # 5. Safe write to shared arrays
+        samples[scan_idx, chain_idx] = new_state
+        acc_rates[scan_idx, chain_idx] = acceptance_rate
+        densities[0, process_id] = chain.model.log_density(new_state)
 
         task_queue.task_done()
 
@@ -318,19 +248,15 @@ def _scan(
     for executor in executors:
         executor.join()
 
-    idx_list = _likelihood_idx(n_chains, even)
-    for i, j in idx_list:
-        executors[i].put((i, j, scan_idx, round_idx))
-    for executor in executors:
-        executor.join()
-
     machine_idx = shared_data.machine_idx.view()
     r = shared_data.rejection_rates.view()
     samples = shared_data.samples.view()
     densities = shared_data.densities.view()
+    temperatures = shared_data.temperatures.view()
+
     # swap
     for i in range(n_chains - 1):
-        alpha = _swap_probability(densities, i, i + 1)
+        alpha = _swap_probability(densities[0], temperatures[round_idx], i, i + 1)
         # swap
         if even == i % 2:
             if _c.Uniform()(sync_rng) < alpha:
