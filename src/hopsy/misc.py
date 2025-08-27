@@ -1917,7 +1917,7 @@ def KLdivergence(x, y):
 
     assert(d == dy)
     if _numpy.array_equal(x,y):
-    return 0
+        return 0
 
 
     mA = _multiplicity_in_self(x)  # Frequency of each point in x (inkl. self)
