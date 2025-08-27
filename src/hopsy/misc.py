@@ -1875,7 +1875,7 @@ def _multiplicity_in_self(a):
     ----------
     out : counts_per_row : numpy.ndarray of int
         1D array of length a.shape[0].
-        For each row of `a`, the entry gives how often that row occurs in `a`.
+        For each row of a, the entry gives how often that row occurs in a.
     """
     _numpy = _s.numpy
     a = _numpy.ascontiguousarray(a)
