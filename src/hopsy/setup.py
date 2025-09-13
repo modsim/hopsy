@@ -11,6 +11,7 @@ def setup(
     n_tuning_rounds=100,
     target_accrate=0.234,
     tuning_target="accrate",
+    tempering=False,
 ):
     """
 
@@ -34,6 +35,8 @@ def setup(
     tuning_target: str
         What tuning_target to use, if n_tuning>0 Valid tuning targets are "accrate" for acceptance rate tuning,
         "esjd" for expected squared jump distance tuning and "esjd/s" for expected squared jump distance per second tuning.
+    tempering: bool
+        Whether to use parallel tempering or not. If yes, assigns linearly spaced temperatures between 0 and 1 to the chains.
 
     Returns
     -------
@@ -54,10 +57,12 @@ def setup(
             random_seeds.append(random_number)
 
     rngs = [_c.RandomNumberGenerator(rs) for rs in random_seeds]
+    temperatures = [1.]*n_chains if not tempering else \
+        _s.numpy.linspace(0, 1, n_chains)
 
-    markov_chains = [MarkovChain(problem, proposal=proposal) for _ in rngs]
+    markov_chains = [MarkovChain(problem, proposal=proposal, coldness=temperatures[i]) for i in range(n_chains)]
     assert len(markov_chains) == n_chains and len(random_seeds) == n_chains
-
+    tuning_results = None
     if n_tuning > 0 and hasattr(markov_chains[0].proposal, "stepsize"):
         mcs, rngs, tuning_results = tune(
             markov_chains,
