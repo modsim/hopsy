@@ -56,6 +56,7 @@ class _submodules:
         import tqdm
     import typing
     import warnings
+    import weakref
 
     import numpy.typing
 
@@ -86,11 +87,15 @@ def create_shared_memory(state_shape, num_blocks: int, state_type=_s.numpy.float
         _s.shared_memory.SharedMemory(size=shared_memory_size, create=True)
         for i in range(num_blocks)
     ]
-    _s.atexit.register(lambda: [release_shared_memory(s) for s in shared_state_memory])
+    _s.atexit.register(lambda: release_shared_memory(shared_state_memory))
     return shared_state_memory
 
 
-def release_shared_memory(shm):
+def release_shared_memory(
+    shared_memory_list: _s.typing.List,
+    chain_index: int = None,
+    barrier: _s.multiprocessing.Barrier = None,
+):
     """
     It is the responsibility of the caller of create_shared_memory to call release_shared_memory
     Multiprocessing will give a warning if leaked memory exists at the end of the program
@@ -106,12 +111,21 @@ def release_shared_memory(shm):
 
     """
     try:
-        # If memory was already unlinked, it will throw. Because we register the cleanup with atexit,
-        # we don't know for sure if the memory still exists or not. We just clean up any handle we ever had.
-        shm.close()
-        shm.unlink()
-    except FileNotFoundError:
-        pass
+        if chain_index is None or chain_index == 0:
+            try:
+                for shm in shared_memory_list:
+                    # We are unsure if the memory still exists or not.
+                    # We just try to clean up any handle we ever had.
+                    shm.close()
+                    shm.unlink()
+            except FileNotFoundError:
+                pass
+    finally:
+        try:
+            if barrier is not None:
+                barrier.abort()
+        except Exception:
+            pass
 
 
 class PyParallelTemperingChain:
@@ -129,22 +143,48 @@ class PyParallelTemperingChain:
         shared_memory: _s.typing.List[_s.shared_memory.SharedMemory] = None,
         draws_per_exchange_attempt: float = 10,
     ):
+        self.chain_index = chain_index
         self.markov_chain = markov_chain
         self.parallel_tempering_sync_rng = sync_rng
         self.shared_memory = shared_memory
         self.draws_per_exchange_attempt = draws_per_exchange_attempt
-        self.chain_index = chain_index
         self.barrier = barrier
         self.num_chains_in_ensemble = num_chains_in_ensemble
         self.draw_offset = 0
         self.draw_tracker = 0
         self.exchange_tracker = 0
+        self._closed = False
+
+        self._finalizer = _s.weakref.finalize(
+            self,
+            release_shared_memory,
+            self.shared_memory,
+            self.chain_index,
+            self.barrier,
+        )
+
+    def cleanup(self):
+        if self._closed:
+            return
+        try:
+            release_shared_memory(self.shared_memory, self.chain_index, self.barrier)
+        finally:
+            self._closed = True
+            if self._finalizer.alive:
+                self._finalizer.detach()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.cleanup()
 
     def __del__(self):
-        if self.chain_index == 0:
-            for n in self.shared_memory:
-                release_shared_memory(n)
-        self.barrier.abort()
+        try:
+            if hasattr(self, "_finalizer") and self._finalizer.alive:
+                self._finalizer()
+        except Exception:
+            pass
 
     @property
     def coldness(self):
