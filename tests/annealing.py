@@ -15,32 +15,34 @@ class AnnealingTests(unittest.TestCase):
         problem = Problem(
             np.array([[1], [-1]]), np.array([3, 3]), Gaussian([0.0], [[1.0]])
         )
-        result = sample_pt(
-            5,
-            2,
-            problem,
-            compute_chebyshev_center(problem),
-            GaussianHitAndRunProposal,
-            42,
-            proposal_args={"stepsize": 1},
+
+        mcs, rngs = setup(problem, proposal=hopsy.GaussianHitAndRunProposal, random_seed=42, n_chains=8, tempering=True)
+
+        final_samples, result_stats = nrpt(
+            mcs,
+            rngs,
+            n_rounds=5,
+            thinning=1,
             progress_bar=True,
+            seed=42,
         )
+
         self.assertTrue(True)
 
     def test_similar_wasserstein_to_single_chain(self):
         problem = Problem(
             np.array([[1], [-1]]), np.array([3, 3]), Gaussian([0.0], [[1.0]])
         )
-        samples_nrpt = sample_pt(
-            5,
-            8,
-            problem,
-            compute_chebyshev_center(problem),
-            GaussianHitAndRunProposal,
-            42,
-            proposal_args={"stepsize": 1},
+        mcs, rngs = setup(problem, proposal=hopsy.GaussianHitAndRunProposal, random_seed=42, n_chains=8, tempering=True)
+
+        samples_nrpt, result_stats = nrpt(
+            mcs,
+            rngs,
+            n_rounds=5,
+            thinning=1,
             progress_bar=True,
-        )["samples"][2**7 :, -1, 0]
+            seed=42,
+        )
 
         samples_sc = sample(*setup(problem, 42, 1), 2**7)[1][0, :, 0]
 

@@ -78,13 +78,16 @@ class SharedData:
 
 def _initialize_shared_arrays(
     smm: _s.SharedMemoryManager,
-    n_chains: int,
-    n_rounds: int,
-    state_dim: int,
-    starting_point: _s.ArrayLike,
+    chains: _s.List[_c.MarkovChain],
+    n_rounds: int = 1,
+    n_samples: int = 1,
 ) -> SharedData:
-    # total number of scan‐steps = sum_{r=0..n_rounds-1} 2**r
-    n_scans = sum(2**r for r in range(n_rounds))
+
+    if n_rounds == 1:
+        n_scans = n_samples
+    else:
+        # total number of scan‐steps = sum_{r=0..n_rounds-1} 2**r
+        n_scans = sum(2**r for r in range(n_rounds))
 
     def make_block(name: str, shape: tuple, dtype) -> SharedMemoryArray:
         n_bytes = int(_s.numpy.prod(shape) * _s.numpy.dtype(dtype).itemsize)
@@ -93,8 +96,15 @@ def _initialize_shared_arrays(
             name=name, shared_memory=shared_memory, shape=shape, dtype=dtype
         )
 
+    n_chains = len(chains)
+    states = [chains[i].state for i in range(n_chains)]
+    state_dim = states[0].shape[0]
+    dtype = states[0].dtype
+    assert all(s.shape == (state_dim,) for s in states), "All chains must have the same state dimension"
+    assert all(s.dtype == dtype for s in states), "All chains must have the same state dtype"
+
     samples = make_block(
-        "samples", (n_scans + 1, n_chains, state_dim), starting_point.dtype
+        "samples", (n_scans + 1, n_chains, state_dim), dtype
     )
     densities = make_block("densities", (1, n_chains), _s.numpy.float64)
     acc_rates = make_block(
@@ -110,15 +120,15 @@ def _initialize_shared_arrays(
     # — initialize contents —
     samples_view = samples.view()
     samples_view.fill(0.0)
-    samples_view[0] = starting_point.ravel()
+    samples_view[0] = _s.numpy.array(states)
 
     idx_array = machine_idx.view()
     idx_array[0, :] = _s.numpy.arange(n_chains, dtype=_s.numpy.int32)
 
     temps_view = temps.view()
     temps_view.fill(0.0)
-    temps_view[0, :] = _s.numpy.linspace(0.0, 1.0, n_chains)
-
+    temps_view[0, :] = _s.numpy.array([chains[i].coldness for i in range(n_chains)])
+    print("Initial temperatures:", temps_view[0, :])
     return SharedData(
         samples=samples,
         densities=densities,
@@ -141,46 +151,14 @@ def _swap_probability(densities, temperatures, idx_curr: int, idx_next: int):
     return 1 if log_likelihood_ratio > 0 else min(1, _s.numpy.exp(log_likelihood_ratio))
 
 
-def _worker_sample(
-    scan_idx: int,
-    round_idx: int,
-    process_id: int,
-    reference_chain: _c.MarkovChain,
-    chain: _c.MarkovChain,
-    rng: _c.RandomNumberGenerator,
-    thinning: int,
-    machine_idx: _s.ArrayLike,
-    temperatures: _s.ArrayLike,
-    samples: _s.ArrayLike,
-    acc_rates: _s.ArrayLike,
-):
-    chain_idx = _s.numpy.where(machine_idx[scan_idx] == process_id)[0][0]
-    beta = temperatures[round_idx, chain_idx]
-
-    if beta <= 1e-9:
-        thinning_factor = max(len(chain.state), int(len(chain.state) ** 2 // 6))
-        reference_chain.state = chain.state
-        acceptance_rate, new_state = reference_chain.draw(rng, thinning_factor)
-        chain.state = new_state
-    else:
-        chain.coldness = beta
-        acceptance_rate, new_state = chain.draw(rng, thinning)
-
-    # 5. Safe write to shared arrays
-    samples[scan_idx, chain_idx] = new_state
-    acc_rates[scan_idx, chain_idx] = acceptance_rate
-
-
 def _launch_worker(
-    target,
-    reference,
-    proposal_cls,
-    starting_point,
-    seed_base,
+    chain : _c.MarkovChain,
+    rng : _c.RandomNumberGenerator,
+    reference: _c.Problem,
     task_queue: _c.multiprocessing_context.JoinableQueue,
     shared_data: SharedData,
     process_id: int,
-    proposal_args: _s.Optional[_s.Dict] = None,
+    proposal_args: _s.Dict = None,
     thinning: int = 1,
 ):
     machine_idx = shared_data.machine_idx.view()
@@ -191,11 +169,9 @@ def _launch_worker(
 
     reference_chain = _c.MarkovChain(reference, _c.UniformCoordinateHitAndRunProposal)
 
-    chain = _c.MarkovChain(target, proposal_cls, starting_point=starting_point)
     if proposal_args:
         for k in proposal_args:
             setattr(chain.proposal, k, proposal_args[k])
-    rng = _c.RandomNumberGenerator(seed_base + (process_id + 1) * 100)
 
     while True:
         task = task_queue.get()
@@ -272,7 +248,7 @@ def _scan(
         r[round_idx, i + 1] += r_diff
 
 
-def _optimize_schedule(rejection_rates: _s.ArrayLike, temperatures: _s.ArrayLike):
+def _optimize_schedule(rejection_rates: _s.ArrayLike, temperatures: _s.ArrayLike, tune_schedule: bool = True):
     n_chains = len(temperatures)
     temperatures_next = _s.numpy.zeros(n_chains)
     temperatures_next[-1] = 1
@@ -283,44 +259,62 @@ def _optimize_schedule(rejection_rates: _s.ArrayLike, temperatures: _s.ArrayLike
         cum_rejection_rates, temperatures, extrapolate=True
     )
     for k in range(1, n_chains - 1):
-        temperatures_next[k] = interpolator(k / n_chains * comm_barrier)
+        temperatures_next[k] = interpolator(k / n_chains * comm_barrier) if tune_schedule else temperatures[k]
 
     return comm_barrier, temperatures_next
 
 
-def sample_pt(
-    n_chains: int,
-    n_rounds: int,
-    target: _c.Problem,
-    starting_point: _s.ArrayLike,
-    proposal_cls: _c.Proposal,
+def nrpt(
+    mcs: _s.List[_c.MarkovChain],
+    rngs: _s.List[_c.RandomNumberGenerator],
     seed: int,
-    proposal_args: _s.Dict = None,
-    thinning: int = 1,
+    n_rounds: int = 0,
+    n_samples: int = 0,
+    thinning : int = 1,
     deo: bool = True,
+    tune_schedule: bool = True,
     progress_bar: bool = False,
+    proposal_args: _s.Dict = None,
 ):
-    r"""
-
-    :param n_chains:
-    :param n_rounds:
-    :param target:
-    :param starting_point:
-    :param proposal_cls:
-    :param seed:
-    :param proposal_args:
-    :param thinning:
-    :param deo:
-    :param progress_bar:
-    :return:
     """
-    assert target.model is not None
+    Non-Reversible Parallel Tempering
+
+    Parameters
+    ----------
+    mcs : List[MarkovChain]
+        List of Markov chains to use for sampling.
+    rngs : List[_c.RandomNumberGenerator]
+        List of random number generators to use for sampling.
+    n_samples : int
+        Number of samples to draw.
+    n_rounds : int
+        Number of rounds of parallel tempering to perform.
+    deo : bool
+        Whether to use deterministic even-odd (True) or random (False) exchanges.
+    tune_schedule : bool
+        Whether to adapt the temperature schedule or not.
+    progress_bar : bool
+        Whether to show a progress bar or not.
+    proposal_args : Dict
+        Additional arguments to pass to the proposal.
+    """
+
+    assert (n_samples > 0) ^ (n_rounds > 0), "Either n_samples or n_rounds must be specified, but not both."
+    assert len(mcs) == len(rngs), "Number of Markov chains must match number of random number generators."
+
+    if n_samples > 0:
+        assert not tune_schedule, "Tuning the schedule is supported only for round-based tuning. For schedule tuning, specify n_rounds instead of n_samples."
+
+    target = mcs[-1].problem
+    starting_point = target.starting_point
 
     # Setup random number generator for synchronization
     sync_rng = _c.RandomNumberGenerator(seed)
 
     # Create special chain for efficiently sampling the uniform reference
     reference = _c.Problem(target.A, target.b)
+    n_chains = len(mcs)
+
     if target.shift is None and target.transformation is None:
         reference.starting_point = starting_point
         reference = _c.round(reference)
@@ -330,35 +324,35 @@ def sample_pt(
         reference.starting_point = _c.transform(reference, [starting_point])[0]
 
     with _s.SharedMemoryManager() as smm:
+
         # Allocate shared memory and initialize parallel workers
         shared_data = _initialize_shared_arrays(
             smm=smm,
-            n_chains=n_chains,
+            chains=mcs,
             n_rounds=n_rounds,
-            state_dim=target.A.shape[1],
-            starting_point=starting_point,
         )
+
         executors = [
             _c.multiprocessing_context.JoinableQueue() for _ in range(n_chains)
         ]
+
         workers = [
             _c.multiprocessing_context.Process(
                 target=_launch_worker,
                 args=(
-                    target,
+                    mcs[i],
+                    rngs[i],
                     reference,
-                    proposal_cls,
-                    starting_point,
-                    seed,
-                    executors[chain_idx],
+                    executors[i],
                     shared_data,
-                    chain_idx,
+                    i,
                     proposal_args,
                     thinning,
                 ),
             )
-            for chain_idx in range(n_chains)
+            for i in range(n_chains)
         ]
+
         for worker in workers:
             worker.start()
 
@@ -392,15 +386,21 @@ def sample_pt(
             # Adapt schedule
             if round_idx < n_rounds - 1:
                 comm_barrier, temperatures_next = _optimize_schedule(
-                    rejection_rates[round_idx], temperatures[round_idx]
+                    rejection_rates[round_idx], temperatures[round_idx], tune_schedule
                 )
                 global_comm_barriers[round_idx] = comm_barrier
                 temperatures[round_idx + 1] = temperatures_next
 
         # Save the results
         result_stats = shared_data.to_numpy()
+        final_samples = None
+
+        if n_rounds > 0:
+            final_samples = result_stats["samples"][-2**(n_rounds-1) :, -1, :]
+        else:
+            final_samples = result_stats["samples"]
 
         for worker in workers:
             worker.kill()
 
-    return result_stats
+    return final_samples, result_stats

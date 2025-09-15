@@ -61,6 +61,8 @@ def setup(
         _s.numpy.linspace(0, 1, n_chains)
 
     markov_chains = [MarkovChain(problem, proposal=proposal, coldness=temperatures[i]) for i in range(n_chains)]
+    for i in range(n_chains):
+        markov_chains[i].coldness = temperatures[i]
     assert len(markov_chains) == n_chains and len(random_seeds) == n_chains
     tuning_results = None
     if n_tuning > 0 and hasattr(markov_chains[0].proposal, "stepsize"):

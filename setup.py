@@ -157,7 +157,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Operating System :: POSIX :: Linux",
     ],
-    ext_modules=[CMakeExtension("hopsy/core")],
+    ext_modules=[CMakeExtension("hopsy.core")],
     # ext_modules=[Extension('hopsy._hopsy', sources=['src/hopsy/hopsy.cpp'])],
     cmdclass={"build_ext": CMakeBuild},
     packages=find_packages(where="src"),
