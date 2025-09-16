@@ -264,22 +264,20 @@ class MarkovChainTests(unittest.TestCase):
                 for r in range(replicates)
             ]
 
-            mcs = create_py_parallel_tempering_ensembles(
+            with create_py_parallel_tempering_ensembles(
                 markov_chains=mcs,
                 temperature_ladder=temperature_ladder,
                 sync_rngs=sync_rngs,
                 draws_per_exchange_attempt=20,
-            )
-
-            rngs = [RandomNumberGenerator(i + 511511) for i, _ in enumerate(mcs)]
-
-            _, samples = sample(
-                markov_chains=mcs,
-                rngs=rngs,
-                n_samples=n_samples,
-                thinning=thinning,
-                n_procs=len(mcs),
-            )
+            ) as mcs:
+                rngs = [RandomNumberGenerator(i + 511511) for i, _ in enumerate(mcs)]
+                _, samples = sample(
+                    markov_chains=mcs,
+                    rngs=rngs,
+                    n_samples=n_samples,
+                    thinning=thinning,
+                    n_procs=len(mcs),
+                )
 
             # mean should be 0 within 5 standard errors for every temp
             # if parallel tempering fails, mean is -5 or 5 with the coldest chain.

@@ -30,6 +30,7 @@ class _submodules:
     import atexit
     import time
     import warnings
+    from collections.abc import MutableSequence
 
     import arviz
     import numpy
@@ -56,6 +57,7 @@ class _submodules:
         import tqdm
     import typing
     import warnings
+    import weakref
 
     import numpy.typing
 
@@ -127,6 +129,44 @@ def release_shared_memory(
             pass
 
 
+class PyParallelTemperingChainGroup(_s.MutableSequence):
+    """Memory management for PyParallelTemperingChains"""
+
+    def __init__(self, chains):
+        self._chains = list(chains)
+        self._closed = False
+        self._finalizer = _s.weakref.finalize(self, self.close)
+
+    def __len__(self):
+        return len(self._chains)
+
+    def __getitem__(self, index):
+        return self._chains[index]
+
+    def __setitem__(self, index, item):
+        self._chains[index] = item
+
+    def __delitem__(self, index):
+        del self._chains[index]
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        self.close()
+
+    def insert(self, index, item):
+        self._chains.insert(index, item)
+
+    def close(self):
+        if self._closed:
+            return
+        self._closed = True
+        for c in self._chains:
+            if hasattr(c, "close"):
+                c.close()
+
+
 class PyParallelTemperingChain:
     """
     Wrapper for MarkovChain for performing parallel tempering using Multiprocessing (instead of MPI).
@@ -154,14 +194,14 @@ class PyParallelTemperingChain:
         self.exchange_tracker = 0
         self._closed = False
 
-    def cleanup(self):
+    def close(self):
         release_shared_memory(self.shared_memory, self.chain_index, self.barrier)
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.cleanup()
+        self.close()
 
     @property
     def coldness(self):
@@ -416,7 +456,7 @@ def create_py_parallel_tempering_ensembles(
                     shared_memory=shm,
                 )
             )
-    return pte
+    return PyParallelTemperingChainGroup(pte)
 
 
 def _propose(self, rng: _c.RandomNumberGenerator):
