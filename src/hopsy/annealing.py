@@ -403,4 +403,4 @@ def nrpt(
         for worker in workers:
             worker.kill()
 
-    return final_samples, result_stats
+    return result_stats, final_samples
