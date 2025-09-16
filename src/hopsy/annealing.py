@@ -106,7 +106,7 @@ def _initialize_shared_arrays(
     samples = make_block(
         "samples", (n_scans + 1, n_chains, state_dim), dtype
     )
-    densities = make_block("densities", (1, n_chains), _s.numpy.float64)
+    densities = make_block("densities", (n_scans + 1, n_chains), _s.numpy.float64)
     acc_rates = make_block(
         "acceptance_rates", (n_scans + 1, n_chains), _s.numpy.float64
     )
@@ -128,7 +128,6 @@ def _initialize_shared_arrays(
     temps_view = temps.view()
     temps_view.fill(0.0)
     temps_view[0, :] = _s.numpy.array([chains[i].coldness for i in range(n_chains)])
-    print("Initial temperatures:", temps_view[0, :])
     return SharedData(
         samples=samples,
         densities=densities,
@@ -186,14 +185,15 @@ def _launch_worker(
             reference_chain.state = chain.state
             acceptance_rate, new_state = reference_chain.draw(rng, thinning_factor)
             chain.state = new_state
+            densities[scan_idx, process_id] = chain.model.log_density(new_state)
         else:
             chain.coldness = beta
             acceptance_rate, new_state = chain.draw(rng, thinning)
+            densities[scan_idx, process_id] = chain.state_log_density
 
         # 5. Safe write to shared arrays
         samples[scan_idx, chain_idx] = new_state
         acc_rates[scan_idx, chain_idx] = acceptance_rate
-        densities[0, process_id] = chain.model.log_density(new_state)
 
         task_queue.task_done()
 
@@ -232,7 +232,7 @@ def _scan(
 
     # swap
     for i in range(n_chains - 1):
-        alpha = _swap_probability(densities[0], temperatures[round_idx], i, i + 1)
+        alpha = _swap_probability(densities[scan_idx], temperatures[round_idx], i, i + 1)
         # swap
         if even == i % 2:
             if _c.Uniform()(sync_rng) < alpha:
@@ -262,6 +262,17 @@ def _optimize_schedule(rejection_rates: _s.ArrayLike, temperatures: _s.ArrayLike
         temperatures_next[k] = interpolator(k / n_chains * comm_barrier) if tune_schedule else temperatures[k]
 
     return comm_barrier, temperatures_next
+
+# see https://pmc.ncbi.nlm.nih.gov/articles/PMC3038348/
+def stepping_stone(densities: _s.numpy.array, betas: _s.numpy.array):
+    tempered_densities = (densities * betas)
+    max_densities = _s.numpy.max(tempered_densities, axis=0)
+    betas = _s.numpy.array([betas[t] - betas[t-1] for t in range(1, len(betas))])
+    n_samples= tempered_densities.shape[0]
+    fac1 = (max_densities[1:] * betas).sum()
+    fac2 = _s.numpy.log(_s.numpy.exp(tempered_densities[:,1:] * betas - max_densities[1:]).sum(axis=0) / n_samples).sum()
+
+    return fac1 + fac2
 
 
 def nrpt(
@@ -374,8 +385,6 @@ def nrpt(
                     machine_idx = shared_data.machine_idx.view()
                     machine_idx[scan_idx] = machine_idx[scan_idx - 1].copy()
 
-                shared_data.densities.view().fill(_s.numpy.nan)
-
                 even = (t % 2) if deo else (_c.Uniform()(sync_rng) < 0.5)
                 _scan(scan_idx, round_idx, executors, sync_rng, shared_data, even=even)
                 scan_idx += 1
@@ -402,5 +411,7 @@ def nrpt(
 
         for worker in workers:
             worker.kill()
+
+    n_samples = final_samples.shape[0]
 
     return result_stats, final_samples
