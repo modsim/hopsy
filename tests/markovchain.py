@@ -358,3 +358,47 @@ class MarkovChainTests(unittest.TestCase):
                     np.min(ess(temp_samples))
                 )
                 assert np.abs(np.mean(temp_samples)) < 5 * expected_std_error
+
+    def test_pyparallel_tempering_pickling(self):
+        replicates = 1
+        n_temps = 4
+        A = np.array([[1, 0], [0, 1], [-1, 0], [0, -1]])
+        b = np.array([2, 2, 2, 2])
+
+        epsilon = 0.05
+        cov = epsilon * np.eye(2, 2)
+        mu1 = np.ones(2).reshape(2, 1)
+        gauss1 = Gaussian(mean=mu1, covariance=cov)
+        mu2 = -np.ones(2).reshape(2, 1)
+        gauss2 = Gaussian(mean=mu2, covariance=cov)
+        model = Mixture([gauss1, gauss2])
+
+        problem = Problem(A, b, model)
+
+        sync_rngs = [RandomNumberGenerator(seed=511 + r) for r in range(replicates)]
+        temperature_ladder = [1.0 - float(n) / (n_temps - 1) for n in range(n_temps)]
+
+        for ProposalType in ProposalTypes:
+            if ProposalType == TruncatedGaussianProposal:
+                continue
+            mcs = [
+                MarkovChain(
+                    proposal=ProposalType,
+                    problem=problem,
+                    starting_point=1 * np.ones(2),
+                )
+                for r in range(replicates)
+            ]
+
+            mcs = create_py_parallel_tempering_ensembles(
+                markov_chains=mcs,
+                temperature_ladder=temperature_ladder,
+                sync_rngs=sync_rngs,
+                draws_per_exchange_attempt=20,
+            )
+
+            for mc in mcs:
+                dump = pickle.dumps(mc)
+                new_mc = pickle.loads(dump)
+                assert new_mc.chain_index == mc.chain_index
+                assert np.all(new_mc.state == mc.state)

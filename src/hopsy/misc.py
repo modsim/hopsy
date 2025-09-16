@@ -56,7 +56,6 @@ class _submodules:
         import tqdm
     import typing
     import warnings
-    import weakref
 
     import numpy.typing
 
@@ -155,36 +154,14 @@ class PyParallelTemperingChain:
         self.exchange_tracker = 0
         self._closed = False
 
-        self._finalizer = _s.weakref.finalize(
-            self,
-            release_shared_memory,
-            self.shared_memory,
-            self.chain_index,
-            self.barrier,
-        )
-
     def cleanup(self):
-        if self._closed:
-            return
-        try:
-            release_shared_memory(self.shared_memory, self.chain_index, self.barrier)
-        finally:
-            self._closed = True
-            if self._finalizer.alive:
-                self._finalizer.detach()
+        release_shared_memory(self.shared_memory, self.chain_index, self.barrier)
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.cleanup()
-
-    def __del__(self):
-        try:
-            if hasattr(self, "_finalizer") and self._finalizer.alive:
-                self._finalizer()
-        except Exception:
-            pass
 
     @property
     def coldness(self):
