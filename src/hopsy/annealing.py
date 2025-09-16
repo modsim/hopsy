@@ -396,7 +396,7 @@ def nrpt(
         final_samples = None
 
         if n_rounds > 0:
-            final_samples = result_stats["samples"][-2**(n_rounds-1) :, -1, :]
+            final_samples = result_stats["samples"][-2**(n_rounds-1) :, :]
         else:
             final_samples = result_stats["samples"]
 
