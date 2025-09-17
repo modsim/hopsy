@@ -524,7 +524,8 @@ namespace hopsy {
                                     double coldness = self.getColdness();
                                     return py::make_tuple(self.proposal->copyProposal().release(),
                                                           self.getProblem(),
-                                                          self.parallelTemperingSyncRng, self.exchangeAttemptProbability,
+                                                          self.parallelTemperingSyncRng,
+                                                          self.exchangeAttemptProbability,
                                                           coldness);
                                 },
                                 [](py::tuple t) {
