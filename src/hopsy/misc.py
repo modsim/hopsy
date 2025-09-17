@@ -155,10 +155,8 @@ class PyParallelTemperingChainGroup(_s.MutableSequence):
     def __exit__(self, *exc):
         self.close()
 
-    def insert(self, index, item):
-        self._chains.insert(index, item)
-
     def close(self):
+        """releases shared memory for PyParallelTemperingChains"""
         if self._closed:
             return
         self._closed = True
