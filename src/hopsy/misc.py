@@ -743,16 +743,19 @@ def is_problem_polytope_empty(problem: _c.Problem):
     return is_polytope_empty(problem.A, problem.b)
 
 
-def compute_chebyshev_center(problem: _c.Problem, original_space: bool = False):
+def compute_chebyshev_center_and_radius(
+    problem: _c.Problem, original_space: bool = False
+):
     """
-    Computes the Chebyshev center, that is the midpoint of a (non-unique) largest inscribed ball in the polytope defined by :math:`Ax \leq b`.
+    Computes the Chebyshev center and radius of the (non-unique) largest inscribed ball in the polytope defined by :math:`Ax \leq b`.
     Note that if A and b are transformed (e.g. rounded), the chebyshev center is computed in the transformed space. To trigger a backtransform, use the parameter `original_space=True`.
+    However, the chebyshev center is NOT affine invariant.
 
     :param hopsy.Problem problem: Problem for which the Chebyshev center should be computed and which contains the matrix :math:`A` and vector :math:`b` in :math:`Ax \leq b`.
     :param bool original_space: If the problem has been transformed (e.g. rounded). the chebyshev center is computed in the rounded space by default. If the chebyshev center is required in the original space, use original_space=True. Only works if the transformation and shift are stored in the problem.
 
     :return: The Chebyshev center of the passed problem.
-    :rtype: numpy.ndarray[float64[n,1]]
+    :rtype: numpy.ndarray[float64[n,1]], float64
     """
     polytope = _s.polytope.Polytope(problem.A, problem.b)
     cheby_result = _s.ChebyshevFinder.chebyshev_center(polytope, _c.LP().settings)
@@ -765,6 +768,24 @@ def compute_chebyshev_center(problem: _c.Problem, original_space: bool = False):
     if original_space:
         return back_transform(problem=problem, points=[chebyshev_center])[0]
 
+    return chebyshev_center, distance_to_border
+
+
+def compute_chebyshev_center(problem: _c.Problem, original_space: bool = False):
+    """
+    Computes the Chebyshev center, that is the midpoint of a (non-unique) largest inscribed ball in the polytope defined by :math:`Ax \leq b`.
+    Note that if A and b are transformed (e.g. rounded), the chebyshev center is computed in the transformed space. To trigger a backtransform, use the parameter `original_space=True`.
+    However, the chebyshev center is NOT affine invariant.
+
+    :param hopsy.Problem problem: Problem for which the Chebyshev center should be computed and which contains the matrix :math:`A` and vector :math:`b` in :math:`Ax \leq b`.
+    :param bool original_space: If the problem has been transformed (e.g. rounded). the chebyshev center is computed in the rounded space by default. If the chebyshev center is required in the original space, use original_space=True. Only works if the transformation and shift are stored in the problem.
+
+    :return: The Chebyshev center of the passed problem.
+    :rtype: numpy.ndarray[float64[n,1]]
+    """
+    chebyshev_center, _ = compute_chebyshev_center_and_radius(
+        problem, original_space=original_space
+    )
     return chebyshev_center
 
 
