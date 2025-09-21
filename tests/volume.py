@@ -30,28 +30,6 @@ class VolumeTest(unittest.TestCase):
         # sample variance should be less than variance because gaussian is constrained by simplex
         self.assertLess(np.mean(np.var(samples)), variance)
 
-    def test_sample_unconstrained_gaussian(self):
-        n_dims = 2
-        variance = 1
-        A, _ = examples.generate_unit_hypercube(n_dims)
-        b = 100 * variance * np.ones(A.shape[0])
-        p = Problem(A, b)
-        n_samples = 1000000
-        samples = sample_gaussian(
-            p,
-            center=np.zeros(n_dims),
-            variance=variance,
-            random_seed=0,
-            n_samples=n_samples,
-            n_procs=4,
-        )
-        # sample variance should be less than variance because gaussian is constrained by simplex
-        print(np.mean(samples[:, :, 0]))
-        print(np.var(samples[:, :, 0]))
-        print(np.mean(samples[:, :, 1]))
-        print(np.var(samples[:, :, 1]))
-        # self.assertLess(np.mean(np.var(samples)), variance)
-
     def test_estimate_log_ratio(self):
         def test_n_dims(n_dims, variance, n_samples=10000):
             A, _ = examples.generate_unit_hypercube(n_dims)
@@ -96,7 +74,6 @@ class VolumeTest(unittest.TestCase):
 
     def test_estimate_cube_volume(self):
         def estimate_cube_volume(n_dims, n_samples):
-            print('estimating in', n_dims, 'dimensions')
             A, b = examples.generate_unit_hypercube(n_dims)
             p = Problem(A, b)
             log_volume, log_volume_error = estimate_polytope_log_volume(
@@ -109,14 +86,12 @@ class VolumeTest(unittest.TestCase):
 
     def test_estimate_simplex_volume(self):
         def estimate_simplex_volume(n_dims, n_samples):
-            print('estimating in', n_dims, 'dimensions')
             A, b = examples.generate_unit_simplex(n_dims)
             p = Problem(A, b)
             log_volume, log_volume_error = estimate_polytope_log_volume(
                 p, n_procs=16, sample_batch_size=n_samples, max_iterations=5 * n_dims,
             )
-            log_theoretical = -gammaln(n_dims+1)
-            print('theoretical', log_theoretical)
+            log_theoretical = -gammaln(n_dims + 1)
             self.assertLess(np.abs(log_volume - log_theoretical), 3 * log_volume_error)
 
         estimate_simplex_volume(15, 1000)

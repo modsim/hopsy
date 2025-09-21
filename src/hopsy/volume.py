@@ -122,7 +122,5 @@ def estimate_polytope_log_volume(
     if compute_rounding:
         rounding_factor = _s.numpy.linalg.slogdet(p.transformation).logabsdet
         log_volume_estimate += rounding_factor
-    print('log ratios', log_ratios)
     log_volume_error = _s.numpy.sqrt(_s.numpy.sum(_s.numpy.square(_s.numpy.array(log_ratio_errors))))
-    print("log vol estimate", log_volume_estimate, 'error', log_volume_error)
     return log_volume_estimate, log_volume_error
