@@ -1,8 +1,10 @@
+from hopsy.core import RandomNumberGenerator
+
 from .misc import (  # TruncatedGaussianProposal,
-    MarkovChain,
     _c,
     compute_chebyshev_center_and_radius,
     ess,
+    rhat,
     round,
     sample,
     setup,
@@ -12,53 +14,61 @@ from .misc import (  # TruncatedGaussianProposal,
 class _submodules:
     import numpy
     from scipy.special import logsumexp
+    from scipy.stats import chi2
 
 
 _s = _submodules
 
 
 def get_first_variance(
-    problem: _c.Problem, center: _s.numpy.ndarray, radius: float, tolerance: float
+       n_dims: int, radius: float, tolerance: float, safety_factor: float = 0.5
 ) -> float:
-    return radius * 1e-5
+    variance = safety_factor * radius / _s.chi2.ppf(1-tolerance, n_dims)
+    return variance
 
 
 def get_next_variance(variance: float, n_dim: int) -> float:
-    return variance * (1.0 + 1.0 / n_dim**2)
+    return variance * (1.0 + 1.0 / n_dim)
 
 
 def sample_gaussian(
-    problem: _c.Problem, center, variance, random_seed, n_samples, n_procs
+        problem: _c.Problem, center, variance, random_seed, n_samples, n_procs
 ):
     gaussian_problem = _c.Problem(
         problem.A,
         problem.b,
-        _c.Gaussian(center, _s.numpy.identity(center.shape[0]) / variance),
+        _c.Gaussian(center, _s.numpy.identity(center.shape[0]) * variance),
     )
-    mcs, rngs = setup(gaussian_problem, random_seed=random_seed)
+    mcs, rngs = setup(gaussian_problem, random_seed=random_seed, n_chains=n_procs)
+    # TODO: set smart starting point in typical set
     return sample(markov_chains=mcs, rngs=rngs, n_samples=n_samples, n_procs=n_procs)[1]
 
 
-def estimate_log_ratio(samples, center, variance_diff: float, n_dims: int):
-    square_norm = samples.flatten() ** 2
-    # square_norm = ((samples-center)**2).sum(axis=-1)
-    log_ratio_samples = -square_norm / 2 * variance_diff
-    print("log_ratio_samples", log_ratio_samples.shape)
-    print("samples shape", samples.shape)
-    n_samples = samples.shape[0] * samples.shape[1]
-    log_ratio = _s.logsumexp(log_ratio_samples) - _s.numpy.log(n_samples)
-    # ess = _c.ess(samples)
-    mc_error = 0
+def estimate_log_ratio(samples, center, variance_im1: float, variance_i: float):
+    square_norm = ((samples - center) ** 2).sum(axis=-1)
+    if variance_i is None:
+        # this is for tail-correction by comparing gauss to uniform
+        log_weights = 0.5 * square_norm * (1. / variance_im1)
+    else:
+        log_weights = 0.5 * square_norm * (1. / variance_im1 - 1. / variance_i)
+    log_ratio = _s.logsumexp(log_weights.ravel()) - _s.numpy.log(log_weights.size)
+    log_squared_ratio = _s.logsumexp(2. * log_weights.ravel()) - _s.numpy.log(log_weights.size)
+    log_variance = _s.numpy.exp(log_squared_ratio - 2. * log_ratio) - 1.
+    log_weights = log_weights.reshape((*log_weights.shape, -1))
+    effective_sample_size = ess(log_weights)[0][0]
+    mc_error = _s.numpy.sqrt(max(log_variance, 0.) / effective_sample_size)
     return log_ratio, mc_error
 
 
-def estimate_polytope_volume(
-    problem,
-    max_iterations=int(1e1),
-    tolerance=1e-9,
-    compute_rounding=True,
-    n_procs=1,
-    sample_batch_size=10000,
+def estimate_polytope_log_volume(
+        problem,
+        max_iterations=30,
+        tolerance=1e-2,
+        compute_rounding=True,
+        n_procs=1,
+        sample_batch_size=10000,
+        get_first_variance_fn=get_first_variance,
+        get_next_variance_fn=get_next_variance,
 ):
     """Cooling Gaussians, see DOI 10.1007/s12532-015-0097-z"""
     if compute_rounding:
@@ -66,38 +76,53 @@ def estimate_polytope_volume(
     else:
         p = problem
 
-    n_dims = problem.A.shape[1]
+    n_dims = p.A.shape[1]
     center, radius = compute_chebyshev_center_and_radius(p)
-    variances = [get_first_variance(problem, center, radius, tolerance)]
+    variances = [get_first_variance_fn(n_dims=n_dims, radius=radius, tolerance=tolerance)]
 
     log_ratios = []
+    log_ratio_errors = []
 
-    sample_batch_size = 10000
-    random_seed = 0
+    rng = _c.RandomNumberGenerator(0)
+    # TODO: using the first log_ratio, it is possible to check whether the first gaussian was essentially unconstrained
     while len(variances) < max_iterations:
-        variances.append(get_next_variance(variances[-1], n_dims))
-        converged = False
-        while not converged:
-            print("center, radius", center, radius)
-            samples = sample_gaussian(
-                problem,
-                center=center,
-                variance=variances[-2],
-                n_procs=n_procs,
-                n_samples=sample_batch_size,
-                random_seed=random_seed,
-            )
-            log_ratio, mc_error_log_ratio = estimate_log_ratio(
-                samples, center, variances[-2], n_dims
-            )
-            converged = True
-        log_ratios.append(log_ratio)
+        random_seed = rng()
+        variances.append(get_next_variance_fn(variances[-1], n_dims))
 
-    slogdet = _s.numpy.linalg.slogdet(p.transformation)
-    rounding_factor = slogdet.sign * slogdet.logabsdet
-    print(rounding_factor)
-    log_volume_estimate = rounding_factor + _s.numpy.sum(log_ratios)
-    print("log vol estimate", log_volume_estimate)
-    volume_estimate = _s.numpy.exp(log_volume_estimate)
-    print("vol estimate", volume_estimate)
-    return volume_estimate
+        samples = sample_gaussian(
+            p,
+            center=center,
+            variance=variances[-2],
+            n_procs=n_procs,
+            n_samples=sample_batch_size,
+            random_seed=random_seed,
+        )
+        log_ratio, mc_error_log_ratio = estimate_log_ratio(
+            samples, center, variance_im1=variances[-2], variance_i=variances[-1]
+        )
+        log_ratios.append(log_ratio)
+        log_ratio_errors.append(mc_error_log_ratio)
+
+    # tail correction:
+    samples = sample_gaussian(
+        p,
+        center=center,
+        variance=variances[-1],
+        n_procs=n_procs,
+        n_samples=sample_batch_size,
+        random_seed=random_seed,
+    )
+    log_ratio, mc_error_log_ratio = estimate_log_ratio(samples, center, variance_im1=variances[-1], variance_i=None)
+    log_ratios.append(log_ratio)
+    log_ratio_errors.append(mc_error_log_ratio)
+
+
+    log_volume_estimate = _s.numpy.sum(_s.numpy.array(log_ratios)) + n_dims * 0.5 * _s.numpy.log(
+        2 * _s.numpy.pi * variances[0])
+    if compute_rounding:
+        rounding_factor = _s.numpy.linalg.slogdet(p.transformation).logabsdet
+        log_volume_estimate += rounding_factor
+    print('log ratios', log_ratios)
+    log_volume_error = _s.numpy.sqrt(_s.numpy.sum(_s.numpy.square(_s.numpy.array(log_ratio_errors))))
+    print("log vol estimate", log_volume_estimate, 'error', log_volume_error)
+    return log_volume_estimate, log_volume_error
