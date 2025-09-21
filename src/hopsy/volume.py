@@ -23,17 +23,20 @@ _s = _submodules
 def get_first_variance(
        n_dims: int, radius: float, tolerance: float, safety_factor: float = 0.5
 ) -> float:
+    """Cooling Gaussians, see DOI 10.1007/s12532-015-0097-z"""
     variance = safety_factor * radius / _s.chi2.ppf(1-tolerance, n_dims)
     return variance
 
 
 def get_next_variance(variance: float, n_dim: int) -> float:
+    """Cooling Gaussians, see DOI 10.1007/s12532-015-0097-z"""
     return variance * (1.0 + 1.0 / n_dim)
 
 
 def sample_gaussian(
         problem: _c.Problem, center, variance, random_seed, n_samples, n_procs
 ):
+    """Cooling Gaussians, see DOI 10.1007/s12532-015-0097-z"""
     gaussian_problem = _c.Problem(
         problem.A,
         problem.b,
@@ -45,6 +48,7 @@ def sample_gaussian(
 
 
 def estimate_log_ratio(samples, center, variance_im1: float, variance_i: float):
+    """Cooling Gaussians, see DOI 10.1007/s12532-015-0097-z"""
     square_norm = ((samples - center) ** 2).sum(axis=-1)
     if variance_i is None:
         # this is for tail-correction by comparing gauss to uniform
