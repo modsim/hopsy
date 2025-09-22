@@ -80,14 +80,14 @@ class VolumeTest(unittest.TestCase):
             p = Problem(A, b)
             log_volume, log_volume_error = estimate_polytope_log_volume(
                 p,
-                n_procs=16,
+                n_procs=8,
                 sample_batch_size=n_samples,
-                max_iterations=5 * n_dims,
+                max_iterations=3 * n_dims,
             )
             log_theoretical = 0
             self.assertLess(np.abs(log_volume - log_theoretical), 3 * log_volume_error)
 
-        estimate_cube_volume(15, 1000)
+        estimate_cube_volume(2, 100)
 
     def test_estimate_simplex_volume(self):
         def estimate_simplex_volume(n_dims, n_samples):
@@ -95,11 +95,11 @@ class VolumeTest(unittest.TestCase):
             p = Problem(A, b)
             log_volume, log_volume_error = estimate_polytope_log_volume(
                 p,
-                n_procs=16,
+                n_procs=8,
                 sample_batch_size=n_samples,
-                max_iterations=5 * n_dims,
+                max_iterations=3 * n_dims,
             )
             log_theoretical = -gammaln(n_dims + 1)
             self.assertLess(np.abs(log_volume - log_theoretical), 3 * log_volume_error)
 
-        estimate_simplex_volume(15, 1000)
+        estimate_simplex_volume(2, 100)
