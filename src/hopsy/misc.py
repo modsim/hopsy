@@ -766,7 +766,7 @@ def compute_chebyshev_center_and_radius(
             "Chebyshev center is outside of polytope. To solve check polytope feasibility or change LP settings"
         )
     if original_space:
-        return back_transform(problem=problem, points=[chebyshev_center]), None
+        return back_transform(problem=problem, points=[chebyshev_center])[0], None
 
     return chebyshev_center, distance_to_border[0]
 
