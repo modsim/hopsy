@@ -540,7 +540,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="hopsy.round">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hopsy.</span></span><span class="sig-name descname"><span class="pre">round</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="hopsy.Problem.html#hopsy.Problem" title="hopsy.core.Problem"><span class="pre">Problem</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#hopsy.round" title="Link to this definition">#</a></dt>
-<dd><p>Rounds the polytope defined by the inequality <span class="math notranslate nohighlight">\(Ax \leq b\)</span> using
+<dd><p>Rounds the polytope defined by the inequality <span class="math notranslate nohighlight">\(Ax &lt; b\)</span> using
 <a class="reference external" href="https://pypi.org/project/PolyRound/">PolyRound</a>.
 This function also strips redundant constraints.
 The unrounding transformation <span class="math notranslate nohighlight">\(T\)</span> and shift <span class="math notranslate nohighlight">\(s\)</span> will be stored in <code class="xref py py-attr docutils literal notranslate"><span class="pre">hopsy.UniformProblem.transformation</span></code>
@@ -549,7 +549,7 @@ the right-hand side <code class="xref py py-attr docutils literal notranslate"><
 inequality</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>problem</strong> (<a class="reference internal" href="hopsy.Problem.html#hopsy.Problem" title="hopsy.Problem"><em>hopsy.Problem</em></a>) – Problem that should be rounded and which contains the matrix <span class="math notranslate nohighlight">\(A\)</span> and vector <span class="math notranslate nohighlight">\(b\)</span> in <span class="math notranslate nohighlight">\(Ax \leq b\)</span>.</p>
+<dd class="field-odd"><p><strong>problem</strong> (<a class="reference internal" href="hopsy.Problem.html#hopsy.Problem" title="hopsy.Problem"><em>hopsy.Problem</em></a>) – Problem that should be rounded and which contains the matrix <span class="math notranslate nohighlight">\(A\)</span> and vector <span class="math notranslate nohighlight">\(b\)</span> in <span class="math notranslate nohighlight">\(Ax &lt; b\)</span>.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The rounded problem.</p>
