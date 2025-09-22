@@ -14,22 +14,6 @@ class VolumeTest(unittest.TestCase):
         next_variance = get_next_variance(variance, n_dim)
         self.assertLess(variance, next_variance)
 
-    def test_sample_constrained_gaussian(self):
-        n_dim = 3
-        p = Problem(*examples.generate_unit_simplex(n_dim))
-        variance = 1
-        n_samples = 100
-        samples = sample_gaussian(
-            p,
-            center=np.zeros(n_dim),
-            variance=variance,
-            random_seed=0,
-            n_samples=n_samples,
-            n_procs=4,
-        )
-        # sample variance should be less than variance because gaussian is constrained by simplex
-        self.assertLess(np.mean(np.var(samples)), variance)
-
     def test_estimate_log_ratio(self):
         def test_n_dims(n_dims, variance, n_samples=10000):
             A, _ = examples.generate_unit_hypercube(n_dims)

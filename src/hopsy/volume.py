@@ -1,4 +1,6 @@
-from hopsy.core import RandomNumberGenerator
+"""
+module for volume estimation
+"""
 
 from .misc import (  # TruncatedGaussianProposal,
     _c,
