@@ -8,3 +8,4 @@ from .examples import *
 from .lp import *
 from .misc import *
 from .tuning import *
+from .volume import *
