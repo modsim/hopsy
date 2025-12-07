@@ -2,7 +2,7 @@ import unittest
 
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.special import gammaln
+from scipy.special import gammaln, erf
 
 from hopsy import *
 
@@ -103,3 +103,79 @@ class VolumeTest(unittest.TestCase):
             self.assertLess(np.abs(log_volume - log_theoretical), 3 * log_volume_error)
 
         estimate_simplex_volume(2, 100)
+
+    def test_1d_degenerate_gaussian_volume(self):
+        L = 5.0
+
+        A = np.array([
+            [ 1.0,  0.0],
+            [-1.0,  0.0],
+            [ 0.0,  1.0],
+            [ 0.0, -1.0],
+        ])
+        b = np.array([L, L, L, L])
+
+        # If your Problem requires a distribution, add Uniform() as third arg:
+        # problem = Problem(A, b, Uniform())
+        problem = Problem(A, b)
+
+        logZ, logZ_err = estimate_projected_gaussian_log_normalization(
+            problem=problem,
+            projection=np.array([1.0, 0.0]),
+            observation=0.0,
+            sigma=1.0,
+            compute_rounding=False,
+            max_iterations=20,
+            tolerance=1e-3,
+            n_procs=4,
+            sample_batch_size=20_000,
+        )
+
+        Z_true = 2 * L * np.sqrt(2 * np.pi) * erf(L / np.sqrt(2.0))
+        logZ_true = np.log(Z_true)
+
+        diff = abs(logZ - logZ_true)
+        print(logZ, logZ_true)
+        assert diff < 5.0 * logZ_err + 5e-2, (
+            f"logZ differs from analytic value by {diff}, "
+            f"which is larger than allowed tolerance. "
+            f"logZ={logZ}, logZ_true={logZ_true}, logZ_err={logZ_err}"
+        )
+
+    def test_2d_gaussian(self):
+        L = 5.0
+
+        A = np.array([
+            [ 1.0,  0.0],
+            [-1.0,  0.0],
+            [ 0.0,  1.0],
+            [ 0.0, -1.0],
+        ])
+        b = np.array([L, L, L, L])
+
+        # If your Problem requires a distribution, add Uniform() as third arg:
+        # problem = Problem(A, b, Uniform())
+        problem = Problem(A, b)
+
+        logZ, logZ_err = estimate_projected_gaussian_log_normalization(
+            problem=problem,
+            projection=np.array([1.0, 1.0]),
+            observation=np.array([0.0, 0.0]),
+            sigma=np.array([1.0, 0.5]),
+            compute_rounding=False,
+            max_iterations=20,
+            tolerance=1e-3,
+            n_procs=4,
+            sample_batch_size=20_000,
+        )
+
+        Z_true = np.pi * erf(L / np.sqrt(2.0)) * erf(np.sqrt(2.0) * L)
+        logZ_true = np.log(Z_true)
+
+        diff = abs(logZ - logZ_true)
+        print(logZ, logZ_true)
+        assert diff < 5.0 * logZ_err + 5e-2, (
+            f"logZ differs from analytic value by {diff}, "
+            f"which is larger than allowed tolerance. "
+            f"logZ={logZ}, logZ_true={logZ_true}, logZ_err={logZ_err}"
+        )
