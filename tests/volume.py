@@ -2,7 +2,7 @@ import unittest
 
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.special import gammaln, erf
+from scipy.special import erf, gammaln
 
 from hopsy import *
 
@@ -106,12 +106,14 @@ class VolumeTest(unittest.TestCase):
 
     def test_estimate_norm_degenerate_gaussian(self):
         L = 5.0
-        A = np.array([
-            [ 1.0,  0.0],
-            [-1.0,  0.0],
-            [ 0.0,  1.0],
-            [ 0.0, -1.0],
-        ])
+        A = np.array(
+            [
+                [1.0, 0.0],
+                [-1.0, 0.0],
+                [0.0, 1.0],
+                [0.0, -1.0],
+            ]
+        )
         b = np.array([L, L, L, L])
 
         # If your Problem requires a distribution, add Uniform() as third arg:
@@ -143,12 +145,14 @@ class VolumeTest(unittest.TestCase):
 
     def test_estimate_norm_gaussian(self):
         L = 5.0
-        A = np.array([
-            [ 1.0,  0.0],
-            [-1.0,  0.0],
-            [ 0.0,  1.0],
-            [ 0.0, -1.0],
-        ])
+        A = np.array(
+            [
+                [1.0, 0.0],
+                [-1.0, 0.0],
+                [0.0, 1.0],
+                [0.0, -1.0],
+            ]
+        )
         b = np.array([L, L, L, L])
 
         # If your Problem requires a distribution, add Uniform() as third arg:
@@ -180,12 +184,14 @@ class VolumeTest(unittest.TestCase):
 
     def test_estimate_norm_degenerate_gaussian_rounded(self):
         L = 5.0
-        A = np.array([
-            [ 1.0,  0.0],
-            [-1.0,  0.0],
-            [ 0.0,  1.0],
-            [ 0.0, -1.0],
-        ])
+        A = np.array(
+            [
+                [1.0, 0.0],
+                [-1.0, 0.0],
+                [0.0, 1.0],
+                [0.0, -1.0],
+            ]
+        )
         b = np.array([L, L, L, L])
 
         # If your Problem requires a distribution, add Uniform() as third arg:
@@ -218,12 +224,14 @@ class VolumeTest(unittest.TestCase):
     def test_estimate_norm_gaussian_rounded(self):
         L = 5.0
 
-        A = np.array([
-            [ 1.0,  0.0],
-            [-1.0,  0.0],
-            [ 0.0,  1.0],
-            [ 0.0, -1.0],
-        ])
+        A = np.array(
+            [
+                [1.0, 0.0],
+                [-1.0, 0.0],
+                [0.0, 1.0],
+                [0.0, -1.0],
+            ]
+        )
         b = np.array([L, L, L, L])
 
         # If your Problem requires a distribution, add Uniform() as third arg:
