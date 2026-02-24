@@ -742,6 +742,75 @@ def is_problem_polytope_empty(problem: _c.Problem):
     return is_polytope_empty(problem.A, problem.b)
 
 
+
+def _compute_chebyshev_center_and_radius_with_gurobi(problem: "_c.Problem"):
+    """
+    Fast Chebyshev center + radius for P = {x | A x <= b} using native gurobipy.
+
+    Returns
+    -------
+    (center, radius) if gurobi is available and solves successfully, else None.
+
+    Notes
+    -----
+    - Expects `problem` to represent inequalities A x <= b.
+    - If the polytope is empty / infeasible / unbounded, returns None.
+    """
+    # 1) Import gurobi; if missing, return None
+    try:
+        import gurobipy as gp
+        from gurobipy import GRB
+    except Exception:
+        return None
+
+    # 2) Pull A, b from your problem object (adapt here if your storage differs)
+    A = _s.numpy.asarray(problem.A, dtype=float)
+    b = _s.numpy.asarray(problem.b, dtype=float).reshape(-1)
+
+    if A.ndim != 2:
+        raise ValueError(f"Expected 2D A, got shape {A.shape}")
+    m, n = A.shape
+    if b.shape[0] != m:
+        raise ValueError(f"Shape mismatch: A is {A.shape}, b is {b.shape}")
+
+    # If your Problem can include equalities or other constraint types,
+    # you can either return None or extend this function. For now:
+    if hasattr(problem, "S") and getattr(problem, "S") is not None:
+        # We only handle pure inequalities here
+        return None
+
+    # 3) Build extended matrix [A | ||A_i||_2]
+    a_norm = _s.numpy.linalg.norm(A, axis=1).reshape(-1, 1)
+    A_ext = _s.numpy.hstack([A, a_norm])  # (m, n+1)
+
+    # 4) Solve max r s.t. A x + ||A_i|| r <= b, r >= 0
+    try:
+        model = gp.Model("ChebyshevCenter")
+        model.Params.OutputFlag = 0  # quiet
+
+        xr = model.addMVar(n + 1, lb=-GRB.INFINITY, ub=GRB.INFINITY, name="xr")
+        xr[n].lb = 0.0  # r >= 0
+
+        # Maximize r <=> minimize -r
+        model.setObjective(-xr[n], GRB.MINIMIZE)
+
+        model.addConstr(A_ext @ xr <= b, name="ineq")
+
+        model.optimize()
+
+        if model.Status != GRB.OPTIMAL:
+            return None
+
+        sol = xr.X
+        center = sol[:n].copy()          # shape (n,)
+        radius = float(sol[n])
+
+        return center, radius
+
+    except Exception:
+        # Covers license issues, numerical issues, etc.
+        return None
+
 def compute_chebyshev_center_and_radius(
     problem: _c.Problem, original_space: bool = False
 ):
@@ -756,18 +825,25 @@ def compute_chebyshev_center_and_radius(
     :return: The Chebyshev center of the passed problem.
     :rtype: numpy.ndarray[float64[n,1]], float64
     """
-    polytope = _s.polytope.Polytope(problem.A, problem.b)
-    cheby_result = _s.ChebyshevFinder.chebyshev_center(polytope, _c.LP().settings)
-    chebyshev_center = cheby_result[0].flatten()
-    distance_to_border = cheby_result[1]
-    if distance_to_border <= 0:
+    # tries to use fast computation, when gurobi is available
+    result = _compute_chebyshev_center_and_radius_with_gurobi(problem)
+    if result is None:
+        polytope = _s.polytope.Polytope(problem.A, problem.b)
+        cheby_result = _s.ChebyshevFinder.chebyshev_center(polytope, _c.LP().settings)
+        chebyshev_center = cheby_result[0].flatten()
+        radius = cheby_result[1][0]
+    else:
+        chebyshev_center, radius = result
+
+    if radius <= 0:
         raise ValueError(
             "Chebyshev center is outside of polytope. To solve check polytope feasibility or change LP settings"
         )
+
     if original_space:
         return back_transform(problem=problem, points=[chebyshev_center])[0], None
 
-    return chebyshev_center, distance_to_border[0]
+    return chebyshev_center, radius
 
 
 def compute_chebyshev_center(problem: _c.Problem, original_space: bool = False):
