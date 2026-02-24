@@ -476,11 +476,9 @@ def tune(
 
             for mc in group:
                 if mc.proposal.__class__.__name__ != key:
-                    raise RuntimeError(
-                        """
+                    raise RuntimeError("""
                         `mcs` need to be list of list of type `hopsy.core.MarkovChain`, where every inner list of `hopsy.core.MarkovChain` objects is required to use the same proposal distribution.
-                    """
-                    )
+                    """)
 
             _mcs[key] = group
             _rngs[key] = rngs[i]
