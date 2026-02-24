@@ -165,15 +165,11 @@ setup(
     install_requires=[
         "PolyRound>=0.2.10",
         "optlang>=1.7.0",
-        "arviz<=0.17.0; python_version<='3.9'",
-        "arviz; python_version>'3.9'",
+        "arviz",
         "numpy",
         "pandas",
         "tqdm",
-        "matplotlib",
-        "scikit-learn",
-        "scipy<1.13.0; python_version<='3.9'",
-        "scipy; python_version>'3.9'",
+        "scipy",
     ],
     zip_safe=False,
 )
