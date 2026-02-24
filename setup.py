@@ -170,6 +170,7 @@ setup(
         "pandas",
         "tqdm",
         "scipy",
+        "scikit-learn",
     ],
     zip_safe=False,
 )
