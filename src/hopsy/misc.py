@@ -742,7 +742,6 @@ def is_problem_polytope_empty(problem: _c.Problem):
     return is_polytope_empty(problem.A, problem.b)
 
 
-
 def _compute_chebyshev_center_and_radius_with_gurobi(problem: "_c.Problem"):
     """
     Fast Chebyshev center + radius for P = {x | A x <= b} using native gurobipy.
@@ -802,7 +801,7 @@ def _compute_chebyshev_center_and_radius_with_gurobi(problem: "_c.Problem"):
             return None
 
         sol = xr.X
-        center = sol[:n].copy()          # shape (n,)
+        center = sol[:n].copy()  # shape (n,)
         radius = float(sol[n])
 
         return center, radius
@@ -810,6 +809,7 @@ def _compute_chebyshev_center_and_radius_with_gurobi(problem: "_c.Problem"):
     except Exception:
         # Covers license issues, numerical issues, etc.
         return None
+
 
 def compute_chebyshev_center_and_radius(
     problem: _c.Problem, original_space: bool = False
