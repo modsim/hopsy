@@ -4,6 +4,24 @@ variables:
   GIT_STRATEGY: clone
   GIT_SUBMODULE_STRATEGY: recursive
 
+workflow:
+  rules:
+    # Run a pipeline for merge requests
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+
+    # If this is a push pipeline AND the branch already has an open MR,
+    # skip the push pipeline (prevents the "two pipelines" problem)
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+
+    # Otherwise run push pipelines normally (branches without an MR, main, etc.)
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      when: always
+
+    # Disable everything else unless you explicitly want it (schedule/web/api/etc.)
+    - when: never
+
 stages:
   - build
   - test
@@ -13,10 +31,19 @@ stages:
 pre-commit:
   image: python:3.14
   stage: build
+  rules:
+    - if: '$CI_COMMIT_AUTHOR =~ /^CI_BOT/'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      when: always
+  cache:
+    paths:
+      - /root/.cache/pre-commit
   script:
     - pip install pre-commit
-    - pre-commit install
-    - pre-commit run --all
+    - pre-commit run --all-files
 
 build-release:
   stage: build
