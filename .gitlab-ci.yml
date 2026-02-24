@@ -1,26 +1,26 @@
+workflow:
+  rules:
+    # Always create MR pipelines
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+
+    # If this is a push pipeline AND there is an open MR for this branch, don't create the push pipeline
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+
+    # Otherwise, create branch pipelines
+    - if: '$CI_COMMIT_BRANCH'
+      when: always
+
+    # Optional: allow tags too (remove if you don't use tag pipelines)
+    - if: '$CI_COMMIT_TAG'
+      when: always
+
 image: quay.io/pypa/manylinux_2_28_x86_64
 
 variables:
   GIT_STRATEGY: clone
   GIT_SUBMODULE_STRATEGY: recursive
-
-workflow:
-  rules:
-    # Run a pipeline for merge requests
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: always
-
-    # If this is a push pipeline AND the branch already has an open MR,
-    # skip the push pipeline (prevents the "two pipelines" problem)
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
-      when: never
-
-    # Otherwise run push pipelines normally (branches without an MR, main, etc.)
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-      when: always
-
-    # Disable everything else unless you explicitly want it (schedule/web/api/etc.)
-    - when: never
 
 stages:
   - build
