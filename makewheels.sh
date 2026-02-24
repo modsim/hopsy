@@ -4,7 +4,7 @@ git rev-parse --short HEAD > .commit
 
 docker ps -a | grep hopsy_manylinux_build_env && (docker stop hopsy_manylinux_build_env; docker rm hopsy_manylinux_build_env)
 
-docker run -d -t --name hopsy_manylinux_build_env -v $(pwd):/io quay.io/pypa/manylinux2014_x86_64
+docker run -d -t --name hopsy_manylinux_build_env -v $(pwd):/io quay.io/pypa/manylinux_2_28_x86_64
 
 for py in "cp39-cp39" "cp310-cp310" "cp311-cp311" "cp312-cp312" "cp313-cp313";
 do
