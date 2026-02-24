@@ -1,6 +1,7 @@
 # Changelog
 
 ## Latest
+- [#188](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/183): Fix compilation issue with new clang and support for python 3.14 and 3.15
 - [#183](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/183): Add basic volume estimation for polytopes
 - [#163](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/163): Fix parallel tempering deconstructor
 - [#176](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/176): Fix setup function for Gaussian models
