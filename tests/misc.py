@@ -792,3 +792,39 @@ class MiscTests(unittest.TestCase):
         problem = Problem(A, b, model)
         problem = add_equality_constraints(problem, A_eq, b_eq)
         mcs, rngs = setup(problem, random_seed=42, n_chains=4)
+
+    def test_kl_identical_samples_zero(self):
+        np.random.seed(0)
+        x = np.random.randn(100, 3)
+        kl = KLdivergence(x, x)
+        self.assertAlmostEqual(kl, 0.0, places=7)
+
+    def test_kl_positive_for_different_distributions(self):
+        np.random.seed(0)
+        x = np.random.randn(200, 2)
+        y = np.random.randn(200, 2) + 2.0  # shifted distribution
+        kl = KLdivergence(x, y)
+        self.assertGreaterEqual(kl, 0.0)
+
+    def test_kl_shape_handling(self):
+        np.random.seed(0)
+        x = np.random.randn(50, 1)
+        y = np.random.randn(60, 1)
+        kl = KLdivergence(x, y)
+        self.assertTrue(np.isfinite(kl))
+
+    def test_kl_small_known_case(self):
+        np.random.seed(0)
+        x = np.array([[0.0], [1.0], [2.0]])
+        # points have 0 probability of being exactly equal
+        y = np.array([[0.000001], [1.5], [3.0]])
+        kl = KLdivergence(x, y)
+        self.assertTrue(np.isfinite(kl))
+
+    def test_kl_not_symmetric(self):
+        np.random.seed(0)
+        x = np.random.randn(150, 2)
+        y = np.random.randn(150, 2) + 1.0
+        kl_xy = KLdivergence(x, y)
+        kl_yx = KLdivergence(y, x)
+        self.assertNotAlmostEqual(kl_xy, kl_yx, places=5)

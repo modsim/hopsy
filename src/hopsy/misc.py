@@ -1,6 +1,4 @@
-"""
-
-"""
+""" """
 
 
 class _core:
@@ -60,6 +58,7 @@ class _submodules:
     import weakref
 
     import numpy.typing
+    from scipy.spatial import cKDTree
 
 
 _s = _submodules
@@ -1085,9 +1084,11 @@ def _sequential_sampling(
             callback.record(
                 chain_idx,
                 state,
-                curr_meta
-                if isinstance(curr_meta, dict)
-                else {"acceptance_rate": curr_meta},
+                (
+                    curr_meta
+                    if isinstance(curr_meta, dict)
+                    else {"acceptance_rate": curr_meta}
+                ),
             )
 
     if (record_meta is None or record_meta is False) and in_memory:
@@ -1490,9 +1491,7 @@ def _compute_statistic(
         relative = (
             args[3]
             if len(args) > 4
-            else kwargs["relative"]
-            if "relative" in kwargs
-            else False
+            else kwargs["relative"] if "relative" in kwargs else False
         )
         return [1 / (n_chains * i) if relative else 1] * dim
     else:
@@ -1536,9 +1535,7 @@ def _arviz(
             relative = (
                 args[3]
                 if len(args) > 4
-                else kwargs["relative"]
-                if "relative" in kwargs
-                else False
+                else kwargs["relative"] if "relative" in kwargs else False
             )
             _result = [1 / (n_chains * n_samples) if relative else 1] * dim
         else:
@@ -1937,3 +1934,80 @@ def setup(
         return markov_chains, rngs, tuning_results
 
     return markov_chains, rngs
+
+
+def _multiplicity_in_self(a):
+    """
+    Parameters
+    ----------
+    a : numpy.ndarrray
+    Count how many times each line appears in a (including itself).
+
+    Returns
+    ----------
+    out : counts_per_row : numpy.ndarray of int
+        1D array of length a.shape[0].
+        For each row of a, the entry gives how often that row occurs in a.
+    """
+    _numpy = _s.numpy
+    a = _numpy.ascontiguousarray(a)
+    keys = a.view(_numpy.dtype((_numpy.void, a.dtype.itemsize * a.shape[1]))).ravel()
+    _, inv, cnt = _numpy.unique(keys, return_inverse=True, return_counts=True)
+    return cnt[inv]
+
+
+def KLdivergence(x, y):
+    """Compute the Kullback-Leibler divergence between two multivariate samples.
+    Parameters
+    ----------
+    x : 2D array (n,d)
+    Samples from distribution P, which typically represents the true
+    distribution.
+    y : 2D array (m,d)
+    Samples from distribution Q, which typically represents the approximate
+    distribution.
+    Returns
+    -------
+    out : float
+    The estimated Kullback-Leibler divergence D(P||Q).
+    References
+    ----------
+    Pérez-Cruz, F. Kullback-Leibler divergence estimation of
+    continuous distributions IEEE International Symposium on Information
+    Theory, 2008.
+    """
+
+    _numpy = _s.numpy
+    KDTree = _s.cKDTree
+
+    # Check the dimensions are consistent
+    x = _numpy.atleast_2d(x)
+    y = _numpy.atleast_2d(y)
+
+    n, d = x.shape
+    m, dy = y.shape
+
+    assert d == dy
+    if _numpy.array_equal(x, y):
+        return 0
+
+    mA = _multiplicity_in_self(x)  # Frequency of each point in x (inkl. self)
+    idx_r = _numpy.minimum(
+        1 + mA - 1, n - 1
+    )  # next neares neighbour = self + skip duplicates
+    k_max = int(idx_r.max())
+
+    # Build a KD tree representation of the samples and find the nearest neighbour
+    # of each point in x.
+    xtree = KDTree(x)
+    ytree = KDTree(y)
+
+    # Get the first k_max+1 nearest neighbours for x, since the first k_max ones are the
+    # sample itself.
+    r = xtree.query(x, k=k_max + 1, eps=0.0, p=2)[0][:, k_max]
+    # force 2D result even when k_max == 1, and select that single column
+    s = ytree.query(x, k=[k_max], eps=0.0, p=2)[0][:, 0]
+
+    # There is a mistake in the paper. In Eq. 14, the right side misses a negative sign
+    # on the first term of the right hand side.
+    return -1 * _numpy.log(r / s).sum() * d / n + _numpy.log(m / (n - 1.0))

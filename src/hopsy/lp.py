@@ -1,6 +1,5 @@
-"""
+""" """
 
-"""
 import threading as _threading
 
 from PolyRound.settings import PolyRoundSettings
