@@ -2013,7 +2013,8 @@ def KLdivergence(x, y):
     # Get the first k_max+1 nearest neighbours for x, since the first k_max ones are the
     # sample itself.
     r = xtree.query(x, k=k_max+1, eps=0.0, p=2)[0][:,k_max]
-    s = ytree.query(x, k=k_max, eps=.0, p=2)[0][:,k_max-1]
+    # force 2D result even when k_max == 1, and select that single column
+    s = ytree.query(x, k=[k_max], eps=0.0, p=2)[0][:, 0]
 
     # There is a mistake in the paper. In Eq. 14, the right side misses a negative sign
     # on the first term of the right hand side.
