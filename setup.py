@@ -163,7 +163,7 @@ setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     install_requires=[
-        "PolyRound>=0.2.10",
+        "PolyRound>=0.2.11",
         "optlang>=1.7.0",
         "arviz",
         "numpy",
