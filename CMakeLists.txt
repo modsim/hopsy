@@ -63,4 +63,3 @@ target_compile_definitions(core PRIVATE
   BUILD_INFO="${HOPSY_BUILD_INFO}"
   VERSION_INFO="${HOPSY_VERSION_INFO}"
 )
-
