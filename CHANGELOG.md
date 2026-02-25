@@ -1,8 +1,9 @@
 # Changelog
 
 ## Latest
+- [#187](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/187): Speed up chebyshev computation for users of gurobi
+- [#181](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/181): Add estimator for KL divergence
 - [#148](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/148): Update dependencies
-- [#181](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/181): Add estimator for KL divergence1
 - [#188](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/188): Fix compilation issue with new clang and support for python 3.14
 - [#183](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/183): Add basic volume estimation for polytopes
 - [#163](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/163): Fix parallel tempering deconstructor
