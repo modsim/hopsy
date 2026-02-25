@@ -8,7 +8,6 @@
 
 #include <pybind11/detail/common.h>
 #include <pybind11/eigen.h>
-#include <pybind11/smart_holder.h>
 #include <pybind11/stl.h>
 #include <pybind11/trampoline_self_life_support.h>
 
@@ -393,8 +392,6 @@ namespace hopsy {
         }
     };
 }// namespace hopsy
-
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::MarkovChain);
 
 namespace hopsy {
     template<typename MarkovChainBase = MarkovChain>

@@ -52,6 +52,9 @@ target_include_directories(core
 )
 
 target_compile_definitions(core PRIVATE HOPS_WITHIN_HOPSY)
+set_property(TARGET core PROPERTY CXX_STANDARD 17)
+set_property(TARGET core PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET core PROPERTY CXX_EXTENSIONS OFF)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
   target_compile_options(core PRIVATE -Wall -Wextra)

@@ -6,7 +6,6 @@
 
 #include <pybind11/detail/common.h>
 #include <pybind11/eigen.h>
-#include <pybind11/smart_holder.h>
 #include <pybind11/stl.h>
 #include <pybind11/trampoline_self_life_support.h>
 
@@ -23,8 +22,6 @@ namespace py = pybind11;
 namespace hopsy {
     using TuningTarget = hops::TuningTarget;
 } // namespace hopsy
-
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::TuningTarget);
 
 namespace hopsy {
 
@@ -139,10 +136,6 @@ namespace hopsy {
         return {optimalParameters, data};
     }
 } // namespace hopsy
-
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::PyTuningTarget);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::AcceptanceRateTarget);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::ExpectedSquaredJumpDistanceTarget);
 
 namespace hopsy {
     void addTuning(py::module& m) {

@@ -9,7 +9,6 @@
 
 #include <pybind11/detail/common.h>
 #include <pybind11/eigen.h>
-#include <pybind11/smart_holder.h>
 #include <pybind11/stl.h>
 #include <pybind11/trampoline_self_life_support.h>
 
@@ -27,8 +26,6 @@ namespace hopsy {
 	using Proposal = hops::Proposal;
     using ProposalParameter = hops::ProposalParameter;
 } // namespace hopsy
-
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::Proposal);
 
 namespace hopsy {
     template<typename ProposalBase = Proposal>
@@ -714,22 +711,6 @@ namespace hopsy {
     using UniformHitAndRunProposal = UninitializedProposalWrapper<
 			hops::HitAndRunProposal<MatrixType, VectorType>>;
 } // namespace hopsy
-
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::AdaptiveMetropolisProposal);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::BallWalkProposal);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::BilliardAdaptiveMetropolisProposal);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::BilliardMALAProposal);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::BilliardWalkProposal);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::CSmMALAProposal);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::DikinWalkProposal);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::GaussianCoordinateHitAndRunProposal);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::GaussianHitAndRunProposal);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::GaussianProposal);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::ReversibleJumpProposal);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::PyProposal);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::TruncatedGaussianProposal);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::UniformCoordinateHitAndRunProposal);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::UniformHitAndRunProposal);
 
 namespace hopsy {
 
