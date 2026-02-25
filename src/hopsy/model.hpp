@@ -10,7 +10,6 @@
 
 #include <pybind11/detail/common.h>
 #include <pybind11/eigen.h>
-#include <pybind11/smart_holder.h>
 #include <pybind11/stl.h>
 #include <pybind11/trampoline_self_life_support.h>
 
@@ -22,8 +21,6 @@ namespace py = pybind11;
 namespace hopsy {
     using Model = hops::Model;
 } // namespace hopsy
-
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::Model);
 
 namespace hopsy {
     template<typename ModelBase = Model>
@@ -238,11 +235,6 @@ namespace hopsy {
     using Mixture = hops::Mixture;
     using Rosenbrock = hops::Rosenbrock;
 } // namespace hopsy
-
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::Gaussian);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::Mixture);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::PyModel);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(hopsy::Rosenbrock);
 
 namespace hopsy {
     void addModels(py::module &m) {

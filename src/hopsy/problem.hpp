@@ -6,7 +6,6 @@
 #include <pybind11/detail/common.h>
 #include <pybind11/eigen.h>
 #include <pybind11/embed.h>
-//#include <pybind11/smart_holder.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 

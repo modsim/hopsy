@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import os
+import shutil
 import subprocess
 import sys
 
 from setuptools import Extension, find_packages, setup
 from setuptools.command.build_ext import build_ext
 
-# Convert distutils Windows platform specifiers to CMake -A arguments
 PLAT_TO_CMAKE = {
     "win32": "Win32",
     "win-amd64": "x64",
@@ -14,132 +14,98 @@ PLAT_TO_CMAKE = {
     "win-arm64": "ARM64",
 }
 
-with open("README.md", "r") as fh:
+with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-with open(".version", "r") as fh:
-    version = fh.read().split("\n")[0]
+with open(".version", "r", encoding="utf-8") as fh:
+    version = fh.read().strip()
 
 try:
-    with open(".commit", "r") as fh:
-        commit = fh.read().split("\n")[0]
-except:
+    with open(".commit", "r", encoding="utf-8") as fh:
+        commit = fh.read().strip()
+except Exception:
     commit = "dirty"
 
 
-# A CMakeExtension needs a sourcedir instead of a file list.
-# The name must be the _single_ output extension from the CMake build.
-# If you need multiple extensions, see scikit-build.
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=""):
-        Extension.__init__(self, name, sources=[])
+        super().__init__(name, sources=[])
         self.sourcedir = os.path.abspath(sourcedir)
 
 
 class CMakeBuild(build_ext):
     def build_extension(self, ext):
+        # get_ext_fullpath returns the path to the folder where the .so/.pyd should go
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
-
-        # required for auto-detection of auxiliary 'native' libs
         if not extdir.endswith(os.path.sep):
             extdir += os.path.sep
 
         cfg = "Debug" if self.debug else "Release"
-
-        # CMake lets you override the generator - we need to check this.
-        # Can be set with Conda-Build, for example.
-        cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
-
+        cmake_generator = os.environ.get("CMAKE_GENERATOR", "").strip()
         with_mpi = os.environ.get("HOPS_MPI", "OFF")
-        print("MPI support is", with_mpi)
 
-        # Set Python_EXECUTABLE instead if you use PYBIND11_FINDPYTHON
-        # EXAMPLE_VERSION_INFO shows you how to pass a value into the C++ code
-        # from Python.
+        # Keep build_temp simple to ensure relative paths work correctly
+        build_temp = os.path.abspath(self.build_temp)
+        os.makedirs(build_temp, exist_ok=True)
+
         cmake_args = [
-            "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}".format(extdir),
-            "-DPYTHON_EXECUTABLE={}".format(sys.executable),
-            "-DHOPSY_VERSION_INFO={}".format(self.distribution.get_version()),
-            "-DHOPSY_BUILD_INFO={}".format(commit),
-            "-DCMAKE_BUILD_TYPE={}".format(cfg),  # not used on MSVC, but no harm
-            "-DHOPS_MPI={}".format(with_mpi),
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}",
+            # 1. Modern CMake (3.12+) - High priority
+            f"-DPython_EXECUTABLE={sys.executable}",
+            # 2. Legacy/Pybind11 fallback - All caps
+            f"-DPYTHON_EXECUTABLE={sys.executable}",
+            # 3. Force it to stay in the right place (don't go hunting for the wrong python!)
+            "-DPython_FIND_STRATEGY=LOCATION",
+            f"-DHOPSY_VERSION_INFO={self.distribution.get_version()}",
+            f"-DHOPSY_BUILD_INFO={commit}",
+            f"-DCMAKE_BUILD_TYPE={cfg}",
+            f"-DHOPS_MPI={with_mpi}",
         ]
-        build_args = []
+        build_args = ["--config", cfg] if os.name == "nt" else []
 
+        # Handle Build ID
         try:
             commit_hash = (
                 subprocess.check_output(
-                    ["git", "rev-parse", "--short", "HEAD"], cwd=self.build_temp
+                    ["git", "rev-parse", "--short", "HEAD"], cwd=ext.sourcedir
                 )
                 .decode("utf-8")
-                .split("\n")[0]
+                .strip()
             )
-            print("Build id:", commit_hash)
-            cmake_args.append("-DHOPSY_BUILD_ID={}".format(commit_hash))
-        except Exception as e:
-            commit_hash = commit
-            print(
-                "ERROR retrieving commit hash automatically. Build ID is set to",
-                commit_hash,
-            )
+            cmake_args.append(f"-DHOPSY_BUILD_ID={commit_hash}")
+        except Exception:
+            cmake_args.append(f"-DHOPSY_BUILD_ID={commit}")
 
-        if self.compiler.compiler_type != "msvc":
-            # Using Ninja-build since it a) is available as a wheel and b)
-            # multithreads automatically. MSVC would require all variables be
-            # exported for Ninja to pick it up, which is a little tricky to do.
-            # Users can override the generator with CMAKE_GENERATOR in CMake
-            # 3.15+.
-            if not cmake_generator:
-                cmake_args += ["-GNinja"]
+        # Generator Logic
+        ninja_available = shutil.which("ninja") is not None
+        if not cmake_generator:
+            if ninja_available:
+                cmake_args += ["-G", "Ninja"]
+            elif os.name != "nt":
+                cmake_args += ["-G", "Unix Makefiles"]
 
-        else:
-
-            # Single config generators are handled 'normally'
-            single_config = any(x in cmake_generator for x in {"NMake", "Ninja"})
-
-            # CMake allows an arch-in-generator style for backward compatibility
-            contains_arch = any(x in cmake_generator for x in {"ARM", "Win64"})
-
-            # Specify the arch if using MSVC generator, but only if it doesn't
-            # contain a backward-compatibility arch spec already in the
-            # generator name.
-            if not single_config and not contains_arch:
-                cmake_args += ["-A", PLAT_TO_CMAKE[self.plat_name]]
-
-            # Multi-config generators have a different way to specify configs
-            if not single_config:
+        # Windows-specific Clang/MSVC logic (keeping your improvements)
+        if os.name == "nt":
+            if "Ninja" in (cmake_generator or ("Ninja" if ninja_available else "")):
                 cmake_args += [
-                    "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}".format(cfg.upper(), extdir)
+                    "-DCMAKE_C_COMPILER=clang-cl",
+                    "-DCMAKE_CXX_COMPILER=clang-cl",
                 ]
-                build_args += ["--config", cfg]
+            elif "Visual Studio" in cmake_generator or not cmake_generator:
+                cmake_args += ["-T", "ClangCL"]
+                if self.plat_name in PLAT_TO_CMAKE:
+                    cmake_args += ["-A", PLAT_TO_CMAKE[self.plat_name]]
+                cmake_args += [
+                    f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}"
+                ]
 
-        # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
-        # across all generators.
         if "CMAKE_BUILD_PARALLEL_LEVEL" not in os.environ:
-            # self.parallel is a Python 3 only way to set parallel jobs by hand
-            # using -j in the build_ext call, not supported by pip or PyPA-build.
             build_args += ["-j16"]
-            # if hasattr(self, "parallel") and self.parallel:
-            # CMake 3.12+ only.
-            # build_args += ["-j{}".format(self.parallel)]
 
-        if not os.path.exists(self.build_temp):
-            os.makedirs(self.build_temp)
-
-        if os.name == "nt":  # os.name == nt is True for windows only
-            # Use clang because MSVC is bad
-            cmake_args += ["-T ClangCL"]
-
-        subprocess.check_call(
-            ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp
-        )
-        subprocess.check_call(
-            ["cmake", "--build", "."] + build_args, cwd=self.build_temp
-        )
+        subprocess.check_call(["cmake", ext.sourcedir] + cmake_args, cwd=build_temp)
+        subprocess.check_call(["cmake", "--build", "."] + build_args, cwd=build_temp)
 
 
-# The information here can also be placed in setup.cfg - better separation of
-# logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="hopsy",
     version=version,
@@ -156,14 +122,15 @@ setup(
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: POSIX :: Linux",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: MacOS",
     ],
     ext_modules=[CMakeExtension("hopsy/core")],
-    # ext_modules=[Extension('hopsy._hopsy', sources=['src/hopsy/hopsy.cpp'])],
     cmdclass={"build_ext": CMakeBuild},
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     install_requires=[
-        "PolyRound>=0.2.11",
+        "PolyRound>=0.4.0",
         "optlang>=1.7.0",
         "arviz",
         "numpy",

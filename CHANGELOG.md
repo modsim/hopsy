@@ -1,6 +1,9 @@
 # Changelog
 
-## Latest
+## v1.7.0
+### Breaking changes
+- compute\_chebyshev\_center does not return radius anymore (function now returns 1 value instead of 2). Use compute\_chebyshev\_center\_and\_radius to obtain center and radius.
+### Issues
 - [#187](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/187): Speed up chebyshev computation for users of gurobi
 - [#181](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/181): Add estimator for KL divergence
 - [#148](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/148): Update dependencies
