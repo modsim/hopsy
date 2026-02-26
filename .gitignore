@@ -1,3 +1,4 @@
+# .gitignore
 logs/
 wheels*/
 wheels*
@@ -18,3 +19,4 @@ compile_commands.json
 .ipynb_checkpoints
 .commit
 cmake-build-*
+src/hopsy/_version.py
