@@ -20,7 +20,6 @@ variables:
 stages:
   - build
   - test
-  - build-docs
   - upload-artifacts
 
 pre-commit:
@@ -160,25 +159,40 @@ test-integration-release:
     - pkill clickhouse || true
 
 build-docs:
-  stage: build-docs
+  stage: test
   image: ubuntu:24.04
   dependencies:
     - build-release
   script:
-    - apt update && apt install -y python3.14-dev pandoc python3.14-pip
-    - PYTHON_VERSION=3.14
-    - PY_VER_CLEAN=$(echo $PYTHON_VERSION | tr -d '.')
-    - PY_PATH="/opt/python/cp${PY_VER_CLEAN}-cp${PY_VER_CLEAN}/bin"
-    - $PY_PATH/pip install uv
-    - uv venv --python $PYTHON_VERSION
-    - pip install uv
+    - apt update && apt install -y python3-dev pandoc python3-pip curl
+    - curl -LsSf https://astral.sh/uv/install.sh | sh
+    - source $HOME/.local/bin/env
     - uv venv
     - source .venv/bin/activate
     - uv pip install sphinx pybind11 numpy pandas matplotlib sphinx-rtd-theme nbsphinx pydata_sphinx_theme ipython docov --break-system-packages
-    - uv pip install dist/hopsy-*cp312*manylinux*.whl --break-system-packages
+    - uv pip install dist/hopsy-*manylinux*.whl --break-system-packages
     - mkdir new-docs
     - sphinx-build -b html docs-sources new-docs
     - docov hopsy --output new-docs/
   artifacts:
     paths:
       - new-docs
+
+
+upload-docs:
+  stage: upload-artifacts
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_COMMIT_AUTHOR !~ /^CI_BOT/'
+  dependencies:
+    - build-docs
+  script:
+    - git config user.email $GITLAB_USER_EMAIL
+    - git config user.name "CI_BOT"
+    - git remote remove origin
+    - git remote add origin https://oauth2:${CI_BOT}@jugit.fz-juelich.de/IBG-1/ModSim/hopsy.git
+    - echo "Author is ${CI_COMMIT_AUTHOR}"
+    - git rm docs -rf # remove old docs so no stales files remain
+    - mv new-docs docs
+    - git add docs
+    - git commit --no-verify --allow-empty -m "automatically add docs for ${CI_COMMIT_MESSAGE}"
+    - git push origin HEAD:$CI_COMMIT_BRANCH
