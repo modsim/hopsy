@@ -165,7 +165,12 @@ build-docs:
   dependencies:
     - build-release
   script:
-    - apt update && apt install -y python3-dev pandoc python3-pip
+    - apt update && apt install -y python3.14-dev pandoc python3.14-pip
+    - PYTHON_VERSION=3.14
+    - PY_VER_CLEAN=$(echo $PYTHON_VERSION | tr -d '.')
+    - PY_PATH="/opt/python/cp${PY_VER_CLEAN}-cp${PY_VER_CLEAN}/bin"
+    - $PY_PATH/pip install uv
+    - uv venv --python $PYTHON_VERSION
     - pip install uv
     - uv venv
     - source .venv/bin/activate
