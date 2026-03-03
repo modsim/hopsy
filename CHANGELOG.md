@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.8.0
+## Latest
 - [#188](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/188): Move to pyproject.toml
 
 
