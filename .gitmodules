@@ -2,6 +2,3 @@
 	path = extern/hops
 	url = ../hops.git
   branch = main
-[submodule "extern/eigen3"]
-	path = extern/eigen3
-	url = https://gitlab.com/libeigen/eigen.git
