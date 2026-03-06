@@ -49,7 +49,9 @@ sdist.include = ["src/hopsy/_version.py"]
 
 
 [tool.setuptools_scm]
-write_to = "src/hopsy/_version.py"
+version_file = "src/hopsy/_version.py"
+version_scheme = "release-branch-semver"
+local_scheme = "no-local-version"
 
 [tool.ruff]
 line-length = 88
