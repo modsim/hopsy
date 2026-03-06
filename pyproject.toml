@@ -9,9 +9,10 @@ build-backend = "scikit_build_core.build"
 [project]
 name = "hopsy"
 dynamic = ["version"]
-description = "A python interface for hops, the highly optimized polytope sampling toolbox."
+description = "hopsy - Highly Optimized Polytope Sampling in Python"
 readme = "README.md"
-license = {file = "LICENSE"}
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
 	{name = "Richard D. Paul", email = "r.paul@fz-juelich.de"},
 	{name = "Johann Fredrik Jadebeck", email = "j.jadebeck@fz-juelich.de"},
@@ -20,12 +21,25 @@ requires-python = ">=3.10"
 dependencies = [
     "PolyRound>=0.4.0",
     "optlang>=1.7.0",
-    "arviz",
+    "arviz<1.0.0",
     "numpy",
     "pandas",
     "tqdm",
     "scipy",
     "scikit-learn",
+]
+keywords = ["polytope sampling", "mcmc", "convex polytopes", "sampling", "Bayesian inference"]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: C++",
+    "Operating System :: OS Independent",
 ]
 
 [project.optional-dependencies]
