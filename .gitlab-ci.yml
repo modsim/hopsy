@@ -163,7 +163,7 @@ build-docs:
   dependencies:
     - build-release
   script:
-    - apt update && apt install -y python3-dev pandoc python3-pip curl
+    - apt update && apt install -y python3-dev pandoc python3-pip curl git
     - curl -LsSf https://astral.sh/uv/install.sh | sh
     - source $HOME/.local/bin/env
     - uv venv
