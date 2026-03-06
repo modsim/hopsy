@@ -133,7 +133,6 @@ test-release-macos:
     - source .venv/bin/activate
     - uv sync --locked --dev --all-extras
     - uv pip install hopsy --find-links dist/
-    - uv pip install docov
     - python -m unittest -v tests
 
 test-integration-release:
@@ -147,9 +146,9 @@ test-integration-release:
     - $PY_PATH/pip install uv
     - uv venv --python $PYTHON_VERSION
     - source .venv/bin/activate
-    - uv sync --locked --dev --all-extras
+    - uv sync --locked --dev --all-extras --group integration-tests
+    - uv pip install --prerelease=allow mcbackend
     - uv pip install hopsy --find-links dist/
-    - uv pip install --prerelease=allow matplotlib jupyter nbconvert clickhouse-driver hagelkorn mcbackend ipyparallel 'polyround[extras]'
     - curl https://clickhouse.com/ | sh
     - ./clickhouse server &> clickhouse.log &
     - sleep 5

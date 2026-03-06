@@ -59,6 +59,16 @@ dev = [
     "sphinx-rtd-theme",
     "twine",
 ]
+integration-tests = [
+    "clickhouse-driver>=0.2.10",
+    "hagelkorn>=1.2.3",
+    "ipyparallel>=9.0.2",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.10.8",
+    "nbconvert>=7.17.0",
+    "polyround[extras]>=0.4.0",
+]
+
 
 [tool.scikit-build]
 cmake.args = ["-DPython_FIND_STRATEGY=LOCATION"]
