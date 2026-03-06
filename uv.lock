@@ -1179,6 +1179,9 @@ extra = [
 dev = [
     { name = "build" },
     { name = "docov" },
+    { name = "ipython", version = "8.38.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "ipython", version = "9.10.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
+    { name = "ipython", version = "9.11.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "nbsphinx" },
     { name = "pre-commit" },
     { name = "pybind11" },
@@ -1217,6 +1220,7 @@ provides-extras = ["extra"]
 dev = [
     { name = "build" },
     { name = "docov" },
+    { name = "ipython" },
     { name = "nbsphinx" },
     { name = "pre-commit" },
     { name = "pybind11" },

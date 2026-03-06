@@ -52,6 +52,7 @@ dev = [
     "docov",
     "pre-commit",
     "build",
+    "ipython",
     "nbsphinx",
     "pybind11",
     "pydata_sphinx_theme",
