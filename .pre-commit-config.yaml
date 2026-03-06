@@ -1,4 +1,4 @@
-exclude: \.(ipynb|nblink)$
+exclude: ^src/hopsy/_version\.py$|\.(ipynb|nblink)$
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v6.0.0

@@ -1,63 +1,65 @@
+.python_versions: &python_versions
+  PYTHON_VERSION: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+
 workflow:
   rules:
-    # Always create MR pipelines
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: always
-
-    # If this is a push pipeline AND there is an open MR for this branch, don't create the push pipeline
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
       when: never
-
-    # Otherwise, create branch pipelines
     - if: '$CI_COMMIT_BRANCH'
-      when: always
-
-    # Optional: allow tags too (remove if you don't use tag pipelines)
     - if: '$CI_COMMIT_TAG'
-      when: always
 
 image: quay.io/pypa/manylinux_2_28_x86_64
 
 variables:
   GIT_STRATEGY: clone
-  GIT_SUBMODULE_STRATEGY: recursive
+  GIT_DEPTH: 0  # CRITICAL: Needed so setuptools_scm can see tags/history
+  GIT_SUBMODULE_STRATEGY: recursive # Fetch hops
+  UV_CACHE_DIR: ".uv-cache"
 
 stages:
   - build
   - test
-  - build-docs
   - upload-artifacts
 
 pre-commit:
   image: python:3.14
   stage: build
-  rules:
-    - if: '$CI_COMMIT_AUTHOR =~ /^CI_BOT/'
-      when: never
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: always
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-      when: always
   cache:
     paths:
-      - /root/.cache/pre-commit
+      - .uv-cache
+      - "${CI_PROJECT_DIR}/.pre-commit-cache"
   script:
-    - pip install pre-commit
-    - pre-commit run --all-files
+    - python -m pip install uv
+    - uv tool run pre-commit run --all-files
+
+build-debug:
+  stage: build
+  script:
+    - /opt/python/cp314-cp314/bin/pip install uv
+    - uv venv
+    - source .venv/bin/activate
+    # Build a debug wheel. We pass 'Debug' to CMake via scikit-build-core configuration
+    - uv build --wheel --python 3.14 -Ccmake.build-type=Debug
+    - auditwheel repair dist/hopsy-*.whl -w dist/
+  artifacts:
+    paths:
+      - dist/*manylinux*
+    expire_in: 7 days
 
 build-release:
   stage: build
-  rules:
-    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   parallel:
     matrix:
-      - PYTHON_VERSION: ["cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313", "cp314-cp314"]
-  environment: $PYTHON_VERSION
+      - *python_versions
   script:
-    - /opt/python/cp313-cp313/bin/python .check_version.py
-    - git rev-parse --short HEAD > .commit
-    - /opt/python/$PYTHON_VERSION/bin/pip wheel --no-deps . -w dist
-    - VERSION=$(cat .version); auditwheel repair dist/hopsy-$VERSION-$PYTHON_VERSION-* -w dist
+    - PY_VER_CLEAN=$(echo $PYTHON_VERSION | tr -d '.')
+    - PY_PATH="/opt/python/cp${PY_VER_CLEAN}-cp${PY_VER_CLEAN}/bin"
+    - $PY_PATH/pip install uv
+    - uv venv
+    - source .venv/bin/activate
+    - uv build --wheel --python $PYTHON_VERSION
+    - auditwheel repair dist/hopsy-*.whl -w dist/
   artifacts:
     paths:
       - dist/*manylinux*
@@ -65,164 +67,115 @@ build-release:
 
 build-release-macos:
   stage: build
-  rules:
-    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   tags:
-      - macos
+    - macos
   parallel:
     matrix:
-    - PYTHON_VERSION: ["cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313", "cp314-cp314"]
-  environment: $PYTHON_VERSION
+      - *python_versions
   before_script:
-    - eval "$(pyenv init -)" && eval "$(pyenv virtualenv-init -)"
-    - pyenv activate $PYTHON_VERSION
-    - rm build dist -r || true
+    - brew install uv || true
   script:
-    - pyenv activate $PYTHON_VERSION && python setup.py bdist_wheel
-    - VERSION=$(cat .version); delocate-wheel -v dist/hopsy-$VERSION-$PYTHON_VERSION-*
+    - uv venv
+    - source .venv/bin/activate
+    - uv build --wheel --python $PYTHON_VERSION
+    - pip install delocate
+    - delocate-wheel -v dist/hopsy-*.whl
   artifacts:
     paths:
-      - dist/*
+      - dist/*.whl
     expire_in: 7 days
 
-build-debug:
-  stage: build
-  rules:
-    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
-  parallel:
-    matrix:
-      - PYTHON_VERSION: ["cp314-cp314"]
-  environment: $PYTHON_VERSION
+test-debug:
+  stage: test
+  dependencies:
+    - build-debug
   script:
-    - /opt/python/cp314-cp314/bin/python .check_version.py
-    - git rev-parse --short HEAD > .commit
-    - echo "$(cat .version).dev0" > .version
-    - sed -i 's/debug = 0/debug = 1/g' setup.cfg
-    - /opt/python/$PYTHON_VERSION/bin/pip wheel --no-deps . -w dist
-    - VERSION=$(cat .version); auditwheel repair dist/hopsy-$VERSION-$PYTHON_VERSION-* -w dist
-  artifacts:
-    paths:
-      - dist/*manylinux*
-    expire_in: 7 days
-
+    - PYTHON_VERSION=3.14
+    - PY_VER_CLEAN=$(echo $PYTHON_VERSION | tr -d '.')
+    - PY_PATH="/opt/python/cp${PY_VER_CLEAN}-cp${PY_VER_CLEAN}/bin"
+    - $PY_PATH/pip install uv
+    - uv venv --python $PYTHON_VERSION
+    - source .venv/bin/activate
+    - uv sync --locked --dev --all-extras
+    - uv pip install hopsy --find-links dist/
+    - python -m unittest -v tests
 
 test-release:
   stage: test
-  rules:
-    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   dependencies:
     - build-release
   parallel:
     matrix:
-      - PYTHON_VERSION: ["cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313", "cp314-cp314"]
-  environment: $PYTHON_VERSION
-  before_script:
-    - /opt/python/$PYTHON_VERSION/bin/python -m pip install docov
+      - *python_versions
   script:
-    - VERSION=$(cat .version); /opt/python/$PYTHON_VERSION/bin/python -m pip install dist/hopsy-$VERSION-$PYTHON_VERSION-manylinux*.whl
-    - VERSION=$(cat .version); /opt/python/$PYTHON_VERSION/bin/python -m unittest -v tests
-  artifacts:
-    paths:
-      - dist
-    expire_in: 7 days
+    - PY_VER_CLEAN=$(echo $PYTHON_VERSION | tr -d '.')
+    - PY_PATH="/opt/python/cp${PY_VER_CLEAN}-cp${PY_VER_CLEAN}/bin"
+    - $PY_PATH/pip install uv
+    - uv venv --python $PYTHON_VERSION
+    - source .venv/bin/activate
+    - uv sync --locked --dev --all-extras
+    - uv pip install hopsy --find-links dist/
+    - python -m unittest -v tests
 
 test-release-macos:
   stage: test
-  rules:
-    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   tags:
-      - macos
+    - macos
   dependencies:
     - build-release-macos
   parallel:
     matrix:
-      - PYTHON_VERSION: ["cp310-cp310", "cp311-cp311", "cp312-cp312", "cp313-cp313", "cp314-cp314"]
-  environment: $PYTHON_VERSION
+      - *python_versions
   before_script:
-    - eval "$(pyenv init -)" && eval "$(pyenv virtualenv-init -)"
-    - pyenv activate $PYTHON_VERSION
-    - python -m pip install docov
+    - brew install uv || true
   script:
-    - VERSION=$(cat .version); python -m pip install dist/hopsy-$VERSION-$PYTHON_VERSION-*macosx*arm64.whl --force-reinstall
-    - VERSION=$(cat .version); python -m unittest -v tests
-  artifacts:
-    paths:
-      - dist
-    expire_in: 7 days
-
-
-test-debug:
-  stage: test
-  rules:
-    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
-  dependencies:
-    - build-debug
-  parallel:
-    matrix:
-      - PYTHON_VERSION: ["cp314-cp314"]
-  environment: $PYTHON_VERSION
-  before_script:
-    - /opt/python/$PYTHON_VERSION/bin/python -m pip install docov
-  script:
-    - VERSION="$(cat .version).dev0"; /opt/python/$PYTHON_VERSION/bin/python -m pip install dist/hopsy-$VERSION-$PYTHON_VERSION-manylinux*.whl
-    - VERSION="$(cat .version).dev0"; /opt/python/$PYTHON_VERSION/bin/python -m unittest -v tests
-  artifacts:
-    paths:
-      - dist
-    expire_in: 7 days
+    - uv venv --python $PYTHON_VERSION
+    - source .venv/bin/activate
+    - uv sync --locked --dev --all-extras
+    - uv pip install hopsy --find-links dist/
+    - python -m unittest -v tests
 
 test-integration-release:
   stage: test
-  rules:
-    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
   dependencies:
     - build-release
-  before_script:
-    # for time reasons we only test the latest python version. Otherwise the tests take more than 1h.
-    - for PY in "cp314-cp314"; do /opt/python/$PY/bin/python -m pip install docov jupyter nbconvert clickhouse-driver hagelkorn mcbackend ipyparallel 'polyround[extras]'; done
+  script:
+    - PYTHON_VERSION=3.14
+    - PY_VER_CLEAN=$(echo $PYTHON_VERSION | tr -d '.')
+    - PY_PATH="/opt/python/cp${PY_VER_CLEAN}-cp${PY_VER_CLEAN}/bin"
+    - $PY_PATH/pip install uv
+    - uv venv --python $PYTHON_VERSION
+    - source .venv/bin/activate
+    - uv sync --locked --dev --all-extras --group integration-tests
+    - uv pip install --prerelease=allow mcbackend
+    - uv pip install hopsy --find-links dist/
     - curl https://clickhouse.com/ | sh
     - ./clickhouse server &> clickhouse.log &
-    - rm examples/ParallelTemperingMPI.ipynb examples/parallel_tempering_MPI.py # mpi not compatible with manylinux
-    - rm examples/Callbacks.ipynb # somehow samples go missing in CI but not locally? For now we skip this test
-    - rm examples/BenchmarkingMultiphaseMonteCarloSampling.ipynb # too slow for CI
-    - rm examples/ParallelTemperingMultiprocessing.ipynb # requires manual converting to python and the manual conversion already exists
-    - rm examples/SamplingAdvice.ipynb # requires manual converting to python and the manual conversion already exists
-  script:
-    - VERSION=$(cat .version); for PY in "cp314-cp314"; do /opt/python/$PY/bin/python -m pip install dist/hopsy-$VERSION-$PY-manylinux*.whl; done
-    - for PY in "cp314-cp314"; do for f in examples/*.py; do /opt/python/$PY/bin/python $f || exit 1; done ;done
-    - for PY in "cp314-cp314"; do for f in examples/*.ipynb; do /opt/python/$PY/bin/python -m jupyter nbconvert --to notebook --execute $f || exit 1; done;done
+    - sleep 5
+    - for f in examples/*.py; do python $f || exit 1; done
+    - for f in examples/*.ipynb; do python -m jupyter nbconvert --to notebook --execute $f || exit 1; done
   after_script:
-    - pkill clickhouse
-  artifacts:
-    paths:
-      - dist
-    expire_in: 7 days
+    - pkill clickhouse || true
 
 build-docs:
-  stage: build-docs
-  rules:
-    - if: '$CI_COMMIT_AUTHOR !~ /^CI_BOT/'
-  image: ubuntu:22.04
+  stage: test
+  image: ubuntu:24.04
   dependencies:
-    - test-release
-  before_script:
-    - apt update -y
-    - apt install -y python3-dev pandoc python3-pip
+    - build-release
   script:
-    - python3 -m pip install docov sphinx pybind11 numpy pandas matplotlib  sphinx-rtd-theme  nbsphinx pydata_sphinx_theme ipython --force-reinstall
-    # We have to use the python3.10 wheel, because this is what ubuntu:22.04 supports out of the box
-    - VERSION="$(cat .version)"; python3 -m pip install dist/hopsy-$VERSION-cp310-cp310-manylinux*.whl
+    - apt update && apt install -y python3-dev pandoc python3-pip curl git
+    - curl -LsSf https://astral.sh/uv/install.sh | sh
+    - source $HOME/.local/bin/env
+    - uv venv
+    - source .venv/bin/activate
+    - uv sync --locked --dev --all-extras
+    - uv pip install hopsy --find-links dist/
     - mkdir new-docs
-    - cd docs-sources
-    - python3 -m sphinx -b html -d _build/doctrees   . _build/html
-    - cp -r _build/html/* ../new-docs/
-    - cd -
-    - python3 -m docov hopsy --output new-docs/; cat new-docs/docov.txt
-    - touch new-docs/.nojekyll
+    - sphinx-build -b html docs-sources new-docs
+    - docov hopsy --output new-docs/
   artifacts:
     paths:
       - new-docs
-    expire_in: 7 days
 
 upload-docs:
   stage: upload-artifacts
