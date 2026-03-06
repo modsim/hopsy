@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Reference &#8212; hopsy 1.7.0 documentation</title>
+    <title>Reference &#8212; hopsy 1.8.0.dev4 documentation</title>
   
   
   
@@ -41,21 +41,21 @@
 
     <script src="_static/jquery.js?v=5d32c60e"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-    <script src="_static/documentation_options.js?v=030dc6f6"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/documentation_options.js?v=cc7df65c"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'zreference';</script>
     <link rel="icon" href="_static/hopsy.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="hopsy.generate_unit_hypercube" href="generated/hopsy.generate_unit_hypercube.html" />
-    <link rel="prev" title="Callbacks" href="notebooks/Callbacks.html" />
+    <link rel="prev" title="Visualizing samples from parallel tempering" href="notebooks/eval_pt_samples.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.7.0" />
+  <meta name="docsearch:version" content="1.8.0.dev4" />
   </head>
   
   
@@ -121,8 +121,8 @@
       
     
     
-    <img src="_static/hopsy.png" class="logo__image only-light" alt="hopsy 1.7.0 documentation - Home"/>
-    <img src="_static/hopsy.png" class="logo__image only-dark pst-js-only" alt="hopsy 1.7.0 documentation - Home"/>
+    <img src="_static/hopsy.png" class="logo__image only-light" alt="hopsy 1.8.0.dev4 documentation - Home"/>
+    <img src="_static/hopsy.png" class="logo__image only-dark pst-js-only" alt="hopsy 1.8.0.dev4 documentation - Home"/>
   
   
 </a></div>
@@ -533,7 +533,7 @@
 <h1>Reference<a class="headerlink" href="#reference" title="Link to this heading">#</a></h1>
 <section id="helpers">
 <h2>Helpers<a class="headerlink" href="#helpers" title="Link to this heading">#</a></h2>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.compute_chebyshev_center.html#hopsy.compute_chebyshev_center" title="hopsy.compute_chebyshev_center"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.compute_chebyshev_center</span></code></a>(problem[, ...])</p></td>
 <td><p>Computes the Chebyshev center, that is the midpoint of a (non-unique) largest inscribed ball in the polytope defined by <span class="math notranslate nohighlight">\(Ax &lt; b\)</span>.</p></td>
@@ -556,7 +556,7 @@
 </tbody>
 </table>
 </div>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.BirkhoffPolytope.html#hopsy.BirkhoffPolytope" title="hopsy.BirkhoffPolytope"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.BirkhoffPolytope</span></code></a>(size)</p></td>
 <td><p>Birkhoff polytope helper that manages transformation of states and constraints</p></td>
@@ -570,7 +570,7 @@
 </section>
 <section id="models">
 <h2>Models<a class="headerlink" href="#models" title="Link to this heading">#</a></h2>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Model.html#hopsy.Model" title="hopsy.Model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Model</span></code></a></p></td>
 <td><p>Base model class.</p></td>
@@ -590,7 +590,7 @@
 </section>
 <section id="problem">
 <h2>Problem<a class="headerlink" href="#problem" title="Link to this heading">#</a></h2>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Problem.html#hopsy.Problem" title="hopsy.Problem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Problem</span></code></a></p></td>
 <td><p></p></td>
@@ -598,7 +598,7 @@
 </tbody>
 </table>
 </div>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.round.html#hopsy.round" title="hopsy.round"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.round</span></code></a>(problem[, simplify])</p></td>
 <td><p>Rounds the polytope defined by the inequality <span class="math notranslate nohighlight">\(Ax &lt; b\)</span> using <a class="reference external" href="https://pypi.org/project/PolyRound/">PolyRound</a>.</p></td>
@@ -621,7 +621,7 @@
 </section>
 <section id="proposals">
 <h2>Proposals<a class="headerlink" href="#proposals" title="Link to this heading">#</a></h2>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Proposal.html#hopsy.Proposal" title="hopsy.Proposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Proposal</span></code></a></p></td>
 <td><p>Interface for proposal mechanisms.</p></td>
@@ -668,7 +668,7 @@
 </section>
 <section id="random">
 <h2>Random<a class="headerlink" href="#random" title="Link to this heading">#</a></h2>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.RandomNumberGenerator.html#hopsy.RandomNumberGenerator" title="hopsy.RandomNumberGenerator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.RandomNumberGenerator</span></code></a></p></td>
 <td><p></p></td>
@@ -685,7 +685,7 @@
 </section>
 <section id="sampling">
 <h2>Sampling<a class="headerlink" href="#sampling" title="Link to this heading">#</a></h2>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.MarkovChain.html#hopsy.MarkovChain" title="hopsy.MarkovChain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.MarkovChain</span></code></a>(problem[, proposal, ...])</p></td>
 <td><p>Given a hopsy.Problem a MarkovChain object can be constructed.</p></td>
@@ -693,7 +693,7 @@
 </tbody>
 </table>
 </div>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.setup.html#hopsy.setup" title="hopsy.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.setup</span></code></a>(problem, random_seed[, ...])</p></td>
 <td><p></p></td>
@@ -707,7 +707,7 @@
 </section>
 <section id="diagnostics">
 <h2>Diagnostics<a class="headerlink" href="#diagnostics" title="Link to this heading">#</a></h2>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.ess.html#hopsy.ess" title="hopsy.ess"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.ess</span></code></a>(data[, series, method, relative, ...])</p></td>
 <td><p>Calculate estimate of the effective sample size (ess).</p></td>
@@ -724,7 +724,7 @@
 </section>
 <section id="tuning">
 <h2>Tuning<a class="headerlink" href="#tuning" title="Link to this heading">#</a></h2>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.tune.html#hopsy.tune" title="hopsy.tune"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.tune</span></code></a>(mcs, rngs, target, n_tuning[, k, ...])</p></td>
 <td><p>Thompson Sampling-based tuning method for specifying meaningful hyperparameters for Markov chain proposal distributions.</p></td>
@@ -746,12 +746,12 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="notebooks/Callbacks.html"
+       href="notebooks/eval_pt_samples.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Callbacks</p>
+        <p class="prev-next-title">Visualizing samples from parallel tempering</p>
       </div>
     </a>
     <a class="right-next"
@@ -848,7 +848,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>
