@@ -148,7 +148,7 @@ test-integration-release:
     - uv venv --python $PYTHON_VERSION
     - source .venv/bin/activate
     - uv pip install hopsy --find-links dist/
-    - uv pip install --prerelease=allow docov jupyter nbconvert clickhouse-driver hagelkorn mcbackend ipyparallel 'polyround[extras]'
+    - uv pip install --prerelease=allow docov matplotlib jupyter nbconvert clickhouse-driver hagelkorn mcbackend ipyparallel 'polyround[extras]'
     - curl https://clickhouse.com/ | sh
     - ./clickhouse server &> clickhouse.log &
     - sleep 5
