@@ -686,7 +686,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "arviz" },
+    { name = "arviz", specifier = ">=0.23.4,<1" },
     { name = "gurobipy", marker = "extra == 'extra'", specifier = ">=13.0.0" },
     { name = "numpy" },
     { name = "optlang", specifier = ">=1.7.0" },
