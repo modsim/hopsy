@@ -25,6 +25,7 @@ set(HOPS_BINARIES OFF CACHE BOOL "" FORCE)
 set(HOPS_TUNING ON CACHE BOOL "" FORCE)
 set(HOPS_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(HOPS_TESTS OFF CACHE BOOL "" FORCE)
+set(HOPS_MPI OFF CACHE BOOL "" FORCE)
 set(HOPS_OPENMP OFF CACHE BOOL "" FORCE)
 set(HOPS_GUROBI OFF CACHE BOOL "" FORCE)
 set(HOPS_DNEST4_SUPPORT OFF CACHE BOOL "" FORCE)
@@ -37,8 +38,10 @@ set(HOPS_INCLUDE_DIR   "${CMAKE_CURRENT_SOURCE_DIR}/extern/hops/include/hops")
 include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
 
 add_subdirectory(extern/hops)
-add_subdirectory(extern/pybind11)
-add_subdirectory(src/hopsy)
+
+find_package(pybind11 CONFIG REQUIRED)
+pybind11_add_module(core src/hopsy/hopsy.cpp src/hopsy/doc.cpp)
+target_link_libraries(core PRIVATE pybind11::module)
 
 if (NOT TARGET core)
   message(FATAL_ERROR "Target 'core' not found. Ensure src/hopsy defines it.")
@@ -66,3 +69,5 @@ target_compile_definitions(core PRIVATE
   BUILD_INFO="${HOPSY_BUILD_INFO}"
   VERSION_INFO="${HOPSY_VERSION_INFO}"
 )
+
+install(TARGETS core DESTINATION hopsy)

@@ -16,9 +16,6 @@
 #include "random.hpp"
 #include "tuning.hpp"
 
-#define STRINGIFY(x) #x
-#define MACRO_STRINGIFY(x) STRINGIFY(x)
-
 namespace py = pybind11;
 
 PYBIND11_MODULE(core, m) {
@@ -26,9 +23,6 @@ PYBIND11_MODULE(core, m) {
     options.disable_function_signatures();
 
     m.doc() = hopsy::doc::base;
-
-    m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
-    m.attr("__build__") = MACRO_STRINGIFY(BUILD_INFO);
 
 #ifdef IS_DEBUG
     m.attr("__is_debug__") = true;

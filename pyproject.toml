@@ -1,12 +1,95 @@
 [build-system]
 requires = [
-    "setuptools>=42",
-    "wheel",
-    "ninja; sys_platform != 'win32'",
-    "cmake>=3.12",
-]
-build-backend = "setuptools.build_meta"
+	"scikit-build-core>=0.10",
+	"setuptools_scm>=8",
+	"pybind11"
+	]
+build-backend = "scikit_build_core.build"
 
-[tool.cibuildwheel]
-build = ["*macosx_x86_64", "*manylinux_x86_64", "*_amd64"]
-skip = ["pp*", "cp36-*", "cp37-*", "cp38-*", "cp39-*"] # no PyPy, no 3.6 and 3.7
+[project]
+name = "hopsy"
+dynamic = ["version"]
+description = "hopsy - Highly Optimized Polytope Sampling in Python"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+	{name = "Richard D. Paul", email = "r.paul@fz-juelich.de"},
+	{name = "Johann Fredrik Jadebeck", email = "j.jadebeck@fz-juelich.de"},
+]
+requires-python = ">=3.10"
+dependencies = [
+    "PolyRound>=0.4.0",
+    "optlang>=1.7.0",
+    "arviz>=0.23.4,<1",
+    "numpy",
+    "pandas",
+    "tqdm",
+    "scipy",
+    "scikit-learn",
+]
+keywords = ["polytope sampling", "mcmc", "convex polytopes", "sampling", "Bayesian inference"]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: C++",
+    "Operating System :: OS Independent",
+]
+
+[project.optional-dependencies]
+extra = [
+    "gurobipy>=13.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "docov",
+    "pre-commit",
+    "build",
+    "ipython",
+    "nbsphinx",
+    "pybind11",
+    "pydata_sphinx_theme",
+    "sphinx",
+    "sphinx-rtd-theme",
+    "twine",
+]
+integration-tests = [
+    "clickhouse-driver>=0.2.10",
+    "hagelkorn>=1.2.3",
+    "ipyparallel>=9.0.2",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.10.8",
+    "nbconvert>=7.17.0",
+    "polyround[extras]>=0.4.0",
+]
+
+
+[tool.scikit-build]
+cmake.args = ["-DPython_FIND_STRATEGY=LOCATION"]
+cmake.build-type = "Release"
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+sdist.include = ["src/hopsy/_version.py"]
+
+
+[tool.setuptools_scm]
+version_file = "src/hopsy/_version.py"
+version_scheme = "release-branch-semver"
+local_scheme = "no-local-version"
+
+[tool.ruff]
+line-length = 88
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["C", "E", "F", "W", "B"]
+ignore = ["E203", "E231", "E501", "W503"]
+
+[tool.ruff.lint.per-file-ignores]
+"docs/conf.py" = ["ALL"]

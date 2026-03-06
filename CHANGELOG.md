@@ -1,5 +1,9 @@
 # Changelog
 
+## Latest
+- [#188](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/188): Move to pyproject.toml and automate versioning
+
+
 ## v1.7.0
 ### Breaking changes
 - compute\_chebyshev\_center does not return radius anymore (function now returns 1 value instead of 2). Use compute\_chebyshev\_center\_and\_radius to obtain center and radius.
