@@ -1,7 +1,7 @@
 # Changelog
 
-## v1.8.0
-- [#188](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/188): Move to pyproject.toml
+## Latest
+- [#188](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/188): Move to pyproject.toml and automate versioning
 
 
 ## v1.7.0
