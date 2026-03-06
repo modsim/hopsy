@@ -96,8 +96,8 @@ test-debug:
     - $PY_PATH/pip install uv
     - uv venv --python $PYTHON_VERSION
     - source .venv/bin/activate
+    - uv sync --locked --dev --all-extras
     - uv pip install hopsy --find-links dist/
-    - uv pip install docov
     - python -m unittest -v tests
 
 test-release:
@@ -113,8 +113,8 @@ test-release:
     - $PY_PATH/pip install uv
     - uv venv --python $PYTHON_VERSION
     - source .venv/bin/activate
+    - uv sync --locked --dev --all-extras
     - uv pip install hopsy --find-links dist/
-    - uv pip install docov
     - python -m unittest -v tests
 
 test-release-macos:
@@ -131,7 +131,7 @@ test-release-macos:
   script:
     - uv venv --python $PYTHON_VERSION
     - source .venv/bin/activate
-    - uv build --wheel --python $PYTHON_VERSION
+    - uv sync --locked --dev --all-extras
     - uv pip install hopsy --find-links dist/
     - uv pip install docov
     - python -m unittest -v tests
@@ -147,8 +147,9 @@ test-integration-release:
     - $PY_PATH/pip install uv
     - uv venv --python $PYTHON_VERSION
     - source .venv/bin/activate
+    - uv sync --locked --dev --all-extras
     - uv pip install hopsy --find-links dist/
-    - uv pip install --prerelease=allow docov matplotlib jupyter nbconvert clickhouse-driver hagelkorn mcbackend ipyparallel 'polyround[extras]'
+    - uv pip install --prerelease=allow matplotlib jupyter nbconvert clickhouse-driver hagelkorn mcbackend ipyparallel 'polyround[extras]'
     - curl https://clickhouse.com/ | sh
     - ./clickhouse server &> clickhouse.log &
     - sleep 5
@@ -168,7 +169,7 @@ build-docs:
     - source $HOME/.local/bin/env
     - uv venv
     - source .venv/bin/activate
-    - uv pip install sphinx pybind11 numpy pandas matplotlib sphinx-rtd-theme nbsphinx pydata_sphinx_theme ipython docov
+    - uv sync --locked --dev --all-extras
     - uv pip install hopsy --find-links dist/
     - mkdir new-docs
     - sphinx-build -b html docs-sources new-docs
