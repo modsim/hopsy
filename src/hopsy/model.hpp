@@ -225,7 +225,7 @@ namespace hopsy {
 
         const MatrixType &getCovariance() const { return fullCovariance; }
 
-        const std::vector<long> &getInactive() const { return hops::DegenerateGaussian::getInactive(); }
+        const std::vector<Eigen::Index> &getInactive() const { return hops::DegenerateGaussian::getInactive(); }
 
     private:
         VectorType fullMean;
