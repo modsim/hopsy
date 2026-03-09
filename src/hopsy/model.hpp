@@ -198,7 +198,7 @@ namespace hopsy {
     public:
         Gaussian(const VectorType &mean,
                  const MatrixType &covariance,
-                 const std::vector<long> &inactive = std::vector<long>()) :
+                 const std::vector<Eigen::Index> &inactive = std::vector<Eigen::Index>()) :
                 hops::DegenerateGaussian(mean, covariance, inactive),
                 fullMean(mean),
                 fullCovariance(covariance) {
@@ -268,7 +268,7 @@ namespace hopsy {
 
         py::classh<Gaussian, Model, ModelTrampoline<Gaussian>>(m, "Gaussian",
                                                                doc::Gaussian::base)
-                .def(py::init([](long dim) {
+                .def(py::init([](Eigen::Index dim) {
                          return Gaussian(VectorType::Zero(dim),
                                          MatrixType::Identity(dim, dim));
                      }),
@@ -276,7 +276,7 @@ namespace hopsy {
                      py::arg("dim"))
                 .def(py::init([](const VectorType &mean,
                                  const MatrixType &covariance,
-                                 const std::vector<long> &inactives) {
+                                 const std::vector<Eigen::Index> &inactives) {
                          if (!mean.size() && !covariance.size()) {
                              return Gaussian(VectorType::Zero(2),
                                              MatrixType::Identity(2, 2),
@@ -305,7 +305,7 @@ namespace hopsy {
                      doc::Gaussian::__init__,
                      py::arg("mean") = VectorType(),
                      py::arg("covariance") = MatrixType(),
-                     py::arg("inactives") = std::vector<long>())
+                     py::arg("inactives") = std::vector<Eigen::Index>())
                 .def_property("mean", &Gaussian::getMean, [](Gaussian &self,
                                                              const VectorType &mean) {
                     self = Gaussian(mean, self.getCovariance(), self.getInactive());
@@ -315,7 +315,7 @@ namespace hopsy {
                     self = Gaussian(self.getMean(), covariance, self.getInactive());
                 }, doc::Gaussian::covariance)
                 .def_property("inactives", &Gaussian::getInactive, [](Gaussian &self,
-                                                                      const std::vector<long> &inactives) {
+                                                                      const std::vector<Eigen::Index> &inactives) {
                     self = Gaussian(self.getMean(), self.getCovariance(), inactives);
                 }, doc::Gaussian::inactives)
                 .def("log_density", [](Gaussian &self, const VectorType& x)  {
@@ -388,7 +388,7 @@ namespace hopsy {
 
                                     Gaussian p(t[0].cast<VectorType>(),
                                                t[1].cast<MatrixType>(),
-                                               t[2].cast<std::vector<long>>());
+                                               t[2].cast<std::vector<Eigen::Index>>());
 
                                     return p;
                                 }
@@ -535,8 +535,8 @@ namespace hopsy {
 
         py::classh<Rosenbrock, Model, ModelTrampoline<Rosenbrock>>(m, "Rosenbrock",
                                                                    doc::Rosenbrock::base)
-                .def(py::init([](long dim) {
-                         return Rosenbrock(1, VectorType::Zero(static_cast<long>(dim / 2)));
+                .def(py::init([](Eigen::Index dim) {
+                         return Rosenbrock(1, VectorType::Zero(static_cast<Eigen::Index>(dim / 2)));
                      }),
                      doc::Rosenbrock::__init__,
                      py::arg("dim"))
