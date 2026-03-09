@@ -55,8 +55,14 @@ jobs:
 
       # This step fixes the 429 error by providing virtualenv via PyPI/uv cache
       # instead of letting cibuildwheel download it from GitHub raw URLs.
-      - name: Pre-install virtualenv to avoid rate limits
-        run: uv pip install --system virtualenv
+      - name: Pre-install virtualenv
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            pip install --upgrade virtualenv
+          else
+            python3 -m pip install --user --upgrade virtualenv
+          fi
+        shell: bash
 
       - name: Set up QEMU
         if: runner.os == 'Linux'
