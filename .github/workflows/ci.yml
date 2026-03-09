@@ -97,7 +97,8 @@ jobs:
         with:
           extras: uv
         env:
-          CIBW_BUILD: cp310-* cp311-* cp312-* cp313-* cp314-*
+#          CIBW_BUILD: cp310-* cp311-* cp312-* cp313-* cp314-*
+          CIBW_BUILD: cp313-*
           CIBW_BUILD_FRONTEND: build[uv]
           CIBW_ARCHS_LINUX: ${{ matrix.cibw_archs_linux }}
           CIBW_ARCHS_MACOS: ${{ matrix.cibw_archs_macos }}
@@ -118,10 +119,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      max-parallel: 6
       matrix:
         os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-15-intel, windows-latest, windows-11-arm]
-        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+#        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+        python-version: ['3.13']
 
     steps:
       - uses: actions/checkout@v4
