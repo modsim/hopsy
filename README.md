@@ -29,14 +29,25 @@ Details and more use-cases are described [here](https://www.biorxiv.org/content/
 
 hopsy can be easily installed from the Python Package Index using ``pip install hopsy``.
 It is also possible to install the source dist on pypi in case there is no wheel for your particular OS yet.
+We publish wheels for:
+
+- **Linux**: `x86_64`, `aarch64`
+  Built with `manylinux`/glibc-compatible tooling.
+  **musllinux/Alpine wheels are not published.**
+
+- **macOS**: `x86_64`, `arm64`
+  **Minimum supported macOS version for wheels: 10.15 (Catalina).**
+
+- **Windows**: `AMD64` (`x86_64`), `ARM64`
+  **32-bit Windows is not supported.**
+Supported Python versions: **3.10–3.14**.
+Older systems may still work when building from source, but are not part of our wheel support policy. For older or highly customized environments, we recommend building from source or using a container.
 
 Alternatively, you can download the source code from our GitHub repository with
 
 ```bash
 git clone https://github.com/modsim/hopsy --recursive
 ```
-
-Note the `--recursive` option which is needed for hops.
 
 Next, compile either a binary wheel using pip
 
@@ -74,20 +85,6 @@ To compile binary wheels for distribution (e.g. via the Python Package Index pyp
 * Ninja or Pip 10+
 * Docker (optional, for building wheels)
 
-
-## MPI support for parallel tempering
-
-If you want to use the parallel tempering implemented in hops, you need a working MPI installation, because threads would not work due to the python GIL.
-The next step is to compile hopsy by source and to check that the script  examples/parallel\_tempering.py works.
-Both modes of the distribution should be found, otherwise there is some issue. In this case, please contact us.
-
-In order to use parallel tempering, python interpreter must be called with MPI:
-
-```
-mpirun -np 10 parallel_tempering_application.py
-```
-
-In this case, 10 parallel chains would be constructed.
 
 
 ## Examples
