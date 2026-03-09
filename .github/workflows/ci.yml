@@ -61,10 +61,11 @@ jobs:
             cibw-${{ runner.os }}-
 
       - name: Set up QEMU
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && runner.arch == 'X64'
         uses: docker/setup-qemu-action@v4
         with:
-          platforms: all
+          platforms: arm64
+          cache-image: false
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.4.0
