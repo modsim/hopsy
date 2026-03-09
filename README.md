@@ -36,8 +36,7 @@ Alternatively, you can download the source code from our GitHub repository with
 git clone https://github.com/modsim/hopsy --recursive
 ```
 
-Note the `--recursive` option which is
-needed for hops, eigen and pybind11 submodules.
+Note the `--recursive` option which is needed for hops.
 
 Next, compile either a binary wheel using pip
 
