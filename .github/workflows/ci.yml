@@ -6,6 +6,12 @@ on:
     tags: [ '*' ]
   pull_request:
 
+# Cancels older runs of a PR if you push new commits, saving CI time.
+# But allows consecutive pushes to 'main' to run to completion.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' }}
+
 jobs:
   build-sdist:
     name: Build source distribution
@@ -42,13 +48,20 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
+      - name: Set up QEMU
+        if: runner.os == 'Linux'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.22
         env:
-          # Build for Python 3.10 through 3.14
           CIBW_BUILD: cp310-* cp311-* cp312-* cp313-* cp314-*
-          # Skip 32-bit and alternative architectures to save CI time
-          CIBW_SKIP: "*-musllinux* *i686 *win32 ppc64le s390x"
+          CIBW_ARCHS_LINUX: auto aarch64
+          CIBW_ARCHS_MACOS: x86_64 arm64
+          CIBW_ARCHS_WINDOWS: auto
+          CIBW_SKIP: "*-musllinux* *i686 *win32"
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
