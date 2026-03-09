@@ -89,10 +89,5 @@ target_compile_definitions(core PRIVATE
     $<$<CONFIG:Debug>:IS_DEBUG>
 )
 
-if(MSVC)
-    target_compile_options(core PRIVATE /W4)
-else()
-    target_compile_options(core PRIVATE -Wall -Wextra)
-endif()
 
 install(TARGETS core DESTINATION hopsy)
