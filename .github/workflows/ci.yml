@@ -38,7 +38,7 @@ jobs:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 3
+      max-parallel: 6
       matrix:
         os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, windows-11-arm, macos-15-intel, macos-latest]
 
@@ -78,6 +78,7 @@ jobs:
           CIBW_ARCHS_MACOS: x86_64 arm64
           CIBW_ARCHS_WINDOWS: auto
           CIBW_SKIP: "*-musllinux* *i686 *win32"
+          CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET=10.15
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
