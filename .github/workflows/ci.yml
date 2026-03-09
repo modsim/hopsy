@@ -60,7 +60,7 @@ jobs:
           if [ "$RUNNER_OS" == "Windows" ]; then
             pip install --upgrade virtualenv
           else
-            python3 -m pip install --user --upgrade virtualenv
+            python3 -m pip install --user --break-system-packages --upgrade virtualenv
           fi
         shell: bash
 
