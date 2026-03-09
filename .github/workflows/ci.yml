@@ -53,16 +53,16 @@ jobs:
         with:
           enable-cache: true
 
-      # This step fixes the 429 error by providing virtualenv via PyPI/uv cache
-      # instead of letting cibuildwheel download it from GitHub raw URLs.
-      - name: Pre-install virtualenv
-        run: |
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            pip install --upgrade virtualenv
-          else
-            python3 -m pip install --user --break-system-packages --upgrade virtualenv
-          fi
-        shell: bash
+      - name: Cache cibuildwheel
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/cibuildwheel
+            ~/Library/Caches/cibuildwheel
+            ~\AppData\Local\cibuildwheel\Cache
+          key: cibw-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            cibw-${{ runner.os }}-
 
       - name: Set up QEMU
         if: runner.os == 'Linux'
