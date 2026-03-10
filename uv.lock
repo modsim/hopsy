@@ -1171,8 +1171,8 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
-extra = [
-    { name = "gurobipy" },
+gurobi = [
+    { name = "gurobipy", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux') or (platform_machine == 'AMD64' and sys_platform == 'win32') or sys_platform == 'darwin'" },
 ]
 
 [package.dev-dependencies]
@@ -1205,7 +1205,7 @@ integration-tests = [
 [package.metadata]
 requires-dist = [
     { name = "arviz", specifier = ">=0.23.4,<1" },
-    { name = "gurobipy", marker = "extra == 'extra'", specifier = ">=13.0.0" },
+    { name = "gurobipy", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'gurobi') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'gurobi') or (platform_machine == 'AMD64' and sys_platform == 'win32' and extra == 'gurobi') or (sys_platform == 'darwin' and extra == 'gurobi')", specifier = ">=13.0.1" },
     { name = "numpy" },
     { name = "optlang", specifier = ">=1.7.0" },
     { name = "pandas" },
@@ -1214,7 +1214,7 @@ requires-dist = [
     { name = "scipy" },
     { name = "tqdm" },
 ]
-provides-extras = ["extra"]
+provides-extras = ["gurobi"]
 
 [package.metadata.requires-dev]
 dev = [

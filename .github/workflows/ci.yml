@@ -1,0 +1,236 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+    tags: ['*']
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' }}
+
+jobs:
+  build-sdist:
+    name: Build source distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Build sdist
+        run: uv build --sdist
+
+      - name: Upload sdist
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+          retention-days: 7
+
+  build-wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        include:
+          - os: ubuntu-latest
+            cibw_archs_linux: x86_64
+            cibw_archs_macos: auto
+            cibw_archs_windows: auto
+
+          - os: ubuntu-24.04-arm
+            cibw_archs_linux: aarch64
+            cibw_archs_macos: auto
+            cibw_archs_windows: auto
+
+          - os: windows-latest
+            cibw_archs_linux: auto
+            cibw_archs_macos: auto
+            cibw_archs_windows: auto
+
+          - os: macos-15-intel
+            cibw_archs_linux: auto
+            cibw_archs_macos: x86_64
+            cibw_archs_windows: auto
+
+          - os: macos-latest
+            cibw_archs_linux: auto
+            cibw_archs_macos: arm64
+            cibw_archs_windows: auto
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Cache cibuildwheel
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/cibuildwheel
+            ~/Library/Caches/cibuildwheel
+            ~\AppData\Local\cibuildwheel\Cache
+          key: cibw-${{ runner.os }}-${{ runner.arch }}-v3.4.0-${{ hashFiles('pyproject.toml', 'uv.lock') }}
+          restore-keys: |
+            cibw-${{ runner.os }}-${{ runner.arch }}-v3.4.0-
+            cibw-${{ runner.os }}-${{ runner.arch }}-
+            cibw-${{ runner.os }}-v3.4.0-
+            cibw-${{ runner.os }}-
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v3.4.0
+        with:
+          extras: uv
+        env:
+          CIBW_BUILD: cp310-* cp311-* cp312-* cp313-* cp314-*
+          CIBW_BUILD_FRONTEND: build[uv]
+          CIBW_ARCHS_LINUX: ${{ matrix.cibw_archs_linux }}
+          CIBW_ARCHS_MACOS: ${{ matrix.cibw_archs_macos }}
+          CIBW_ARCHS_WINDOWS: ${{ matrix.cibw_archs_windows }}
+          CIBW_SKIP: "*-musllinux* *i686 *win32"
+          CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET=10.15
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: ./wheelhouse/*.whl
+          retention-days: 7
+
+  test:
+    needs: build-wheels
+    name: Test on ${{ matrix.os }} with Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, macos-15-intel, windows-latest]
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Download wheels for this OS
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: dist/
+
+      - name: Run Unit Tests
+        shell: bash
+        run: |
+          uv sync --locked --dev --all-extras
+          uv pip install hopsy --find-links dist/ --no-index
+          uv run python -m unittest -v tests
+
+  integration-test:
+    needs: build-wheels
+    name: Integration Tests
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+
+      - name: Download macOS wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels-macos-latest
+          path: dist/
+
+      - name: Run Integration Tests
+        shell: bash
+        run: |
+          curl https://clickhouse.com/ | sh
+          ./clickhouse server > clickhouse.log 2>&1 &
+          sleep 10
+
+          uv sync --locked --dev --all-extras --group integration-tests
+          uv pip install --prerelease=allow mcbackend
+          uv pip install hopsy --find-links dist/ --no-index
+
+          for f in examples/*.py; do
+            uv run python "$f" || exit 1
+          done
+
+          for f in examples/*.ipynb; do
+            uv run python -m jupyter nbconvert --to notebook --execute "$f" || exit 1
+          done
+
+  build-docs:
+    needs: build-wheels
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Install System Dependencies
+        run: sudo apt-get update && sudo apt-get install -y pandoc
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+
+      - name: Download Ubuntu wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels-ubuntu-latest
+          path: dist/
+
+      - name: Build Docs
+        run: |
+          uv sync --locked --dev --all-extras
+          uv pip install hopsy --find-links dist/ --no-index
+
+          mkdir new-docs
+          uv run sphinx-build -b html docs-sources new-docs
+          uv run docov hopsy --output new-docs/
+
+      - name: Upload Docs Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: new-docs
+          path: new-docs/
+          retention-days: 7

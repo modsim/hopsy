@@ -684,15 +684,15 @@ namespace hopsy {
     };
 
     using AdaptiveMetropolisProposal = UninitializedProposalWrapper<
-            hops::AdaptiveMetropolisProposal<MatrixType>, MatrixType, double, unsigned long>;
+            hops::AdaptiveMetropolisProposal<MatrixType>, MatrixType, double, size_t>;
     using BallWalkProposal = UninitializedProposalWrapper<
             hops::BallWalkProposal<MatrixType, VectorType>, double>;
     using BilliardAdaptiveMetropolisProposal = UninitializedProposalWrapper<
-            hops::BilliardAdaptiveMetropolisProposal<MatrixType>, MatrixType, double, unsigned long, long>;
+            hops::BilliardAdaptiveMetropolisProposal<MatrixType>, MatrixType, double, size_t, size_t>;
     using BilliardMALAProposal = UninitializedProposalWrapper<
-            hops::BilliardMALAProposal<ModelWrapper, MatrixType>, ModelWrapper, long, double>;
+            hops::BilliardMALAProposal<ModelWrapper, MatrixType>, ModelWrapper, size_t, double>;
     using BilliardWalkProposal = UninitializedProposalWrapper<
-            hops::BilliardWalkProposal<MatrixType>, long, double>;
+            hops::BilliardWalkProposal<MatrixType>, size_t, double>;
     using CSmMALAProposal = UninitializedProposalWrapper<
             hops::CSmMALAProposal<ModelWrapper, MatrixType>, ModelWrapper, double, double>;
     using DikinWalkProposal = UninitializedProposalWrapper<
@@ -800,7 +800,7 @@ namespace hopsy {
             .def(py::init([] (const Problem* problem,
                               double boundaryCushion,
                               double eps,
-                              unsigned long warmUp) {
+                              size_t warmUp) {
                         auto _problem(*problem);
                         MatrixType sqrtMve = computeSqrtMaximumVolumeEllipsoid(_problem);
                         auto proposal = AdaptiveMetropolisProposal::createFromProblem(&_problem, sqrtMve, eps, warmUp);
@@ -816,7 +816,7 @@ namespace hopsy {
                               const VectorType* startingPoint,
                               double boundaryCushion,
                               double eps,
-                              unsigned long warmUp) {
+                              size_t warmUp) {
                         auto _problem(*problem);
                         MatrixType sqrtMve = computeSqrtMaximumVolumeEllipsoid(_problem);
                         auto proposal = AdaptiveMetropolisProposal::create(&_problem, startingPoint, sqrtMve, eps, warmUp);
@@ -837,7 +837,7 @@ namespace hopsy {
                 adaptiveMetropolisProposal, ProposalParameter::BOUNDARY_CUSHION, "boundary_cushion", doc::AdaptiveMetropolisProposal::boundaryCushion);
         proposal::addParameter<AdaptiveMetropolisProposal>(
                 adaptiveMetropolisProposal, ProposalParameter::EPSILON, "eps", doc::AdaptiveMetropolisProposal::epsilon);
-        proposal::addParameter<AdaptiveMetropolisProposal, decltype(adaptiveMetropolisProposal), unsigned long>(
+        proposal::addParameter<AdaptiveMetropolisProposal, decltype(adaptiveMetropolisProposal), size_t>(
                 adaptiveMetropolisProposal, ProposalParameter::WARM_UP, "warm_up", doc::AdaptiveMetropolisProposal::warmUp);
         // pickling
         adaptiveMetropolisProposal.def(py::pickle([] (const AdaptiveMetropolisProposal& self) {
@@ -847,7 +847,7 @@ namespace hopsy {
                                               self.proposal->getCholeskyOfMaximumVolumeEllipsoid(),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::BOUNDARY_CUSHION)),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::EPSILON)),
-                                              std::any_cast<unsigned long>(self.proposal->getParameter(ProposalParameter::WARM_UP)));
+                                              std::any_cast<size_t>(self.proposal->getParameter(ProposalParameter::WARM_UP)));
                     },
                     [] (py::tuple t) {
                         if (t.size() != 7) throw std::runtime_error("Invalid state!");
@@ -857,7 +857,7 @@ namespace hopsy {
                                                             t[2].cast<VectorType>(),
                                                             t[3].cast<MatrixType>(),
                                                             t[5].cast<double>(),
-                                                            t[6].cast<unsigned long>());
+                                                            t[6].cast<size_t>());
                         p.setParameter(ProposalParameter::BOUNDARY_CUSHION, t[4].cast<double>());
                         return p;
                     })
@@ -914,8 +914,8 @@ namespace hopsy {
             .def(py::init([] (const Problem* problem,
                               double boundaryCushion,
                               double eps,
-                              unsigned long warmUp,
-                              long maxReflections) {
+                              size_t warmUp,
+                              size_t maxReflections) {
                         MatrixType sqrtMve = computeSqrtMaximumVolumeEllipsoid(*problem);
                         auto proposal = BilliardAdaptiveMetropolisProposal::createFromProblem(problem, sqrtMve, eps, warmUp, maxReflections);
                         proposal.setParameter(ProposalParameter::BOUNDARY_CUSHION, boundaryCushion);
@@ -931,8 +931,8 @@ namespace hopsy {
                               const VectorType* startingPoint,
                               double boundaryCushion,
                               double eps,
-                              unsigned long warmUp,
-                              long maxReflections) {
+                              size_t warmUp,
+                              size_t maxReflections) {
                         MatrixType sqrtMve = computeSqrtMaximumVolumeEllipsoid(*problem);
                         auto proposal = BilliardAdaptiveMetropolisProposal::create(problem, startingPoint, sqrtMve, eps, warmUp, maxReflections);
                         proposal.setParameter(ProposalParameter::BOUNDARY_CUSHION, boundaryCushion);
@@ -953,9 +953,9 @@ namespace hopsy {
                 billiardBilliardAdaptiveMetropolisProposal, ProposalParameter::BOUNDARY_CUSHION, "boundary_cushion", doc::BilliardAdaptiveMetropolisProposal::boundaryCushion);
         proposal::addParameter<BilliardAdaptiveMetropolisProposal>(
                 billiardBilliardAdaptiveMetropolisProposal, ProposalParameter::EPSILON, "eps", doc::BilliardAdaptiveMetropolisProposal::epsilon);
-        proposal::addParameter<BilliardAdaptiveMetropolisProposal, decltype(billiardBilliardAdaptiveMetropolisProposal), unsigned long>(
+        proposal::addParameter<BilliardAdaptiveMetropolisProposal, decltype(billiardBilliardAdaptiveMetropolisProposal), size_t>(
                 billiardBilliardAdaptiveMetropolisProposal, ProposalParameter::WARM_UP, "warm_up", doc::BilliardAdaptiveMetropolisProposal::warmUp);
-        proposal::addParameter<BilliardAdaptiveMetropolisProposal, decltype(billiardBilliardAdaptiveMetropolisProposal), long>(
+        proposal::addParameter<BilliardAdaptiveMetropolisProposal, decltype(billiardBilliardAdaptiveMetropolisProposal), size_t>(
                 billiardBilliardAdaptiveMetropolisProposal, ProposalParameter::MAX_REFLECTIONS, "max_reflections", doc::BilliardAdaptiveMetropolisProposal::maxReflections);
         // pickling
         billiardBilliardAdaptiveMetropolisProposal.def(py::pickle([] (const BilliardAdaptiveMetropolisProposal& self) {
@@ -965,8 +965,8 @@ namespace hopsy {
                                               self.proposal->getCholeskyOfMaximumVolumeEllipsoid(),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::BOUNDARY_CUSHION)),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::EPSILON)),
-                                              std::any_cast<unsigned long>(self.proposal->getParameter(ProposalParameter::WARM_UP)),
-                                              std::any_cast<long>(self.proposal->getParameter(ProposalParameter::MAX_REFLECTIONS)));
+                                              std::any_cast<size_t>(self.proposal->getParameter(ProposalParameter::WARM_UP)),
+                                              std::any_cast<size_t>(self.proposal->getParameter(ProposalParameter::MAX_REFLECTIONS)));
                     },
                     [] (py::tuple t) {
                         if (t.size() != 8) throw std::runtime_error("Invalid state!");
@@ -976,8 +976,8 @@ namespace hopsy {
                                                             t[2].cast<VectorType>(),
                                                             t[3].cast<MatrixType>(),
                                                             t[5].cast<double>(),
-                                                            t[6].cast<unsigned long>(),
-                                                            t[7].cast<unsigned long>());
+                                                            t[6].cast<size_t>(),
+                                                            t[7].cast<size_t>());
                         p.setParameter(ProposalParameter::BOUNDARY_CUSHION, t[4].cast<double>());
                         return p;
                     })
@@ -993,7 +993,7 @@ namespace hopsy {
             //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
             .def(py::init([] (const Problem* problem,
                               double stepSize,
-                              long maximumNumberOfReflections) -> BilliardMALAProposal {
+                              size_t maximumNumberOfReflections) -> BilliardMALAProposal {
                         if (problem) {
                             if (!problem->model) {
                                 throw std::runtime_error("Cannot initialize hopsy.BilliardMALAProposal for "
@@ -1014,7 +1014,7 @@ namespace hopsy {
             .def(py::init([] (const Problem* problem,
                               const VectorType* startingPoint,
                               double stepSize,
-                              long maximumNumberOfReflections) -> BilliardMALAProposal {
+                              size_t maximumNumberOfReflections) -> BilliardMALAProposal {
                         if (problem) {
                             if (!problem->model) {
                                 throw std::runtime_error("Cannot initialize hopsy.BilliardMALAProposal for uniform problem (problem.model == None).");
@@ -1045,7 +1045,7 @@ namespace hopsy {
                                               self.proposal->getB(),
                                               self.proposal->getState(),
                                               model,
-                                              std::any_cast<long>(self.proposal->getParameter(ProposalParameter::MAX_REFLECTIONS)),
+                                              std::any_cast<size_t>(self.proposal->getParameter(ProposalParameter::MAX_REFLECTIONS)),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
                     },
                     [] (py::tuple t) {
@@ -1055,7 +1055,7 @@ namespace hopsy {
                                                t[1].cast<VectorType>(),
                                                t[2].cast<VectorType>(),
                                                ModelWrapper(t[3].cast<Model*>()->copyModel()),
-                                               t[4].cast<long>(),
+                                               t[4].cast<size_t>(),
                                                t[5].cast<double>());
                     })
                 );
@@ -1068,7 +1068,7 @@ namespace hopsy {
             //.def(py::init<>()) # TODO solve re-initialization of empty proposals in markov chain before allowing default constructor
             .def(py::init([] (const Problem* problem,
                               double stepSize,
-                              long maximumNumberOfReflections) -> BilliardWalkProposal {
+                              size_t maximumNumberOfReflections) -> BilliardWalkProposal {
                         if (problem) {
                             return BilliardWalkProposal::createFromProblem(
                                     problem, maximumNumberOfReflections, stepSize);
@@ -1084,7 +1084,7 @@ namespace hopsy {
             .def(py::init([] (const Problem* problem,
                               const VectorType* startingPoint,
                               double stepSize,
-                              long maximumNumberOfReflections) -> BilliardWalkProposal {
+                              size_t maximumNumberOfReflections) -> BilliardWalkProposal {
                         if (problem) {
                             return BilliardWalkProposal::create(problem, startingPoint, maximumNumberOfReflections, stepSize);
                         } else {
@@ -1109,7 +1109,7 @@ namespace hopsy {
                         return py::make_tuple(self.proposal->getA(),
                                               self.proposal->getB(),
                                               self.proposal->getState(),
-                                              std::any_cast<long>(self.proposal->getParameter(ProposalParameter::MAX_REFLECTIONS)),
+                                              std::any_cast<size_t>(self.proposal->getParameter(ProposalParameter::MAX_REFLECTIONS)),
                                               std::any_cast<double>(self.proposal->getParameter(ProposalParameter::STEP_SIZE)));
                     },
                     [] (py::tuple t) {
@@ -1118,7 +1118,7 @@ namespace hopsy {
                         return BilliardWalkProposal(t[0].cast<MatrixType>(),
                                                t[1].cast<VectorType>(),
                                                t[2].cast<VectorType>(),
-                                               t[3].cast<long>(),
+                                               t[3].cast<size_t>(),
                                                t[4].cast<double>());
                     })
                 );
