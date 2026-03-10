@@ -38,10 +38,10 @@ We publish wheels for:
 - **macOS**: `x86_64`, `arm64`
   **Minimum supported macOS version for wheels: 10.15 (Catalina).**
 
-- **Windows**: `AMD64` (`x86_64`), `ARM64`
-  **32-bit Windows is not supported.**
+- **Windows**: `AMD64` (`x86_64`)
+  **32-bit and ARM Windows is not supported.**
 Supported Python versions: **3.10–3.14**.
-Older systems may still work when building from source, but are not part of our wheel support policy. For older or highly customized environments, we recommend building from source or using a container.
+Older and other systems may still work when building from source, but are not part of our wheel support policy. For older or highly customized environments, we recommend building from source or using a container.
 
 Alternatively, you can download the source code from our GitHub repository with
 
