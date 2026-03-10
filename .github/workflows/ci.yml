@@ -148,7 +148,8 @@ jobs:
   integration-test:
     needs: build-wheels
     name: Integration Tests
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         with:
@@ -164,24 +165,30 @@ jobs:
         with:
           python-version: '3.14'
 
-      - name: Download Ubuntu wheels
+      - name: Download macOS wheels
         uses: actions/download-artifact@v4
         with:
-          name: wheels-ubuntu-latest
+          name: wheels-macos-latest
           path: dist/
 
       - name: Run Integration Tests
+        shell: bash
         run: |
           curl https://clickhouse.com/ | sh
-          ./clickhouse server &> clickhouse.log &
-          sleep 5
+          ./clickhouse server > clickhouse.log 2>&1 &
+          sleep 10
 
           uv sync --locked --dev --all-extras --group integration-tests
           uv pip install --prerelease=allow mcbackend
           uv pip install hopsy --find-links dist/ --no-index
 
-          for f in examples/*.py; do uv run python "$f" || exit 1; done
-          for f in examples/*.ipynb; do uv run python -m jupyter nbconvert --to notebook --execute "$f" || exit 1; done
+          for f in examples/*.py; do
+            uv run python "$f" || exit 1
+          done
+
+          for f in examples/*.ipynb; do
+            uv run python -m jupyter nbconvert --to notebook --execute "$f" || exit 1
+          done
 
   build-docs:
     needs: build-wheels
