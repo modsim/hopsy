@@ -39,8 +39,6 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/jquery.js?v=5d32c60e"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
     <script src="_static/documentation_options.js?v=030dc6f6"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
@@ -535,22 +533,22 @@
 <h2>Helpers<a class="headerlink" href="#helpers" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.compute_chebyshev_center.html#hopsy.compute_chebyshev_center" title="hopsy.compute_chebyshev_center"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.compute_chebyshev_center</span></code></a>(problem[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.compute_chebyshev_center.html#hopsy.compute_chebyshev_center" title="hopsy.compute_chebyshev_center"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_chebyshev_center</span></code></a>(problem[, ...])</p></td>
 <td><p>Computes the Chebyshev center, that is the midpoint of a (non-unique) largest inscribed ball in the polytope defined by <span class="math notranslate nohighlight">\(Ax &lt; b\)</span>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.generate_unit_hypercube.html#hopsy.generate_unit_hypercube" title="hopsy.generate_unit_hypercube"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.generate_unit_hypercube</span></code></a>(dimension)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.generate_unit_hypercube.html#hopsy.generate_unit_hypercube" title="hopsy.generate_unit_hypercube"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_unit_hypercube</span></code></a>(dimension)</p></td>
 <td><p>Generate matrix A and vector b of the unit N-dimensional hypercube.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.generate_unit_simplex.html#hopsy.generate_unit_simplex" title="hopsy.generate_unit_simplex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.generate_unit_simplex</span></code></a>(dimension)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.generate_unit_simplex.html#hopsy.generate_unit_simplex" title="hopsy.generate_unit_simplex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_unit_simplex</span></code></a>(dimension)</p></td>
 <td><p>Generate matrix A and vector b of the unit N-dimensional simplex.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.is_polytope_empty.html#hopsy.is_polytope_empty" title="hopsy.is_polytope_empty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.is_polytope_empty</span></code></a>(A, b[, S, h])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.is_polytope_empty.html#hopsy.is_polytope_empty" title="hopsy.is_polytope_empty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_polytope_empty</span></code></a>(A, b[, S, h])</p></td>
 <td><p>Checks whether the polytope given by Ax &lt; b and optionally Sx=h has a solution x.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.run_multiphase_sampling.html#hopsy.run_multiphase_sampling" title="hopsy.run_multiphase_sampling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.run_multiphase_sampling</span></code></a>(problem, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.run_multiphase_sampling.html#hopsy.run_multiphase_sampling" title="hopsy.run_multiphase_sampling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_multiphase_sampling</span></code></a>(problem, seeds, ...)</p></td>
 <td><p>runs multiphase sampling as suggested in <a class="reference external" href="https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf">https://drops.dagstuhl.de/opus/volltexte/2021/13820/pdf/LIPIcs-SoCG-2021-21.pdf</a> limit_singular_value_ratio=2.3</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.simplify.html#hopsy.simplify" title="hopsy.simplify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.simplify</span></code></a>(problem)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.simplify.html#hopsy.simplify" title="hopsy.simplify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simplify</span></code></a>(problem)</p></td>
 <td><p>Simplifies the polytope defined in the <code class="docutils literal notranslate"><span class="pre">problem</span></code> by removing redundant constraints and refunction inequality constraints to equality constraints in case of dimension width less than thresh.</p></td>
 </tr>
 </tbody>
@@ -558,10 +556,10 @@
 </div>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.BirkhoffPolytope.html#hopsy.BirkhoffPolytope" title="hopsy.BirkhoffPolytope"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.BirkhoffPolytope</span></code></a>(size)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.BirkhoffPolytope.html#hopsy.BirkhoffPolytope" title="hopsy.BirkhoffPolytope"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BirkhoffPolytope</span></code></a>(size)</p></td>
 <td><p>Birkhoff polytope helper that manages transformation of states and constraints</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.LP.html#hopsy.LP" title="hopsy.LP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.LP</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.LP.html#hopsy.LP" title="hopsy.LP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LP</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Singleton for controlling PolyRound parameters for Linear Programming.</p></td>
 </tr>
 </tbody>
@@ -572,16 +570,16 @@
 <h2>Models<a class="headerlink" href="#models" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Model.html#hopsy.Model" title="hopsy.Model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Model</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Model.html#hopsy.Model" title="hopsy.Model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Model</span></code></a></p></td>
 <td><p>Base model class.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.Gaussian.html#hopsy.Gaussian" title="hopsy.Gaussian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Gaussian</span></code></a>(self[, mean, covariance, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.Gaussian.html#hopsy.Gaussian" title="hopsy.Gaussian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Gaussian</span></code></a>(self[, mean, covariance, inactives])</p></td>
 <td><p>Gaussian model which can be invariant in some dimensions of the input vector.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Mixture.html#hopsy.Mixture" title="hopsy.Mixture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Mixture</span></code></a>(self, components[, weights])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Mixture.html#hopsy.Mixture" title="hopsy.Mixture"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Mixture</span></code></a>(self, components[, weights])</p></td>
 <td><p>The <code class="docutils literal notranslate"><span class="pre">Mixture</span></code> is a weighted sum of <span class="math notranslate nohighlight">\(n\)</span> components, so its unnormalized density is given as</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.Rosenbrock.html#hopsy.Rosenbrock" title="hopsy.Rosenbrock"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Rosenbrock</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.Rosenbrock.html#hopsy.Rosenbrock" title="hopsy.Rosenbrock"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Rosenbrock</span></code></a></p></td>
 <td><p>A multi-dimensional Rosenbrock function in <span class="math notranslate nohighlight">\(2n\)</span> dimensions.</p></td>
 </tr>
 </tbody>
@@ -592,7 +590,7 @@
 <h2>Problem<a class="headerlink" href="#problem" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Problem.html#hopsy.Problem" title="hopsy.Problem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Problem</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Problem.html#hopsy.Problem" title="hopsy.Problem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Problem</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -600,19 +598,19 @@
 </div>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.round.html#hopsy.round" title="hopsy.round"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.round</span></code></a>(problem[, simplify])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.round.html#hopsy.round" title="hopsy.round"><code class="xref py py-obj docutils literal notranslate"><span class="pre">round</span></code></a>(problem[, simplify])</p></td>
 <td><p>Rounds the polytope defined by the inequality <span class="math notranslate nohighlight">\(Ax &lt; b\)</span> using <a class="reference external" href="https://pypi.org/project/PolyRound/">PolyRound</a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.add_box_constraints.html#hopsy.add_box_constraints" title="hopsy.add_box_constraints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.add_box_constraints</span></code></a>(problem, ...[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.add_box_constraints.html#hopsy.add_box_constraints" title="hopsy.add_box_constraints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_box_constraints</span></code></a>(problem, lower_bound, ...)</p></td>
 <td><p>Adds box constraints to all dimensions.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.add_equality_constraints.html#hopsy.add_equality_constraints" title="hopsy.add_equality_constraints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.add_equality_constraints</span></code></a>(problem, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.add_equality_constraints.html#hopsy.add_equality_constraints" title="hopsy.add_equality_constraints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_equality_constraints</span></code></a>(problem, A_eq, b_eq)</p></td>
 <td><p>Adds equality constraints as specified.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.back_transform.html#hopsy.back_transform" title="hopsy.back_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.back_transform</span></code></a>(problem[, samples, points])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.back_transform.html#hopsy.back_transform" title="hopsy.back_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">back_transform</span></code></a>(problem[, samples, points])</p></td>
 <td><p>Transform samples from the sampling space to the original parameter space.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.transform.html#hopsy.transform" title="hopsy.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.transform</span></code></a>(problem[, samples, points])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.transform.html#hopsy.transform" title="hopsy.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(problem[, samples, points])</p></td>
 <td><p>Transform samples from the original parameter space to the sampling space.</p></td>
 </tr>
 </tbody>
@@ -623,43 +621,43 @@
 <h2>Proposals<a class="headerlink" href="#proposals" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Proposal.html#hopsy.Proposal" title="hopsy.Proposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Proposal</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Proposal.html#hopsy.Proposal" title="hopsy.Proposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Proposal</span></code></a></p></td>
 <td><p>Interface for proposal mechanisms.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.AdaptiveMetropolisProposal.html#hopsy.AdaptiveMetropolisProposal" title="hopsy.AdaptiveMetropolisProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.AdaptiveMetropolisProposal</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.AdaptiveMetropolisProposal.html#hopsy.AdaptiveMetropolisProposal" title="hopsy.AdaptiveMetropolisProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AdaptiveMetropolisProposal</span></code></a></p></td>
 <td><p>Adaptive Metropolis Algorithm for convex polytopes, see <a class="reference external" href="https://doi.org/10.2307/3318737">https://doi.org/10.2307/3318737</a> for unconstrained version.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.BallWalkProposal.html#hopsy.BallWalkProposal" title="hopsy.BallWalkProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.BallWalkProposal</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.BallWalkProposal.html#hopsy.BallWalkProposal" title="hopsy.BallWalkProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BallWalkProposal</span></code></a></p></td>
 <td><p>This proposal is implemented for academic purpose and not recommended for production use, see <a class="reference external" href="https://doi.org/10.1007/s12532-015-0097-z">https://doi.org/10.1007/s12532-015-0097-z</a> for description.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.BilliardWalkProposal.html#hopsy.BilliardWalkProposal" title="hopsy.BilliardWalkProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.BilliardWalkProposal</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.BilliardWalkProposal.html#hopsy.BilliardWalkProposal" title="hopsy.BilliardWalkProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BilliardWalkProposal</span></code></a></p></td>
 <td><p>See <a class="reference external" href="https://doi.org/10.3182/20140824-6-ZA-1003.02312">https://doi.org/10.3182/20140824-6-ZA-1003.02312</a> for descrption.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.CSmMALAProposal.html#hopsy.CSmMALAProposal" title="hopsy.CSmMALAProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.CSmMALAProposal</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.CSmMALAProposal.html#hopsy.CSmMALAProposal" title="hopsy.CSmMALAProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CSmMALAProposal</span></code></a></p></td>
 <td><p>Do not use when fisher information is expensive for your model.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.DikinWalkProposal.html#hopsy.DikinWalkProposal" title="hopsy.DikinWalkProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.DikinWalkProposal</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.DikinWalkProposal.html#hopsy.DikinWalkProposal" title="hopsy.DikinWalkProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DikinWalkProposal</span></code></a></p></td>
 <td><p>See <a class="reference external" href="https://doi.org/10.1016/j.orl.2016.07.005">https://doi.org/10.1016/j.orl.2016.07.005</a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.GaussianCoordinateHitAndRunProposal.html#hopsy.GaussianCoordinateHitAndRunProposal" title="hopsy.GaussianCoordinateHitAndRunProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.GaussianCoordinateHitAndRunProposal</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.GaussianCoordinateHitAndRunProposal.html#hopsy.GaussianCoordinateHitAndRunProposal" title="hopsy.GaussianCoordinateHitAndRunProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GaussianCoordinateHitAndRunProposal</span></code></a></p></td>
 <td><p>Mix of <a class="reference external" href="https://doi.org/10.1093/bioinformatics/btx052">https://doi.org/10.1093/bioinformatics/btx052</a> and <a class="reference external" href="https://deepblue.lib.umich.edu/bitstream/handle/2027.42/3513/bal7884.0001.001.pdf">https://deepblue.lib.umich.edu/bitstream/handle/2027.42/3513/bal7884.0001.001.pdf</a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.GaussianHitAndRunProposal.html#hopsy.GaussianHitAndRunProposal" title="hopsy.GaussianHitAndRunProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.GaussianHitAndRunProposal</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.GaussianHitAndRunProposal.html#hopsy.GaussianHitAndRunProposal" title="hopsy.GaussianHitAndRunProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GaussianHitAndRunProposal</span></code></a></p></td>
 <td><p>Mix of <a class="reference external" href="https://doi.org/10.1093/bioinformatics/btx052">https://doi.org/10.1093/bioinformatics/btx052</a> and <a class="reference external" href="https://deepblue.lib.umich.edu/bitstream/handle/2027.42/3513/bal7884.0001.001.pdf">https://deepblue.lib.umich.edu/bitstream/handle/2027.42/3513/bal7884.0001.001.pdf</a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.GaussianProposal.html#hopsy.GaussianProposal" title="hopsy.GaussianProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.GaussianProposal</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.GaussianProposal.html#hopsy.GaussianProposal" title="hopsy.GaussianProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GaussianProposal</span></code></a></p></td>
 <td><p>Random walk with gaussian steps.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.ReversibleJumpProposal.html#hopsy.ReversibleJumpProposal" title="hopsy.ReversibleJumpProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.ReversibleJumpProposal</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.ReversibleJumpProposal.html#hopsy.ReversibleJumpProposal" title="hopsy.ReversibleJumpProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReversibleJumpProposal</span></code></a></p></td>
 <td><p>This is the implementation of the algorithm described in <a class="reference external" href="https://pubmed.ncbi.nlm.nih.gov/31214716/">https://pubmed.ncbi.nlm.nih.gov/31214716/</a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.UniformCoordinateHitAndRunProposal.html#hopsy.UniformCoordinateHitAndRunProposal" title="hopsy.UniformCoordinateHitAndRunProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.UniformCoordinateHitAndRunProposal</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.UniformCoordinateHitAndRunProposal.html#hopsy.UniformCoordinateHitAndRunProposal" title="hopsy.UniformCoordinateHitAndRunProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UniformCoordinateHitAndRunProposal</span></code></a></p></td>
 <td><p>See <a class="reference external" href="https://doi.org/10.1093/bioinformatics/btx052">https://doi.org/10.1093/bioinformatics/btx052</a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.UniformHitAndRunProposal.html#hopsy.UniformHitAndRunProposal" title="hopsy.UniformHitAndRunProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.UniformHitAndRunProposal</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.UniformHitAndRunProposal.html#hopsy.UniformHitAndRunProposal" title="hopsy.UniformHitAndRunProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UniformHitAndRunProposal</span></code></a></p></td>
 <td><p>See: <a class="reference external" href="https://dl.acm.org/doi/pdf/10.1145/256562.256619">https://dl.acm.org/doi/pdf/10.1145/256562.256619</a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.TruncatedGaussianProposal.html#hopsy.TruncatedGaussianProposal" title="hopsy.TruncatedGaussianProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.TruncatedGaussianProposal</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.TruncatedGaussianProposal.html#hopsy.TruncatedGaussianProposal" title="hopsy.TruncatedGaussianProposal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TruncatedGaussianProposal</span></code></a></p></td>
 <td><p>This is a gibbs sampler for constrained Gaussians, see  <a class="reference external" href="https://doi.org/10.1093/bioinformatics/btz315">https://doi.org/10.1093/bioinformatics/btz315</a>.</p></td>
 </tr>
 </tbody>
@@ -670,13 +668,13 @@
 <h2>Random<a class="headerlink" href="#random" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.RandomNumberGenerator.html#hopsy.RandomNumberGenerator" title="hopsy.RandomNumberGenerator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.RandomNumberGenerator</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.RandomNumberGenerator.html#hopsy.RandomNumberGenerator" title="hopsy.RandomNumberGenerator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomNumberGenerator</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.Uniform.html#hopsy.Uniform" title="hopsy.Uniform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Uniform</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.Uniform.html#hopsy.Uniform" title="hopsy.Uniform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Uniform</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Normal.html#hopsy.Normal" title="hopsy.Normal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.Normal</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.Normal.html#hopsy.Normal" title="hopsy.Normal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Normal</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -687,7 +685,7 @@
 <h2>Sampling<a class="headerlink" href="#sampling" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.MarkovChain.html#hopsy.MarkovChain" title="hopsy.MarkovChain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.MarkovChain</span></code></a>(problem[, proposal, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.MarkovChain.html#hopsy.MarkovChain" title="hopsy.MarkovChain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MarkovChain</span></code></a>(problem[, proposal, starting_point])</p></td>
 <td><p>Given a hopsy.Problem a MarkovChain object can be constructed.</p></td>
 </tr>
 </tbody>
@@ -695,10 +693,10 @@
 </div>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.setup.html#hopsy.setup" title="hopsy.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.setup</span></code></a>(problem, random_seed[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.setup.html#hopsy.setup" title="hopsy.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup</span></code></a>(problem, random_seed[, n_chains, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.sample.html#hopsy.sample" title="hopsy.sample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.sample</span></code></a>(markov_chains, rngs, n_samples)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.sample.html#hopsy.sample" title="hopsy.sample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample</span></code></a>(markov_chains, rngs, n_samples[, ...])</p></td>
 <td><p>Draw <code class="docutils literal notranslate"><span class="pre">n_samples</span></code> from every passed chain in <code class="docutils literal notranslate"><span class="pre">markov_chains</span></code> using the respective random number generator from <code class="docutils literal notranslate"><span class="pre">rngs</span></code>.</p></td>
 </tr>
 </tbody>
@@ -709,13 +707,13 @@
 <h2>Diagnostics<a class="headerlink" href="#diagnostics" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.ess.html#hopsy.ess" title="hopsy.ess"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.ess</span></code></a>(data[, series, method, relative, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.ess.html#hopsy.ess" title="hopsy.ess"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ess</span></code></a>(data[, series, method, relative, prob, ...])</p></td>
 <td><p>Calculate estimate of the effective sample size (ess).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.mcse.html#hopsy.mcse" title="hopsy.mcse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.mcse</span></code></a>(data[, series, method, prob, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hopsy.mcse.html#hopsy.mcse" title="hopsy.mcse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mcse</span></code></a>(data[, series, method, prob, dask_kwargs])</p></td>
 <td><p>Calculate Markov Chain Standard Error statistic.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.rhat.html#hopsy.rhat" title="hopsy.rhat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.rhat</span></code></a>(data[, series, method, dask_kwargs])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.rhat.html#hopsy.rhat" title="hopsy.rhat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rhat</span></code></a>(data[, series, method, dask_kwargs])</p></td>
 <td><p>Compute estimate of rank normalized splitR-hat for a set of traces.</p></td>
 </tr>
 </tbody>
@@ -726,7 +724,7 @@
 <h2>Tuning<a class="headerlink" href="#tuning" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.tune.html#hopsy.tune" title="hopsy.tune"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hopsy.tune</span></code></a>(mcs, rngs, target, n_tuning[, k, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hopsy.tune.html#hopsy.tune" title="hopsy.tune"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tune</span></code></a>(mcs, rngs, target, n_tuning[, k, ...])</p></td>
 <td><p>Thompson Sampling-based tuning method for specifying meaningful hyperparameters for Markov chain proposal distributions.</p></td>
 </tr>
 </tbody>

@@ -1,6 +1,8 @@
 Reference
 =========
 
+.. currentmodule:: hopsy
+
 Helpers
 """""""""
 
@@ -9,19 +11,19 @@ Helpers
    :toctree: generated/
    :template: ../_templates/autosummary/base.rst
 
-   hopsy.compute_chebyshev_center
-   hopsy.generate_unit_hypercube
-   hopsy.generate_unit_simplex
-   hopsy.is_polytope_empty
-   hopsy.run_multiphase_sampling
-   hopsy.simplify
+   compute_chebyshev_center
+   generate_unit_hypercube
+   generate_unit_simplex
+   is_polytope_empty
+   run_multiphase_sampling
+   simplify
 
 .. autosummary::
    :toctree: generated/
    :template: ../_templates/autosummary/class.rst
 
-   hopsy.BirkhoffPolytope
-   hopsy.LP
+   BirkhoffPolytope
+   LP
 
 Models
 """"""
@@ -31,10 +33,10 @@ Models
    :toctree: generated/
    :template: ../_templates/autosummary/class.rst
 
-   hopsy.Model
-   hopsy.Gaussian
-   hopsy.Mixture
-   hopsy.Rosenbrock
+   Model
+   Gaussian
+   Mixture
+   Rosenbrock
 
 Problem
 """""""
@@ -44,17 +46,17 @@ Problem
    :toctree: generated/
    :template: ../_templates/autosummary/class.rst
 
-   hopsy.Problem
+   Problem
 
 .. autosummary::
    :toctree: generated/
    :template: ../_templates/autosummary/base.rst
 
-   hopsy.round
-   hopsy.add_box_constraints
-   hopsy.add_equality_constraints
-   hopsy.back_transform
-   hopsy.transform
+   round
+   add_box_constraints
+   add_equality_constraints
+   back_transform
+   transform
 
 Proposals
 """""""""
@@ -64,19 +66,19 @@ Proposals
    :toctree: generated/
    :template: ../_templates/autosummary/class.rst
 
-   hopsy.Proposal
-   hopsy.AdaptiveMetropolisProposal
-   hopsy.BallWalkProposal
-   hopsy.BilliardWalkProposal
-   hopsy.CSmMALAProposal
-   hopsy.DikinWalkProposal
-   hopsy.GaussianCoordinateHitAndRunProposal
-   hopsy.GaussianHitAndRunProposal
-   hopsy.GaussianProposal
-   hopsy.ReversibleJumpProposal
-   hopsy.UniformCoordinateHitAndRunProposal
-   hopsy.UniformHitAndRunProposal
-   hopsy.TruncatedGaussianProposal
+   Proposal
+   AdaptiveMetropolisProposal
+   BallWalkProposal
+   BilliardWalkProposal
+   CSmMALAProposal
+   DikinWalkProposal
+   GaussianCoordinateHitAndRunProposal
+   GaussianHitAndRunProposal
+   GaussianProposal
+   ReversibleJumpProposal
+   UniformCoordinateHitAndRunProposal
+   UniformHitAndRunProposal
+   TruncatedGaussianProposal
 
 Random
 """"""
@@ -86,9 +88,9 @@ Random
    :toctree: generated/
    :template: ../_templates/autosummary/random_class.rst
 
-   hopsy.RandomNumberGenerator
-   hopsy.Uniform
-   hopsy.Normal
+   RandomNumberGenerator
+   Uniform
+   Normal
 
 Sampling
 """"""""
@@ -98,14 +100,14 @@ Sampling
    :toctree: generated/
    :template: ../_templates/autosummary/class.rst
 
-   hopsy.MarkovChain
+   MarkovChain
 
 .. autosummary::
    :toctree: generated/
    :template: ../_templates/autosummary/base.rst
 
-   hopsy.setup
-   hopsy.sample
+   setup
+   sample
 
 Diagnostics
 """""""""""
@@ -115,9 +117,9 @@ Diagnostics
    :toctree: generated/
    :template: ../_templates/autosummary/base.rst
 
-   hopsy.ess
-   hopsy.mcse
-   hopsy.rhat
+   ess
+   mcse
+   rhat
 
 Tuning
 """"""
@@ -126,5 +128,4 @@ Tuning
    :toctree: generated/
    :template: ../_templates/autosummary/base.rst
 
-   hopsy.tune
-
+   tune
