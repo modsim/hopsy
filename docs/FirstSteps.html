@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>First steps &#8212; hopsy &#34;1.7.0b0&#34; documentation</title>
+    <title>First steps &#8212; hopsy 1.7.0 documentation</title>
   
   
   
@@ -42,12 +42,12 @@
 
     <script src="_static/jquery.js?v=5d32c60e"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-    <script src="_static/documentation_options.js?v=189a3618"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/documentation_options.js?v=030dc6f6"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'FirstSteps';</script>
     <link rel="icon" href="_static/hopsy.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
@@ -56,7 +56,7 @@
     <link rel="prev" title="hopsy - Highly Optimized Polytope Sampling in Python" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content=""1.7.0b0"" />
+  <meta name="docsearch:version" content="1.7.0" />
   </head>
   
   
@@ -122,8 +122,8 @@
       
     
     
-    <img src="_static/hopsy.png" class="logo__image only-light" alt="hopsy "1.7.0b0" documentation - Home"/>
-    <img src="_static/hopsy.png" class="logo__image only-dark pst-js-only" alt="hopsy "1.7.0b0" documentation - Home"/>
+    <img src="_static/hopsy.png" class="logo__image only-light" alt="hopsy 1.7.0 documentation - Home"/>
+    <img src="_static/hopsy.png" class="logo__image only-dark pst-js-only" alt="hopsy 1.7.0 documentation - Home"/>
   
   
 </a></div>
@@ -387,7 +387,7 @@ make
 <p>Convex polytope sampling considers the problem of sampling probability densities <span class="math notranslate nohighlight">\(f\)</span> supported on a linearly constrained space, i.e. a convex polytope</p>
 <div class="math notranslate nohighlight">
 \[\mathcal{P} := \{ x \in \mathbb{R}^d : Ax \leq b \}\]</div>
-<p>with <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{n \times d}, b \in \mathbb{R}^n\)</span>. Such probability densities can arise for example when performing Bayesian inference on ODE systems, most prominently in metabolic flux analysis <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Often, those probability densities are not analytically tractable and, thus, we need to resort to numerical sampling tools like Markov chain Monte Carlo simulations. <code class="docutils literal notranslate"><span class="pre">hopsy</span></code> offers a variety of different samplers for this exact purpose. Moreover, <code class="docutils literal notranslate"><span class="pre">hopsy</span></code> aims to be a general
+<p>with <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{n \times d}, b \in \mathbb{R}^n\)</span>. Such probability densities can arise for example when performing Bayesian inference on ODE systems, most prominently in metabolic flux analysis [1]_. Often, those probability densities are not analytically tractable and, thus, we need to resort to numerical sampling tools like Markov chain Monte Carlo simulations. <code class="docutils literal notranslate"><span class="pre">hopsy</span></code> offers a variety of different samplers for this exact purpose. Moreover, <code class="docutils literal notranslate"><span class="pre">hopsy</span></code> aims to be a general
 purpose sampling library by leveraging the abstract formulation of the polytope sampling problem given earlier. Finally, since polytope sampling remains an open problem with new methods being developed as we speak, <code class="docutils literal notranslate"><span class="pre">hopsy</span></code> also allows to implement custom sampling algorithms.</p>
 <section id="Sampling-from-a-simplex">
 <h3>Sampling from a simplex<a class="headerlink" href="#Sampling-from-a-simplex" title="Link to this heading">#</a></h3>
@@ -482,8 +482,8 @@ purpose sampling library by leveraging the abstract formulation of the polytope 
 </div>
 <p class="rubric">Footnotes</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id2" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<aside class="footnote brackets" id="id1" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
 <p><a class="reference external" href="https://doi.org/10.1002/bit.26379">https://doi.org/10.1002/bit.26379</a></p>
 </aside>
 </aside>
@@ -600,7 +600,7 @@ purpose sampling library by leveraging the abstract formulation of the polytope 
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>
