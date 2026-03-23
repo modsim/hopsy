@@ -51,19 +51,25 @@ class CMakeBuild(build_ext):
         cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
 
         with_mpi = os.environ.get("HOPS_MPI", "OFF")
+
+        cmake_cxx_flags = os.environ.get("CMAKE_CXX_FLAGS", "")
+        python_executable = os.environ.get("PYTHON_EXECUTABLE", sys.executable)
+
         print("MPI support is", with_mpi)
 
-        # Set Python_EXECUTABLE instead if you use PYBIND11_FINDPYTHON
-        # EXAMPLE_VERSION_INFO shows you how to pass a value into the C++ code
-        # from Python.
         cmake_args = [
             "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}".format(extdir),
-            "-DPYTHON_EXECUTABLE={}".format(sys.executable),
+            "-DPYTHON_EXECUTABLE={}".format(python_executable),
             "-DHOPSY_VERSION_INFO={}".format(self.distribution.get_version()),
             "-DHOPSY_BUILD_INFO={}".format(commit),
             "-DCMAKE_BUILD_TYPE={}".format(cfg),  # not used on MSVC, but no harm
             "-DHOPS_MPI={}".format(with_mpi),
+            "-DCMAKE_CXX_FLAGS={}".format(cmake_cxx_flags),
         ]
+
+        print("---debug---")
+        print("CMake arguments:", cmake_args)
+
         build_args = []
 
         try:
@@ -129,6 +135,7 @@ class CMakeBuild(build_ext):
         if os.name == "nt":  # os.name == nt is True for windows only
             # Use clang because MSVC is bad
             cmake_args += ["-T ClangCL"]
+        print(f"DEBUG: Running CMake with: {['cmake', ext.sourcedir] + cmake_args}")
 
         subprocess.check_call(
             ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp
