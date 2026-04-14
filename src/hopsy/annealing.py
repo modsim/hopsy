@@ -82,6 +82,8 @@ def _initialize_shared_arrays(
     n_rounds: int = 1,
     n_samples: int = 1,
 ) -> SharedData:
+    """
+    """
 
     if n_rounds == 1:
         n_scans = n_samples
@@ -140,6 +142,8 @@ def _initialize_shared_arrays(
 
 
 def _swap_probability(densities, temperatures, idx_curr: int, idx_next: int):
+    """
+    """
     log_likelihood_ratio = (
         temperatures[idx_curr] * densities[idx_next]
         + temperatures[idx_next] * densities[idx_curr]
@@ -163,6 +167,8 @@ def _launch_worker(
     thinning: int = 1,
     uniform_thinning: _s.Optional[int] = None,
 ):
+    """
+    """
     machine_idx = shared_data.machine_idx.view()
     temperatures = shared_data.temperatures.view()
     samples = shared_data.samples.view()
@@ -260,6 +266,8 @@ def _scan(
 
 
 def _optimize_schedule(rejection_rates: _s.ArrayLike, temperatures: _s.ArrayLike, tune_schedule: bool = True):
+    """
+    """
     n_chains = len(temperatures)
     temperatures_next = _s.numpy.zeros(n_chains)
     temperatures_next[-1] = 1
@@ -276,6 +284,8 @@ def _optimize_schedule(rejection_rates: _s.ArrayLike, temperatures: _s.ArrayLike
 
 # see https://pmc.ncbi.nlm.nih.gov/articles/PMC3038348/
 def stepping_stone(densities: _s.numpy.array, betas: _s.numpy.array):
+    """
+    """
     tempered_densities = (densities * betas)
     max_densities = _s.numpy.max(tempered_densities, axis=0)
     betas = _s.numpy.array([betas[t] - betas[t-1] for t in range(1, len(betas))])
