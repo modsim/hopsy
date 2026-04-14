@@ -11,6 +11,7 @@ class _core:
         Uniform,
         UniformCoordinateHitAndRunProposal,
     )
+    from .definitions import multiprocessing_context
     from .misc import MarkovChain, round, transform
 
 
@@ -20,7 +21,8 @@ _c = _core
 class _submodules:
     import os
     from dataclasses import dataclass
-    from threading import ThreadPoolExecutor
+    from multiprocessing.managers import SharedMemoryManager
+    from multiprocessing.shared_memory import SharedMemory
     from typing import Dict, List, Optional, Tuple
 
     import numpy
@@ -35,130 +37,224 @@ class _submodules:
 
 _s = _submodules
 
-class NRPTResult:
 
-    def __init__(self,
-        chains: _s.List[_c.MarkovChain],
-        n_rounds: int = 1,
-        n_samples: int = 1,
-    ):
+@_s.dataclass
+class SharedMemoryArray:
+    r"""Storage for a numpy array in shared memory"""
+    name: str
+    shared_memory: _s.SharedMemory
+    shape: _s.Tuple[int, ...]
+    dtype: _s.numpy.dtype
 
-        if n_rounds == 1:
-            n_scans = n_samples
-        else:
-            # total number of scan‐steps = sum_{r=0..n_rounds-1} 2**r
-            n_scans = sum(2**r for r in range(n_rounds))
-
-        self.n_chains = len(chains)
-        states = [chains[i].state for i in range(self.n_chains)]
-        state_dim = len(states[0])
-        dtype = states[0].dtype
-        assert all(s.shape == (state_dim,) for s in states), "All chains must have the same state dimension"
-        assert all(s.dtype == dtype for s in states), "All chains must have the same state dtype"
-
-        samples = _s.numpy.zeros((n_scans + 1, self.n_chains, state_dim))
-        samples[0] = _s.numpy.array(states) # log the initial starting point of each chain
-    
-        densities = _s.numpy.zeros((n_scans + 1, self.n_chains))
-        densities[0] = _s.numpy.array(chain.state_log_density for chain in chains) # initialize with log density of initial state 
-
-        machine_idx = _s.numpy.zeros((n_scans + 1, self.n_chains), _s.numpy.int32)
-        machine_idx[0] = _s.numpy.arange(self.n_chains, dtype=_s.numpy.int32) # initialize indices by list order
-
-        acc_rates = _s.numpy.zeros((n_scans, self.n_chains))
-    
-        rej_rates = _s.numpy.zeros((n_rounds, self.n_chains))
-        inv_temperatures = _s.numpy.zeros((n_rounds, self.n_chains))
-        global_comm_barriers = _s.numpy.zeros((n_rounds, self.n_chains))
+    def view(self) -> _s.ArrayLike:
+        r""""""
+        return _s.numpy.ndarray(
+            self.shape, dtype=_s.numpy.dtype(self.dtype), buffer=self.shared_memory.buf
+        )
 
 
-def _swap_probability(densities, inv_temperatures, idx_curr: int, idx_next: int):
+@_s.dataclass
+class SharedData:
+    r"""Shared data for parallel tempering"""
+
+    samples: SharedMemoryArray
+    densities: SharedMemoryArray
+    acceptance_rates: SharedMemoryArray
+    rejection_rates: SharedMemoryArray
+    machine_idx: SharedMemoryArray
+    temperatures: SharedMemoryArray
+    global_comm_barriers: SharedMemoryArray
+
+    def to_numpy(self) -> _s.Dict[str, _s.ArrayLike]:
+        r"""
+        Return a dict mapping each shared-data attribute name
+        to its NumPy array view.
+        """
+        return {
+            attr: getattr(self, attr).view().copy()
+            for attr in self.__dataclass_fields__
+        }
+
+
+def _initialize_shared_arrays(
+    smm: _s.SharedMemoryManager,
+    chains: _s.List[_c.MarkovChain],
+    n_rounds: int = 1,
+    n_samples: int = 1,
+) -> SharedData:
+
+    if n_rounds == 1:
+        n_scans = n_samples
+    else:
+        # total number of scan‐steps = sum_{r=0..n_rounds-1} 2**r
+        n_scans = sum(2**r for r in range(n_rounds))
+
+    def make_block(name: str, shape: tuple, dtype) -> SharedMemoryArray:
+        n_bytes = int(_s.numpy.prod(shape) * _s.numpy.dtype(dtype).itemsize)
+        shared_memory: _s.SharedMemory = smm.SharedMemory(size=n_bytes)
+        return SharedMemoryArray(
+            name=name, shared_memory=shared_memory, shape=shape, dtype=dtype
+        )
+
+    n_chains = len(chains)
+    states = [chains[i].state for i in range(n_chains)]
+    state_dim = states[0].shape[0]
+    dtype = states[0].dtype
+    assert all(s.shape == (state_dim,) for s in states), "All chains must have the same state dimension"
+    assert all(s.dtype == dtype for s in states), "All chains must have the same state dtype"
+
+    samples = make_block(
+        "samples", (n_scans + 1, n_chains, state_dim), dtype
+    )
+    densities = make_block("densities", (n_scans + 1, n_chains), _s.numpy.float64)
+    acc_rates = make_block(
+        "acceptance_rates", (n_scans + 1, n_chains), _s.numpy.float64
+    )
+    rej_rates = make_block("rejection_rates", (n_rounds, n_chains), _s.numpy.float64)
+    machine_idx = make_block("machine_idx", (n_scans + 1, n_chains), _s.numpy.int32)
+    temps = make_block("temperatures", (n_rounds, n_chains), _s.numpy.float64)
+    global_comm_barriers = make_block(
+        "global_comm_barriers", (n_rounds, n_chains), _s.numpy.float64
+    )
+
+    # — initialize contents —
+    samples_view = samples.view()
+    samples_view.fill(0.0)
+    samples_view[0] = _s.numpy.array(states)
+
+    idx_array = machine_idx.view()
+    idx_array[0, :] = _s.numpy.arange(n_chains, dtype=_s.numpy.int32)
+
+    temps_view = temps.view()
+    temps_view.fill(0.0)
+    temps_view[0, :] = _s.numpy.array([chains[i].coldness for i in range(n_chains)])
+    return SharedData(
+        samples=samples,
+        densities=densities,
+        acceptance_rates=acc_rates,
+        rejection_rates=rej_rates,
+        machine_idx=machine_idx,
+        temperatures=temps,
+        global_comm_barriers=global_comm_barriers,
+    )
+
+
+def _swap_probability(densities, temperatures, idx_curr: int, idx_next: int):
     log_likelihood_ratio = (
-        inv_temperatures[idx_curr] * densities[idx_next]
-        + inv_temperatures[idx_next] * densities[idx_curr]
-        - inv_temperatures[idx_curr] * densities[idx_curr]
-        - inv_temperatures[idx_next] * densities[idx_next]
+        temperatures[idx_curr] * densities[idx_next]
+        + temperatures[idx_next] * densities[idx_curr]
+        - temperatures[idx_curr] * densities[idx_curr]
+        - temperatures[idx_next] * densities[idx_next]
     )
 
     return 1 if log_likelihood_ratio > 0 else min(1, _s.numpy.exp(log_likelihood_ratio))
 
 
-def _explore(
+def _launch_worker(
     chain : _c.MarkovChain,
     rng : _c.RandomNumberGenerator,
     reference: _c.Problem,
-    data: NRPTResult,
-    scan_idx: int, 
-    round_idx: int,
-    thread_id: int,
+    compute_barrier,
+    swap_barrier,
+    shared_indices,
+    shared_data: SharedData,
+    process_id: int,
+    proposal_args: _s.Dict = None,
     thinning: int = 1,
+    uniform_thinning: _s.Optional[int] = None,
 ):
-    machine_idx = data.machine_idx
-    temperatures = data.temperatures
-    samples = data.samples
-    acc_rates = data.acceptance_rates
-    densities = data.densities
+    machine_idx = shared_data.machine_idx.view()
+    temperatures = shared_data.temperatures.view()
+    samples = shared_data.samples.view()
+    acc_rates = shared_data.acceptance_rates.view()
+    densities = shared_data.densities.view()
 
-    chain_idx = _s.numpy.where(machine_idx[scan_idx] == thread_id)[0][0]
-    beta = temperatures[round_idx, chain_idx]
+    reference_chain = _c.MarkovChain(reference, _c.UniformCoordinateHitAndRunProposal)
 
-    if beta <= 1e-9:
-        reference_chain = _c.MarkovChain(reference, _c.UniformCoordinateHitAndRunProposal)
-        thinning_factor = max(len(chain.state), int(len(chain.state) ** 2 // 6))
-        reference_chain.state = chain.state
-        acceptance_rate, new_state = reference_chain.draw(rng, thinning_factor)
-        chain.state = new_state
-        densities[scan_idx, thread_id] = chain.model.log_density(new_state)
-    else:
-        chain.coldness = beta
-        acceptance_rate, new_state = chain.draw(rng, thinning)
-        densities[scan_idx, thread_id] = chain.state_log_density
+    if proposal_args:
+        for k in proposal_args:
+            setattr(chain.proposal, k, proposal_args[k])
 
-    # 5. Safe write to shared arrays
-    samples[scan_idx, chain_idx] = new_state
-    acc_rates[scan_idx, chain_idx] = acceptance_rate
+    while True:
+        compute_barrier.wait()
+        scan_idx, round_idx = shared_indices[:]
+
+        if scan_idx == -1:
+            break
+
+        chain_idx = _s.numpy.where(machine_idx[scan_idx] == process_id)[0][0]
+        beta = temperatures[round_idx, chain_idx]
+
+        if beta <= 1e-9:
+            if uniform_thinning is not None:
+                thinning_factor = uniform_thinning
+            else:
+                thinning_factor = max(len(chain.state), int(len(chain.state) ** 2 // 6))
+            reference_chain.state = chain.state
+            acceptance_rate, new_state = reference_chain.draw(rng, thinning_factor)
+            chain.state = new_state
+            densities[scan_idx, process_id] = chain.model.log_density(new_state)
+        else:
+            chain.coldness = beta
+            acceptance_rate, new_state = chain.draw(rng, thinning)
+            densities[scan_idx, process_id] = chain.state_log_density
+
+        # 5. Safe write to shared arrays
+        samples[scan_idx, chain_idx] = new_state
+        acc_rates[scan_idx, chain_idx] = acceptance_rate
+
+        swap_barrier.wait()
 
 
 def _scan(
     scan_idx: int,
     round_idx: int,
-    executor: _s.ThreadPoolExecutor,
+    compute_barrier,
+    swap_barrier,
+    shared_indices,
+    n_chains: int,
     sync_rng: _c.RandomNumberGenerator,
-    data: NRPTResult,
+    shared_data: SharedData,
     even: bool = False,
 ):
     r"""
 
     :param scan_idx:
     :param round_idx:
-    :param executors:
+    :param compute_barrier:
+    :param swap_barrier:
+    :param shared_indices:
+    :param n_chains:
     :param sync_rng:
     :param shared_data:
     :param even:
     :return:
     """
-    n_chains = executor.max_workers
+    # local step
+    shared_indices[:] = [scan_idx, round_idx]
+    compute_barrier.wait()
+    swap_barrier.wait()
 
-    # Local exploration step and density computation (parallel)
-    executor.map(_explore, ...)
+    machine_idx = shared_data.machine_idx.view()
+    r = shared_data.rejection_rates.view()
+    samples = shared_data.samples.view()
+    densities = shared_data.densities.view()
+    temperatures = shared_data.temperatures.view()
 
-    machine_idx = data.machine_idx
-    r = data.rejection_rates
-    samples = data.samples
-    densities = data.densities
-    temperatures = data.temperatures
-
-    # Compute swap probability and swap
+    # swap
     for i in range(n_chains - 1):
         alpha = _swap_probability(densities[scan_idx], temperatures[round_idx], i, i + 1)
+        # swap
         if even == i % 2:
             if _c.Uniform()(sync_rng) < alpha:
                 samples_row = samples[scan_idx]
-                samples_row[[i, i + 1]] = samples_row[[i + 1, i]]  # this creates an internal copy of the RHS
+                samples_row[[i, i + 1]] = samples_row[
+                    [i + 1, i]
+                ]  # this creates an internal copy of the RHS
+
                 idx_row = machine_idx[scan_idx]
                 idx_row[[i, i + 1]] = idx_row[[i + 1, i]]
-        
-        # Update rejection rates
+        # update rejection rates
         r_diff = max(1.0 - alpha, 1e-10)
         r[round_idx, i + 1] += r_diff
 
@@ -197,6 +293,7 @@ def nrpt(
     n_rounds: int = 0,
     n_samples: int = 0,
     thinning : int = 1,
+    uniform_thinning: _s.Optional[int] = None,
     deo: bool = True,
     tune_schedule: bool = True,
     progress_bar: bool = False,
@@ -215,6 +312,10 @@ def nrpt(
         Number of samples to draw.
     n_rounds : int
         Number of rounds of parallel tempering to perform.
+    thinning : int
+        Thinning factor for the Markov chains.
+    uniform_thinning : int
+        Thinning factor for the uniform reference chain.
     deo : bool
         Whether to use deterministic even-odd (True) or random (False) exchanges.
     tune_schedule : bool
@@ -237,12 +338,6 @@ def nrpt(
     # Setup random number generator for synchronization
     sync_rng = _c.RandomNumberGenerator(seed)
 
-    # Initialize regular Markov chains
-    for mc in mcs:
-        if proposal_args:
-            for k in proposal_args:
-                setattr(mc.proposal, k, proposal_args[k])
-
     # Create special chain for efficiently sampling the uniform reference
     reference = _c.Problem(target.A, target.b)
     n_chains = len(mcs)
@@ -255,13 +350,46 @@ def nrpt(
         reference.transformation = target.transformation
         reference.starting_point = _c.transform(reference, [starting_point])[0]
 
-    data = NRPTResult(mcs, n_rounds, n_samples)
+    with _s.SharedMemoryManager() as smm:
 
-    with _s.ThreadPoolExecutor(n_chains) as executor:
+        # Allocate shared memory and initialize parallel workers
+        shared_data = _initialize_shared_arrays(
+            smm=smm,
+            chains=mcs,
+            n_rounds=n_rounds,
+        )
+
+        compute_barrier = _c.multiprocessing_context.Barrier(n_chains + 1)
+        swap_barrier = _c.multiprocessing_context.Barrier(n_chains + 1)
+        shared_indices = _c.multiprocessing_context.Array('i', 2)
+
+        workers = [
+            _c.multiprocessing_context.Process(
+                target=_launch_worker,
+                args=(
+                    mcs[i],
+                    rngs[i],
+                    reference,
+                    compute_barrier,
+                    swap_barrier,
+                    shared_indices,
+                    shared_data,
+                    i,
+                    proposal_args,
+                    thinning,
+                    uniform_thinning,
+                ),
+            )
+            for i in range(n_chains)
+        ]
+
+        for worker in workers:
+            worker.start()
+
         # Run parallel tempering for the given number of rounds
-        temperatures = data.temperatures
-        rejection_rates = data.rejection_rates
-        global_comm_barriers = data.global_comm_barriers
+        temperatures = shared_data.temperatures.view()
+        rejection_rates = shared_data.rejection_rates.view()
+        global_comm_barriers = shared_data.global_comm_barriers.view()
         scan_idx = 1
         for round_idx in range(n_rounds):
             # Perform 2 ** round_idx scans
@@ -273,11 +401,11 @@ def nrpt(
                 iterator = range(2**round_idx)
             for t in iterator:
                 if scan_idx <= 2**n_rounds - 1:
-                    machine_idx = data.machine_idx
+                    machine_idx = shared_data.machine_idx.view()
                     machine_idx[scan_idx] = machine_idx[scan_idx - 1].copy()
 
                 even = (t % 2) if deo else (_c.Uniform()(sync_rng) < 0.5)
-                _scan(scan_idx, round_idx, executor, sync_rng, data, even=even)
+                _scan(scan_idx, round_idx, compute_barrier, swap_barrier, shared_indices, n_chains, sync_rng, shared_data, even=even)
                 scan_idx += 1
 
             # Compute rejection rates (until now, the array contains the total number of rejections)
@@ -292,10 +420,20 @@ def nrpt(
                 temperatures[round_idx + 1] = temperatures_next
 
         # Save the results
+        result_stats = shared_data.to_numpy()
         final_samples = None
-        if n_rounds > 0:
-            final_samples = data.samples[-2**(n_rounds-1) :, :]
-        else:
-            final_samples = data.samples
 
-    return data, final_samples
+        if n_rounds > 0:
+            final_samples = result_stats["samples"][-2**(n_rounds-1) :, :]
+        else:
+            final_samples = result_stats["samples"]
+
+        # Signal workers to exit
+        shared_indices[:] = [-1, -1]
+        compute_barrier.wait()
+        for worker in workers:
+            worker.join()
+
+    n_samples = final_samples.shape[0]
+
+    return result_stats, final_samples
