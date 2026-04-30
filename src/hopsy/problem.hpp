@@ -132,31 +132,13 @@ namespace hopsy {
         local["b"] = problem.b;
 
         py::exec(R"(
-            from numpy import identity, zeros
-            from pandas import DataFrame, Series
-
-            import os
-            import sys
+            from numpy import identity
 
             try:
-                from PolyRound.api import PolyRoundApi as prapi
-                from PolyRound.mutable_classes.polytope import Polytope
-                from PolyRound.static_classes.rounding.maximum_volume_ellipsoid import MaximumVolumeEllipsoidFinder
+                from hopsy import LP
+                from hopsy._polyround_backend import sqrt_maximum_volume_ellipsoid
 
-                polytope = Polytope(A, b)
-                polytope = prapi.simplify_polytope(polytope, LP().settings)
-
-                if polytope.S is not None:
-                    polytope = prapi.transform_polytope(polytope, LP().settings)
-                else:
-                    number_of_reactions = polytope.A.shape[1]
-                    polytope.transformation = DataFrame(identity(number_of_reactions))
-                    polytope.transformation.index = [str(i) for i in range(polytope.transformation.to_numpy().shape[0])]
-                    polytope.transformation.columns = [str(i) for i in range(polytope.transformation.to_numpy().shape[1])]
-                    polytope.shift = Series(zeros(number_of_reactions))
-
-                MaximumVolumeEllipsoidFinder.iterative_solve(polytope, LP().settings)
-                sqrt_mve = polytope.transformation.values
+                sqrt_mve = sqrt_maximum_volume_ellipsoid(A, b, LP().settings)
             except:
                 sqrt_mve = identity(A.shape[1])
         )", local);

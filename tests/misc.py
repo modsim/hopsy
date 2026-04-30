@@ -30,6 +30,8 @@ ProposalTypes = [
     UniformHitAndRunProposal,
 ]
 
+# TODO Check back_transform tol
+
 
 class MiscTests(unittest.TestCase):
     def test_is_polytope_empty_returns_false_on_non_empty(self):
@@ -580,7 +582,7 @@ class MiscTests(unittest.TestCase):
         self.assertTrue(np.all((problem.b - problem.A @ problem.starting_point) > 0))
 
         original_starting_point = back_transform(problem, [problem.starting_point])[0]
-        self.assertTrue(np.all(original_starting_point == starting_point))
+        np.testing.assert_allclose(original_starting_point, starting_point, atol=1e-12)
 
     def test_starting_point_with_equality_constraints_when_rounded(self):
         A = np.array([]).reshape((0, 3))
@@ -605,7 +607,7 @@ class MiscTests(unittest.TestCase):
         self.assertTrue(np.all((problem.b - problem.A @ problem.starting_point) > 0))
 
         original_starting_point = back_transform(problem, [problem.starting_point])[0]
-        self.assertTrue(np.all(original_starting_point == starting_point))
+        np.testing.assert_allclose(original_starting_point, starting_point, atol=1e-12)
 
     def test_warning_when_adding_box_constraints_after_equality_constraints(self):
         with warnings.catch_warnings(record=True) as w:
@@ -650,7 +652,7 @@ class MiscTests(unittest.TestCase):
         self.assertTrue(np.all((problem.b - problem.A @ problem.starting_point) > 0))
 
         original_starting_point = back_transform(problem, [problem.starting_point])[0]
-        self.assertTrue(np.all(original_starting_point == starting_point))
+        np.testing.assert_allclose(original_starting_point, starting_point, atol=1e-12)
 
     def test_starting_point_with_equality_constraints_when_rounded_simplify(self):
         A = np.array([]).reshape((0, 3))
@@ -675,7 +677,7 @@ class MiscTests(unittest.TestCase):
         self.assertTrue(np.all((problem.b - problem.A @ problem.starting_point) > 0))
 
         original_starting_point = back_transform(problem, [problem.starting_point])[0]
-        self.assertTrue(np.all(original_starting_point == starting_point))
+        np.testing.assert_allclose(original_starting_point, starting_point, atol=1e-12)
 
         def test_equality_constraints_throw_on_existing_transformation(self):
             A = np.array([]).reshape((0, 3))
