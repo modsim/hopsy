@@ -19,9 +19,9 @@ authors = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "PolyRound>=0.4.0",
     "optlang>=1.7.0",
     "arviz>=0.23.4,<1",
+    "gurobipy>=13.0.1; (sys_platform == 'linux' and (platform_machine == 'x86_64' or platform_machine == 'aarch64')) or (sys_platform == 'darwin') or (sys_platform == 'win32' and platform_machine == 'AMD64')",
     "numpy",
     "pandas",
     "tqdm",
@@ -41,11 +41,6 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Programming Language :: C++",
     "Operating System :: OS Independent",
-]
-
-[project.optional-dependencies]
-gurobi = [
-  "gurobipy>=13.0.1; (sys_platform == 'linux' and (platform_machine == 'x86_64' or platform_machine == 'aarch64')) or (sys_platform == 'darwin') or (sys_platform == 'win32' and platform_machine == 'AMD64')"
 ]
 
 [dependency-groups]
@@ -68,7 +63,6 @@ integration-tests = [
     "jupyter>=1.1.1",
     "matplotlib>=3.10.8",
     "nbconvert>=7.17.0",
-    "polyround[extras]>=0.4.0",
 ]
 
 

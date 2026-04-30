@@ -37,22 +37,23 @@ class ProblemTests(unittest.TestCase):
         self.assertEqual(id_gaussian, id(gaussian))
         self.assertNotEqual(id_gaussian, id(new_gaussian))
 
-    def test_create_box_and_round_glpk(self):
+    def test_create_box_and_round_gurobi(self):
+        problem = add_box_constraints(
+            Problem(np.zeros((0, 2)), np.ones((0))),
+            [0.5, 1.0e-14],
+            # Keep the narrow interval strictly below the threshold despite
+            # Gurobi feasibility tolerance around zero.
+            [0.95, 9.99999e-8],
+            simplify=True,
+        )
+
+        self.assertEqual(problem.A.shape, (2, 1))
+        np.testing.assert_allclose(np.sort(problem.A.flatten()), [-1.0, 1.0])
+        np.testing.assert_allclose(problem.b, [0.225, 0.225])
+
         try:
-            lp = LP()
-            lp.settings.backend = "glpk"
-            problem = add_box_constraints(
-                Problem(np.zeros((0, 2)), np.ones((0))),
-                [0.5, 1.0e-14],
-                [0.95, 1.0e-7],
-                simplify=True,
-            )
-            expected_A = np.array([[-1.0], [1.0]])
-            expected_b = np.array([0.225, 0.225])
-            self.assertTrue(np.isclose(problem.A, expected_A).all())
-            self.assertTrue(np.isclose(problem.b, expected_b).all())
             problem = round(problem)
-        except:
+        except Exception:
             self.fail("Rounding box created from np.zeros unexpectedly raised error.")
 
     def test_add_box_constraints(self):
@@ -136,10 +137,9 @@ class ProblemTests(unittest.TestCase):
         assert (new_problem.A == expected_A).all()
         assert (new_problem.b == expected_b).all()
 
-    def test_create_box_and_round_glpk_thresh_adjusted(self):
+    def test_create_box_and_round_gurobi_thresh_adjusted(self):
         try:
             lp = LP()
-            lp.settings.backend = "glpk"
             lp.settings.thresh = 1e-8
             problem = add_box_constraints(
                 Problem(np.zeros((0, 2)), np.ones((0))),
