@@ -1553,6 +1553,13 @@ def _is_constant_chains(data: _s.numpy.typing.ArrayLike):
     return _s.numpy.sum(_s.numpy.abs(_s.numpy.diff(data, axis=1))) == 0
 
 
+def _data_to_arviz_format(data):
+    if hasattr(_s.arviz, "convert_to_inference_data"):
+        # Old API is used for Python 3.10 and 3.11
+        return _s.arviz.convert_to_inference_data(data)
+    return _s.arviz.convert_to_datatree(data)
+
+
 def _compute_statistic(
     i: int,
     n_chains: int,
@@ -1571,7 +1578,7 @@ def _compute_statistic(
         )
         return [1 / (n_chains * i) if relative else 1] * dim
     else:
-        return f(_s.arviz.convert_to_inference_data(data[:, :i]), **kwargs).x.data
+        return f(_data_to_arviz_format(data[:, :i]), **kwargs).x.data
 
 
 def _arviz(
@@ -1615,9 +1622,7 @@ def _arviz(
             )
             _result = [1 / (n_chains * n_samples) if relative else 1] * dim
         else:
-            _result = f(
-                _s.arviz.convert_to_inference_data(data), *args, **kwargs
-            ).x.data
+            _result = f(_data_to_arviz_format(data), *args, **kwargs).x.data
         result.append(_result)
 
     return _s.numpy.array(result)
