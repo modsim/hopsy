@@ -1,8 +1,10 @@
 # Changelog
 
 ## Latest
+- [#192](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/192): Update to arviz>=1.0.0
 - [#193](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/188): Add github actions for wheel building
 - [#188](https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy/-/issues/188): Move to pyproject.toml and automate versioning
+
 
 
 ## v1.7.0
