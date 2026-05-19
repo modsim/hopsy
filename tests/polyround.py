@@ -2,45 +2,73 @@ import unittest
 import warnings
 
 import numpy as np
+import pandas as pd
 
 import hopsy
+from hopsy._polyround import PolyRoundApi
+from hopsy._polyround.polytope import Polytope
 
-try:
-    from hopsy._polyround.api import PolyRoundApi
-    from hopsy._polyround.default_settings import default_numerics_threshold
-    from hopsy._polyround.mutable_classes.polytope import Polytope
-    from hopsy._polyround.settings import PolyRoundSettings
-    from hopsy._polyround.static_classes.constraint_removal_reduction import (
-        PolytopeReducer,
-    )
-    from hopsy._polyround.static_classes.lp_interfacing import GurobiInterfacer
-    from hopsy._polyround.static_classes.lp_utils import ChebyshevFinder
-    from hopsy._polyround.static_classes.rounding.geometric_mean_scaling import (
-        geometric_mean_scaling,
-    )
-    from hopsy._polyround.static_classes.rounding.maximum_volume_ellipsoid import (
-        MaximumVolumeEllipsoidFinder,
-    )
-    from hopsy._polyround.static_classes.rounding.nearest_symmetric_positive_definite import (
-        NSPD,
-    )
-except ImportError:
-    from PolyRound.api import PolyRoundApi
-    from PolyRound.default_settings import default_numerics_threshold
-    from PolyRound.mutable_classes.polytope import Polytope
-    from PolyRound.settings import PolyRoundSettings
-    from PolyRound.static_classes.constraint_removal_reduction import PolytopeReducer
-    from PolyRound.static_classes.lp_interfacing import GurobiInterfacer
-    from PolyRound.static_classes.lp_utils import ChebyshevFinder
-    from PolyRound.static_classes.rounding.geometric_mean_scaling import (
-        geometric_mean_scaling,
-    )
-    from PolyRound.static_classes.rounding.maximum_volume_ellipsoid import (
-        MaximumVolumeEllipsoidFinder,
-    )
-    from PolyRound.static_classes.rounding.nearest_symmetric_positive_definite import (
-        NSPD,
-    )
+
+class PolyRoundApi:
+    """Compatibility shim for tests that still use the old PolyRoundApi shape."""
+
+    @staticmethod
+    def simplify_polytope(polytope, settings=None):
+        result = simplify_polytope(
+            polytope.A.values,
+            polytope.b.values,
+            settings,
+            S=None if polytope.S is None else polytope.S.values,
+            h=None if polytope.h is None else polytope.h.values,
+        )
+        return _polytope_from_result(result)
+
+    @staticmethod
+    def transform_polytope(polytope, settings=None):
+        result = transform_polytope(
+            polytope.A.values,
+            polytope.b.values,
+            settings,
+            S=None if polytope.S is None else polytope.S.values,
+            h=None if polytope.h is None else polytope.h.values,
+        )
+        return _polytope_from_result(result)
+
+    @staticmethod
+    def round_polytope(polytope, settings=None):
+        result = round_polytope(
+            polytope.A.values,
+            polytope.b.values,
+            settings,
+            simplify_first=False,
+        )
+        rounded = _polytope_from_result(result)
+        rounded.transformation = pd.DataFrame(
+            polytope.transformation.values @ result.transformation
+        )
+        rounded.shift = pd.Series(
+            polytope.shift.values + polytope.transformation.values @ result.shift
+        )
+        return rounded
+
+    @staticmethod
+    def simplify_transform_and_round(polytope, settings=None):
+        simplified = PolyRoundApi.simplify_polytope(polytope, settings)
+        transformed = (
+            PolyRoundApi.transform_polytope(simplified, settings)
+            if simplified.S is not None
+            else simplified
+        )
+        return PolyRoundApi.round_polytope(transformed, settings)
+
+
+def _polytope_from_result(result):
+    polytope = Polytope(result.A, result.b, S=result.S, h=result.h)
+    if result.transformation is not None:
+        polytope.transformation = pd.DataFrame(result.transformation)
+    if result.shift is not None:
+        polytope.shift = pd.Series(result.shift)
+    return polytope
 
 
 # Helpers: polytope builders
@@ -125,10 +153,8 @@ def origin_is_interior(polytope, atol=0.0):
     return bool(polytope.border_distance(x) > atol)
 
 
-# Simplify
-
-
-class PolyRoundSimplifyTests(unittest.TestCase):
+class PolyRoundTests(unittest.TestCase):
+    """Tests for internal PolyRound behavior and public hopsy wiring."""
 
     def _settings(self, simplify_only=False):
         return PolyRoundSettings(simplify_only=simplify_only)
@@ -215,12 +241,6 @@ class PolyRoundSimplifyTests(unittest.TestCase):
             result.S, "simplify_only should not produce equality constraints"
         )
 
-
-# Transform
-
-
-class PolyRoundTransformTests(unittest.TestCase):
-
     def _equality_box(self):
         """Box in R^3 with one equality constraint x2 = 0.5, so dim reduces to 2."""
         A = np.vstack([np.eye(3), -np.eye(3)])
@@ -256,12 +276,6 @@ class PolyRoundTransformTests(unittest.TestCase):
             "Back-transformed origin is not feasible in the original polytope",
         )
 
-
-# Round
-
-
-class PolyRoundRoundTests(unittest.TestCase):
-
     def _roundable_polytope(self, n=4):
         """A box already transformed to be inequality-only (no equalities)."""
         return box_polytope(n)
@@ -291,12 +305,6 @@ class PolyRoundRoundTests(unittest.TestCase):
         x_original = result.back_transform(np.zeros(result.A.shape[1]))
         self.assertTrue(is_feasible(original_A, original_b, x_original))
 
-
-# Full pipeline (simplify > transform > round)
-
-
-class PolyRoundPipelineTests(unittest.TestCase):
-
     def test_full_pipeline_box_with_equality(self):
         """End-to-end simplify_transform_and_round on a box with one equality."""
         A = np.vstack([np.eye(4), -np.eye(4)])
@@ -314,13 +322,6 @@ class PolyRoundPipelineTests(unittest.TestCase):
         result = PolyRoundApi.simplify_transform_and_round(polytope)
         self.assertTrue(result.inequality_only)
         self.assertGreater(float(result.b.min()), 0.0)
-
-
-# OG tests
-
-
-class PolyRoundOldReferenceTests(unittest.TestCase):
-    """Small, dependency-free tests ported from old PolyRound/unit_tests.py."""
 
     def test_exact_small_simplex_rounding(self):
         dim = 2
@@ -563,14 +564,7 @@ class PolyRoundOldReferenceTests(unittest.TestCase):
         np.testing.assert_allclose(reduced_polytope.A.values, A_true)
         np.testing.assert_allclose(reduced_polytope.b.values, b_true)
 
-
-# Public calls
-
-
-class PolyRoundWiringTests(unittest.TestCase):
-    """Regression tests for the public hopsy API that wraps native PolyRound."""
-
-    def setUp(self):
+    def _reset_lp(self):
         hopsy.LP().reset()
 
     def _box_problem(self, n=2, lo=-1.0, hi=1.0, starting_point=None):
@@ -586,6 +580,7 @@ class PolyRoundWiringTests(unittest.TestCase):
         return float(np.max(distances) / np.min(distances))
 
     def test_simplify_full_dimensional_problem_does_not_store_identity_transform(self):
+        self._reset_lp()
         problem = self._box_problem(n=2)
 
         simplified = hopsy.simplify(problem)
@@ -604,6 +599,7 @@ class PolyRoundWiringTests(unittest.TestCase):
         self.assertEqual(user_warnings, [])
 
     def test_simplified_full_dimensional_problem_accepts_equality_constraints(self):
+        self._reset_lp()
         problem = self._box_problem(n=2)
         simplified = hopsy.simplify(problem)
 
@@ -618,6 +614,7 @@ class PolyRoundWiringTests(unittest.TestCase):
         self.assertIsNotNone(constrained.shift)
 
     def test_add_box_constraints_simplify_does_not_mark_plain_box_transformed(self):
+        self._reset_lp()
         problem = hopsy.Problem(np.zeros((0, 2)), np.zeros((0,)))
 
         constrained = hopsy.add_box_constraints(problem, -1.0, 1.0, simplify=True)
@@ -627,6 +624,7 @@ class PolyRoundWiringTests(unittest.TestCase):
         self.assertIsNone(constrained.shift)
 
     def test_simplify_dimension_reduction_transforms_starting_point(self):
+        self._reset_lp()
         A = np.vstack([np.eye(3), -np.eye(3)])
         b = np.array([1.0, 1.0, 1e-8, 1.0, 1.0, 1e-8])
         original_starting_point = np.array([0.0, 0.0, 0.0])
@@ -648,6 +646,7 @@ class PolyRoundWiringTests(unittest.TestCase):
     def test_round_after_dimension_reducing_simplify_composes_starting_point_mapping(
         self,
     ):
+        self._reset_lp()
         A = np.vstack([np.eye(3), -np.eye(3)])
         b = np.array([1.0, 1.0, 1e-8, 1.0, 1.0, 1e-8])
         original_starting_point = np.array([0.0, 0.0, 0.0])
@@ -663,6 +662,7 @@ class PolyRoundWiringTests(unittest.TestCase):
         np.testing.assert_allclose(roundtrip, original_starting_point, atol=1e-7)
 
     def test_markov_chain_after_noop_simplify_uses_untransformed_problem_contract(self):
+        self._reset_lp()
         problem = hopsy.simplify(self._box_problem(n=2))
 
         self.assertIsNone(problem.transformation)
@@ -673,6 +673,7 @@ class PolyRoundWiringTests(unittest.TestCase):
         self.assertTrue(np.all(problem.b - problem.A @ markov_chain.state > 0))
 
     def test_round_improves_axis_aligned_box_facet_distance_isotropy(self):
+        self._reset_lp()
         widths = np.array([1.0e-2, 1.0, 1.0e2])
         A = np.vstack([np.eye(3), -np.eye(3)])
         b = np.concatenate([widths, widths])
@@ -699,6 +700,7 @@ class PolyRoundWiringTests(unittest.TestCase):
         self.assertLess(rounded_ratio, 10.0)
 
     def test_reverse_mapping_for_sampled_original_points_after_equality_and_round(self):
+        self._reset_lp()
         A = np.vstack([np.eye(3), -np.eye(3)])
         b = np.full(6, 2.0)
         A_eq = np.array([[1.0, 1.0, 0.0]])

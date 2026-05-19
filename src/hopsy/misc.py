@@ -26,17 +26,23 @@ _c = _core
 
 class _submodules:
     import atexit
-    import multiprocessing
-    import os
     import time
     import warnings
     from collections.abc import MutableSequence
-    from multiprocessing import shared_memory
 
     import arviz
     import numpy
+    import pandas
 
-    from . import _polyround_backend as polyround_backend
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+
+        from ._polyround import polytope
+        from ._polyround import PolyRoundApi
+
+    import multiprocessing
+    import os
+    from multiprocessing import shared_memory
 
     if "JPY_PARENT_PID" in os.environ:
         import tqdm.notebook as tqdm
@@ -508,7 +514,6 @@ def MarkovChain(
 
     # convenience setup, where the proposal is just a type
     if isinstance(proposal, type):
-
         # determine a starting point
         if starting_point is not None:
             pass
@@ -549,7 +554,7 @@ def add_box_constraints(
     r"""Adds box constraints to all dimensions. This will extend :attr:`hopsy.Problem.A` and :attr:`hopsy.Problem.b` of the returned :class:`hopsy.Problem` to have :math:`m+2n` rows.
     Box constraints are added naively, meaning that we do neither check whether the dimension may be already
     somehow bound nor check whether the very same constraint already exists. You can remove redundant constraints
-    efficiently using :func:`hopsy.round`, which uses hopsy's native PolyRound backend to remove redundant constraints and also rounds the polytope.
+    efficiently using the `PolyRound <https://pypi.org/project/PolyRound/>`_ toolbox or by using the :func:`hopsy.round` function, uses PolyRound to remove redundant constraints and also rounds the polytope.
 
     If ``lower_bound`` and ``upper_bound`` are both ``float``, then every dimension :math:`i` will be bound as
     :math:`lb \leq x_i \leq ub`. If `lower_bound`` and ``upper_bound`` are both ``numpy.ndarray`` with
@@ -660,31 +665,21 @@ def add_equality_constraints(
         )
 
     try:
+        polytope = _s.polytope.Polytope(A=problem.A, b=problem.b, S=A_eq, h=b_eq)
         with _s.warnings.catch_warnings():
             _s.warnings.simplefilter("ignore")
-            settings = _c.LP().settings
-            simplified = _s.polyround_backend.simplify(
-                problem.A,
-                problem.b,
-                settings,
-                S=A_eq,
-                h=b_eq,
-            )
-            result = _s.polyround_backend.transform(
-                simplified.A,
-                simplified.b,
-                settings,
-                S=simplified.S,
-                h=simplified.h,
-            )
+            polytope = _s.PolyRoundApi.simplify_polytope(polytope, _c.LP().settings)
+
+        # transform_polytope carries out dimension reduction due to equality constraints if possible
+        polytope = _s.PolyRoundApi.transform_polytope(polytope, _c.LP().settings)
 
         _problem = _c.Problem(
-            result.A,
-            result.b,
+            polytope.A,
+            polytope.b,
             problem.model,
             problem.starting_point,
-            result.transformation,
-            result.shift,
+            polytope.transformation.values,
+            polytope.shift.values,
         )
 
         if problem.starting_point is not None:
@@ -698,7 +693,7 @@ def add_equality_constraints(
                 _problem.starting_point = None
 
         return _problem
-    except ValueError:
+    except ValueError as e:
         raise ValueError(
             "Adding these equality constraints makes the problem infeasible! Check the problem and/or the LP().settings"
         )
@@ -719,7 +714,15 @@ def is_polytope_empty(
     """
     if not (S is not None and h is not None) and not (S is None and h is None):
         raise RuntimeError("Either S and h must both be None OR both must have values")
-    return _s.polyround_backend.is_empty(A, b, _c.LP().settings, S=S, h=h)
+    polytope = _s.polytope.Polytope(A=A, b=b, S=S, h=h)
+    _s.warnings.filterwarnings("ignore", category=DeprecationWarning)
+    optlang_model = _s.PolyRoundApi.polytope_to_model(polytope, _c.LP().settings)
+    status = optlang_model.optimize()
+    _s.warnings.simplefilter("always")
+    if status != "optimal":
+        return True
+    else:
+        return False
 
 
 def is_problem_polytope_empty(problem: _c.Problem):
@@ -817,13 +820,17 @@ def compute_chebyshev_center_and_radius(
     :rtype: numpy.ndarray[float64[n,1]], float64
     """
     # tries to use fast computation, when gurobi is available
-    result = _compute_chebyshev_center_and_radius_with_gurobi(problem)
+    ### PolyRound backend guard patch
+    result = (
+        _compute_chebyshev_center_and_radius_with_gurobi(problem)
+        if _s.PolyRoundApi.backend_name(_c.LP().settings) == "gurobi"
+        else None
+    )
     if result is None:
-        chebyshev_center, radius = _s.polyround_backend.chebyshev_center(
-            problem.A,
-            problem.b,
-            _c.LP().settings,
-        )
+        polytope = _s.polytope.Polytope(problem.A, problem.b)
+        cheby_result = _s.PolyRoundApi.chebyshev_center(polytope, _c.LP().settings)
+        chebyshev_center = cheby_result[0].flatten()
+        radius = cheby_result[1][0]
     else:
         chebyshev_center, radius = result
 
@@ -859,18 +866,37 @@ def compute_chebyshev_center(problem: _c.Problem, original_space: bool = False):
 def _compute_maximum_volume_ellipsoid(problem: _c.Problem):
     with _s.warnings.catch_warnings():
         _s.warnings.simplefilter("ignore")
-        return _s.polyround_backend.sqrt_maximum_volume_ellipsoid(
-            problem.A,
-            problem.b,
-            _c.LP().settings,
-        )
+
+        polytope = _s.polytope.Polytope(problem.A, problem.b)
+
+        polytope = _s.PolyRoundApi.simplify_polytope(polytope, _c.LP().settings)
+
+        if polytope.S is not None:
+            polytope = _s.PolyRoundApi.transform_polytope(polytope, _c.LP().settings)
+        else:
+            number_of_reactions = polytope.A.shape[1]
+            polytope.transformation = _s.pandas.DataFrame(
+                _s.numpy.identity(number_of_reactions)
+            )
+            polytope.transformation.index = [
+                str(i) for i in range(polytope.transformation.to_numpy().shape[0])
+            ]
+            polytope.transformation.columns = [
+                str(i) for i in range(polytope.transformation.to_numpy().shape[1])
+            ]
+            polytope.shift = _s.pandas.Series(_s.numpy.zeros(number_of_reactions))
+
+        _s.PolyRoundApi.iterative_solve(polytope, _c.LP().settings)
+
+        # return polytope.transform.values      ###
+        return polytope.transformation.values
 
 
 def simplify(problem: _c.Problem):
     r"""simplify(problem)
 
     Simplifies the polytope defined in the ``problem`` by removing redundant constraints and refunction inequality constraints to equality constraints in case of dimension width less than thresh.
-    Thresh is defined in the LP settings singleton and refers to hopsy's native PolyRound settings.
+    Thresh is defined in the LP settings singleton and refers to `PolyRound <https://pypi.org/project/PolyRound/>`_ settings.
     Simplification is typically the first step before sampling. It is called automatically when round is called, because it is required for efficient and effective rounding.
 
     Parameters
@@ -886,35 +912,52 @@ def simplify(problem: _c.Problem):
     with _s.warnings.catch_warnings():
         _s.warnings.simplefilter("ignore")
 
-        existing_transform = problem.transformation
-        existing_shift = problem.shift
-        existing_starting_point = problem.starting_point
+        ### PolyRound simplify affine metadata patch
+        # existing_transform = problem.transformation
+        # existing_shift = problem.shift
+        # existing_starting_point = problem.starting_point
+        polytope = _s.polytope.Polytope(problem.A, problem.b)
+        # input_dimension = polytope.A.shape[1]
 
-        settings = _c.LP().settings
-        simplified = _s.polyround_backend.simplify(
-            problem.A,
-            problem.b,
-            settings,
+        polytope = _s.PolyRoundApi.simplify_polytope(
+            polytope, settings=_c.LP().settings
         )
-        if simplified.S is not None:
-            result = _s.polyround_backend.transform(
-                simplified.A,
-                simplified.b,
-                settings,
-                S=simplified.S,
-                h=simplified.h,
-            )
+        if polytope.S is not None:
+            polytope = _s.PolyRoundApi.transform_polytope(polytope, _c.LP().settings)
         else:
-            result = simplified
+            number_of_reactions = polytope.A.shape[1]
+            polytope.transformation = _s.pandas.DataFrame(
+                _s.numpy.identity(number_of_reactions)
+            )
+            polytope.transformation.index = [
+                str(i) for i in range(polytope.transformation.to_numpy().shape[0])
+            ]
+            polytope.transformation.columns = [
+                str(i) for i in range(polytope.transformation.to_numpy().shape[1])
+            ]
+            polytope.shift = _s.pandas.Series(_s.numpy.zeros(number_of_reactions))
 
-        problem.A = result.A
-        problem.b = result.b
+        problem.A = polytope.A.values
+        problem.b = polytope.b.values
 
-        if result.transformed:
+        ### Keep this commented for OG behaviour
+        """
+        stage_transform = polytope.transformation.values
+        stage_shift = polytope.shift.values
+        stage_is_identity = stage_transform.shape == (
+            input_dimension,
+            input_dimension,
+        ) and _s.numpy.allclose(stage_transform, _s.numpy.eye(input_dimension))
+        stage_is_zero_shift = _s.numpy.allclose(
+            stage_shift,
+            _s.numpy.zeros(input_dimension),
+        )
+
+        if not (stage_is_identity and stage_is_zero_shift):
             previous_transform = (
                 existing_transform
                 if existing_transform is not None
-                else _s.numpy.eye(result.transformation.shape[0])
+                else _s.numpy.eye(stage_transform.shape[0])
             )
             previous_shift = (
                 existing_shift
@@ -922,33 +965,35 @@ def simplify(problem: _c.Problem):
                 else _s.numpy.zeros(previous_transform.shape[0])
             )
 
-            problem.transformation = previous_transform @ result.transformation
-            problem.shift = previous_shift + previous_transform @ result.shift
+            problem.transformation = previous_transform @ stage_transform
+            problem.shift = previous_shift + previous_transform @ stage_shift
 
             if existing_starting_point is not None:
                 intermediate_problem = _c.Problem(
-                    result.A,
-                    result.b,
-                    transformation=result.transformation,
-                    shift=result.shift,
+                    polytope.A.values,
+                    polytope.b.values,
+                    transformation=stage_transform,
+                    shift=stage_shift,
                 )
                 problem.starting_point = transform(
-                    intermediate_problem, [existing_starting_point]
+                    intermediate_problem,
+                    [existing_starting_point],
                 )[0]
 
                 if _s.numpy.any((problem.b - problem.A @ problem.starting_point) < 0):
                     with _s.warnings.catch_warnings():
                         _s.warnings.simplefilter("default")
                         _s.warnings.warn(
-                            "Simplifying the problem transformed the starting point outside "
-                            "the simplified polytope. Please provide a new starting point."
+                            "Simplifying the problem transformed the starting point "
+                            "outside the simplified polytope. Please provide a new "
+                            "starting point."
                         )
                     problem.starting_point = None
         else:
             problem.transformation = existing_transform
             problem.shift = existing_shift
             problem.starting_point = existing_starting_point
-
+        """
         return problem
 
 
@@ -958,7 +1003,7 @@ _simplify = simplify
 def round(problem: _c.Problem, simplify=True):
     """
     Rounds the polytope defined by the inequality :math:`Ax < b` using
-    hopsy's native PolyRound backend.
+    `PolyRound <https://pypi.org/project/PolyRound/>`_.
     This function also strips redundant constraints.
     The unrounding transformation :math:`T` and shift :math:`s` will be stored in :attr:`hopsy.UniformProblem.transformation`
     and :attr:`hopsy.UniformProblem.shift` of the returned problem. Its left-hand side operator :attr:`hopsy.UniformProblem.A` and
@@ -973,30 +1018,45 @@ def round(problem: _c.Problem, simplify=True):
     with _s.warnings.catch_warnings():
         _s.warnings.simplefilter("ignore")
 
-        result = _s.polyround_backend.round_polytope(
-            problem.A,
-            problem.b,
-            _c.LP().settings,
-            simplify_first=simplify,
-        )
+        polytope = _s.polytope.Polytope(problem.A, problem.b)
+
+        if simplify:
+            polytope = _s.PolyRoundApi.simplify_polytope(polytope, _c.LP().settings)
 
         existing_transform = problem.transformation
         existing_shift = problem.shift
 
+        if polytope.S is not None:
+            polytope = _s.PolyRoundApi.transform_polytope(polytope, _c.LP().settings)
+        else:
+            number_of_reactions = polytope.A.shape[1]
+            polytope.transformation = _s.pandas.DataFrame(
+                _s.numpy.identity(number_of_reactions)
+            )
+            polytope.transformation.index = [
+                str(i) for i in range(polytope.transformation.to_numpy().shape[0])
+            ]
+            polytope.transformation.columns = [
+                str(i) for i in range(polytope.transformation.to_numpy().shape[1])
+            ]
+            polytope.shift = _s.pandas.Series(_s.numpy.zeros(number_of_reactions))
+
+        polytope = _s.PolyRoundApi.round_polytope(polytope, _c.LP().settings)
+
         complete_transform = (
-            result.transformation
+            polytope.transformation.values
             if existing_transform is None
-            else existing_transform @ result.transformation
+            else existing_transform @ polytope.transformation.values
         )
         complete_shift = (
-            result.shift
+            polytope.shift.values
             if existing_shift is None
-            else existing_shift + existing_transform @ result.shift
+            else existing_shift + existing_transform @ polytope.shift.values
         )
 
         _problem = _c.Problem(
-            result.A,
-            result.b,
+            polytope.A.values,
+            polytope.b.values,
             problem.model,
             transformation=complete_transform,
             shift=complete_shift,
@@ -1007,10 +1067,10 @@ def round(problem: _c.Problem, simplify=True):
 
         if problem.starting_point is not None:
             intermediate_problem = _c.Problem(
-                result.A,
-                result.b,
-                transformation=result.transformation,
-                shift=result.shift,
+                polytope.A.values,
+                polytope.b.values,
+                transformation=polytope.transformation.values,
+                shift=polytope.shift.values,
             )
             _problem.starting_point = transform(
                 intermediate_problem, [problem.starting_point]
@@ -1575,6 +1635,10 @@ def _compute_statistic(
             args[3]
             if len(args) > 4
             else kwargs["relative"] if "relative" in kwargs else False
+            ###
+            # else kwargs["relative"]
+            # if "relative" in kwargs
+            # else False
         )
         return [1 / (n_chains * i) if relative else 1] * dim
     else:
@@ -1619,6 +1683,10 @@ def _arviz(
                 args[3]
                 if len(args) > 4
                 else kwargs["relative"] if "relative" in kwargs else False
+                ###
+                # else kwargs["relative"]
+                # if "relative" in kwargs
+                # else False
             )
             _result = [1 / (n_chains * n_samples) if relative else 1] * dim
         else:
@@ -1875,7 +1943,7 @@ def run_multiphase_sampling(
     assert len(starting_points) == len(seeds)
     rngs = [_c.RandomNumberGenerator(s) for s in seeds]
 
-    polytope = _s.polyround_backend.make_polytope(A=problem.A, b=problem.b)
+    polytope = _s.polytope.Polytope(A=problem.A, b=problem.b)
     polytope.normalize()
     current_ess = 0
     iterations = 0

@@ -19,9 +19,9 @@ authors = [
 ]
 requires-python = ">=3.10"
 dependencies = [
+    "highspy>=1.14.0",
     "optlang>=1.7.0",
     "arviz>=0.23.4,<2",
-    "gurobipy>=13.0.1; (sys_platform == 'linux' and (platform_machine == 'x86_64' or platform_machine == 'aarch64')) or (sys_platform == 'darwin') or (sys_platform == 'win32' and platform_machine == 'AMD64')",
     "numpy",
     "pandas",
     "tqdm",
@@ -41,6 +41,23 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Programming Language :: C++",
     "Operating System :: OS Independent",
+]
+
+[project.optional-dependencies]
+polyround = [
+  "PolyRound>=0.4.0",
+]
+gurobi = [
+  "gurobipy>=13.0.1; (sys_platform == 'linux' and (platform_machine == 'x86_64' or platform_machine == 'aarch64')) or (sys_platform == 'darwin') or (sys_platform == 'win32' and platform_machine == 'AMD64')",
+]
+cobra = [
+  "cobra>=0.20.0",
+]
+python-libsbml = [
+  "python-libsbml>=5.18",
+]
+cuda13 = [
+  "cupy-cuda13x>=14.0.1",
 ]
 
 [dependency-groups]

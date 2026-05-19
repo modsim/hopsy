@@ -2,11 +2,11 @@
 
 import threading as _threading
 
-from ._polyround_backend import default_settings as _default_settings
+from ._polyround.settings import PolyRoundSettings
 
 
 class LP:
-    """Singleton for controlling hopsy's native PolyRound LP parameters.
+    """Singleton for controlling PolyRound parameters for Linear Programming.
     Pattern from https://medium.com/analytics-vidhya/how-to-create-a-thread-safe-singleton-class-in-python-822e1170a7f6
     """
 
@@ -23,9 +23,9 @@ class LP:
                 # instance is still nonexistent.
                 if not self.__instance:
                     self.__instance = super(LP, self).__new__(self)
-                    self.settings = _default_settings()
+                    self.settings = PolyRoundSettings()
         return self.__instance
 
     def reset(self):
-        """resets all native PolyRound LP settings to their default values"""
-        self.settings = _default_settings()
+        """resets all settings regarding PolyRound to the default values, which are set in PolyRound itself"""
+        self.settings = PolyRoundSettings()

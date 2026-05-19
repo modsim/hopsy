@@ -8,27 +8,80 @@ try:
 except Exception:
     gp = None
 
-from hopsy._polyround.default_settings import (
-    default_accepted_tol_violation,
-    default_hp_flags,
-)
-from hopsy._polyround.mutable_classes.polytope import Polytope
+from hopsy._polyround.default_settings import default_accepted_tol_violation
+from hopsy._polyround.polytope import Polytope
 
 
-class NativeToleranceConfiguration:
-    def __init__(self, feasibility, optimality):
-        self.feasibility = feasibility
-        self.optimality = optimality
+def verbose_print(settings, backend, message):
+    if getattr(settings, "verbose", bool(settings)):
+        print(f"[{backend}] {message}")
 
 
-class NativeConfiguration:
-    def __init__(self, presolve, feasibility, optimality):
+class Configuration:
+    def __init__(self, problem, tolerances=None, presolve=False, lp_method="primal"):
+        self.problem = problem
+        self.tolerances = tolerances or self
+        self.lp_method = lp_method
         self.presolve = presolve
-        self.lp_method = "primal"
-        self.tolerances = NativeToleranceConfiguration(feasibility, optimality)
+
+    @property
+    def feasibility(self):
+        return self.problem.Params.FeasibilityTol
+
+    @feasibility.setter
+    def feasibility(self, value):
+        self.problem.Params.FeasibilityTol = value
+
+    @property
+    def optimality(self):
+        return self.problem.Params.OptimalityTol
+
+    @optimality.setter
+    def optimality(self, value):
+        self.problem.Params.OptimalityTol = value
+
+    @property
+    def lp_method(self):
+        methods = {
+            -1: "auto",
+            0: "primal",
+            1: "dual",
+            2: "barrier",
+            3: "concurrent",
+            4: "deterministic_concurrent",
+        }
+        return methods[self.problem.Params.Method]
+
+    @lp_method.setter
+    def lp_method(self, value):
+        methods = {
+            "auto": -1,
+            "primal": 0,
+            "dual": 1,
+            "barrier": 2,
+            "concurrent": 3,
+            "deterministic_concurrent": 4,
+        }
+        if value not in methods:
+            raise ValueError("Invalid LP method.")
+        self.problem.Params.Method = methods[value]
+
+    @property
+    def presolve(self):
+        return self._presolve
+
+    @presolve.setter
+    def presolve(self, value):
+        if value is True:
+            self.problem.Params.Presolve = 2
+        elif value is False:
+            self.problem.Params.Presolve = 0
+        else:
+            self.problem.Params.Presolve = -1
+        self._presolve = value
 
 
-class NativeObjective:
+class Objective:
     def __init__(self, model):
         self._model = model
 
@@ -45,7 +98,7 @@ class NativeObjective:
         return np.nan
 
 
-class NativeGurobiModel:
+class Model:
     def __init__(self, problem, variables, configuration, source_polytope=None):
         self.problem = problem
         self.variables = variables
@@ -54,7 +107,7 @@ class NativeGurobiModel:
 
     @property
     def status(self):
-        return GurobiInterfacer.gurobi_status(self.problem.Status)
+        return Interfacer.status(self.problem.Status)
 
     @property
     def primal_values(self):
@@ -66,63 +119,63 @@ class NativeGurobiModel:
 
     @property
     def objective(self):
-        return NativeObjective(self)
+        return Objective(self)
 
     def optimize(self):
+        self.update()
         self.problem.optimize()
+        if self.status != "optimal" and self.configuration.presolve == "auto":
+            self.configuration.presolve = True
+            self.problem.optimize()
+            self.configuration.presolve = "auto"
 
     def update(self):
         self.problem.update()
 
 
-class GurobiInterfacer:
+class Interfacer:
     @staticmethod
-    def is_native_gurobi_model(model):
-        return isinstance(model, NativeGurobiModel)
-
-    @staticmethod
-    def require_native_gurobi():
+    def require_package():
         if gp is None:
-            raise ImportError("hopsy's native PolyRound backend requires gurobipy.")
+            raise ImportError("This backend requires gurobipy.")
 
     @staticmethod
-    def gurobi_status(status):
+    def status(status):
         if gp is None:
             return str(status)
         mapping = {
             gp.GRB.OPTIMAL: "optimal",
+            gp.GRB.LOADED: "loaded",
             gp.GRB.INFEASIBLE: "infeasible",
             gp.GRB.INF_OR_UNBD: "infeasible_or_unbounded",
             gp.GRB.UNBOUNDED: "unbounded",
-            gp.GRB.NUMERIC: "numeric_error",
-            gp.GRB.SUBOPTIMAL: "suboptimal",
+            gp.GRB.CUTOFF: "cutoff",
+            gp.GRB.ITERATION_LIMIT: "iteration_limit",
+            gp.GRB.NODE_LIMIT: "node_limit",
             gp.GRB.TIME_LIMIT: "time_limit",
+            gp.GRB.SOLUTION_LIMIT: "solution_limit",
             gp.GRB.INTERRUPTED: "interrupted",
+            gp.GRB.NUMERIC: "numeric",
+            gp.GRB.SUBOPTIMAL: "suboptimal",
+            gp.GRB.INPROGRESS: "in_progress",
         }
         return mapping.get(status, str(status))
 
     @staticmethod
-    def native_configuration(settings):
-        return NativeConfiguration(
-            presolve=settings.presolve,
-            feasibility=settings.hp_flags.get(
-                "FeasibilityTol", default_hp_flags["FeasibilityTol"]
-            ),
-            optimality=settings.hp_flags.get(
-                "OptimalityTol", default_hp_flags["OptimalityTol"]
-            ),
-        )
+    def configuration(problem):
+        return Configuration(problem)
 
     @staticmethod
-    def make_native_model(variable_names, settings):
-        GurobiInterfacer.require_native_gurobi()
+    def make_model(variable_names, settings):
+        Interfacer.require_package()
         problem = gp.Model()
-        wrapper = NativeGurobiModel(
+        problem.setParam("OutputFlag", 1 if settings.sgp else 0)
+        wrapper = Model(
             problem=problem,
             variables=[],
-            configuration=GurobiInterfacer.native_configuration(settings),
+            configuration=Interfacer.configuration(problem),
         )
-        GurobiInterfacer.configure_gurobi_model(wrapper, settings)
+        Interfacer.configure_model(wrapper, settings)
         wrapper.variables = [
             problem.addVar(lb=-gp.GRB.INFINITY, name=str(name))
             for name in variable_names
@@ -131,7 +184,7 @@ class GurobiInterfacer:
         return wrapper
 
     @staticmethod
-    def build_native_row_expressions(matrix, variables):
+    def build_row_expressions(matrix, variables):
         matrix = sp.csr_matrix(matrix, dtype=np.float64)
         expressions = []
         for row_ind in range(matrix.shape[0]):
@@ -143,17 +196,17 @@ class GurobiInterfacer:
         return expressions
 
     @staticmethod
-    def native_constraint_names(names):
+    def constraint_names(names):
         if names is None:
             return None
         return [str(name) for name in names]
 
     @staticmethod
-    def add_native_constraint_system(model, matrix, rhs, names=None, equality=False):
+    def add_constraint_system(model, matrix, rhs, names=None, equality=False):
         matrix = sp.csr_matrix(matrix, dtype=np.float64)
         rhs = np.asarray(rhs, dtype=np.float64).reshape(-1)
         sense = "=" if equality else "<"
-        constraint_names = GurobiInterfacer.native_constraint_names(names)
+        constraint_names = Interfacer.constraint_names(names)
         if constraint_names is None:
             constraints = model.problem.addMConstr(matrix, model.variables, sense, rhs)
         else:
@@ -168,25 +221,7 @@ class GurobiInterfacer:
         return constraints
 
     @staticmethod
-    def add_native_constraints(problem, expressions, rhs, names=None, equality=False):
-        rhs = np.asarray(rhs, dtype=np.float64).reshape(-1)
-        constraints = []
-        for row_ind, bound in enumerate(rhs):
-            name = "" if names is None else str(names[row_ind])
-            if equality:
-                constr = problem.addConstr(
-                    expressions[row_ind] == float(bound), name=name
-                )
-            else:
-                constr = problem.addConstr(
-                    expressions[row_ind] <= float(bound), name=name
-                )
-            constraints.append(constr)
-        problem.update()
-        return constraints
-
-    @staticmethod
-    def native_linexpr(coefficients, variables):
+    def linexpr(coefficients, variables):
         coefficients = np.asarray(coefficients, dtype=np.float64).reshape(-1)
         nonzero = np.flatnonzero(coefficients)
         if nonzero.size == 0:
@@ -197,7 +232,7 @@ class GurobiInterfacer:
         )
 
     @staticmethod
-    def native_solution(model, size=None):
+    def solution(model, size=None):
         if model.status == "optimal":
             return np.asarray([var.X for var in model.variables], dtype=np.float64)
         if size is None:
@@ -207,57 +242,41 @@ class GurobiInterfacer:
         return x
 
     @staticmethod
-    def configure_gurobi_model(m, settings):
+    def configure_model(m, settings):
         problem = m.problem if hasattr(m, "problem") else m
-        if not settings.sgp:
-            problem.setParam("OutputFlag", 0)
-        else:
-            problem.setParam("OutputFlag", 1)
-        problem.setParam("Method", 0)
-        if settings.verbose:
-            print("Using the hp flags: " + str(settings.hp_flags))
+        problem.setParam("OutputFlag", 1 if settings.sgp else 0)
+        verbose_print(settings, "gurobi", "hp flags=" + str(settings.hp_flags))
         for key, val in settings.hp_flags.items():
             problem.setParam(key, val)
         problem.setParam("Threads", 1)
-        if settings.presolve:
-            problem.setParam("Presolve", 2)
-        else:
-            problem.setParam("Presolve", 0)
-        if GurobiInterfacer.is_native_gurobi_model(m):
-            m.configuration = GurobiInterfacer.native_configuration(settings)
 
     @staticmethod
-    def gurobi_solve(obj, A, b, settings, S=None, h=None):
+    def solve(obj, A, b, settings, S=None, h=None):
         variable_names = [str(r) for r in range(A.shape[1])]
-        model = GurobiInterfacer.make_native_model(variable_names, settings)
-        problem = model.problem
-        problem.setObjective(
-            GurobiInterfacer.native_linexpr(obj, model.variables),
+        model = Interfacer.make_model(variable_names, settings)
+        model.problem.setObjective(
+            Interfacer.linexpr(obj, model.variables),
             gp.GRB.MINIMIZE,
         )
-        GurobiInterfacer.add_native_constraint_system(model, A, b, equality=False)
+        Interfacer.add_constraint_system(model, A, b, equality=False)
         if S is not None:
             assert h is not None
-            GurobiInterfacer.add_native_constraint_system(model, S, h, equality=True)
+            Interfacer.add_constraint_system(model, S, h, equality=True)
         model.optimize()
-        return GurobiInterfacer.native_solution(model, A.shape[1]), model
+        return Interfacer.solution(model, A.shape[1]), model
 
     @staticmethod
-    def gurobi_solve_model(obj, m):
-        if not GurobiInterfacer.is_native_gurobi_model(m):
-            raise ValueError("The gurobi branch only supports native gurobi models.")
+    def solve_model(obj, m):
 
         m.problem.setObjective(
-            GurobiInterfacer.native_linexpr(obj, m.variables),
+            Interfacer.linexpr(obj, m.variables),
             gp.GRB.MINIMIZE,
         )
         m.optimize()
-        return GurobiInterfacer.native_solution(m), m
+        return Interfacer.solution(m), m
 
     @staticmethod
-    def gurobi_regularize_chebyshev_center(obj_val, m):
-        if not GurobiInterfacer.is_native_gurobi_model(m):
-            raise ValueError("The gurobi branch only supports native gurobi models.")
+    def regularize_chebyshev_center(obj_val, m):
 
         lower_bound = float(np.squeeze(obj_val)) / 2.0
         last_var = m.variables[-1]
@@ -267,12 +286,13 @@ class GurobiInterfacer:
             quadratic_objective.add(var * var)
         m.problem.setObjective(quadratic_objective, gp.GRB.MINIMIZE)
         m.optimize()
-        return GurobiInterfacer.native_solution(m), m
+        return Interfacer.solution(m), m
 
     @staticmethod
     def polytope_to_model(polytope, settings):
-        model = GurobiInterfacer.make_native_model(polytope.A.columns, settings)
-        GurobiInterfacer.add_native_constraint_system(
+        model = Interfacer.make_model(polytope.A.columns, settings)
+        model.configuration.presolve = settings.presolve
+        Interfacer.add_constraint_system(
             model,
             polytope.A.values,
             polytope.b.values,
@@ -280,7 +300,7 @@ class GurobiInterfacer:
             equality=False,
         )
         if polytope.S is not None:
-            GurobiInterfacer.add_native_constraint_system(
+            Interfacer.add_constraint_system(
                 model,
                 polytope.S.values,
                 polytope.h.values,
@@ -292,14 +312,14 @@ class GurobiInterfacer:
 
     @staticmethod
     def model_to_polytope(m):
-        A, b = GurobiInterfacer.constraints_as_mat(m, sense="<")
-        S, h = GurobiInterfacer.constraints_as_mat(m, sense="=")
+        A, b = Interfacer.constraints_as_mat(m, sense="<")
+        S, h = Interfacer.constraints_as_mat(m, sense="=")
         if S.size > 0:
             return Polytope(A, b, S, h)
         return Polytope(A, b)
 
     @staticmethod
-    def native_constraint_record(m, constr):
+    def constraint_record(m, constr):
         row = m.problem.getRow(constr)
         coefficients = {}
         for index in range(row.size()):
@@ -315,8 +335,6 @@ class GurobiInterfacer:
 
     @staticmethod
     def constraints_as_mat(m, sense="<"):
-        if not GurobiInterfacer.is_native_gurobi_model(m):
-            raise ValueError("The gurobi branch only supports native gurobi models.")
         r_names = [var.VarName for var in m.variables]
 
         if sense == "<":
@@ -329,9 +347,7 @@ class GurobiInterfacer:
         rows = []
         duplicate_counts = {}
         for constr in m.problem.getConstrs():
-            live_sense, coefficients, rhs = GurobiInterfacer.native_constraint_record(
-                m, constr
-            )
+            live_sense, coefficients, rhs = Interfacer.constraint_record(m, constr)
             if live_sense != target_sense:
                 continue
 
@@ -358,9 +374,6 @@ class GurobiInterfacer:
 
     @staticmethod
     def check_tolerances(m):
-        if not GurobiInterfacer.is_native_gurobi_model(m):
-            raise ValueError("The gurobi branch only supports native gurobi models.")
-
         feasibility_threshold = (
             m.configuration.tolerances.feasibility * default_accepted_tol_violation
         )
@@ -400,14 +413,9 @@ class GurobiInterfacer:
     def get_opt(m, settings):
         if m.status == "optimal":
             if settings.check_lps:
-                GurobiInterfacer.check_tolerances(m)
+                Interfacer.check_tolerances(m)
             return m.objective.value
-        if (
-            m.status == "infeasible"
-            or m.status == "infeasible_or_unbounded"
-            or m.status == "unbounded"
-            or m.status == "numeric_error"
-        ):
+        if m.status in {"infeasible", "check_original_solver_status", "undefined"}:
             # print("model in infeasible state, resetting lp")
             m.problem.reset()
             m.optimize()
