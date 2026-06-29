@@ -179,7 +179,7 @@ def check_convergence(
     if (res < tol * (1 + bnrm) and rmu <= minmu) or (
         iter > 100
         and prev_obj != -np.inf
-        and (prev_obj >= (1 - tol) * objval or prev_obj <= (1 - tol) * objval)
+        and (prev_obj >= (1 - tol) * objval and prev_obj <= (1 - tol) * objval)
     ):
         verbose_print(verbose, "gurobi", "inner MVE converged")
         x = x + x0.squeeze()

@@ -3,6 +3,8 @@
 import os
 import sys
 
+import numpy as np
+
 sys.path.insert(0, os.getcwd())
 import argparse
 import time
@@ -10,7 +12,7 @@ import time
 from hopsy._polyround.default_settings import default_hp_flags
 from hopsy._polyround.settings import DEFAULT_BACKEND, PolyRoundSettings
 
-from .backend import Exp2Backend
+from .backend import GurobiCuPyBackend
 from .lp_utils import parse_sbml_cobrapy, polytope_to_csv
 
 
@@ -18,6 +20,7 @@ def main(args):
     inputs = args.files
     path = args.path
     # thresh = args.thresh
+    # verbose = args.verbose
     # reduce = not args.do_not_reduce
     # set hp flags
     hp_flags = default_hp_flags
@@ -32,17 +35,22 @@ def main(args):
         backend=args.backend,
         hp_flags=hp_flags,
         thresh=args.thresh,
+        verbose=args.v,
         check_lps=args.check_lps,
+        sgp=args.sgp,
         reduce=(not args.do_not_reduce),
     )
     for input in inputs:
         input_name = input.split("/")[-1].split(".")[0]
+        # file_path = os.path.dirname(__file__)
+        # logging.basicConfig(filename=os.path.join(file_path, 'logs', input_name + '.log'))
+        # logging.info("starting a new run")
         if input.endswith(".xml"):
             polytope = parse_sbml_cobrapy(input, prescale=False)
         else:
             raise (IOError("Only xml files supported at the moment"))
         start_time = time.time()
-        polytope = Exp2Backend().simplify_transform_and_round(
+        polytope = GurobiCuPyBackend().simplify_transform_and_round(
             polytope,
             settings=settings,
         )
@@ -59,11 +67,17 @@ def pars_args():
     parser.add_argument(
         "-hp", action="store_true", help="run the program with high precision option"
     )
+    parser.add_argument("-sgp", action="store_true", help="show Gurobi solver progress")
+    parser.add_argument(
+        "-v",
+        action="store_true",
+        help="print PolyRound progress information",
+    )
     parser.add_argument(
         "-check_lps", action="store_true", help="make external checks on lp solutions"
     )
     parser.add_argument(
-        "-do_not_reduce", action="store_true", help="skip constraint reduction"
+        "-do_not_reduce", action="store_true", help="run in verbose mode"
     )
     parser.add_argument(
         "-thresh",
@@ -83,13 +97,14 @@ def pars_args():
     parser.add_argument("files", nargs="*")
 
     args = parser.parse_args()
+    print(args)
 
     return args
 
 
 # TODO ???
 def _simplify_transform_and_round(polytope, settings):
-    backend = Exp2Backend()
+    backend = GurobiCuPyBackend()
     polytope = backend.simplify_polytope(polytope, settings=settings)
     if not polytope.inequality_only:
         polytope = backend.transform_polytope(polytope, settings=settings)
@@ -97,4 +112,4 @@ def _simplify_transform_and_round(polytope, settings):
 
 
 if __name__ == "__main__":
-    main(pars_args())
+    print(main(pars_args()))

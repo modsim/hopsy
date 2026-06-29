@@ -2,74 +2,17 @@ import unittest
 import warnings
 
 import numpy as np
-import pandas as pd
 
 import hopsy
-from hopsy._polyround import PolyRoundApi
+from hopsy._polyround import PolyRoundApi, PolyRoundSettings
+from hopsy._polyround.default_settings import default_numerics_threshold
+from hopsy._polyround.gurobi.constraint_removal_reduction import null_space
+from hopsy._polyround.gurobi.geometric_mean_scaling import geometric_mean_scaling
+from hopsy._polyround.gurobi.lp_interfacing import Interfacer as GurobiInterfacer
+from hopsy._polyround.gurobi.lp_utils import chebyshev_center
+from hopsy._polyround.gurobi.maximum_volume_ellipsoid import run_mve
+from hopsy._polyround.gurobi.nearest_symmetric_positive_definite import get_NSPD
 from hopsy._polyround.polytope import Polytope
-
-
-class PolyRoundApi:
-    """Compatibility shim for tests that still use the old PolyRoundApi shape."""
-
-    @staticmethod
-    def simplify_polytope(polytope, settings=None):
-        result = simplify_polytope(
-            polytope.A.values,
-            polytope.b.values,
-            settings,
-            S=None if polytope.S is None else polytope.S.values,
-            h=None if polytope.h is None else polytope.h.values,
-        )
-        return _polytope_from_result(result)
-
-    @staticmethod
-    def transform_polytope(polytope, settings=None):
-        result = transform_polytope(
-            polytope.A.values,
-            polytope.b.values,
-            settings,
-            S=None if polytope.S is None else polytope.S.values,
-            h=None if polytope.h is None else polytope.h.values,
-        )
-        return _polytope_from_result(result)
-
-    @staticmethod
-    def round_polytope(polytope, settings=None):
-        result = round_polytope(
-            polytope.A.values,
-            polytope.b.values,
-            settings,
-            simplify_first=False,
-        )
-        rounded = _polytope_from_result(result)
-        rounded.transformation = pd.DataFrame(
-            polytope.transformation.values @ result.transformation
-        )
-        rounded.shift = pd.Series(
-            polytope.shift.values + polytope.transformation.values @ result.shift
-        )
-        return rounded
-
-    @staticmethod
-    def simplify_transform_and_round(polytope, settings=None):
-        simplified = PolyRoundApi.simplify_polytope(polytope, settings)
-        transformed = (
-            PolyRoundApi.transform_polytope(simplified, settings)
-            if simplified.S is not None
-            else simplified
-        )
-        return PolyRoundApi.round_polytope(transformed, settings)
-
-
-def _polytope_from_result(result):
-    polytope = Polytope(result.A, result.b, S=result.S, h=result.h)
-    if result.transformation is not None:
-        polytope.transformation = pd.DataFrame(result.transformation)
-    if result.shift is not None:
-        polytope.shift = pd.Series(result.shift)
-    return polytope
-
 
 # Helpers: polytope builders
 
@@ -422,7 +365,7 @@ class PolyRoundTests(unittest.TestCase):
         b = np.array([[0], [0], [0], [1]], dtype=float)
         x = np.array([[0.1], [0.1], [0.1]])
 
-        _, E, _, delta_b, delta_s = MaximumVolumeEllipsoidFinder.run_mve(A, b, x, 1e-3)
+        _, E, _, delta_b, delta_s = run_mve(A, b, x, 1e-3)
 
         E_sol = np.array(
             [[0.25, 0, 0], [-0.0833, 0.2357, 0], [-0.0833, -0.1178, 0.2042]]
@@ -447,7 +390,7 @@ class PolyRoundTests(unittest.TestCase):
         A = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
         A_sol = np.array([[2, 3, 4], [3, 5, 6], [4, 6, 9]])
 
-        A_hat = NSPD.get_NSPD(A)
+        A_hat = get_NSPD(A)
 
         self.assertLess(np.max(np.abs(A_hat - A_sol)), 1)
 
@@ -494,7 +437,7 @@ class PolyRoundTests(unittest.TestCase):
     def test_simple_null_space(self):
         S = np.array([[1, -1, 0], [0, 1, -1]])
 
-        null = PolytopeReducer.null_space(S)
+        null = null_space(S)
 
         self.assertEqual(null.shape[1], 1)
         self.assertLessEqual(np.linalg.norm(S @ null), 1e-9)
@@ -514,13 +457,13 @@ class PolyRoundTests(unittest.TestCase):
         A = np.vstack((np.eye(3), -np.eye(3), S))
         b = np.array([1, 1, 1, 1, 1, 1, 0], dtype=float)
 
-        x, dist0 = ChebyshevFinder.chebyshev_center(Polytope(A, b), settings)
+        x, dist0 = chebyshev_center(Polytope(A, b), settings)
         dist0 = float(np.squeeze(dist0))
         self.assertTrue(np.all(np.abs(x - x[0]) < 1e-10))
         self.assertGreater(dist0, 0.0)
 
         b[3] = 0
-        x, dist1 = ChebyshevFinder.chebyshev_center(Polytope(A, b), settings)
+        x, dist1 = chebyshev_center(Polytope(A, b), settings)
         dist1 = float(np.squeeze(dist1))
         self.assertTrue(np.all(x[0] - x[1:] > 0))
         self.assertGreater(dist0, dist1)
@@ -530,7 +473,7 @@ class PolyRoundTests(unittest.TestCase):
         A_ext = np.array([[1, 0, 1], [0, 1, 1], [-1, 0, 1], [0, -1, 1]], dtype=float)
         obj = np.array([0, 0, -1], dtype=float)
 
-        val, _ = GurobiInterfacer.gurobi_solve(obj, A_ext, b, PolyRoundSettings())
+        val, _ = GurobiInterfacer.solve(obj, A_ext, b, PolyRoundSettings())
 
         np.testing.assert_allclose(val, np.array([0, 0, 1]), atol=1e-10)
 
@@ -540,7 +483,7 @@ class PolyRoundTests(unittest.TestCase):
         obj = np.array([0, 0, -1], dtype=float)
         settings = PolyRoundSettings(check_lps=True)
 
-        _, model = GurobiInterfacer.gurobi_solve(obj, A_ext, b, settings)
+        _, model = GurobiInterfacer.solve(obj, A_ext, b, settings)
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")
             GurobiInterfacer.get_opt(model, settings)

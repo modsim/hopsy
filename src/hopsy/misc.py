@@ -37,8 +37,8 @@ class _submodules:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
 
-        from ._polyround import polytope
         from ._polyround import PolyRoundApi
+        from ._polyround import polytope
 
     import multiprocessing
     import os
@@ -820,7 +820,6 @@ def compute_chebyshev_center_and_radius(
     :rtype: numpy.ndarray[float64[n,1]], float64
     """
     # tries to use fast computation, when gurobi is available
-    ### PolyRound backend guard patch
     result = (
         _compute_chebyshev_center_and_radius_with_gurobi(problem)
         if _s.PolyRoundApi.backend_name(_c.LP().settings) == "gurobi"
@@ -912,12 +911,11 @@ def simplify(problem: _c.Problem):
     with _s.warnings.catch_warnings():
         _s.warnings.simplefilter("ignore")
 
-        ### PolyRound simplify affine metadata patch
-        # existing_transform = problem.transformation
-        # existing_shift = problem.shift
-        # existing_starting_point = problem.starting_point
+        existing_transform = problem.transformation
+        existing_shift = problem.shift
+        existing_starting_point = problem.starting_point
         polytope = _s.polytope.Polytope(problem.A, problem.b)
-        # input_dimension = polytope.A.shape[1]
+        input_dimension = polytope.A.shape[1]
 
         polytope = _s.PolyRoundApi.simplify_polytope(
             polytope, settings=_c.LP().settings
@@ -940,8 +938,6 @@ def simplify(problem: _c.Problem):
         problem.A = polytope.A.values
         problem.b = polytope.b.values
 
-        ### Keep this commented for OG behaviour
-        """
         stage_transform = polytope.transformation.values
         stage_shift = polytope.shift.values
         stage_is_identity = stage_transform.shape == (
@@ -993,7 +989,6 @@ def simplify(problem: _c.Problem):
             problem.transformation = existing_transform
             problem.shift = existing_shift
             problem.starting_point = existing_starting_point
-        """
         return problem
 
 
@@ -1635,10 +1630,6 @@ def _compute_statistic(
             args[3]
             if len(args) > 4
             else kwargs["relative"] if "relative" in kwargs else False
-            ###
-            # else kwargs["relative"]
-            # if "relative" in kwargs
-            # else False
         )
         return [1 / (n_chains * i) if relative else 1] * dim
     else:
@@ -1683,10 +1674,6 @@ def _arviz(
                 args[3]
                 if len(args) > 4
                 else kwargs["relative"] if "relative" in kwargs else False
-                ###
-                # else kwargs["relative"]
-                # if "relative" in kwargs
-                # else False
             )
             _result = [1 / (n_chains * n_samples) if relative else 1] * dim
         else:

@@ -25,7 +25,7 @@ try:
     import cupy as cp
     from cupyx.scipy.linalg import solve_triangular
 except ImportError as error:
-    raise ImportError("hopsy's exp1 PolyRound backend requires CuPy.") from error
+    raise ImportError("hopsy's gurobi-cupy PolyRound backend requires CuPy.") from error
 
 
 def as_float(value):
@@ -110,17 +110,17 @@ def iterative_solve(polytope, settings):
     nDimensions = polytope.A.shape[1]
     verbose_print(
         settings,
-        "exp1",
+        "gurobi-cupy",
         "iterative_solve start "
         + f"A={polytope.A.shape}, b={polytope.b.shape}, "
         + f"nonzeros={np.count_nonzero(polytope.A.values)}",
     )
     with verbose_timer(
         settings,
-        "exp1",
+        "gurobi-cupy",
         f"geometric_mean_scaling A={polytope.A.shape}",
     ):
-        # exp1/geometric_mean_scaling uses CuPy internally, but returns NumPy
+        # gurobi_cupy/geometric_mean_scaling uses CuPy internally, but returns NumPy
         # scales so the host-side Polytope transformation code can stay shared
         # with the CPU backend.
         columnScale, _ = geometric_mean_scaling(polytope.A.values, 0, 0.99)
@@ -152,15 +152,15 @@ def iterative_solve(polytope, settings):
         iteration = iteration + 1
         verbose_print(
             settings,
-            "exp1",
+            "gurobi-cupy",
             f"outer iteration={iteration} begin "
             + f"reg={reg:.3e}, A={polytope.A.shape}, b_min={polytope.b.min():.3e}",
         )
-        with verbose_timer(settings, "exp1", f"chebyshev_center outer={iteration}"):
+        with verbose_timer(settings, "gurobi-cupy", f"chebyshev_center outer={iteration}"):
             [center, distance] = chebyshev_center(polytope, settings)
         verbose_print(
             settings,
-            "exp1",
+            "gurobi-cupy",
             f"outer iteration={iteration} chebyshev distance={scalar_float(distance):.6e}",
         )
         reg = np.maximum(reg / 10, 1e-10)
@@ -168,7 +168,7 @@ def iterative_solve(polytope, settings):
         # Calculate and apply transform
         with verbose_timer(
             settings,
-            "exp1",
+            "gurobi-cupy",
             f"run_mve outer={iteration} reg={reg:.3e}",
         ):
             (
@@ -186,7 +186,7 @@ def iterative_solve(polytope, settings):
             )
         verbose_print(
             settings,
-            "exp1",
+            "gurobi-cupy",
             f"outer iteration={iteration} run_mve finished "
             + f"msg={converged}, max_delta_b={np.max(np.abs(delta_b)):.3e}, "
             + f"max_delta_s={np.max(np.abs(delta_s)):.3e}",
@@ -200,7 +200,7 @@ def iterative_solve(polytope, settings):
         temp_eig = temp_eig_all[0]
         verbose_print(
             settings,
-            "exp1",
+            "gurobi-cupy",
             "iteration="
             + str(iteration)
             + ", reg="
@@ -222,7 +222,7 @@ def iterative_solve(polytope, settings):
     if iteration == maxIterations:
         verbose_print(
             settings,
-            "exp1",
+            "gurobi-cupy",
             "maximum number of iterations reached; rounding may not be ideal",
         )
         if not (
@@ -233,13 +233,13 @@ def iterative_solve(polytope, settings):
                 "Polytope distortions delta_b and delta_s non-zero after reaching max iterations."
             )
 
-    verbose_print(settings, "exp1", "maximum volume ellipsoid found")
+    verbose_print(settings, "gurobi-cupy", "maximum volume ellipsoid found")
     if np.min(polytope.b.values) <= 0:
         center, _ = chebyshev_center(polytope, settings)
         polytope.apply_shift(center)
         verbose_print(
             settings,
-            "exp1",
+            "gurobi-cupy",
             "shifting so that the origin is inside the polytope",
         )
 
@@ -251,14 +251,14 @@ def run_mve(A, b, x0, reg, verbose=False):
     m, n = A.shape
     verbose_print(
         verbose,
-        "exp1",
+        "gurobi-cupy",
         "run_mve start "
         + f"A={A.shape}, b={b.shape}, x0={x0.shape}, reg={reg:.3e}, "
         + f"Q/G={matrix_size((m, m))}, E2={matrix_size((n, n))}",
     )
     with verbose_timer(
         verbose_output,
-        "exp1",
+        "gurobi-cupy",
         f"solve_mve A={A.shape} maxiter={maxiter}",
     ):
         (
@@ -273,14 +273,14 @@ def run_mve(A, b, x0, reg, verbose=False):
         ) = solve_mve(A, b, x0, reg, maxiter=maxiter, tol=tol2, verbose=verbose)
     verbose_print(
         verbose,
-        "exp1",
+        "gurobi-cupy",
         f"solve_mve returned msg={msg}, inner_iterations={_iter}",
     )
-    with verbose_timer(verbose_output, "exp1", f"get_NSPD E2={E2.shape}"):
+    with verbose_timer(verbose_output, "gurobi-cupy", f"get_NSPD E2={E2.shape}"):
         E2 = get_NSPD(E2)
     with verbose_timer(
         verbose_output,
-        "exp1",
+        "gurobi-cupy",
         f"cholesky transform E2={E2.shape}",
     ):
         # Keep the SPD correction and Cholesky on the device.  The resulting
@@ -333,23 +333,23 @@ def check_convergence(
     else:
         objval = -np.inf
 
-    verbose_print(verbose, "exp1", "inner MVE iteration=" + str(iter))
+    verbose_print(verbose, "gurobi-cupy", "inner MVE iteration=" + str(iter))
     if (
         np.abs((last_r1 - r1) / np.minimum(np.abs(last_r1), np.abs(r1))) < 1e-2
         and np.abs((last_r2 - r2) / np.minimum(np.abs(last_r2), np.abs(r2))) < 1e-2
         and max_eig / min_eig > 100
         and reg > 1e-10
     ):
-        verbose_print(verbose, "exp1", "stopped making progress; restarting")
+        verbose_print(verbose, "gurobi-cupy", "stopped making progress; restarting")
         x = x + x0.squeeze()
         msg = 2
 
     if (res < tol * (1 + bnrm) and rmu <= minmu) or (
         iter > 100
         and prev_obj != -np.inf
-        and (prev_obj >= (1 - tol) * objval or prev_obj <= (1 - tol) * objval)
+        and (prev_obj >= (1 - tol) * objval and prev_obj <= (1 - tol) * objval)
     ):
-        verbose_print(verbose, "exp1", "inner MVE converged")
+        verbose_print(verbose, "gurobi-cupy", "inner MVE converged")
         x = x + x0.squeeze()
         msg = 1
 
@@ -362,7 +362,7 @@ def solve_mve(A, b, x0, reg, maxiter=50, tol=1e-4, verbose=False):
     verbose_output = getattr(verbose, "verbose", bool(verbose))
     verbose_print(
         verbose,
-        "exp1",
+        "gurobi-cupy",
         "solve_mve upload "
         + f"A={A.shape} ({matrix_size(A.shape)}), b={b.shape}, x0={x0.shape}",
     )
@@ -398,7 +398,7 @@ def solve_mve(A, b, x0, reg, maxiter=50, tol=1e-4, verbose=False):
         )
         verbose_print(
             verbose,
-            "exp1",
+            "gurobi-cupy",
             "solve_mve slack scaling "
             + f"min={min_slack:.3e}, max={max_slack:.3e}, "
             + f"max_delta_b={max_delta_b:.3e}, max_delta_s={max_delta_s:.3e}",
@@ -423,7 +423,7 @@ def solve_mve(A, b, x0, reg, maxiter=50, tol=1e-4, verbose=False):
         if verbose_output:
             verbose_print(
                 verbose,
-                "exp1",
+                "gurobi-cupy",
                 f"solve_mve iter={iter} begin reg={reg:.3e}",
             )
         if astep is not None and Adx is not None:
@@ -436,14 +436,14 @@ def solve_mve(A, b, x0, reg, maxiter=50, tol=1e-4, verbose=False):
         assert A.shape[1] == Aty.shape[0]
         with verbose_timer(
             verbose_output,
-            "exp1",
+            "gurobi-cupy",
             f"iter={iter} form prod/E2 {n}x{n}",
         ):
             prod = Aty @ A
             E2 = cp.linalg.inv(prod)
         with verbose_timer(
             verbose_output,
-            "exp1",
+            "gurobi-cupy",
             f"iter={iter} form Q {m}x{m} ({matrix_size((m, m))})",
         ):
             Q = A @ E2 @ cp.transpose(A)
@@ -481,7 +481,7 @@ def solve_mve(A, b, x0, reg, maxiter=50, tol=1e-4, verbose=False):
             gap_value, rmu_log_value = as_floats(gap, rmu)
             verbose_print(
                 verbose,
-                "exp1",
+                "gurobi-cupy",
                 f"solve_mve iter={iter} residuals "
                 + f"r1={r1:.3e}, r2={r2:.3e}, r3={r3:.3e}, "
                 + f"res={res:.3e}, gap={gap_value:.3e}, rmu={rmu_log_value:.3e}",
@@ -515,7 +515,7 @@ def solve_mve(A, b, x0, reg, maxiter=50, tol=1e-4, verbose=False):
         #
         with verbose_timer(
             verbose_output,
-            "exp1",
+            "gurobi-cupy",
             f"iter={iter} form G {m}x{m} ({matrix_size((m, m))})",
         ):
             YQ = cp.multiply(Q, cp.squeeze(y))
@@ -530,14 +530,14 @@ def solve_mve(A, b, x0, reg, maxiter=50, tol=1e-4, verbose=False):
             temp_rhs = cp.transpose(cp.multiply(cp.transpose(YA), h + z))
         with verbose_timer(
             verbose_output,
-            "exp1",
+            "gurobi-cupy",
             f"iter={iter} cholesky G {m}x{m}",
         ):
             # Explicit lower Cholesky factor, then cholesky_solve() above
             G_c = cp.linalg.cholesky(G)
         with verbose_timer(
             verbose_output,
-            "exp1",
+            "gurobi-cupy",
             f"iter={iter} triangular solve T {m}x{n}",
         ):
             T = cholesky_solve(G_c, temp_rhs)
@@ -547,7 +547,7 @@ def solve_mve(A, b, x0, reg, maxiter=50, tol=1e-4, verbose=False):
         R23 = R2 - R3Dy
         with verbose_timer(
             verbose_output,
-            "exp1",
+            "gurobi-cupy",
             f"iter={iter} solve ATP_A {n}x{n}",
         ):
             ATP_A = ATP @ A
@@ -558,7 +558,7 @@ def solve_mve(A, b, x0, reg, maxiter=50, tol=1e-4, verbose=False):
         Adx = A @ dx
         with verbose_timer(
             verbose_output,
-            "exp1",
+            "gurobi-cupy",
             f"iter={iter} triangular solve dyDy {m}",
         ):
             dyDy = cholesky_solve(G_c, y2h * (Adx - R23))
@@ -581,7 +581,7 @@ def solve_mve(A, b, x0, reg, maxiter=50, tol=1e-4, verbose=False):
         if verbose_output:
             verbose_print(
                 verbose,
-                "exp1",
+                "gurobi-cupy",
                 f"solve_mve iter={iter} step "
                 + f"astep={astep:.3e}, ax={ax:.3e}, ay={ay:.3e}, az={az:.3e}",
             )

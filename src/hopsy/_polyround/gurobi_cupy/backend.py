@@ -3,8 +3,8 @@ import numpy as np
 from hopsy._polyround.polytope import Polytope
 from hopsy._polyround.settings import PolyRoundSettings
 
-from . import lp_interfacing as lp
 from .constraint_removal_reduction import constraint_removal, null_space
+from .lp_interfacing import Interfacer
 from .lp_utils import (
     chebyshev_center,
     extract_polytope,
@@ -19,8 +19,8 @@ except Exception:
     Model = None
 
 
-class Exp2Backend:
-    name = "exp2"
+class GurobiCuPyBackend:
+    name = "gurobi-cupy"
 
     def simplify_polytope(
         self,
@@ -67,17 +67,32 @@ class Exp2Backend:
                 "Polytope already transformed (only contains inequality constraints)"
             )
         polytope = polytope.copy()
-        x, _ = chebyshev_center(polytope, settings)
+        x, dist = chebyshev_center(polytope, settings)
         if polytope.border_distance(x) <= 0:
             raise ValueError("Chebyshev center outside polytope before transforming")
+        if settings.verbose:
+            print("chebyshev distance is : " + str(dist))
+            pre_b_dist = polytope.border_distance(x)
+            print("border distance pre-transformation is: " + str(pre_b_dist))
         # put x at zero!
         polytope.apply_shift(x)
+        if settings.verbose:
+            x_0 = np.zeros(x.shape)
+            b_dist_at_zero = polytope.border_distance(x_0)
+            print("border distance zero-transformation is: " + str(b_dist_at_zero))
         stoichiometry = polytope.S.values
-        transformation = null_space(
-            stoichiometry,
-            eps=settings.numerics_threshold,
-        )
+        transformation = null_space(stoichiometry, eps=settings.numerics_threshold)
         polytope.apply_transformation(transformation)
+        if settings.verbose:
+            u = np.zeros((transformation.shape[1], 1))
+            norm_check = np.linalg.norm(np.matmul(stoichiometry, transformation))
+            print("norm of the null space is: " + str(norm_check))
+            b_dist = polytope.border_distance(u)
+            print("border distance after transformation is: " + str(b_dist))
+            # test if we can reproduce the original x
+            trans_x = polytope.back_transform(u)
+            x_rec_diff = np.max(trans_x - np.squeeze(x))
+            print("the deviation of the back transform is: " + str(x_rec_diff))
         return polytope
 
     def round_polytope(
@@ -101,6 +116,9 @@ class Exp2Backend:
         # create a blank polytope so that we can make isolated checks on the rounding transform
         blank_polytope = Polytope(polytope.A, polytope.b)
         iterative_solve(blank_polytope, settings)
+        # iterative_solve(
+        #     o_polytope, backend, hp_flags=hp_flags, verbose=verbose, sgp=sgp
+        # )
         # check if the transformation is full dimensional
         _, s, _ = np.linalg.svd(blank_polytope.transformation)
         if not np.min(s) > settings.thresh / settings.accepted_tol_violation:
@@ -194,4 +212,4 @@ class Exp2Backend:
         polytope: Polytope,
         settings: PolyRoundSettings,
     ):
-        return lp.polytope_to_model(polytope, settings)
+        return Interfacer.polytope_to_model(polytope, settings)

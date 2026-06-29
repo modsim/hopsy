@@ -16,6 +16,8 @@ try:
 except Exception:
     cobra = None
 
+_COBRA_SBML_SOLVER = "glpk"
+
 
 def chebyshev_center(polytope, settings):
     # get norm col
@@ -152,6 +154,8 @@ def read_sbml_model(file):
         raise NotImplementedError(
             "missing optional cobrapy dependency required for parsing sbml. Use pip install 'PolyRound[extras]'"
         )
+    # COBRA defaults to Gurobi when gurobipy is installed, even for parsing.
+    cobra.Configuration().solver = _COBRA_SBML_SOLVER
     model = cobra.io.read_sbml_model(file)
     return model
 

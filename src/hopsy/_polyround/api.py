@@ -14,7 +14,7 @@ import numpy as np
 from .polytope import Polytope
 from .settings import PolyRoundSettings, fix_backend_name
 
-_SUPPORTED_BACKENDS = frozenset({"gurobi", "glpk", "highs", "exp1", "exp2"})
+_SUPPORTED_BACKENDS = frozenset({"gurobi", "gurobi-cupy", "highs"})
 
 
 def backend_name(settings: Any | None = None) -> str:
@@ -133,8 +133,14 @@ class PolyRoundApi:
             polytope,
             settings,
         )
+        center = np.asarray(center).reshape((-1, 1))
         radius = float(np.asarray(radius).reshape(-1)[0])
-        return np.asarray(center).reshape((-1, 1)), np.array([radius])
+        if not np.isfinite(center).all() or not np.isfinite(radius):
+            raise ValueError(
+                "Chebyshev center computation returned non-finite values. "
+                "Check polytope feasibility or LP solver settings."
+            )
+        return center, np.array([radius])
 
     @staticmethod
     def iterative_solve(polytope: Polytope, settings: Any | None = None):
@@ -192,8 +198,8 @@ def _backend_for(settings):
         return _gurobi_backend()
     if name == "highs":
         return _highs_backend()
-    if name == "exp1":
-        return _exp1_backend()
+    if name == "gurobi-cupy":
+        return _gurobi_cupy_backend()
     if name == "exp2":
         return _exp2_backend()
     if name == "glpk":
@@ -210,13 +216,15 @@ def _gurobi_backend():
         raise RuntimeError("Could not initialize PolyRound backend 'gurobi'") from error
 
 
-def _exp1_backend():
+def _gurobi_cupy_backend():
     try:
-        from .exp1.backend import Exp1Backend
+        from .gurobi_cupy.backend import GurobiCuPyBackend
 
-        return Exp1Backend()
+        return GurobiCuPyBackend()
     except Exception as error:
-        raise RuntimeError("Could not initialize PolyRound backend 'exp1'") from error
+        raise RuntimeError(
+            "Could not initialize PolyRound backend 'gurobi-cupy'"
+        ) from error
 
 
 def _exp2_backend():

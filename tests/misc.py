@@ -214,6 +214,42 @@ class MiscTests(unittest.TestCase):
 
         self.assertTrue((problem.b - problem.A @ problem.starting_point >= 0).all())
 
+    def test_simplify_dimension_reduction_updates_affine_metadata(self):
+        LP().reset()
+        try:
+            A = np.vstack([np.eye(3), -np.eye(3)])
+            b = np.array([1.0, 1.0, 1e-8, 1.0, 1.0, 1e-8])
+            original_starting_point = np.array([0.0, 0.0, 0.0])
+            problem = Problem(A, b, starting_point=original_starting_point)
+
+            simplified = simplify(problem)
+
+            self.assertEqual(simplified.A.shape[1], 2)
+            self.assertEqual(simplified.starting_point.shape[0], 2)
+            self.assertEqual(simplified.transformation.shape, (3, 2))
+            self.assertEqual(simplified.shift.shape, (3,))
+            self.assertTrue(
+                np.all(simplified.b - simplified.A @ simplified.starting_point >= -1e-8)
+            )
+            np.testing.assert_allclose(
+                back_transform(simplified, [simplified.starting_point])[0],
+                original_starting_point,
+                atol=1e-7,
+            )
+
+            rounded = round(simplified, simplify=False)
+            self.assertEqual(rounded.A.shape[1], rounded.starting_point.shape[0])
+            self.assertTrue(
+                np.all(rounded.b - rounded.A @ rounded.starting_point >= -1e-8)
+            )
+            np.testing.assert_allclose(
+                back_transform(rounded, [rounded.starting_point])[0],
+                original_starting_point,
+                atol=1e-7,
+            )
+        finally:
+            LP().reset()
+
     def test_ess(self):
         states = [[[0, 1, 2, 3, 4]] * 100] * 4
         neff = ess(states)

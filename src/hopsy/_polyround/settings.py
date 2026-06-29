@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-DEFAULT_BACKEND = "gurobi"
+DEFAULT_BACKEND = "highs"
 DEFAULT_HP_FLAGS = {
     "FeasibilityTol": 1e-9,
     "OptimalityTol": 1e-8,

@@ -60,7 +60,7 @@ def chebyshev_center(polytope, settings):
     finite, radius = solution_summary(x)
     verbose_print(
         settings,
-        "exp1",
+        "gurobi-cupy",
         "chebyshev LP "
         + f"status={m.status}, solcount={m.problem.SolCount}, "
         + f"finite={finite}, radius={radius}",
@@ -72,7 +72,7 @@ def chebyshev_center(polytope, settings):
         finite, radius = solution_summary(x)
         verbose_print(
             settings,
-            "exp1",
+            "gurobi-cupy",
             "chebyshev regularization "
             + f"status={m.status}, solcount={m.problem.SolCount}, "
             + f"finite={finite}, radius={radius}",
