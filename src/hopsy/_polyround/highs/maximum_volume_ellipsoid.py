@@ -161,7 +161,6 @@ def check_convergence(
     if np.min(E2_eig) > 0:
         sum_det = np.sum(np.log(E2_eig))
         objval = sum_det / 2
-        # objval = np.log(np.linalg.det(E2)) / 2
     else:
         objval = -np.inf
 
@@ -209,11 +208,6 @@ def solve_mve(A, b, x0, reg, maxiter=50, tol=1e-4, verbose=False):
     limited = np.minimum(bmAx0, min_el * default_max_ratio_bmAx0)
     delta_s = bmAx0 - limited
     bmAx0 = limited
-    # if np.any(bmAx0 <= 0):
-    #     if verbose:
-    #         print("x0 not interior, use absolute value")
-    #     bmAx0 = np.abs(bmAx0)
-    #     # raise ValueError
 
     A = np.divide(A, bmAx0)
     b = np.ones((m,))
@@ -260,7 +254,6 @@ def solve_mve(A, b, x0, reg, maxiter=50, tol=1e-4, verbose=False):
         res = np.max([r1, r2, r3])
 
         if iter % 10 == 0:
-            # print(r2, r1, r3, objval);
             objval, msg, x = check_convergence(
                 E2,
                 r1,

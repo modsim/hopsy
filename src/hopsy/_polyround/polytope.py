@@ -60,7 +60,6 @@ class Polytope:
             self.transformation.values, shift.reshape((shift.size,))
         )
         self.b -= np.squeeze(np.matmul(self.A.values, shift))
-        # self.center -= shift
         if not self.inequality_only:
             self.h -= np.squeeze(np.matmul(self.S.values, shift))
 

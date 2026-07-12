@@ -1,4 +1,3 @@
-# ©2020-​2021 ETH Zurich, Axel Theorell
 import numpy as np
 import pandas as pd
 import scipy.sparse as sp

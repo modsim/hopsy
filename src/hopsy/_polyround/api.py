@@ -200,10 +200,6 @@ def _backend_for(settings):
         return _highs_backend()
     if name == "gurobi-cupy":
         return _gurobi_cupy_backend()
-    if name == "exp2":
-        return _exp2_backend()
-    if name == "glpk":
-        return _glpk_backend()
     _raise_unknown_backend(name)
 
 
@@ -225,24 +221,6 @@ def _gurobi_cupy_backend():
         raise RuntimeError(
             "Could not initialize PolyRound backend 'gurobi-cupy'"
         ) from error
-
-
-def _exp2_backend():
-    try:
-        from .exp2.backend import Exp2Backend
-
-        return Exp2Backend()
-    except Exception as error:
-        raise RuntimeError("Could not initialize PolyRound backend 'exp2'") from error
-
-
-def _glpk_backend():
-    try:
-        from .glpk.backend import GlpkBackend
-
-        return GlpkBackend()
-    except Exception as error:
-        raise RuntimeError("Could not initialize PolyRound backend 'glpk'") from error
 
 
 def _highs_backend():

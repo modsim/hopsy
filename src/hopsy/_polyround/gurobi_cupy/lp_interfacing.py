@@ -1,4 +1,3 @@
-# ©2020-​2021 ETH Zurich, Axel Theorell
 import numpy as np
 import pandas as pd
 from scipy import sparse as sp
@@ -416,7 +415,6 @@ class Interfacer:
                 Interfacer.check_tolerances(m)
             return m.objective.value
         if m.status in {"infeasible", "check_original_solver_status", "undefined"}:
-            # print("model in infeasible state, resetting lp")
             m.problem.reset()
             m.optimize()
             if m.status == "optimal":

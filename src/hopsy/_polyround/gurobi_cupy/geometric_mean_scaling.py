@@ -31,8 +31,8 @@ def geometric_mean_scaling(A, iprint, scltol):
 
     for npass in range(maxpass + 1):
 
-        # Find the largest column ratio.
-        # Also set new column scales (except on pass 0).
+        # Finds the largest column ratio.
+        # Also sets new column scales (except on pass 0).
 
         rscale[rscale == 0] = 1
         # Rinv    = diag(sparse(1./rscale));
@@ -56,7 +56,7 @@ def geometric_mean_scaling(A, iprint, scltol):
             break
         aratio = sratio_value
 
-        # Set new row scales for the next pass.
+        # Sets new row scales for the next pass.
 
         cscale[cscale == 0] = 1
         # Cinv    = diag(sparse(1./cscale));
@@ -68,9 +68,9 @@ def geometric_mean_scaling(A, iprint, scltol):
         rmin = 1.0 / (rmin + eps)
         rscale = cp.sqrt(cp.maximum(rmin, damp * rmax) * rmax)
 
-    # Reset column scales so the biggest element
+    # Resets column scales so the biggest element
     # in each scaled column will be 1.
-    # Again, allow for empty rows and columns.
+    # Again, allows for empty rows and columns.
 
     rscale[rscale == 0] = 1
     # Rinv = diag(sparse(1. / rscale));

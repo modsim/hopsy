@@ -1,5 +1,3 @@
-# ©2020-​2021 ETH Zurich, Axel Theorell
-
 import os
 import uuid
 from pathlib import Path
@@ -234,7 +232,6 @@ def make_precision_truncated_integer_polytope(polytope, max_decimals):
     row_norm_potency = np.power(
         10.0, np.floor(np.log10(np.abs(row_norm))).astype(np.int64) * -1
     )
-    # polytope.S = ((polytope.S*precision).astype(int).astype(float))/precision
     for attribute in dir(truncated_p):
         tentative_df = getattr(truncated_p, attribute)
         # do not truncate transformation or shift

@@ -1,5 +1,3 @@
-# ©2020-​2021 ETH Zurich, Axel Theorell
-
 import os
 import sys
 
@@ -16,9 +14,6 @@ from hopsy._polyround.settings import DEFAULT_BACKEND, PolyRoundSettings
 def main(args):
     inputs = args.files
     path = args.path
-    # thresh = args.thresh
-    # verbose = args.verbose
-    # reduce = not args.do_not_reduce
     # set hp flags
     hp_flags = default_hp_flags
     if args.hp:
@@ -39,9 +34,6 @@ def main(args):
     )
     for input in inputs:
         input_name = input.split("/")[-1].split(".")[0]
-        # file_path = os.path.dirname(__file__)
-        # logging.basicConfig(filename=os.path.join(file_path, 'logs', input_name + '.log'))
-        # logging.info("starting a new run")
         if input.endswith(".xml"):
             polytope = parse_sbml_cobrapy(input, prescale=False)
         else:

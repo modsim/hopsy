@@ -156,7 +156,9 @@ def iterative_solve(polytope, settings):
             f"outer iteration={iteration} begin "
             + f"reg={reg:.3e}, A={polytope.A.shape}, b_min={polytope.b.min():.3e}",
         )
-        with verbose_timer(settings, "gurobi-cupy", f"chebyshev_center outer={iteration}"):
+        with verbose_timer(
+            settings, "gurobi-cupy", f"chebyshev_center outer={iteration}"
+        ):
             [center, distance] = chebyshev_center(polytope, settings)
         verbose_print(
             settings,
@@ -329,7 +331,6 @@ def check_convergence(
     )
     if min_eig > 0:
         objval = sum_det / 2
-        # objval = np.log(np.linalg.det(E2)) / 2
     else:
         objval = -np.inf
 
@@ -403,11 +404,6 @@ def solve_mve(A, b, x0, reg, maxiter=50, tol=1e-4, verbose=False):
             + f"min={min_slack:.3e}, max={max_slack:.3e}, "
             + f"max_delta_b={max_delta_b:.3e}, max_delta_s={max_delta_s:.3e}",
         )
-    # if np.any(bmAx0 <= 0):
-    #     if verbose:
-    #         print("x0 not interior, use absolute value")
-    #     bmAx0 = np.abs(bmAx0)
-    #     # raise ValueError
 
     A = cp.divide(A, bmAx0)
     b = cp.ones((m,), dtype=A.dtype)
@@ -488,7 +484,6 @@ def solve_mve(A, b, x0, reg, maxiter=50, tol=1e-4, verbose=False):
             )
 
         if iter % 10 == 0:
-            # print(r2, r1, r3, objval);
             objval, msg, x = check_convergence(
                 E2,
                 r1,

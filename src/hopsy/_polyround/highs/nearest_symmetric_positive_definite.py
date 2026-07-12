@@ -15,15 +15,11 @@ def get_NSPD(A):
 
 def correct_numerics(A_hat):
     mineig = 0
-    # p = 1
     k = 0
-    # while p != 0:
     while mineig <= 0:
-        # R, p = np.linalg.cholesky(A_hat)
         eigenvals = np.linalg.eig(A_hat)[0]
         mineig = np.min(eigenvals)
         k += 1
-        # if p != 0:
         if mineig <= 0:
             A_hat = A_hat + (
                 -mineig * k**2

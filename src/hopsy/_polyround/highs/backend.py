@@ -116,9 +116,6 @@ class HiGHSBackend:
         # create a blank polytope so that we can make isolated checks on the rounding transform
         blank_polytope = Polytope(polytope.A, polytope.b)
         iterative_solve(blank_polytope, settings)
-        # iterative_solve(
-        #     o_polytope, backend, hp_flags=hp_flags, verbose=verbose, sgp=sgp
-        # )
         # check if the transformation is full dimensional
         _, s, _ = np.linalg.svd(blank_polytope.transformation)
         if not np.min(s) > settings.thresh / settings.accepted_tol_violation:
@@ -129,7 +126,6 @@ class HiGHSBackend:
         polytope.apply_shift(blank_polytope.shift.values)
         polytope.apply_transformation(blank_polytope.transformation.values)
 
-        # assert polytope == o_polytope
         return polytope
 
     def simplify_transform_and_round(

@@ -1,4 +1,3 @@
-# ©2020-​2021 ETH Zurich, Axel Theorell
 import warnings
 from dataclasses import dataclass
 
@@ -982,7 +981,6 @@ class Interfacer:
                 Interfacer.check_tolerances(m)
             return m.objective.value
         if m.status in {"infeasible", "undefined", "unknown"}:
-            # print("model in infeasible state, resetting lp")
             m.problem.clearSolver()
             m.optimize()
             if m.status == "optimal":
