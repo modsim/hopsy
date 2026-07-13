@@ -14,6 +14,13 @@ from hopsy._polyround.gurobi.maximum_volume_ellipsoid import run_mve
 from hopsy._polyround.gurobi.nearest_symmetric_positive_definite import get_NSPD
 from hopsy._polyround.polytope import Polytope
 
+try:
+    GurobiInterfacer.require_package()
+except ImportError:
+    HAS_GUROBI = False
+else:
+    HAS_GUROBI = True
+
 # Helpers: polytope builders
 
 
@@ -451,6 +458,7 @@ class PolyRoundTests(unittest.TestCase):
 
         self.assertEqual(result.transformation.shape, (3, 1))
 
+    @unittest.skipUnless(HAS_GUROBI, "requires the optional gurobipy dependency")
     def test_chebyshev_center(self):
         settings = PolyRoundSettings()
         S = np.ones((1, 3))
@@ -468,6 +476,7 @@ class PolyRoundTests(unittest.TestCase):
         self.assertTrue(np.all(x[0] - x[1:] > 0))
         self.assertGreater(dist0, dist1)
 
+    @unittest.skipUnless(HAS_GUROBI, "requires the optional gurobipy dependency")
     def test_minimal_lp(self):
         b = np.array([1, 1, 1, 1], dtype=float)
         A_ext = np.array([[1, 0, 1], [0, 1, 1], [-1, 0, 1], [0, -1, 1]], dtype=float)
@@ -477,6 +486,7 @@ class PolyRoundTests(unittest.TestCase):
 
         np.testing.assert_allclose(val, np.array([0, 0, 1]), atol=1e-10)
 
+    @unittest.skipUnless(HAS_GUROBI, "requires the optional gurobipy dependency")
     def test_check_lps_validates_native_lp_without_warning(self):
         b = np.array([1, 1, 1, 1], dtype=float)
         A_ext = np.array([[1, 0, 1], [0, 1, 1], [-1, 0, 1], [0, -1, 1]], dtype=float)
