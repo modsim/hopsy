@@ -16,7 +16,7 @@ def constraint_removal(polytope, settings):
     """
     Removes redundant constraints and removes narrow directions by turning them into equality constraints
     :param polytope: Polytope object to round
-    :param hp_flags: Dictionary of gurobi flags for high precision solution
+    :param hp_flags: Dictionary of HiGHS options for high precision solution
     :param thresh: Float determining how narrow a direction has to be to declare an equality constraint
     :param verbose: Bool regulating output level
     :return: Polytope object with non-empty interior and no redundant constraints, number of removed constraints,
@@ -29,7 +29,8 @@ def constraint_removal(polytope, settings):
 
     model = Interfacer.make_model(polytope.A.columns, settings)
     model.configuration.presolve = settings.presolve
-    model.set_time_limit(default_solver_timeout)
+    problem = model.problem
+    problem.setOptionValue("time_limit", default_solver_timeout)
 
     inequality_expressions = Interfacer.build_row_expressions(
         polytope.A.values, model.variables
@@ -40,7 +41,7 @@ def constraint_removal(polytope, settings):
         polytope.b.values,
         names=polytope.b.index,
         equality=False,
-    ).tolist()
+    )
 
     if polytope.S is not None:
         Interfacer.add_constraint_system(
@@ -91,34 +92,46 @@ def constraint_removal_loop(
         if index % 50 == 0:
             verbose_print(settings, "highs", f"investigating constraint={index}")
 
-        Interfacer.set_objective(model, inequality_expressions[index], maximize=True)
+        model.problem.setObjective(
+            inequality_expressions[index], highspy.ObjSense.kMaximize
+        )
         model.optimize()
         max_val = Interfacer.get_opt(model, settings)
 
         if settings.reduce:
             original_rhs = rhs[index]
-            constr.RHS = float(original_rhs + 1.0)
+            model.problem.changeRowBounds(
+                int(constr),
+                -highspy.kHighsInf,
+                float(original_rhs + 1.0),
+            )
             model.optimize()
             perturbed_val = Interfacer.get_opt(model, settings)
-            constr.RHS = float(original_rhs)
+            model.problem.changeRowBounds(
+                int(constr),
+                -highspy.kHighsInf,
+                float(original_rhs),
+            )
             if np.abs(max_val - perturbed_val) < settings.thresh:
                 removed += 1
                 active_mask[index] = False
-                model.remove_constraint(constr)
+                model.problem.removeConstr(constr, inequality_constraints)
                 continue
         elif rhs[index] - max_val >= settings.thresh:
             continue
 
         if not settings.simplify_only:
-            Interfacer.set_objective(
-                model,
-                inequality_expressions[index],
-                maximize=False,
+            model.problem.setObjective(
+                inequality_expressions[index], highspy.ObjSense.kMinimize
             )
             model.optimize()
             min_val = Interfacer.get_opt(model, settings)
             if np.abs(max_val - min_val) < settings.thresh:
-                constr.Sense = "="
+                model.problem.changeRowBounds(
+                    int(constr),
+                    float(rhs[index]),
+                    float(rhs[index]),
+                )
                 equality_mask[index] = True
                 refunctioned += 1
 

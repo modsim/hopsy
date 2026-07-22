@@ -37,8 +37,7 @@ class _submodules:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
 
-        from ._polyround import PolyRoundApi
-        from ._polyround import polytope
+        from ._polyround import PolyRoundApi, polytope
 
     import multiprocessing
     import os
@@ -49,7 +48,6 @@ class _submodules:
     else:
         import tqdm
     import typing
-    import warnings
     import weakref
 
     import numpy.typing
@@ -779,7 +777,7 @@ def _compute_chebyshev_center_and_radius_with_gurobi(problem: "_c.Problem"):
     # 4) Solve max r s.t. A x + ||A_i|| r <= b, r >= 0
     try:
         model = gp.Model("ChebyshevCenter")
-        model.Params.OutputFlag = 0  # quiet
+        model.Params.OutputFlag = int(_c.LP().settings.sgp)
 
         xr = model.addMVar(n + 1, lb=-GRB.INFINITY, ub=GRB.INFINITY, name="xr")
         xr[n].lb = 0.0  # r >= 0
@@ -819,12 +817,13 @@ def compute_chebyshev_center_and_radius(
     :return: The Chebyshev center of the passed problem.
     :rtype: numpy.ndarray[float64[n,1]], float64
     """
-    # tries to use fast computation, when gurobi is available
-    result = (
-        _compute_chebyshev_center_and_radius_with_gurobi(problem)
-        if _s.PolyRoundApi.backend_name(_c.LP().settings) == "gurobi"
-        else None
-    )
+    # # tries to use fast computation, when gurobi is available
+    # result = (
+    #     _compute_chebyshev_center_and_radius_with_gurobi(problem)
+    #     if _s.PolyRoundApi.backend_name(_c.LP().settings) == "gurobi"
+    #     else None
+    # )
+    result = None
     if result is None:
         polytope = _s.polytope.Polytope(problem.A, problem.b)
         cheby_result = _s.PolyRoundApi.chebyshev_center(polytope, _c.LP().settings)

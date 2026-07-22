@@ -1,14 +1,17 @@
 import os
 import sys
 
+import numpy as np
+
 sys.path.insert(0, os.getcwd())
 import argparse
 import time
 
 from hopsy._polyround.default_settings import default_hp_flags
-from hopsy._polyround.highs.backend import HiGHSBackend
-from hopsy._polyround.highs.lp_utils import parse_sbml_cobrapy, polytope_to_csv
 from hopsy._polyround.settings import DEFAULT_BACKEND, PolyRoundSettings
+
+from .backend import HiGHSBackend
+from .lp_utils import parse_sbml_cobrapy, polytope_to_csv
 
 
 def main(args):
@@ -18,10 +21,9 @@ def main(args):
     hp_flags = default_hp_flags
     if args.hp:
         hp_flags = {
-            "NumericFocus": 3,
-            "FeasibilityTol": 1e-09,
-            "OptimalityTol": 1e-09,
-            "MarkowitzTol": 0.999,
+            "primal_feasibility_tolerance": 1e-09,
+            "dual_feasibility_tolerance": 1e-09,
+            "optimality_tolerance": 1e-09,
         }
     settings = PolyRoundSettings(
         backend=args.backend,
@@ -56,7 +58,6 @@ def pars_args():
     parser.add_argument(
         "-hp", action="store_true", help="run the program with high precision option"
     )
-
     parser.add_argument("-sgp", action="store_true", help="show HiGHS progress")
     parser.add_argument(
         "-v",
