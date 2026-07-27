@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import scipy.sparse as sp
 
-from hopsy._polyround.default_settings import default_solver_timeout
+from hopsy._rounding.default_settings import default_solver_timeout
 
 from .lp_interfacing import Interfacer, gp
 
@@ -24,7 +24,7 @@ def constraint_removal(polytope, settings):
     """
     if gp is None:
         raise ImportError(
-            "hopsy's gurobi-cupy PolyRound backend requires gurobipy for constraint reduction."
+            "hopsy's Gurobi rounding backend requires gurobipy for constraint reduction."
         )
 
     model = Interfacer.make_model(polytope.A.columns, settings)
@@ -67,8 +67,8 @@ def constraint_removal(polytope, settings):
 
     model.update()
     reduced_polytope = Interfacer.model_to_polytope(model)
-    verbose_print(settings, "gurobi-cupy", f"removed constraints={removed}")
-    verbose_print(settings, "gurobi-cupy", f"refunctioned constraints={refunctioned}")
+    verbose_print(settings, "gurobi", f"removed constraints={removed}")
+    verbose_print(settings, "gurobi", f"refunctioned constraints={refunctioned}")
     return reduced_polytope, removed, refunctioned
 
 
@@ -90,7 +90,7 @@ def constraint_removal_loop(
             continue
 
         if index % 50 == 0:
-            verbose_print(settings, "gurobi-cupy", f"investigating constraint={index}")
+            verbose_print(settings, "gurobi", f"investigating constraint={index}")
 
         model.problem.setObjective(inequality_expressions[index], gp.GRB.MAXIMIZE)
         model.optimize()

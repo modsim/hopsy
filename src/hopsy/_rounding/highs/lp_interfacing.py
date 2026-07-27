@@ -7,8 +7,8 @@ try:
 except Exception:
     highspy = None
 
-from hopsy._polyround.default_settings import default_accepted_tol_violation
-from hopsy._polyround.polytope import Polytope
+from hopsy._rounding.default_settings import default_accepted_tol_violation
+from hopsy._rounding.polytope import Polytope
 
 
 def verbose_print(settings, backend, message):
@@ -204,8 +204,8 @@ class Model:
     def optimize(self):
         self.update()
         # NOTE: Repeated primal-simplex re-solves can hit basis cycling during
-        # cleanup and return unknown status (see https://github.com/ERGO-Code/HiGHS/issues/1785). 
-        
+        # cleanup and return unknown status (see https://github.com/ERGO-Code/HiGHS/issues/1785).
+
         # Store the configured LP method across temporary recovery fallbacks
         requested_method = self.configuration.lp_method
 

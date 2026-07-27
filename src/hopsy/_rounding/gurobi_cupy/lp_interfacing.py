@@ -7,8 +7,8 @@ try:
 except Exception:
     gp = None
 
-from hopsy._polyround.default_settings import default_accepted_tol_violation
-from hopsy._polyround.polytope import Polytope
+from hopsy._rounding.default_settings import default_accepted_tol_violation
+from hopsy._rounding.polytope import Polytope
 
 
 def verbose_print(settings, backend, message):
@@ -244,7 +244,7 @@ class Interfacer:
     def configure_model(m, settings):
         problem = m.problem if hasattr(m, "problem") else m
         problem.setParam("OutputFlag", 1 if settings.sgp else 0)
-        verbose_print(settings, "gurobi", "hp flags=" + str(settings.hp_flags))
+        verbose_print(settings, "gurobi-cupy", "hp flags=" + str(settings.hp_flags))
         for key, val in settings.hp_flags.items():
             problem.setParam(key, val)
         problem.setParam("Threads", 1)

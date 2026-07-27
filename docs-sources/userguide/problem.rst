@@ -49,10 +49,8 @@ Thus, it is possible to set unrounding transformations and shifts for the proble
 such the produced states lie in the correct space.
 This assumes, that the transformation was already applied to the :math:`A` and :math:`b` matrix,
 which are passed to the model.
-In order to compute rounding transformations, we recommend to use the PolyRound\ [#f1]_ toolbox.
+Use :func:`hopsy.round` to compute and apply a rounding transformation.
 For more details about rounding, please refer to xyz.
-
-.. [#f1] https://pypi.org/project/PolyRound/
 
 Reference
 ^^^^^^^^^
@@ -82,5 +80,4 @@ Problem
    hopsy.add_box_constraints
    hopsy.compute_chebyshev_center
    hopsy.round
-
 

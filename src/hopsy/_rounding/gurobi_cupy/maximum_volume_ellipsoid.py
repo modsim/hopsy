@@ -3,7 +3,7 @@ from time import perf_counter
 
 import numpy as np
 
-from hopsy._polyround.default_settings import (
+from hopsy._rounding.default_settings import (
     default_0_width,
     default_max_ratio_bmAx0,
     default_numerics_threshold,
@@ -25,7 +25,7 @@ try:
     import cupy as cp
     from cupyx.scipy.linalg import solve_triangular
 except ImportError as error:
-    raise ImportError("hopsy's gurobi-cupy PolyRound backend requires CuPy.") from error
+    raise ImportError("hopsy's gurobi-cupy rounding backend requires CuPy.") from error
 
 
 def as_float(value):

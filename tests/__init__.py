@@ -3,9 +3,9 @@ from .lp import LPTests
 from .markovchain import MarkovChainTests
 from .misc import MiscTests
 from .model import ModelTests
-from .polyround import PolyRoundTests
 from .problem import ProblemTests
 from .proposal import ProposalTests
 from .random import RandomTests
+from .rounding import RoundingTests
 from .tuning import TuningTests
 from .volume import VolumeTest

@@ -17,9 +17,9 @@ def fix_backend_name(backend: Any | None) -> str:
 
 
 @dataclass
-class PolyRoundSettings:
+class RoundingSettings:
     """
-    Public PolyRound settings object used by hopsy.LP().
+    Public rounding settings object used by hopsy.LP().
     """
 
     backend: str = DEFAULT_BACKEND

@@ -1,18 +1,18 @@
-"""Public facade for hopsy's vendored PolyRound integration."""
+"""Public facade for hopsy's rounding subpackage."""
 
 from . import polytope
 from .api import (
-    PolyRoundApi,
+    RoundingApi,
     active_backend,
     backend_name,
 )
 from .polytope import Polytope
-from .settings import DEFAULT_BACKEND, PolyRoundSettings
+from .settings import DEFAULT_BACKEND, RoundingSettings
 
 __all__ = [
     "DEFAULT_BACKEND",
-    "PolyRoundApi",
-    "PolyRoundSettings",
+    "RoundingApi",
+    "RoundingSettings",
     "Polytope",
     "active_backend",
     "backend_name",

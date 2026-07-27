@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.linalg import cho_factor, cho_solve
 
-from hopsy._polyround.default_settings import (
+from hopsy._rounding.default_settings import (
     default_0_width,
     default_max_ratio_bmAx0,
     default_numerics_threshold,

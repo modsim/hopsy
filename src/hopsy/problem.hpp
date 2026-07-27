@@ -140,14 +140,14 @@ namespace hopsy {
             import sys
 
             try:
-                from hopsy._polyround import PolyRoundApi as prapi
-                from hopsy._polyround import Polytope
+                from hopsy._rounding import RoundingApi as rounding_api
+                from hopsy._rounding import Polytope
 
                 polytope = Polytope(A, b)
-                polytope = prapi.simplify_polytope(polytope, LP().settings)
+                polytope = rounding_api.simplify_polytope(polytope, LP().settings)
 
                 if polytope.S is not None:
-                    polytope = prapi.transform_polytope(polytope, LP().settings)
+                    polytope = rounding_api.transform_polytope(polytope, LP().settings)
                 else:
                     number_of_reactions = polytope.A.shape[1]
                     polytope.transformation = DataFrame(identity(number_of_reactions))
@@ -155,7 +155,7 @@ namespace hopsy {
                     polytope.transformation.columns = [str(i) for i in range(polytope.transformation.to_numpy().shape[1])]
                     polytope.shift = Series(zeros(number_of_reactions))
 
-                prapi.iterative_solve(polytope, LP().settings)
+                rounding_api.iterative_solve(polytope, LP().settings)
                 sqrt_mve = polytope.transformation.values
             except:
                 sqrt_mve = identity(A.shape[1])

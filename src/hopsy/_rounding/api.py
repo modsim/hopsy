@@ -1,8 +1,8 @@
-"""Facade for hopsy's vendored PolyRound backends.
+"""Facade for hopsy's rounding backends.
 
-The public API mirrors the external PolyRound package: PolyRound calls accept
-and return :class:`hopsy._polyround.polytope.Polytope` objects. Backend choice is
-handled here through ``PolyRoundSettings.backend``.
+Rounding calls accept and return
+:class:`hopsy._rounding.polytope.Polytope` objects. Backend choice is handled
+here through ``RoundingSettings.backend``.
 """
 
 from __future__ import annotations
@@ -12,13 +12,13 @@ from typing import Any
 import numpy as np
 
 from .polytope import Polytope
-from .settings import PolyRoundSettings, fix_backend_name
+from .settings import RoundingSettings, fix_backend_name
 
 _SUPPORTED_BACKENDS = frozenset({"gurobi", "gurobi-cupy", "highs"})
 
 
 def backend_name(settings: Any | None = None) -> str:
-    """Return the configured PolyRound backend name."""
+    """Return the configured rounding backend name."""
 
     name = getattr(settings, "backend", None) if settings is not None else None
     return fix_backend_name(name)
@@ -30,8 +30,8 @@ def active_backend(settings: Any | None = None):
     return _backend_for(settings)
 
 
-class PolyRoundApi:
-    """Main PolyRound API. Route the calls to the right backend."""
+class RoundingApi:
+    """Main rounding API. Route the calls to the right backend."""
 
     @staticmethod
     def backend_name(settings: Any | None = None) -> str:
@@ -175,13 +175,13 @@ class _StatusReturningModel:
 
 def _settings_or_default(settings: Any | None):
     if settings is None:
-        return PolyRoundSettings()
+        return RoundingSettings()
     return settings
 
 
 def _require_polytope(polytope: Polytope) -> Polytope:
     if not isinstance(polytope, Polytope):
-        raise TypeError("PolyRound API expects a Polytope instance.")
+        raise TypeError("Rounding API expects a Polytope instance.")
     return polytope
 
 
@@ -209,7 +209,7 @@ def _gurobi_backend():
 
         return GurobiBackend()
     except Exception as error:
-        raise RuntimeError("Could not initialize PolyRound backend 'gurobi'") from error
+        raise RuntimeError("Could not initialize rounding backend 'gurobi'") from error
 
 
 def _gurobi_cupy_backend():
@@ -219,7 +219,7 @@ def _gurobi_cupy_backend():
         return GurobiCuPyBackend()
     except Exception as error:
         raise RuntimeError(
-            "Could not initialize PolyRound backend 'gurobi-cupy'"
+            "Could not initialize rounding backend 'gurobi-cupy'"
         ) from error
 
 
@@ -229,11 +229,9 @@ def _highs_backend():
 
         return HiGHSBackend()
     except Exception as error:
-        raise RuntimeError("Could not initialize PolyRound backend 'highs'") from error
+        raise RuntimeError("Could not initialize rounding backend 'highs'") from error
 
 
 def _raise_unknown_backend(name: str):
     valid = ", ".join(sorted(_SUPPORTED_BACKENDS))
-    raise ValueError(
-        f"Unknown PolyRound backend {name!r}. Available backends: {valid}."
-    )
+    raise ValueError(f"Unknown rounding backend {name!r}. Available backends: {valid}.")

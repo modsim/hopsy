@@ -7,10 +7,10 @@ sys.path.insert(0, os.getcwd())
 import argparse
 import time
 
-from hopsy._polyround.default_settings import default_hp_flags
-from hopsy._polyround.settings import DEFAULT_BACKEND, PolyRoundSettings
+from hopsy._rounding.default_settings import default_hp_flags
+from hopsy._rounding.settings import DEFAULT_BACKEND, RoundingSettings
 
-from .backend import HiGHSBackend
+from .backend import GurobiCuPyBackend
 from .lp_utils import parse_sbml_cobrapy, polytope_to_csv
 
 
@@ -21,11 +21,12 @@ def main(args):
     hp_flags = default_hp_flags
     if args.hp:
         hp_flags = {
-            "primal_feasibility_tolerance": 1e-09,
-            "dual_feasibility_tolerance": 1e-09,
-            "optimality_tolerance": 1e-09,
+            "NumericFocus": 3,
+            "FeasibilityTol": 1e-09,
+            "OptimalityTol": 1e-09,
+            "MarkowitzTol": 0.999,
         }
-    settings = PolyRoundSettings(
+    settings = RoundingSettings(
         backend=args.backend,
         hp_flags=hp_flags,
         thresh=args.thresh,
@@ -41,7 +42,7 @@ def main(args):
         else:
             raise (IOError("Only xml files supported at the moment"))
         start_time = time.time()
-        polytope = HiGHSBackend().simplify_transform_and_round(
+        polytope = GurobiCuPyBackend().simplify_transform_and_round(
             polytope,
             settings=settings,
         )
@@ -58,11 +59,11 @@ def pars_args():
     parser.add_argument(
         "-hp", action="store_true", help="run the program with high precision option"
     )
-    parser.add_argument("-sgp", action="store_true", help="show HiGHS progress")
+    parser.add_argument("-sgp", action="store_true", help="show Gurobi solver progress")
     parser.add_argument(
         "-v",
         action="store_true",
-        help="print PolyRound progress information",
+        help="print rounding progress information",
     )
     parser.add_argument(
         "-check_lps", action="store_true", help="make external checks on lp solutions"
@@ -77,7 +78,7 @@ def pars_args():
         help="Threshold parameter for minimal width of a dimension",
     )
     parser.add_argument(
-        "-path", type=str, default="PolyRound/output/", help="Output path"
+        "-path", type=str, default="rounding/output/", help="Output path"
     )
     parser.add_argument(
         "-backend",
@@ -94,7 +95,7 @@ def pars_args():
 
 
 def _simplify_transform_and_round(polytope, settings):
-    backend = HiGHSBackend()
+    backend = GurobiCuPyBackend()
     polytope = backend.simplify_polytope(polytope, settings=settings)
     if not polytope.inequality_only:
         polytope = backend.transform_polytope(polytope, settings=settings)

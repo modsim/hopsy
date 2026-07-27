@@ -37,7 +37,7 @@ class _submodules:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
 
-        from ._polyround import PolyRoundApi, polytope
+        from ._rounding import RoundingApi, polytope
 
     import multiprocessing
     import os
@@ -552,7 +552,7 @@ def add_box_constraints(
     r"""Adds box constraints to all dimensions. This will extend :attr:`hopsy.Problem.A` and :attr:`hopsy.Problem.b` of the returned :class:`hopsy.Problem` to have :math:`m+2n` rows.
     Box constraints are added naively, meaning that we do neither check whether the dimension may be already
     somehow bound nor check whether the very same constraint already exists. You can remove redundant constraints
-    efficiently using the `PolyRound <https://pypi.org/project/PolyRound/>`_ toolbox or by using the :func:`hopsy.round` function, uses PolyRound to remove redundant constraints and also rounds the polytope.
+    efficiently with :func:`hopsy.round`, which also rounds the polytope.
 
     If ``lower_bound`` and ``upper_bound`` are both ``float``, then every dimension :math:`i` will be bound as
     :math:`lb \leq x_i \leq ub`. If `lower_bound`` and ``upper_bound`` are both ``numpy.ndarray`` with
@@ -666,10 +666,10 @@ def add_equality_constraints(
         polytope = _s.polytope.Polytope(A=problem.A, b=problem.b, S=A_eq, h=b_eq)
         with _s.warnings.catch_warnings():
             _s.warnings.simplefilter("ignore")
-            polytope = _s.PolyRoundApi.simplify_polytope(polytope, _c.LP().settings)
+            polytope = _s.RoundingApi.simplify_polytope(polytope, _c.LP().settings)
 
         # transform_polytope carries out dimension reduction due to equality constraints if possible
-        polytope = _s.PolyRoundApi.transform_polytope(polytope, _c.LP().settings)
+        polytope = _s.RoundingApi.transform_polytope(polytope, _c.LP().settings)
 
         _problem = _c.Problem(
             polytope.A,
@@ -714,7 +714,7 @@ def is_polytope_empty(
         raise RuntimeError("Either S and h must both be None OR both must have values")
     polytope = _s.polytope.Polytope(A=A, b=b, S=S, h=h)
     _s.warnings.filterwarnings("ignore", category=DeprecationWarning)
-    optlang_model = _s.PolyRoundApi.polytope_to_model(polytope, _c.LP().settings)
+    optlang_model = _s.RoundingApi.polytope_to_model(polytope, _c.LP().settings)
     status = optlang_model.optimize()
     _s.warnings.simplefilter("always")
     if status != "optimal":
@@ -820,13 +820,13 @@ def compute_chebyshev_center_and_radius(
     # # tries to use fast computation, when gurobi is available
     # result = (
     #     _compute_chebyshev_center_and_radius_with_gurobi(problem)
-    #     if _s.PolyRoundApi.backend_name(_c.LP().settings) == "gurobi"
+    #     if _s.RoundingApi.backend_name(_c.LP().settings) == "gurobi"
     #     else None
     # )
     result = None
     if result is None:
         polytope = _s.polytope.Polytope(problem.A, problem.b)
-        cheby_result = _s.PolyRoundApi.chebyshev_center(polytope, _c.LP().settings)
+        cheby_result = _s.RoundingApi.chebyshev_center(polytope, _c.LP().settings)
         chebyshev_center = cheby_result[0].flatten()
         radius = cheby_result[1][0]
     else:
@@ -867,10 +867,10 @@ def _compute_maximum_volume_ellipsoid(problem: _c.Problem):
 
         polytope = _s.polytope.Polytope(problem.A, problem.b)
 
-        polytope = _s.PolyRoundApi.simplify_polytope(polytope, _c.LP().settings)
+        polytope = _s.RoundingApi.simplify_polytope(polytope, _c.LP().settings)
 
         if polytope.S is not None:
-            polytope = _s.PolyRoundApi.transform_polytope(polytope, _c.LP().settings)
+            polytope = _s.RoundingApi.transform_polytope(polytope, _c.LP().settings)
         else:
             number_of_reactions = polytope.A.shape[1]
             polytope.transformation = _s.pandas.DataFrame(
@@ -884,7 +884,7 @@ def _compute_maximum_volume_ellipsoid(problem: _c.Problem):
             ]
             polytope.shift = _s.pandas.Series(_s.numpy.zeros(number_of_reactions))
 
-        _s.PolyRoundApi.iterative_solve(polytope, _c.LP().settings)
+        _s.RoundingApi.iterative_solve(polytope, _c.LP().settings)
 
         # return polytope.transform.values      ###
         return polytope.transformation.values
@@ -894,7 +894,7 @@ def simplify(problem: _c.Problem):
     r"""simplify(problem)
 
     Simplifies the polytope defined in the ``problem`` by removing redundant constraints and refunction inequality constraints to equality constraints in case of dimension width less than thresh.
-    Thresh is defined in the LP settings singleton and refers to `PolyRound <https://pypi.org/project/PolyRound/>`_ settings.
+    Thresh is defined in the LP settings singleton and refers to the rounding settings.
     Simplification is typically the first step before sampling. It is called automatically when round is called, because it is required for efficient and effective rounding.
 
     Parameters
@@ -916,11 +916,9 @@ def simplify(problem: _c.Problem):
         polytope = _s.polytope.Polytope(problem.A, problem.b)
         input_dimension = polytope.A.shape[1]
 
-        polytope = _s.PolyRoundApi.simplify_polytope(
-            polytope, settings=_c.LP().settings
-        )
+        polytope = _s.RoundingApi.simplify_polytope(polytope, settings=_c.LP().settings)
         if polytope.S is not None:
-            polytope = _s.PolyRoundApi.transform_polytope(polytope, _c.LP().settings)
+            polytope = _s.RoundingApi.transform_polytope(polytope, _c.LP().settings)
         else:
             number_of_reactions = polytope.A.shape[1]
             polytope.transformation = _s.pandas.DataFrame(
@@ -996,8 +994,8 @@ _simplify = simplify
 
 def round(problem: _c.Problem, simplify=True):
     """
-    Rounds the polytope defined by the inequality :math:`Ax < b` using
-    `PolyRound <https://pypi.org/project/PolyRound/>`_.
+    Rounds the polytope defined by the inequality :math:`Ax < b` using hopsy's
+    rounding implementation.
     This function also strips redundant constraints.
     The unrounding transformation :math:`T` and shift :math:`s` will be stored in :attr:`hopsy.UniformProblem.transformation`
     and :attr:`hopsy.UniformProblem.shift` of the returned problem. Its left-hand side operator :attr:`hopsy.UniformProblem.A` and
@@ -1015,13 +1013,13 @@ def round(problem: _c.Problem, simplify=True):
         polytope = _s.polytope.Polytope(problem.A, problem.b)
 
         if simplify:
-            polytope = _s.PolyRoundApi.simplify_polytope(polytope, _c.LP().settings)
+            polytope = _s.RoundingApi.simplify_polytope(polytope, _c.LP().settings)
 
         existing_transform = problem.transformation
         existing_shift = problem.shift
 
         if polytope.S is not None:
-            polytope = _s.PolyRoundApi.transform_polytope(polytope, _c.LP().settings)
+            polytope = _s.RoundingApi.transform_polytope(polytope, _c.LP().settings)
         else:
             number_of_reactions = polytope.A.shape[1]
             polytope.transformation = _s.pandas.DataFrame(
@@ -1035,7 +1033,7 @@ def round(problem: _c.Problem, simplify=True):
             ]
             polytope.shift = _s.pandas.Series(_s.numpy.zeros(number_of_reactions))
 
-        polytope = _s.PolyRoundApi.round_polytope(polytope, _c.LP().settings)
+        polytope = _s.RoundingApi.round_polytope(polytope, _c.LP().settings)
 
         complete_transform = (
             polytope.transformation.values

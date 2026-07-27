@@ -1,7 +1,7 @@
 import numpy as np
 
-from hopsy._polyround.polytope import Polytope
-from hopsy._polyround.settings import PolyRoundSettings
+from hopsy._rounding.polytope import Polytope
+from hopsy._rounding.settings import RoundingSettings
 
 from .constraint_removal_reduction import constraint_removal, null_space
 from .lp_interfacing import Interfacer
@@ -25,7 +25,7 @@ class GurobiCuPyBackend:
     def simplify_polytope(
         self,
         polytope: Polytope,
-        settings: PolyRoundSettings,
+        settings: RoundingSettings,
         normalize: bool = True,
     ) -> Polytope:
         """
@@ -53,7 +53,7 @@ class GurobiCuPyBackend:
     def transform_polytope(
         self,
         polytope: Polytope,
-        settings: PolyRoundSettings,
+        settings: RoundingSettings,
     ) -> Polytope:
         """
         Express polytope in a (shifted) orthogonal basis in the null space of the equality constraints to remove all
@@ -98,7 +98,7 @@ class GurobiCuPyBackend:
     def round_polytope(
         self,
         polytope: Polytope,
-        settings: PolyRoundSettings,
+        settings: RoundingSettings,
     ) -> Polytope:
         """
         Round polytope using the maximum volume ellipsoid approach
@@ -131,7 +131,7 @@ class GurobiCuPyBackend:
     def simplify_transform_and_round(
         self,
         polytope: Polytope,
-        settings: PolyRoundSettings,
+        settings: RoundingSettings,
     ) -> Polytope:
         """
         Conveniently execute simplify_polytope, transform_polytope and round polytope in sequence
@@ -162,8 +162,8 @@ class GurobiCuPyBackend:
         """
         if Model is None:
             raise NotImplementedError(
-                "Cobra not currently supported. Install Polyround with extras to support cobra "
-                "(pip install 'PolyRound[extras]')"
+                "Cobra support requires the optional cobrapy dependency "
+                "(pip install 'hopsy[sbml]')."
             )
         return extract_polytope(model)
 
@@ -173,14 +173,14 @@ class GurobiCuPyBackend:
     def sbml_to_polytope(
         self,
         file_name: str,
-        settings: PolyRoundSettings,
+        settings: RoundingSettings,
         inf_bound=1e5,
         prescale=False,
     ) -> Polytope:
         if Model is None:
             raise NotImplementedError(
-                "Cobra not currently supported. Install Polyround with extras to support cobra "
-                "(pip install 'PolyRound[extras]')"
+                "Cobra support requires the optional cobrapy dependency "
+                "(pip install 'hopsy[sbml]')."
             )
         polytope = parse_sbml_cobrapy(
             file_name,
@@ -192,20 +192,20 @@ class GurobiCuPyBackend:
     def chebyshev_center(
         self,
         polytope: Polytope,
-        settings: PolyRoundSettings,
+        settings: RoundingSettings,
     ):
         return chebyshev_center(polytope, settings)
 
     def iterative_solve(
         self,
         polytope: Polytope,
-        settings: PolyRoundSettings,
+        settings: RoundingSettings,
     ):
         return iterative_solve(polytope, settings)
 
     def polytope_to_model(
         self,
         polytope: Polytope,
-        settings: PolyRoundSettings,
+        settings: RoundingSettings,
     ):
         return Interfacer.polytope_to_model(polytope, settings)

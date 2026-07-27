@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from hopsy._polyround.polytope import Polytope
+from hopsy._rounding.polytope import Polytope
 
 from .lp_interfacing import Interfacer
 
@@ -155,7 +155,8 @@ def polytope_to_csv(polytope, dirname):
 def parse_sbml_cobrapy(file, inf_bound=1e5, prescale=False):
     if cobra is None:
         raise NotImplementedError(
-            "missing optional cobrapy dependency required for parsing sbml. Use pip install 'PolyRound[extras]'"
+            "Missing optional cobrapy dependency required for parsing SBML. "
+            "Use pip install 'hopsy[sbml]'."
         )
     model = read_sbml_model(file)
 
@@ -187,7 +188,8 @@ def parse_sbml_cobrapy(file, inf_bound=1e5, prescale=False):
 def read_sbml_model(file):
     if cobra is None:
         raise NotImplementedError(
-            "missing optional cobrapy dependency required for parsing sbml. Use pip install 'PolyRound[extras]'"
+            "Missing optional cobrapy dependency required for parsing SBML. "
+            "Use pip install 'hopsy[sbml]'."
         )
     model = cobra.io.read_sbml_model(file)
     return model
@@ -196,7 +198,8 @@ def read_sbml_model(file):
 def extract_polytope(model, inf_bound=1e5):
     if cobra is None:
         raise NotImplementedError(
-            "missing optional cobrapy dependency required for parsing sbml. Use pip install 'PolyRound[extras]'"
+            "Missing optional cobrapy dependency required for parsing SBML. "
+            "Use pip install 'hopsy[sbml]'."
         )
     S = cobra.util.array.create_stoichiometric_matrix(model, array_type="DataFrame")
     # make bounds matrix

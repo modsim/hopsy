@@ -2,11 +2,12 @@
 
 import threading as _threading
 
-from ._polyround.settings import PolyRoundSettings
+from ._rounding.settings import RoundingSettings
 
 
 class LP:
-    """Singleton for controlling PolyRound parameters for Linear Programming.
+    """Singleton for controlling rounding parameters for linear programming.
+
     Pattern from https://medium.com/analytics-vidhya/how-to-create-a-thread-safe-singleton-class-in-python-822e1170a7f6
     """
 
@@ -23,9 +24,9 @@ class LP:
                 # instance is still nonexistent.
                 if not self.__instance:
                     self.__instance = super(LP, self).__new__(self)
-                    self.settings = PolyRoundSettings()
+                    self.settings = RoundingSettings()
         return self.__instance
 
     def reset(self):
-        """resets all settings regarding PolyRound to the default values, which are set in PolyRound itself"""
-        self.settings = PolyRoundSettings()
+        """Reset all rounding settings to their default values."""
+        self.settings = RoundingSettings()
