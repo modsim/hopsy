@@ -2,7 +2,6 @@
 #define TYPES_H
 
 #include <Eigen/Core>
-#include <pcg/random.hpp>
 
 namespace hopsy {
 
@@ -12,7 +11,7 @@ namespace hopsy {
     template <typename Scalar>
     using Matrix = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;
 
-    using RandomNumberGenerator = pcg64;
+    using Index = Eigen::Index;
 
 } // namespace hopsy
 
