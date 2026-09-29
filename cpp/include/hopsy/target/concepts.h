@@ -22,7 +22,7 @@ namespace hopsy {
         const State& state
     )
     {
-        target_density.log_gradient(state);
+        target.log_gradient(state);
     };
 
     template <typename Target, typename State>
