@@ -1,64 +1,56 @@
 #ifndef HIT_AND_RUN_H
 #define HIT_AND_RUN_H
 
+#include <hopsy/kernel/traits.h>
 #include <hopsy/random_number_generator.h>
 
 namespace hopsy {
-
-    template <typename DirectionGenerator, typename LineKernel, typename ProposalGeometry>
+    template<typename State, typename DirectionGenerator, typename LineKernel>
     class HitAndRunKernel {
     public:
-        template <typename DirectionContextType, typename Direction, typename LineDomain>
-        struct LineKernelContext {
-            const DirectionContextType& direction_context;
-            const Direction& direction;
-            const LineDomain& domain;
-        };
-
-        template <typename State, typename Direction, typename LineTransition>
         struct Proposal {
-            State state;
-            Direction direction;
-            LineTransition line_transition;
+            DirectionGenerator::direction_type direction;
+            LineKernel::step_type step;
         };
 
-        template <typename State, typename Target, typename DomainGeometry>
+        template<typename DomainGeometry>
         [[nodiscard]] auto propose(
-            const State& state,
-            RandomNumberGenerator& rng,
-            const Target& target,
-            const DomainGeometry& domain_geometry
-            // const ProposalGeometry& proposal_geometry
+            const State &state,
+            RandomNumberGenerator &rng,
+            const DomainGeometry &domain_geometry
         ) {
-            auto& direction = direction_generator_.generate(rng);
+            Proposal proposal;
+            proposal.direction.noalias() = direction_generator_.generate(rng);
+            auto &line_domain = domain_geometry.line_domain(state, direction);
+            auto step = line_kernel_.propose(rng, line_domain);
 
-            auto& DomainGeometry::line_domain_type domain_geometry.line_domain(state, direction);
-
-            line_kernel_.propose(rng);
-
-            // return Proposal<State, decltype(move.direction), decltype(move.line_transition)>{
-            //     .state = std::move(proposal_state),
-            //     .direction = std::move(move.direction),
-            //     .line_transition = std::move(move.line_transition)
-            // };
+            return proposal;
         }
 
-        template <typename State, typename Target, typename Geometry, typename Workspace>
-        auto advance(
-            State& state,
-            RandomNumberGenerator& rng,
-            const Target& target,
-            const Geometry& geometry,
-            Workspace& workspace
-        ) {
+        double log_acceptance_probability() {
+            if constexpr (requires_metropolis_hastings_v<LineKernel>) {
+                return line_kernel_.log_proposal_ratio(line_domain, proposal.step);
+            } else {
+                return 0.;
+            }
+        }
 
+        template<typename Geometry, typename Workspace>
+        auto accept(Proposal &proposal, Geometry &geometry, Workspace &workspace) {
+            geometry.advance_workspace(proposal.step, proposal.direction, workspace);
+            // hit and run (we should only compute this
+            state + proposal.direction * proposal.step;
+            // coordinate hit and run
+            state(coordinate) += proposal.step;
+        }
+
+        auto reject() {
         }
 
     private:
         [[no_unique_address]] DirectionGenerator direction_generator_;
         [[no_unique_address]] LineKernel line_kernel_;
     };
-
 }
 
 #endif //HIT_AND_RUN_H

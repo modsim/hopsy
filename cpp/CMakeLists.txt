@@ -67,6 +67,7 @@ add_subdirectory(dependencies)
 target_link_libraries(
         hopsy_core
         INTERFACE
+        Boost::headers
         Eigen3::Eigen
         hopsy::pcg
 )

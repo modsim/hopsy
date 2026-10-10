@@ -11,7 +11,7 @@ namespace hopsy {
         const State& state
     )
     {
-            target.log_density(state);
+        target.log_density(state);
     };
 
     template <typename Target, typename State>

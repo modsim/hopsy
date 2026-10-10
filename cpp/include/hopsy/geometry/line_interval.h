@@ -2,13 +2,12 @@
 #define LINE_INTERVAL_H
 
 namespace hopsy {
-
-    template <typename Scalar>
+    template<typename Scalar>
     struct LineInterval {
+        using scalar_type = Scalar;
         Scalar lower;
         Scalar upper;
     };
-
 }
 
 #endif //LINE_INTERVAL_H

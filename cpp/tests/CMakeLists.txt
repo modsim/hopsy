@@ -1,7 +1,10 @@
 add_executable(
         hopsy_core_tests
         direction_generator_test.cpp
+        draw_test.cpp
         linear_polytope_test.cpp
+        line_kernel_test.cpp
+        step_test.cpp
         uniform_target_test.cpp
 )
 

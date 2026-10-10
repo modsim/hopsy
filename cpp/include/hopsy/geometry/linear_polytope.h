@@ -143,7 +143,7 @@ private:
       }
     }
 
-    return {LineInterval<Scalar>{lower, upper}};
+    return {Lint seInterval<Scalar>{lower, upper}};
   }
 
   matrix_type A_;

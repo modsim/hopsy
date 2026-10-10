@@ -3,20 +3,22 @@
 
 #include <Eigen/Dense>
 
+#include <hopsy/target/traits.h>
+
 namespace hopsy {
     class UniformTarget {
     public:
         static constexpr bool thread_safe = true;
 
-        template <typename State>
-        double log_density(const State&) const noexcept {
+        template<typename State>
+        double log_density(const State &) const noexcept {
             return 0.;
         }
 
-        template <typename Derived>
+        template<typename Derived>
             requires (!std::integral<typename Derived::Scalar>)
         auto log_gradient(
-            const Eigen::MatrixBase<Derived>& state
+            const Eigen::MatrixBase<Derived> &state
         ) const {
             using Scalar = typename Derived::Scalar;
 
@@ -25,10 +27,10 @@ namespace hopsy {
             );
         }
 
-        template <typename Derived>
+        template<typename Derived>
             requires (!std::integral<typename Derived::Scalar>)
         auto log_hessian(
-            const Eigen::MatrixBase<Derived>& state
+            const Eigen::MatrixBase<Derived> &state
         ) const {
             using Scalar = typename Derived::Scalar;
 
@@ -39,6 +41,9 @@ namespace hopsy {
             >::Zero(state.size(), state.size());
         }
     };
+
+    template<>
+    struct target_is_uniform<UniformTarget> : std::true_type {};
 }
 
 #endif //UNIFORM_H

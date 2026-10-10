@@ -1,5 +1,54 @@
 include(FetchContent)
 
+#########
+# Boost #
+#########
+
+# Initial supported baseline; not a claim that older releases cannot work.
+set(HOPSY_BOOST_MIN_VERSION "1.89.0")
+
+if(NOT TARGET Boost::headers)
+    find_package(
+            Boost ${HOPSY_BOOST_MIN_VERSION}
+            QUIET
+            CONFIG
+            GLOBAL
+    )
+endif()
+
+if(NOT TARGET Boost::headers)
+    message(STATUS "Boost not found; fetching Boost 1.89.0 headers")
+
+    FetchContent_Declare(
+            hopsy_boost
+            URL
+            https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.bz2
+            URL_HASH
+            SHA256=85a33fa22621b4f314f8e85e1a5e2a9363d22e4f4992925d4bb3bc631b5a0c7a
+            DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+            # Populate the source tree without configuring Boost.
+            SOURCE_SUBDIR hopsy_headers_only
+    )
+
+    FetchContent_MakeAvailable(hopsy_boost)
+
+    add_library(
+            Boost::headers
+            INTERFACE
+            IMPORTED
+            GLOBAL
+    )
+
+    set_target_properties(
+            Boost::headers
+            PROPERTIES
+            INTERFACE_INCLUDE_DIRECTORIES
+            "${hopsy_boost_SOURCE_DIR}"
+    )
+else()
+    message(STATUS "Using existing Boost headers")
+endif()
+
 
 ##########
 # Eigen3 #

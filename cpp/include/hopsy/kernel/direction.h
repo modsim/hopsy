@@ -4,11 +4,9 @@
 #include <hopsy/linalg.h>
 
 namespace hopsy {
-
     struct CoordinateDirection {
         Index coordinate;
     };
-
 }
 
 #endif // DIRECTION_H

@@ -10,7 +10,6 @@
 #include <hopsy/random_number_generator.h>
 
 namespace hopsy {
-
     class CyclingCoordinateDirectionGenerator {
     public:
         using direction_type = CoordinateDirection;
@@ -20,10 +19,10 @@ namespace hopsy {
                 throw std::invalid_argument("CyclingCoordinateDirectionGenerator: num_dimensions must be positive");
             }
             num_dimensions_ = num_dimensions;
-            direction_.coordinate = num_dimensions-Index{1};
+            direction_.coordinate = num_dimensions - Index{1};
         }
 
-        [[nodiscard]] const direction_type& generate(RandomNumberGenerator &) {
+        [[nodiscard]] const direction_type &generate(RandomNumberGenerator &) {
             ++direction_.coordinate;
             direction_.coordinate %= num_dimensions_;
             return direction_;
@@ -46,7 +45,7 @@ namespace hopsy {
             uniform_distribution_ = std::uniform_int_distribution<Index>(0, num_dimensions - 1);
         }
 
-        [[nodiscard]] const direction_type& generate(RandomNumberGenerator &rng) {
+        [[nodiscard]] const direction_type &generate(RandomNumberGenerator &rng) {
             direction_.coordinate = uniform_distribution_(rng);
             return direction_;
         }
