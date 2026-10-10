@@ -1,20 +1,13 @@
 #ifndef HIT_AND_RUN_H
 #define HIT_AND_RUN_H
 
+#include <hopsy/random_number_generator.h>
+
 namespace hopsy {
 
-    template <typename DirectionGenerator, typename LineKernel>
+    template <typename DirectionGenerator, typename LineKernel, typename ProposalGeometry>
     class HitAndRunKernel {
     public:
-        template <typename State, typename Target, typename Geometry, typename Workspace>
-        struct DirectionContext {
-            const State& state;
-            RandomNumberGenerator& rng;
-            const Target& target;
-            const Geometry& geometry;
-            const Workspace& workspace;
-        };
-
         template <typename DirectionContextType, typename Direction, typename LineDomain>
         struct LineKernelContext {
             const DirectionContextType& direction_context;
@@ -29,37 +22,25 @@ namespace hopsy {
             LineTransition line_transition;
         };
 
-        template <typename State, typename Target, typename Geometry, typename Workspace>
+        template <typename State, typename Target, typename DomainGeometry>
         [[nodiscard]] auto propose(
             const State& state,
             RandomNumberGenerator& rng,
             const Target& target,
-            const Geometry& geometry,
-            const Workspace& workspace
+            const DomainGeometry& domain_geometry
+            // const ProposalGeometry& proposal_geometry
         ) {
-            auto move = draw_move(
-                state,
-                rng,
-                target,
-                geometry,
-                workspace
-            );
+            auto& direction = direction_generator_.generate(rng);
 
-            State proposal_state = state;
+            auto& DomainGeometry::line_domain_type domain_geometry.line_domain(state, direction);
 
-            if (move.line_transition.accepted) {
-                geometry.apply_step(
-                    proposal_state,
-                    move.direction,
-                    move.line_transition.step
-                );
-            }
+            line_kernel_.propose(rng);
 
-            return Proposal<State, decltype(move.direction), decltype(move.line_transition)>{
-                .state = std::move(proposal_state),
-                .direction = std::move(move.direction),
-                .line_transition = std::move(move.line_transition)
-            };
+            // return Proposal<State, decltype(move.direction), decltype(move.line_transition)>{
+            //     .state = std::move(proposal_state),
+            //     .direction = std::move(move.direction),
+            //     .line_transition = std::move(move.line_transition)
+            // };
         }
 
         template <typename State, typename Target, typename Geometry, typename Workspace>
@@ -70,73 +51,10 @@ namespace hopsy {
             const Geometry& geometry,
             Workspace& workspace
         ) {
-            auto move = draw_move(
-                state,
-                rng,
-                target,
-                geometry,
-                workspace
-            );
 
-            if (move.line_transition.accepted) {
-                geometry.apply_step(
-                    state,
-                    move.direction,
-                    move.line_transition.step,
-                    workspace
-                );
-            }
-
-            return move.line_transition;
         }
 
     private:
-        template <typename Direction, typename LineTransition>
-        struct Move {
-            Direction direction;
-            LineTransition line_transition;
-        };
-
-        template <typename State, typename Target, typename Geometry, typename Workspace>
-        [[nodiscard]] auto draw_move(
-            const State& state,
-            RandomNumberGenerator& rng,
-            const Target& target,
-            const Geometry& geometry,
-            const Workspace& workspace
-        ) {
-            DirectionContext<State, Target, Geometry, Workspace> direction_context{
-                .state = state,
-                .rng = rng,
-                .target = target,
-                .geometry = geometry,
-                .workspace = workspace
-            };
-
-            auto direction = direction_generator_.generate(direction_context);
-
-            auto domain = geometry.line_domain(
-                    state,
-                    direction,
-                    workspace
-                );
-
-            LineKernelContext<decltype(direction_context), decltype(direction), decltype(domain)> line_context{
-                .direction_context = direction_context,
-                .direction = direction,
-                .domain = domain
-            };
-
-            auto line_transition =
-                line_kernel_.advance(line_context);
-
-            return Move<decltype(direction), decltype(line_transition)>{
-                .direction = std::move(direction),
-                .line_transition = std::move(line_transition)
-            };
-        }
-
-
         [[no_unique_address]] DirectionGenerator direction_generator_;
         [[no_unique_address]] LineKernel line_kernel_;
     };

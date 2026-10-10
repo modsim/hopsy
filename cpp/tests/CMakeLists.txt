@@ -1,5 +1,7 @@
 add_executable(
         hopsy_core_tests
+        direction_generator_test.cpp
+        linear_polytope_test.cpp
         uniform_target_test.cpp
 )
 
@@ -17,10 +19,6 @@ if(HOPSY_CATCH2_EXTRAS_DIR)
             "${HOPSY_CATCH2_EXTRAS_DIR}"
     )
 endif()
-
-include(Catch)
-
-catch_discover_tests(hopsy_core_tests)
 
 include(Catch)
 catch_discover_tests(hopsy_core_tests)

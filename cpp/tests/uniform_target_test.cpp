@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <hopsy/linalg.h>
-#include <hopsy/target/concept.h>
+#include <hopsy/target/concepts.h>
 #include <hopsy/target/uniform.h>
 
 TEST_CASE("UniformTarget satisfies target density concepts", "[target][uniform]")
