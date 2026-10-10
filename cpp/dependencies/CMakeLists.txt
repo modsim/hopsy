@@ -146,12 +146,6 @@ endif()
 ############
 
 if(HOPSY_BUILD_PYTHON)
-    find_package(
-            Python 3.10
-            REQUIRED
-            COMPONENTS Interpreter Development.Module
-    )
-
     set(
             HOPSY_NANOBIND_VERSION
             "2.12.0"

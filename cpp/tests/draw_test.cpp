@@ -132,3 +132,32 @@ TEST_CASE_METHOD(Fixture, "draw validates arguments before taking steps", "[samp
     CHECK(kernel.proposals == 0);
     CHECK((state.array() == 0).all());
 }
+
+TEST_CASE_METHOD(Fixture, "draw thinning counts rejected attempts too", "[sampling][draw]") {
+    AlternatingKernel alternating;
+    const auto samples = hopsy::draw(
+        alternating, state, rng, target, geometry, workspace, 3, 2
+    );
+    REQUIRE(samples.cols() == 3);
+    for (Eigen::Index col = 0; col < samples.cols(); ++col) {
+        CHECK((samples.col(col).array() == double(col + 1)).all());
+    }
+    CHECK(alternating.proposals == 6);
+    CHECK(alternating.acceptances == 3);
+    CHECK(alternating.rejections == 3);
+}
+
+TEST_CASE_METHOD(Fixture, "draw_into writes into mapped storage with padding", "[sampling][draw]") {
+    double storage[15];
+    for (auto &value : storage) value = -1.;
+    using Map = Eigen::Map<Eigen::MatrixXd, Eigen::Unaligned, Eigen::OuterStride<>>;
+    Map samples(storage, 2, 3, Eigen::OuterStride<>(5));
+    hopsy::draw_into(kernel, state, rng, target, geometry, workspace, samples);
+    for (int col = 0; col < 3; ++col) {
+        for (int row = 0; row < 5; ++row) {
+            CHECK(storage[5*col + row] == (row < 2 ? double(col + 1) : -1.));
+        }
+    }
+    CHECK(kernel.proposals == 3);
+    CHECK((state.array() == 3).all());
+}

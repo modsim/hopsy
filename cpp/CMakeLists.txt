@@ -84,6 +84,11 @@ target_link_libraries(
 # ---------------------------------------------------------------------------
 
 if(HOPSY_BUILD_PYTHON)
+    find_package(
+            Python 3.10
+            REQUIRED
+            COMPONENTS Interpreter Development.Module
+    )
     add_subdirectory(bindings)
 endif()
 
