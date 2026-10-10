@@ -22,6 +22,12 @@ option(
         ${PROJECT_IS_TOP_LEVEL}
 )
 
+option(
+        HOPSY_BUILD_PYTHON
+        "Build the hopsy Python bindings"
+        OFF
+)
+
 
 # ---------------------------------------------------------------------------
 # Library
@@ -73,6 +79,13 @@ target_link_libraries(
 )
 
 
+# ---------------------------------------------------------------------------
+# Python bindings
+# ---------------------------------------------------------------------------
+
+if(HOPSY_BUILD_PYTHON)
+    add_subdirectory(bindings)
+endif()
 
 # ---------------------------------------------------------------------------
 # Tests
@@ -139,4 +152,10 @@ if(HOPSY_INSTALL_CPP)
             DESTINATION ${HOPSY_CMAKE_INSTALL_DIR}
     )
 
+endif()
+
+option(HOPSY_BUILD_CPP_BENCHMARKS "Build the standalone hit-and-run microbenchmark" OFF)
+if(HOPSY_BUILD_CPP_BENCHMARKS)
+    add_executable(hopsy_hit_and_run_benchmark benchmarks/hit_and_run_benchmark.cpp)
+    target_link_libraries(hopsy_hit_and_run_benchmark PRIVATE hopsy::core)
 endif()

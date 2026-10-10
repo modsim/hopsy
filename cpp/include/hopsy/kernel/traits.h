@@ -1,9 +1,10 @@
-#ifndef TRAITS_H
-#define TRAITS_H
+#ifndef HOPSY_KERNEL_TRAITS_H
+#define HOPSY_KERNEL_TRAITS_H
 
 #include <type_traits>
 
 namespace hopsy {
+    template<typename LineKernel>
     struct line_kernel_requires_mh : std::true_type {
     };
 

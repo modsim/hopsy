@@ -4,7 +4,6 @@
 #include <cmath>
 #include <limits>
 #include <random>
-#include <type_traits>
 
 #include <hopsy/random_number_generator.h>
 
@@ -25,22 +24,20 @@ namespace hopsy {
             kernel.accept(state, target, geometry, workspace);
             return true;
         } else {
-            const auto log_ratio = kernel.log_acceptance_ratio(
+            const double log_ratio = kernel.log_acceptance_ratio(
                 state, target, geometry, workspace
             );
-
-            using Scalar = std::remove_cvref_t<decltype(log_ratio)>;
 
             if (std::isnan(log_ratio)) {
                 kernel.reject(state, target, geometry, workspace);
                 return false;
             }
 
-            bool accepted = log_ratio >= Scalar{0};
+            bool accepted = log_ratio >= 0.;
 
-            if (!accepted && log_ratio != -std::numeric_limits<Scalar>::infinity()) {
-                std::uniform_real_distribution<Scalar> uniform(
-                    Scalar{0}, Scalar{1}
+            if (!accepted && log_ratio != -std::numeric_limits<double>::infinity()) {
+                std::uniform_real_distribution<double> uniform(
+                    0., 1.
                 );
                 accepted = std::log(uniform(rng)) < log_ratio;
             }

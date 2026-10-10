@@ -67,11 +67,11 @@ namespace hopsy {
         // log q(reverse) - log q(forward); deliberately NOT clipped at zero.
         template<typename LineDomain, typename Scalar>
             requires std::ranges::forward_range<const LineDomain>
-        [[nodiscard]] Scalar log_proposal_ratio(const LineDomain &domain, Scalar step) const {
+        [[nodiscard]] double log_proposal_ratio(const LineDomain &domain, Scalar step) const {
             if (!std::isfinite(step)) {
                 throw std::invalid_argument("GaussianLineKernel: step must be finite.");
             }
-            return static_cast<Scalar>(std::log(normalization(domain, 0)) -
+            return static_cast<double>(std::log(normalization(domain, 0)) -
                                        std::log(normalization(domain, step)));
         }
 

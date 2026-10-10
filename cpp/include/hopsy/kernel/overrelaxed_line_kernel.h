@@ -7,6 +7,7 @@
 #include <stdexcept>
 
 #include <hopsy/random_number_generator.h>
+#include <hopsy/kernel/traits.h>
 
 namespace hopsy {
     // Linear overrelaxation on ONE chord, with the current point at t=0.
@@ -14,6 +15,11 @@ namespace hopsy {
     // This transition is symmetric and preserves the uniform line distribution.
     class OverRelaxedLineKernel {
     public:
+        template<typename LineDomain, typename Scalar>
+        [[nodiscard]] constexpr double log_proposal_ratio(const LineDomain &, Scalar) const noexcept {
+            return 0.;
+        }
+
         template<typename LineDomain>
             requires std::ranges::forward_range<const LineDomain>
         [[nodiscard]] auto propose(RandomNumberGenerator &rng, const LineDomain &domain) const {

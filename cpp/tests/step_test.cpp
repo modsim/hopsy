@@ -103,7 +103,9 @@ TEST_CASE("step rejects a pending proposal when log_ratio is NaN", "[sampling][s
     Workspace workspace;
     hopsy::RandomNumberGenerator rng(42);
 
+    const auto untouched_rng = rng;
     hopsy::step(kernel, state, rng, target, geometry, workspace);
+    CHECK(rng == untouched_rng);
     CHECK(state.position == 7);
     CHECK(kernel.proposals == 1);
     CHECK(kernel.evaluations == 1);

@@ -12,6 +12,12 @@
 namespace hopsy {
     class UniformLineKernel {
     public:
+        // log q(reverse) - log q(forward) for a translated chord domain.
+        template<typename LineDomain, typename Scalar>
+        [[nodiscard]] constexpr double log_proposal_ratio(const LineDomain &, Scalar) const noexcept {
+            return 0.;
+        }
+
         template<typename LineDomain> requires std::ranges::forward_range<const LineDomain>
         [[nodiscard]] auto propose(
             RandomNumberGenerator &rng,

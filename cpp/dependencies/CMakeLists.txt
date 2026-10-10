@@ -6,6 +6,7 @@ include(FetchContent)
 
 # Initial supported baseline; not a claim that older releases cannot work.
 set(HOPSY_BOOST_MIN_VERSION "1.89.0")
+set(HOPSY_BOOST_MIN_VERSION "${HOPSY_BOOST_MIN_VERSION}" PARENT_SCOPE)
 
 if(NOT TARGET Boost::headers)
     find_package(
@@ -49,12 +50,53 @@ else()
     message(STATUS "Using existing Boost headers")
 endif()
 
+##########
+# Catch2 #
+##########
+
+if(HOPSY_BUILD_CPP_TESTS)
+
+    set(HOPSY_CATCH2_VERSION "3.8.1")
+
+    find_package(
+            Catch2 ${HOPSY_CATCH2_VERSION}
+            QUIET
+    )
+
+    if(NOT Catch2_FOUND)
+        message(
+                STATUS
+                "Catch2 not found; fetching Catch2 ${HOPSY_CATCH2_VERSION}"
+        )
+
+        FetchContent_Declare(
+                Catch2
+                GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+                GIT_TAG v${HOPSY_CATCH2_VERSION}
+                GIT_SHALLOW TRUE
+        )
+
+        FetchContent_MakeAvailable(Catch2)
+
+        set(
+                HOPSY_CATCH2_EXTRAS_DIR
+                "${catch2_SOURCE_DIR}/extras"
+                PARENT_SCOPE
+        )
+    else()
+        message(STATUS "Using installed Catch2")
+    endif()
+
+endif()
+
+
 
 ##########
 # Eigen3 #
 ##########
 
 set(HOPSY_EIGEN_MIN_VERSION "5.0")
+set(HOPSY_EIGEN_MIN_VERSION "${HOPSY_EIGEN_MIN_VERSION}" PARENT_SCOPE)
 set(HOPSY_EIGEN_FETCH_VERSION "5.0.1")
 
 find_package(
@@ -97,6 +139,37 @@ else()
     message(STATUS "Using installed Eigen3")
 endif()
 
+
+
+############
+# nanobind #
+############
+
+if(HOPSY_BUILD_PYTHON)
+    find_package(
+            Python 3.10
+            REQUIRED
+            COMPONENTS Interpreter Development.Module
+    )
+
+    set(
+            HOPSY_NANOBIND_VERSION
+            "2.12.0"
+            CACHE STRING
+            "nanobind version used by hopsy"
+    )
+
+    FetchContent_Declare(
+            nanobind
+            GIT_REPOSITORY https://github.com/wjakob/nanobind.git
+            GIT_TAG "v${HOPSY_NANOBIND_VERSION}"
+            GIT_SHALLOW TRUE
+            GIT_SUBMODULES_RECURSE TRUE
+    )
+
+    FetchContent_MakeAvailable(nanobind)
+endif()
+
 #######
 # PCG #
 #######
@@ -111,6 +184,7 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(pcg_cpp)
+set(pcg_cpp_SOURCE_DIR "${pcg_cpp_SOURCE_DIR}" PARENT_SCOPE)
 
 add_library(hopsy_pcg INTERFACE)
 
@@ -131,43 +205,3 @@ add_library(
         hopsy::pcg
         ALIAS hopsy_pcg
 )
-
-
-##########
-# Catch2 #
-##########
-
-if(HOPSY_BUILD_CPP_TESTS)
-
-    set(HOPSY_CATCH2_VERSION "3.8.1")
-
-    find_package(
-            Catch2 ${HOPSY_CATCH2_VERSION}
-            QUIET
-    )
-
-    if(NOT Catch2_FOUND)
-        message(
-                STATUS
-                "Catch2 not found; fetching Catch2 ${HOPSY_CATCH2_VERSION}"
-        )
-
-        FetchContent_Declare(
-                Catch2
-                GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-                GIT_TAG v${HOPSY_CATCH2_VERSION}
-                GIT_SHALLOW TRUE
-        )
-
-        FetchContent_MakeAvailable(Catch2)
-
-        set(
-                HOPSY_CATCH2_EXTRAS_DIR
-                "${catch2_SOURCE_DIR}/extras"
-                PARENT_SCOPE
-        )
-    else()
-        message(STATUS "Using installed Catch2")
-    endif()
-
-endif()

@@ -153,3 +153,31 @@ TEST_CASE(
         REQUIRE(direction.data() == data_address);
     }
 }
+
+TEMPLATE_TEST_CASE("Direction stepping materializes into reusable storage",
+                   "[direction]", float, double) {
+    using Vector = hopsy::Vector<TestType>;
+    const Vector state = (Vector(3) << 1, -2, 3).finished();
+    const Vector original = state;
+    Vector output(3);
+    const auto *storage = output.data();
+    SECTION("Dense direction") {
+        const Vector direction = (Vector(3) << -2, 4, 1).finished();
+        for (const TestType distance : {TestType{0}, TestType{0.5}, TestType{-2}}) {
+            hopsy::step_direction(direction, state, distance, output);
+            CHECK(output.isApprox(state + distance * direction));
+            CHECK(output.data() == storage);
+            CHECK(state == original);
+        }
+    }
+    // SECTION("Coordinate direction") {
+    //     for (hopsy::Index i = 0; i < 3; ++i) {
+    //         Vector expected = state;
+    //         expected(i) -= TestType{0.5};
+    //         hopsy::step_direction(hopsy::CoordinateDirection{i}, state, TestType{-0.5}, output);
+    //         CHECK(output == expected);
+    //         CHECK(output.data() == storage);
+    //         CHECK(state == original);
+    //     }
+    // }
+}

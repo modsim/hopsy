@@ -28,6 +28,11 @@ namespace hopsy {
             return direction_;
         }
 
+        // Valid after generate(); retained until the next generate().
+        [[nodiscard]] const direction_type &direction() const noexcept {
+            return direction_;
+        }
+
     private:
         direction_type direction_{};
         Index num_dimensions_;
@@ -47,6 +52,11 @@ namespace hopsy {
 
         [[nodiscard]] const direction_type &generate(RandomNumberGenerator &rng) {
             direction_.coordinate = uniform_distribution_(rng);
+            return direction_;
+        }
+
+        // Valid after generate(); retained until the next generate().
+        [[nodiscard]] const direction_type &direction() const noexcept {
             return direction_;
         }
 
@@ -76,6 +86,11 @@ namespace hopsy {
                 norm = direction_.norm();
             } while (norm == Scalar{0});
             direction_ /= norm;
+            return direction_;
+        }
+
+        // Valid after generate(); retained until the next generate().
+        [[nodiscard]] const direction_type &direction() const noexcept {
             return direction_;
         }
 
