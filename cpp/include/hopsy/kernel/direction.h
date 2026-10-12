@@ -27,7 +27,7 @@ namespace hopsy {
     void accept_direction(
         const CoordinateDirection& direction,
         State& state,
-        State& candidate
+        const State& candidate
     ) {
         const auto i = direction.coordinate;
         state(i) = candidate(i);

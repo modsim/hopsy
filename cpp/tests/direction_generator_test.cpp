@@ -24,7 +24,7 @@ TEMPLATE_TEST_CASE(
     // hopsy::RandomCoordinateDirectionGenerator,
     hopsy::CyclingCoordinateDirectionGenerator
 ) {
-    for (const hopsy::Index dimension : {1, 2, 3, 10}) {
+    for (const hopsy::Index dimension: {1, 2, 3, 10}) {
         CAPTURE(dimension);
 
         TestType generator(dimension);
@@ -45,7 +45,7 @@ TEST_CASE(
     "Cycling coordinate generator advances and wraps around",
     "[direction_generator]"
 ) {
-    for (const hopsy::Index dimension : {1, 2, 3, 10}) {
+    for (const hopsy::Index dimension: {1, 2, 3, 10}) {
         CAPTURE(dimension);
 
         hopsy::CyclingCoordinateDirectionGenerator generator(dimension);
@@ -115,9 +115,9 @@ TEMPLATE_TEST_CASE(
 ) {
     using Scalar = TestType;
     const Scalar tolerance =
-        Scalar{100} * std::numeric_limits<Scalar>::epsilon();
+            Scalar{100} * std::numeric_limits<Scalar>::epsilon();
 
-    for (const hopsy::Index dimension : {1, 2, 3, 10, 100}) {
+    for (const hopsy::Index dimension: {1, 2, 3, 10, 100}) {
         CAPTURE(dimension);
 
         hopsy::RandomDirectionGenerator<Scalar> generator(dimension);
@@ -126,7 +126,7 @@ TEMPLATE_TEST_CASE(
         for (int draw = 0; draw < 100; ++draw) {
             CAPTURE(draw);
 
-            const auto& direction = generator.generate(rng);
+            const auto &direction = generator.generate(rng);
 
             REQUIRE(direction.size() == dimension);
             REQUIRE(direction.allFinite());
@@ -142,20 +142,24 @@ TEST_CASE(
     hopsy::RandomDirectionGenerator<double> generator(5);
     hopsy::RandomNumberGenerator rng(42);
 
-    const auto& first = generator.generate(rng);
-    const auto* vector_address = &first;
-    const auto* data_address = first.data();
+    const auto &first = generator.generate(rng);
+    const auto *vector_address = &first;
+    const auto *data_address = first.data();
 
     for (int draw = 0; draw < 100; ++draw) {
-        const auto& direction = generator.generate(rng);
+        const auto &direction = generator.generate(rng);
 
         REQUIRE(&direction == vector_address);
         REQUIRE(direction.data() == data_address);
     }
 }
 
-TEMPLATE_TEST_CASE("Direction stepping materializes into reusable storage",
-                   "[direction]", float, double) {
+TEMPLATE_TEST_CASE(
+    "Direction stepping reuses proposal storage",
+    "[direction]",
+    float,
+    double
+) {
     using Vector = hopsy::Vector<TestType>;
     const Vector state = (Vector(3) << 1, -2, 3).finished();
     const Vector original = state;
@@ -163,21 +167,35 @@ TEMPLATE_TEST_CASE("Direction stepping materializes into reusable storage",
     const auto *storage = output.data();
     SECTION("Dense direction") {
         const Vector direction = (Vector(3) << -2, 4, 1).finished();
-        for (const TestType distance : {TestType{0}, TestType{0.5}, TestType{-2}}) {
+        for (const TestType distance: {TestType{0}, TestType{0.5}, TestType{-2}}) {
             hopsy::step_direction(direction, state, distance, output);
             CHECK(output.isApprox(state + distance * direction));
             CHECK(output.data() == storage);
             CHECK(state == original);
         }
     }
-    // SECTION("Coordinate direction") {
-    //     for (hopsy::Index i = 0; i < 3; ++i) {
-    //         Vector expected = state;
-    //         expected(i) -= TestType{0.5};
-    //         hopsy::step_direction(hopsy::CoordinateDirection{i}, state, TestType{-0.5}, output);
-    //         CHECK(output == expected);
-    //         CHECK(output.data() == storage);
-    //         CHECK(state == original);
-    //     }
-    // }
+    SECTION("Coordinate direction") {
+        for (hopsy::Index i = 0; i < 3; ++i) {
+            const auto direction = hopsy::CoordinateDirection{i};
+            constexpr TestType distance = TestType{-0.5};
+
+            Vector expected = state;
+            expected(i) += distance;
+
+            hopsy::step_direction(direction, state, distance, output);
+
+            // Only the affected coordinate is materialized.
+            CHECK(output(i) == expected(i));
+            CHECK(output.data() == storage);
+            CHECK(state == original);
+
+            // Accepting the proposal must produce the complete state.
+            Vector accepted = state;
+            hopsy::accept_direction(direction, accepted, output);
+
+            CHECK(accepted == expected);
+            CHECK(output.data() == storage);
+            CHECK(state == original);
+        }
+    }
 }

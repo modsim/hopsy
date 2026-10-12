@@ -39,7 +39,7 @@ template<typename Function> double measure(int iterations, Function function) {
 }
 
 template<typename Generator> void run(int n, const char *name) {
-    const int iterations = n <= 100'000'000;
+    const int iterations = 1'000'000;
     hopsy::Matrix<double> A(2*n, n);
     A.topRows(n).setIdentity();
     A.bottomRows(n) = -hopsy::Matrix<double>::Identity(n,n);

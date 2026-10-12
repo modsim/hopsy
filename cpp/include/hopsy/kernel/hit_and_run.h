@@ -28,12 +28,15 @@ namespace hopsy {
 
         template<typename Target>
         static constexpr bool always_accept =
-            target_is_uniform_v<Target> && !line_kernel_requires_mh_v<LineKernel>;
+                target_is_uniform_v<Target> && !line_kernel_requires_mh_v<LineKernel>;
 
         HitAndRunKernel(const State &initial_state,
-                        DirectionGenerator direction_generator, LineKernel line_kernel)
+                        DirectionGenerator direction_generator,
+                        LineKernel line_kernel)
             : direction_generator_(std::move(direction_generator)),
-              line_kernel_(std::move(line_kernel)), proposal_{initial_state} {}
+              line_kernel_(std::move(line_kernel)),
+              proposal_{.state = initial_state} {
+        }
 
         // The proposal belongs to the kernel and is overwritten by propose().
         // After accept(), its state buffer contains the previous accepted state.
@@ -44,15 +47,12 @@ namespace hopsy {
         // call must not overwrite workspace.direction_product while pending.
         template<typename Target, typename Geometry, typename Workspace>
         void propose(const State &state, RandomNumberGenerator &rng,
-                                const Target &, const Geometry &geometry,
-                                Workspace &workspace) {
+                     const Target &, const Geometry &geometry,
+                     Workspace &workspace) {
             const auto &direction = direction_generator_.generate(rng);
             const auto &domain = geometry.line_domain(state, direction, workspace);
             proposal_.step = line_kernel_.propose(rng, domain);
-            // Evaluate before the chord's origin changes. No symmetry dispatch:
-            // each line kernel supplies log q(x|y) - log q(y|x).
-            proposal_.log_proposal_ratio =
-                line_kernel_.log_proposal_ratio(domain, proposal_.step);
+            proposal_.log_proposal_ratio = line_kernel_.log_proposal_ratio(domain, proposal_.step);
             step_direction(direction, state, proposal_.step, proposal_.state);
         }
 
@@ -69,8 +69,6 @@ namespace hopsy {
         void accept(State &state, const Target &, const Geometry &geometry,
                     Workspace &workspace) {
             geometry.advance_workspace(proposal_.step, direction_generator_.direction(), workspace);
-            // Dynamic owning Eigen vectors exchange buffers without copying.
-            // Callers must not retain data pointers or views across acceptance.
             accept_direction(direction_generator_.direction(), state, proposal_.state);
         }
 
