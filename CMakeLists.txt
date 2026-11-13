@@ -19,6 +19,7 @@ endif()
 
 option(USE_SYSTEM_EIGEN "Use system Eigen" OFF)
 option(HOPSY_NO_EIGEN_VECTORIZE "Disable Eigen vectorization" OFF)
+option(HOPSY_BUILD_GPU "Build the hopsy.gpu CUDA extension" OFF)
 
 if(HOPSY_NO_EIGEN_VECTORIZE)
     add_compile_definitions(EIGEN_DONT_VECTORIZE)
