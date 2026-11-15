@@ -1,0 +1,8 @@
+#ifndef REVERSIBLE_JUMP_KERNEL_H
+#define REVERSIBLE_JUMP_KERNEL_H
+
+namespace hopsy {
+
+}
+
+#endif //REVERSIBLE_JUMP_KERNEL_H

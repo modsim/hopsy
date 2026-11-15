@@ -92,26 +92,29 @@ def new_run(new, family, n_samples, thinning, threads, seed):
             "csmala": "CSmMALAKernel",
         }[family],
     )
+    problem = new.Problem(geometry, target)
     chains = [
-        cls(
-            geometry,
+        new.bind_chain(
+            problem,
+            cls(np.zeros(n), step_size=0.7 if family == "grw" else 0.3),
             np.zeros(n),
-            seed=seed + i,
-            step_size=0.7 if family == "grw" else 0.3,
         )
-        for i in range(4)
+        for _ in range(4)
     ]
-    for chain in chains:
-        chain.draw(1, thinning=20000, target=target)
+    rngs = [new.RandomNumberGenerator(seed + i) for i in range(4)]
+    for chain, rng in zip(chains, rngs):
+        chain.draw(rng, 1, thinning=20000)
     start = time.perf_counter()
     if threads == 1:
         samples = [
-            chain.draw(n_samples, thinning=thinning, target=target) for chain in chains
+            chain.draw(rng, n_samples, thinning=thinning)
+            for chain, rng in zip(chains, rngs)
         ]
     else:
         with ThreadPoolExecutor(4) as pool:
             futures = [
-                pool.submit(chain.draw, n_samples, thinning, target) for chain in chains
+                pool.submit(chain.draw, rng, n_samples, thinning)
+                for chain, rng in zip(chains, rngs)
             ]
             samples = [future.result() for future in futures]
     elapsed = time.perf_counter() - start

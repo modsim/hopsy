@@ -1,0 +1,321 @@
+{
+  "python": "3.14.8 (main, Oct  2 2026, 10:23:31) [GCC 16.2.1 20260810]",
+  "platform": "Linux-6.18.55-1-lts-x86_64-with-glibc2.44",
+  "cpus": "0,1,2,3",
+  "repeats": 3,
+  "samples_per_case": 9,
+  "module_sha256": {
+    "before": "7cdc5b4090e0fd206571f381055a54941e6c905ff6ff3ae1c1e7dafe38658fb6",
+    "after": "ecfea23cc128a4f31bffa9b22b52ec92c54fc6ac2606e33b3b112dd704092c60"
+  },
+  "summary": [
+    {
+      "target": "gaussian",
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "batch": 1,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 813148.5470093093,
+      "after": 803213.5610243015,
+      "speedup": 0.9877820774303196
+    },
+    {
+      "target": "gaussian",
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "batch": 16,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 5603984.88405717,
+      "after": 5662052.472325571,
+      "speedup": 1.0103618388467817
+    },
+    {
+      "target": "gaussian",
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "batch": 20000,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 6562459.194117238,
+      "after": 6705003.635085833,
+      "speedup": 1.0217211927346346
+    },
+    {
+      "target": "gaussian",
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "batch": 20000,
+      "workers": 4,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 24109282.553097736,
+      "after": 20018582.250931967,
+      "speedup": 0.8303267509866167
+    },
+    {
+      "target": "gaussian",
+      "kernel": "UniformHitAndRunKernel",
+      "batch": 1,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 675896.0725964451,
+      "after": 646040.0088829345,
+      "speedup": 0.9558274342402686
+    },
+    {
+      "target": "gaussian",
+      "kernel": "UniformHitAndRunKernel",
+      "batch": 16,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 2419649.7817061488,
+      "after": 2468735.013667785,
+      "speedup": 1.0202860894716033
+    },
+    {
+      "target": "gaussian",
+      "kernel": "UniformHitAndRunKernel",
+      "batch": 20000,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 2702157.8895430574,
+      "after": 2789428.2907551443,
+      "speedup": 1.0322965588168664
+    },
+    {
+      "target": "gaussian",
+      "kernel": "UniformHitAndRunKernel",
+      "batch": 20000,
+      "workers": 4,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 9310993.467479032,
+      "after": 9707443.14579309,
+      "speedup": 1.042578665713681
+    },
+    {
+      "target": "gaussian",
+      "kernel": "GaussianRandomWalkKernel",
+      "batch": 1,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 705972.5347615299,
+      "after": 728035.7882054903,
+      "speedup": 1.0312522829962687
+    },
+    {
+      "target": "gaussian",
+      "kernel": "GaussianRandomWalkKernel",
+      "batch": 16,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 3205215.5268664737,
+      "after": 3407420.884973989,
+      "speedup": 1.0630863529808237
+    },
+    {
+      "target": "gaussian",
+      "kernel": "GaussianRandomWalkKernel",
+      "batch": 20000,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 3782490.8885539942,
+      "after": 4094967.203842024,
+      "speedup": 1.0826112539315291
+    },
+    {
+      "target": "gaussian",
+      "kernel": "GaussianRandomWalkKernel",
+      "batch": 20000,
+      "workers": 4,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 12778246.308500143,
+      "after": 14215580.709345516,
+      "speedup": 1.1124829155851577
+    },
+    {
+      "target": "gaussian",
+      "kernel": "DikinWalkKernel",
+      "batch": 1,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 398698.5442905698,
+      "after": 398368.09306288057,
+      "speedup": 0.9991711752339673
+    },
+    {
+      "target": "gaussian",
+      "kernel": "DikinWalkKernel",
+      "batch": 16,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 722958.8188886287,
+      "after": 742345.3890553757,
+      "speedup": 1.026815594000982
+    },
+    {
+      "target": "gaussian",
+      "kernel": "DikinWalkKernel",
+      "batch": 20000,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 752330.503579577,
+      "after": 774495.6716272035,
+      "speedup": 1.029462008973669
+    },
+    {
+      "target": "gaussian",
+      "kernel": "DikinWalkKernel",
+      "batch": 20000,
+      "workers": 4,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 2729100.8526051175,
+      "after": 2827264.3279485707,
+      "speedup": 1.0359691637081676
+    },
+    {
+      "target": "gaussian",
+      "kernel": "CSmMALAKernel",
+      "batch": 1,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 324883.22357831855,
+      "after": 356207.88775964786,
+      "speedup": 1.0964182263285687
+    },
+    {
+      "target": "gaussian",
+      "kernel": "CSmMALAKernel",
+      "batch": 16,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 595986.3774160428,
+      "after": 610792.2470365396,
+      "speedup": 1.0248426309418162
+    },
+    {
+      "target": "gaussian",
+      "kernel": "CSmMALAKernel",
+      "batch": 20000,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 608240.6696545769,
+      "after": 632195.0314553991,
+      "speedup": 1.0393830320725281
+    },
+    {
+      "target": "gaussian",
+      "kernel": "CSmMALAKernel",
+      "batch": 20000,
+      "workers": 4,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 2244799.6059980835,
+      "after": 2262809.5456360923,
+      "speedup": 1.0080229609760651
+    },
+    {
+      "target": "uniform",
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "batch": 1,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 902865.4466191548,
+      "after": 887179.0385562645,
+      "speedup": 0.9826259736468715
+    },
+    {
+      "target": "uniform",
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "batch": 16,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 13087806.11341754,
+      "after": 13340190.20888731,
+      "speedup": 1.019283911549624
+    },
+    {
+      "target": "uniform",
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "batch": 20000,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 19190911.15101801,
+      "after": 20133099.931055985,
+      "speedup": 1.0490955730357805
+    },
+    {
+      "target": "uniform",
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "batch": 20000,
+      "workers": 4,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 80600554.6326847,
+      "after": 81476434.58743075,
+      "speedup": 1.0108669221786084
+    },
+    {
+      "target": "uniform",
+      "kernel": "UniformHitAndRunKernel",
+      "batch": 1,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 724819.4374793993,
+      "after": 721116.1521946646,
+      "speedup": 0.9948907478287102
+    },
+    {
+      "target": "uniform",
+      "kernel": "UniformHitAndRunKernel",
+      "batch": 16,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 3114613.250775632,
+      "after": 3150443.7718481286,
+      "speedup": 1.0115040032863065
+    },
+    {
+      "target": "uniform",
+      "kernel": "UniformHitAndRunKernel",
+      "batch": 20000,
+      "workers": 1,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 3674320.0304114856,
+      "after": 3614723.927638278,
+      "speedup": 0.9837803723464629
+    },
+    {
+      "target": "uniform",
+      "kernel": "UniformHitAndRunKernel",
+      "batch": 20000,
+      "workers": 4,
+      "steps": 20000,
+      "thinning": 1,
+      "before": 12830855.6450806,
+      "after": 13035264.633002734,
+      "speedup": 1.0159310488385476
+    }
+  ]
+}

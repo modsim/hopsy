@@ -19,12 +19,14 @@ def main():
     target = core.GaussianTarget(
         np.zeros(dimension), np.array([[1.0, 0.5], [0.5, 1.0]])
     )
-    chain = core.GaussianRandomWalkKernel(
-        geometry, initial_state=np.zeros(dimension), seed=42, step_size=0.7
-    )  # step_size is a standard deviation in sampling coordinates.
+    problem = core.Problem(geometry, target)
+    initial_state = np.zeros(dimension)
+    kernel = core.GaussianRandomWalkKernel(initial_state, step_size=0.7)
+    chain = core.bind_chain(problem, kernel, initial_state)
+    rng = core.RandomNumberGenerator(seed=42)
 
-    chain.draw(2_000, target=target)  # Discard warm-up samples.
-    samples = chain.draw(20_000, thinning=3, target=target)
+    chain.draw(rng, 2_000)  # Discard warm-up samples.
+    samples = chain.draw(rng, 20_000, thinning=3)
 
     # Each column is one sample. The box slightly truncates the Gaussian tails.
     print("Sample shape:", samples.shape)

@@ -90,6 +90,16 @@ namespace hopsy {
             clear_target_data();
         }
 
+        // Cold reinitialization of a binding may replace state/geometry too.
+        void invalidate_state_cache() {
+            require_idle();
+            clear_target_data();
+            if constexpr (!symmetric_proposal) {
+                reverse_.current_metric_valid = false;
+                reverse_.candidate_metric_valid = false;
+            }
+        }
+
         template <typename Target, typename Geometry, typename Workspace>
         void propose(const State &state, RandomNumberGenerator &rng, const Target &target,
                      const Geometry &geometry, Workspace &workspace) {

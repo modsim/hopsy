@@ -1,4 +1,5 @@
-#pragma once
+#ifndef OVERRELAXED_LINE_KERNEL
+#define OVERRELAXED_LINE_KERNEL
 
 #include <algorithm>
 #include <cmath>
@@ -59,3 +60,5 @@ namespace hopsy {
     struct line_kernel_requires_mh<OverRelaxedLineKernel> : std::false_type {
     };
 } // namespace hopsy
+
+#endif //OVERRELAXED_LINE_KERNEL

@@ -124,23 +124,26 @@ def run_old(np, old, problem, count, args, seed):
 
 
 def run_new(np, new, geometry, count, args, seed):
+    problem = new.Problem(geometry, new.UniformTarget())
     chains = [
-        new.UniformCoordinateHitAndRunKernel(
-            geometry, np.zeros(DIMENSION), seed=seed + i
+        new.bind_chain(
+            problem,
+            new.UniformCoordinateHitAndRunKernel(np.zeros(DIMENSION)),
+            np.zeros(DIMENSION),
         )
-        for i in range(count)
+        for _ in range(count)
     ]
-    for k in chains:
-        k.draw(1, thinning=args.warmup)
+    rngs = [new.RandomNumberGenerator(seed + i) for i in range(count)]
+    for chain, rng in zip(chains, rngs):
+        chain.draw(rng, 1, thinning=args.warmup)
     start = time.perf_counter_ns()
     if count == 1:
-        samples = [chains[0].draw(args.samples, thinning=args.thinning)]
+        samples = [chains[0].draw(rngs[0], args.samples, thinning=args.thinning)]
     else:
-        # Native uniform draw releases the GIL. Each task owns a distinct chain.
         with ThreadPoolExecutor(max_workers=count) as pool:
             futures = [
-                pool.submit(k.draw, args.samples, thinning=args.thinning)
-                for k in chains
+                pool.submit(chain.draw, rng, args.samples, thinning=args.thinning)
+                for chain, rng in zip(chains, rngs)
             ]
             samples = [future.result() for future in futures]
     seconds = (time.perf_counter_ns() - start) / 1e9

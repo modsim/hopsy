@@ -69,6 +69,7 @@ target_compile_features(
 # ---------------------------------------------------------------------------
 
 add_subdirectory(dependencies)
+find_package(Threads REQUIRED)
 
 target_link_libraries(
         hopsy_core
@@ -76,6 +77,7 @@ target_link_libraries(
         Boost::headers
         Eigen3::Eigen
         hopsy::pcg
+        Threads::Threads
 )
 
 

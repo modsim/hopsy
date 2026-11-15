@@ -131,14 +131,32 @@ namespace hopsy {
             const Index rows = Sampling ? sampling_dimension() : target_dimension();
             if (thinning < 1 || samples.rows() != rows)
                 throw std::invalid_argument("Invalid output dimension or thinning");
-            for (Index sample = 0; sample < samples.cols(); ++sample) {
-                for (Index iteration = 0; iteration < thinning; ++iteration)
-                    step(rng);
-                if constexpr (Sampling || Problem::identity_coordinates)
-                    samples.col(sample) = state_;
-                else {
-                    auto column = samples.col(sample);
-                    problem_.coordinates().to_target(state_, column);
+            // Resolve the fixed binding once per batch. Cancellation surrounds
+            // the batch rather than rebuilding a single-step call each time.
+            auto &target = sampling_target();
+            const auto &geometry = problem_.geometry();
+            auto &workspace = mutable_workspace();
+            auto draw = [&] {
+                for (Index sample = 0; sample < samples.cols(); ++sample) {
+                    for (Index iteration = 0; iteration < thinning; ++iteration)
+                        hopsy::step(kernel_, state_, rng, target, geometry, workspace);
+                    if constexpr (Sampling || Problem::identity_coordinates)
+                        samples.col(sample) = state_;
+                    else {
+                        auto column = samples.col(sample);
+                        problem_.coordinates().to_target(state_, column);
+                    }
+                }
+            };
+            using Target = std::remove_cvref_t<decltype(target)>;
+            if constexpr (Kernel::template always_accept<Target>) {
+                draw();
+            } else {
+                try {
+                    draw();
+                } catch (...) {
+                    kernel_.reject(state_);
+                    throw;
                 }
             }
         }

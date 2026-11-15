@@ -1,233 +1,168 @@
-# Experimental hit-and-run bindings
+# Direct experimental core bindings
 
-The current bound-problem contracts and optional PolyRound coordinate mapping
-are described in [README_bound_contract.md](../benchmarks/README_bound_contract.md).
-A small Python 3 Gaussian sampling example is in
-[examples/gaussian.py](../examples/gaussian.py), with its run command in the docstring.
+`_hopsy_core` exposes concrete C++ problems, kernels, explicit random-number
+generators, and persistent chain bindings. The 2.0 API deliberately replaces the
+former geometry-owning Python kernel wrappers and per-call `target=` arguments.
 
-This directory builds `_hopsy_core` with nanobind. It contains the bindings,
-Python tests, and a usage example. No core headers are replaced.
+## Example
 
-## Integration
+```python
+import _hopsy_core as core
+import numpy as np
 
-In the root CMakeLists.txt, after the core target and dependency setup:
+n = 2
+geometry = core.LinearPolytope(
+    np.vstack((np.eye(n), -np.eye(n))), np.full(2*n, 4.0)
+)
+target = core.GaussianTarget(np.zeros(n), np.array([[1., .5], [.5, 1.]]))
+problem = core.Problem(geometry, target)
+initial_state = np.zeros(n)
+kernel = core.GaussianRandomWalkKernel(initial_state, step_size=0.7)
+chain = core.bind_chain(problem, kernel, initial_state)
+rng = core.RandomNumberGenerator(seed=42)
 
-```cmake
-if(HOPSY_BUILD_PYTHON)
-    add_subdirectory(bindings)
-endif()
+chain.draw(rng, 2_000)  # Discard warm-up.
+samples = chain.draw(rng, 20_000, thinning=3)
 ```
 
-Remove any earlier root-level `nanobind_add_module(_hopsy_core ...)` call:
-the target is now defined in `bindings/CMakeLists.txt`, with `bindings.cpp`
-relative to that directory. The stub's `src/python/bindings.cpp` path was fixed.
+See [the runnable Gaussian example](../examples/gaussian.py). Each column is one
+sample. `step_size` is a standard deviation in sampling coordinates, not variance.
+`GaussianTarget` takes a covariance matrix. The distribution above is restricted
+to the supplied box; its far tails are truncated.
 
-Python and nanobind must already be configured (as in the dependency setup we
-discussed). Discover Python in the parent scope, before configuring dependencies:
+The corresponding C++ construction uses the same objects and operations:
 
-```cmake
-if(HOPSY_BUILD_PYTHON)
-    find_package(Python 3.10 REQUIRED COMPONENTS Interpreter Development.Module)
-endif()
+```cpp
+#include <hopsy/kernel/gaussian_kernel.h>
+#include <hopsy/sampling/owned_chain.h>
+// geometry and target are already constructed.
+auto problem = hopsy::Problem(std::cref(geometry), std::cref(target));
+hopsy::Vector<double> initial_state = hopsy::Vector<double>::Zero(2);
+hopsy::GaussianKernel<hopsy::Vector<double>, hopsy::ZeroDrift,
+                      hopsy::IdentityMetric> kernel(initial_state, {}, {}, 0.7);
+auto chain = hopsy::bind_chain(problem, kernel,
+                              hopsy::Vector<double>(initial_state));
+hopsy::RandomNumberGenerator rng(42);
+auto samples = chain->draw(rng, 20'000, 3);
 ```
 
-For local tests, install NumPy and pytest into that same Python environment and
-ensure `enable_testing()` is called in the root CMakeLists.txt. Then:
+C++ `bind_chain` with an **lvalue** state retains its original borrowed-view
+semantics. An **rvalue** state selects `OwnedStateChain`, which owns the accepted
+vector and workspace and retains a persistent `BoundChain`. A shared pointer to
+an immutable problem optionally transfers shared ownership of that problem to
+the C++ owner. Python uses these owning overloads directly: the Eigen caster
+copies the NumPy initial vector once and moves it into C++ storage.
+
+The kernel owns its candidate and proposal caches, not the accepted state.
+Consequently the initial state appears in both kernel construction and binding.
+It must match the kernel candidate when constructing an owning binding; create
+a fresh kernel for a different initial state. State snapshots are detached copies.
+There is no mutable NumPy view into state, cached metrics, or workspace memory.
+
+## Lifetimes and execution
+
+- A problem constructed through Python borrows immutable geometry, native target,
+  and optional map objects. Nanobind retains these borrowed Python objects for the
+  lifetime of that concrete C++ problem. Custom Python targets are held by value
+  through the callback adapter.
+- A Python-held chain shares ownership of its current problem in C++, borrows its
+  kernel, and retains that kernel's Python object. Rebinding releases the old
+  shared problem. No Python sampling or state-management layer is involved.
+  As with C++ shared ownership, avoid strong ownership cycles. A callback target
+  that references its chain can use `weakref.ref(chain)`; chains support weakrefs.
+- A kernel can belong to one owning binding at a time. A chain and RNG cannot be
+  used concurrently or reentrantly. C++ boundary guards enforce these restrictions
+  once per public call, outside transition loops. Raw low-level C++ APIs retain
+  their existing caller-managed exclusivity contracts.
+- `draw` does not rebind, clear accepted-state caches, or allocate coordinate
+  evaluation buffers at each batch boundary. It allocates the requested result;
+  `draw_into` uses caller-provided output. The resource guards may allocate ordinary
+  bookkeeping storage at a call boundary; no such work occurs per transition.
+- Native uniform/Gaussian targets release the GIL during sampling. Python callbacks
+  retain the GIL and receive owning state copies. Overrides on subclasses of native
+  targets use the Python adapter, so overridden densities are respected.
+- `rng.seed(value)` reseeds only the RNG. It does not reset a kernel's retained
+  direction/distribution state. Construct a fresh kernel and RNG for exact replay.
+
+`Problem(...)` and `bind_chain(...)` select concrete template instantiations at
+construction, like C++ template deduction. Returned Python class names beginning
+with `_` are implementation details. There is no virtual target/kernel dispatch
+inside native transition loops. The bindings are split across translation units
+by kernel family to limit compiler memory consumption.
+
+## Operations
+
+```python
+accepted = chain.step(rng)
+physical = chain.draw(rng, 1000, thinning=2)
+sampling = chain.draw_sampling(rng, 1000, thinning=2)
+
+physical_out = np.empty((chain.target_dimension, 1000), order="F")
+chain.draw_into(rng, physical_out, thinning=2)
+sampling_out = np.empty((chain.sampling_dimension, 1000), order="F")
+chain.draw_sampling_into(rng, sampling_out, thinning=2)
+
+state_z = chain.sampling_state
+state_x = chain.target_state
+chain.step_size = 0.5  # Gaussian-family chains, between completed transitions.
+```
+
+Outputs must be writable float64 matrices with compatible dimensions and
+nonoverlapping positive strides. C/F contiguous and ordinary sliced matrices
+work. Direct kernel step-size access is permitted while unbound; use the chain's
+step-size property while bound. Invalid output arguments do not consume the RNG.
+
+All three Gaussian kernels and the nine Hit-and-Run combinations are available:
+`GaussianRandomWalkKernel`, `DikinWalkKernel`, `CSmMALAKernel`, and
+`{Uniform,Gaussian,OverRelaxed}{,Coordinate,RandomCoordinate}HitAndRunKernel`.
+The latter are concrete instantiations of C++ `HitAndRunKernel`; their constructors
+also accept the explicit direction-generator and line-kernel objects used in C++.
+A uniform problem uses an explicit `UniformTarget()`.
+
+## Coordinates and target changes
+
+Supply an optional `AffineCoordinates(T, shift)` when constructing the problem.
+The geometry and initial state are already in sampling coordinates `z`; physical
+coordinates are `x = T*z + shift`. Full-column-rank rectangular maps support
+PolyRound equality elimination. Targets are evaluated in physical coordinates;
+volume corrections and pulled-back gradients are handled by the core problem.
+See [coordinate mathematics and historical benchmarks](../benchmarks/README_bound_contract.md).
+
+```python
+coordinates = core.AffineCoordinates(T, shift)
+problem = core.Problem(rounded_geometry, physical_target, coordinates)
+```
+
+For an explicit change of target:
+
+```python
+new_problem = core.Problem(geometry, another_gaussian_target)
+chain.rebind_problem(new_problem)
+```
+
+Rebinding requires the **same concrete problem type**, geometry object, and map
+object (for mapped problems). Thus Gaussian-to-Gaussian and custom-Python-to-custom-
+Python replacements work; uniform-to-Gaussian requires a fresh binding/kernel.
+Target-dependent caches are invalidated once; geometry-only metric factors remain
+valid. A fresh owning binding invalidates both state- and geometry-dependent
+Gaussian caches. Do not silently mutate a bound target: create/rebind a problem
+explicitly, including after changing mathematical parameters on a Python target.
+Callbacks are captured at problem construction. Tempering controls and target
+families are a separate future feature.
+
+## Build and validation
+
+With the existing configured isolated environment:
 
 ```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
-    -DHOPSY_BUILD_PYTHON=ON -DHOPSY_BUILD_PYTHON_TESTS=ON
-cmake --build build -j 3
-ctest --test-dir build -R hopsy_python_bindings --output-on-failure
+cmake --build cpp/build-python -j 2
+PYTHONPATH=cpp/build-python/core/bindings cpp/.benchmark-venv/bin/python \
+  -m pytest -q cpp/bindings/tests
+PYTHONPATH=cpp/build-python/core/bindings cpp/.benchmark-venv/bin/python \
+  cpp/examples/gaussian.py
 ```
 
-CTest supplies the extension directory automatically. For direct use with a
-single-configuration generator, set `PYTHONPATH=build/bindings`; multi-configuration
-generators may place the extension in `build/bindings/Release` instead.
-
-`NOMINSIZE` retains Release optimization for instantiated sampling algorithms.
-The install destination defaults to `hopsy/experimental`, configurable with
-`HOPSY_PYTHON_INSTALL_DIR`. This directory does not provide wheel packaging or a
-Python facade; those can be added to the existing hopsy package separately.
-
-## Python API
-
-```python
-import numpy as np
-import _hopsy_core as h
-
-n = 3
-geometry = h.LinearPolytope(np.vstack((np.eye(n), -np.eye(n))), np.ones(2*n))
-kernel = h.UniformCoordinateHitAndRunKernel(geometry, np.zeros(n), seed=42)
-
-accepted = h.step(kernel)  # bool
-samples = h.draw(kernel, 10_000, thinning=3)
-# shape: (dimension, num_samples), float64, samples stored as columns
-
-# Equivalent methods:
-accepted = kernel.step()
-samples = kernel.draw(10_000, thinning=3)
-
-output = np.empty((n, 1000), dtype=np.float64, order='F')
-h.draw_into(kernel, output, thinning=3)
-# kernel.draw_into(output, thinning=3) is equivalent.
-
-current = kernel.state  # detached copy, not an editable view
-kernel.reset(np.zeros(n))  # rebuilds candidate + geometry workspace
-kernel.seed(123)  # resets RNG and direction-generator caches
-```
-
-All bound numeric types use double precision. Inputs must be NumPy arrays (or
-compatible arrays accepted by the Eigen caster), not Python lists. Geometry
-construction copies `A` and `b`; kernel construction copies `initial_state`.
-
-Each Python kernel is a small owning wrapper around one concrete core template
-instantiation. It owns the accepted state, candidate, geometry workspace, and RNG.
-Geometry is immutable through this API and shared between kernels without another
-matrix copy. The wrapper intentionally does not expose the raw propose/accept
-lifecycle or mutable state buffers: coordinate cache synchronization and dense
-buffer swaps remain internal. There is no virtual kernel hierarchy.
-
-| Direction generator | Uniform chord | Gaussian displacement | Overrelaxed chord |
-|---|---|---|---|
-| Random dense | `UniformHitAndRunKernel` | `GaussianHitAndRunKernel` | `OverRelaxedHitAndRunKernel` |
-| Cycling coordinate | `UniformCoordinateHitAndRunKernel` | `GaussianCoordinateHitAndRunKernel` | `OverRelaxedCoordinateHitAndRunKernel` |
-| Random coordinate | `UniformRandomCoordinateHitAndRunKernel` | `GaussianRandomCoordinateHitAndRunKernel` | `OverRelaxedRandomCoordinateHitAndRunKernel` |
-
-Every constructor takes `(geometry, initial_state, seed=0)`. Gaussian variants
-also accept `standard_deviation=1.0` as their fourth argument. This controls the
-proposal distribution, not the target. The geometry and starting state must be
-finite, dimensionally compatible, and the starting state feasible. No rounding
-or initial-point search is performed. The core line kernels retain their domain
-requirements (e.g. positive-length bounded chords for uniform sampling).
-
-## Targets and threads
-
-Omitting `target` (or passing `None` or an exact `UniformTarget()` instance) uses
-the native uniform target and releases the GIL around the C++ sampling operation.
-The same API also accepts a Python object with a `log_density(state)` method:
-
-```python
-class LinearTarget:
-    def log_density(self, state):
-        return float(state[0])
-
-samples = kernel.draw(10_000, thinning=3, target=LinearTarget())
-```
-
-Python targets keep the GIL held. The attribute is resolved once per sampling
-call, while density evaluations happen as needed in the C++ loop. Each evaluation
-receives a detached NumPy snapshot, so retaining or modifying it cannot damage the
-chain. Those snapshots incur copies and callbacks; use the native uniform path
-for core throughput benchmarks. UniformTarget subclasses are treated as Python
-targets so overrides are respected. Native nonuniform targets and affine target
-wrappers can be bound later.
-
-Independent native chains can run from multiple Python threads. A nonblocking
-per-chain lock rejects simultaneous or reentrant operations on the same chain.
-The lock is acquired once per batch, not once per sample. This build does not
-opt into nanobind's free-threaded CPython mode; that requires separate validation.
-The caller must not mutate output arrays from another thread while draw_into runs.
-
-If target evaluation raises, the exception propagates and the pending core
-proposal is discarded by rebuilding caches from the last accepted state. The
-kernel remains usable. Completed transitions and consumed RNG values are retained;
-coordinate cycling and direction-distribution caches restart. Partially written
-`draw_into` output is not rolled back. Invalid counts, dimensions, and reset states
-are rejected before advancing the chain.
-
-## Output semantics
-
-One step means one attempted transition. Thinning counts attempts, including
-rejections. Stored samples may therefore repeat. The initial state is not stored
-as a separate sample. Output remains in sampling coordinates.
-
-`draw` returns an owning matrix whose NumPy view remains valid after the kernel is
-advanced or deleted. `draw_into` requires writable float64 storage and disables
-implicit conversion, so it cannot silently write into a temporary. C- and
-F-contiguous arrays and ordinary positive-stride slices are supported. Overlapping
-or negative-stride output layouts are rejected. Getters (`state`, `A`, `b`) return
-detached arrays; use `reset` to change chain state safely.
-
-## Validation scope
-
-Tests cover all nine instantiations, native and Python targets, sample shapes and
-thinning, deterministic seeded replay, ownership/lifetimes, reset/reseed,
-C/F/sliced output buffers, invalid arguments, rejection, Python exceptions,
-reentrancy, and independent chains in Python threads. Fixed-seed nonuniform tests
-check the known mean of exp(x0) on [-1,1]^2.
-
-The supplied archive contained only the binding CMake stub. Validation therefore
-used the core from this session with the agreed void-propose and synchronized
-coordinate accept/reject changes applied in the test workspace. The bindings do
-not depend on the return value of propose() and also work with its earlier
-reference-returning signature. Tested environment: Linux x86-64, GCC 13.3,
-Python 3.12, NumPy 2.3.5, nanobind 2.12.0, Eigen 5.0.1, and Boost 1.89.0.
-
-Validation result: 43 Python tests passed. The installed module import and
-example execution also passed; all 66 C++ tests passed in the reconstructed core
-test workspace. The example's uniform second moments were approximately 0.332, 0.332,
-and 0.330 (expected 1/3). The Python test count excludes the separate install and
-example smoke checks.
-
-Nanobind references:
-- https://nanobind.readthedocs.io/en/latest/eigen.html
-- https://nanobind.readthedocs.io/en/latest/ownership.html
-
-
-## Gaussian-family bindings
-
-`GaussianRandomWalkKernel`, `DikinWalkKernel`, and `CSmMALAKernel` accept
-`(geometry, initial_state, seed=0, step_size=1.0)`. Their `step_size` property is
-a positive finite standard-deviation multiplier, readable/writable between
-completed transitions. They provide `state` (a detached copy), `dimension`,
-`reset`, `seed`, `step`, `draw`, and `draw_into`. They use separate owning
-contexts and do not change Hit-and-Run state/candidate ownership.
-
-```python
-from concurrent.futures import ThreadPoolExecutor
-import numpy as np
-import _hopsy_core as h
-
-n = 10
-geometry = h.LinearPolytope(np.vstack((np.eye(n), -np.eye(n))), np.full(2*n, 3.))
-target = h.GaussianTarget(np.zeros(n), np.eye(n))
-chains = [h.CSmMALAKernel(geometry, np.zeros(n), seed=i, step_size=0.3)
-          for i in range(4)]
-with ThreadPoolExecutor(4) as pool:
-    samples = list(pool.map(lambda c: c.draw(100000, target=target), chains))
-```
-
-`GaussianTarget` is an immutable native double-precision Gaussian density with
-log density and gradient. Native target draws release the GIL for the complete
-batch. Geometry and this target may be shared; each concurrent task must use a
-distinct chain. Uniform targets also release the GIL. Python targets retain the
-GIL and require `log_gradient` for CSmMALA, in addition to `log_density`.
-Those callbacks receive detached state copies. Thread speedups measured with
-native targets should not be assumed for Python callbacks.
-
-Dikin/CSmMALA construction and reset require a strict-interior initial state and
-full-rank constraint normals. State-dependent factors initialize lazily in the
-kernel; wrapper exception recovery reconstructs the context from the last
-accepted state. RNG consumption and completed transitions are not rolled back.
-CSmMALA currently uses the Dikin metric only (legacy `fisher_weight=0`) and clips
-gradient norm at 1. Scale has no implicit dimension normalization.
-
-The actual pybind11-multiprocessing versus nanobind-thread comparison and
-reproducible local build commands are documented in
-`../benchmarks/README_python_profile.md`.
-
-
-### Target caches and batch boundaries
-
-Gaussian-family chains cache accepted-state density and unscaled preconditioned
-gradient data within each draw batch. Step-size changes preserve these caches.
-Target changes between Python `draw`, `draw_into`, or `step` calls are safe:
-these entry points start with fresh target caches. During a batch, targets must
-remain fixed mathematical functions. C++ callers using repeated low-level
-`step` calls can retain caches across transitions, but must call
-`invalidate_target_cache()` after mutating a target in place. Different target
-types/addresses are detected automatically. See
-`../benchmarks/README_csmala_cache.md` for the explicit pending-proposal lifecycle
-and matched single-chain benchmarks. No stored Gaussian proposal correction is
-exposed or retained; Hit-and-Run still stores its line normalization correction.
+`bindings/CMakeLists.txt` links the extension to `hopsy::core`. Enable
+`HOPSY_BUILD_PYTHON_TESTS` to register the suite with CTest. No legacy package,
+facade, or installed extension is changed. API performance measurements and their
+reproduction commands are in [README_direct_bindings.md](../benchmarks/README_direct_bindings.md).

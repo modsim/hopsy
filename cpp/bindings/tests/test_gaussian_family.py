@@ -1,124 +1,211 @@
+import gc
+import threading
+import weakref
 from concurrent.futures import ThreadPoolExecutor
 
 import _hopsy_core as core
 import numpy as np
 import pytest
+from test_bindings import GAUSSIAN, box, make
 
-NAMES = ["GaussianRandomWalkKernel", "DikinWalkKernel", "CSmMALAKernel"]
+
+class Counted:
+    def __init__(self, mean=0.0):
+        self.mean = mean
+        self.densities = self.gradients = 0
+
+    def log_density(self, x):
+        self.densities += 1
+        return -0.5 * np.sum((x - self.mean) ** 2)
+
+    def log_gradient(self, x):
+        self.gradients += 1
+        return self.mean - x
 
 
-def make(name, seed=42):
-    n = 3
-    geometry = core.LinearPolytope(
-        np.vstack((np.eye(n), -np.eye(n))), np.full(2 * n, 3.0)
+@pytest.mark.parametrize("mapped", [False, True])
+def test_csmala_caches_survive_python_batches_and_rebinding_releases_target(mapped):
+    target = Counted()
+    old = weakref.ref(target)
+    g = box(2, 100.0)
+    coordinates = core.AffineCoordinates(np.eye(2), np.zeros(2)) if mapped else None
+    p = core.Problem(g, target, coordinates)
+    assert p.geometry is g and p.target is target
+    if mapped:
+        assert p.coordinates is coordinates
+    chain = core.bind_chain(
+        p, core.CSmMALAKernel(np.zeros(2), step_size=0.001), np.zeros(2)
     )
-    return getattr(core, name)(geometry, np.zeros(n), seed=seed, step_size=0.3)
+    rng = core.RandomNumberGenerator(4)
+    chain.draw(rng, 4)
+    assert (target.densities, target.gradients) == (5, 5)
+    chain.draw(rng, 4)
+    assert (target.densities, target.gradients) == (9, 9)
+    replacement = Counted(0.5)
+    p2 = core.Problem(g, replacement, coordinates)
+    chain.rebind_problem(p2)
+    del p, target, p2
+    gc.collect()
+    assert old() is None
+    chain.step(rng)
+    assert (replacement.densities, replacement.gradients) == (2, 2)
+    # The currently bound problem is retained by C++ shared ownership.
+    chain.draw(rng, 2)
+    assert replacement.densities == 4
 
 
-def target():
-    return core.GaussianTarget(np.zeros(3), np.eye(3))
-
-
-@pytest.mark.parametrize("name", NAMES)
-def test_scale_reset_reseed_and_draw_into(name):
-    a, b = make(name), make(name)
-    density = target()
-    a.step_size = 0.4
-    b.step_size = 0.4
-    for bad in [0.0, -1.0, np.nan, np.inf]:
-        with pytest.raises(ValueError):
-            a.step_size = bad
-        assert a.step_size == 0.4
-    out = np.empty((3, 100), order="F")
-    a.draw_into(out, target=density)
-    np.testing.assert_array_equal(out, b.draw(100, target=density))
-    saved = a.state
-    a.draw(10, target=density)
-    np.testing.assert_array_equal(saved, out[:, -1])
-    a.reset(np.zeros(3))
-    a.seed(42)
-    np.testing.assert_array_equal(a.draw(100, target=density), out)
-    before = a.state
+@pytest.mark.parametrize("name", GAUSSIAN + ["UniformCoordinateHitAndRunKernel"])
+def test_rebinding_changes_distribution_without_changing_geometry(name):
+    g = box(2, 6.0)
+    p = core.Problem(g, core.GaussianTarget(np.zeros(2), np.eye(2)))
+    initial = np.zeros(2)
+    chain = core.bind_chain(p, getattr(core, name)(initial), initial)
+    rng = core.RandomNumberGenerator(8)
+    chain.draw(rng, 10)
+    before = chain.sampling_state
+    new_target = core.GaussianTarget(np.ones(2), np.eye(2))
     with pytest.raises(ValueError):
-        a.reset(np.ones(2))
-    np.testing.assert_array_equal(a.state, before)
+        chain.rebind_problem(core.Problem(box(2, 6.0), new_target))
+    np.testing.assert_array_equal(chain.sampling_state, before)
+    chain.rebind_problem(core.Problem(g, new_target))
+    chain.draw(rng, 3000)
+    samples = chain.draw(rng, 25000, thinning=3)
+    assert np.max(np.abs(samples.mean(axis=1) - 1.0)) < 0.1
 
 
-@pytest.mark.parametrize("name", NAMES)
-def test_native_target_parallel_reproducibility(name):
-    density = target()
-    serial = [make(name, i).draw(3000, target=density) for i in range(4)]
-    chains = [make(name, i) for i in range(4)]
-    with ThreadPoolExecutor(4) as pool:
-        parallel = list(pool.map(lambda c: c.draw(3000, target=density), chains))
-    for x, y in zip(serial, parallel):
-        np.testing.assert_array_equal(x, y)
-        assert np.max(np.abs(y)) <= 3.0
+@pytest.mark.parametrize("name", GAUSSIAN + ["UniformCoordinateHitAndRunKernel"])
+def test_callback_failure_cancels_pending_transition(name):
+    class Target(Counted):
+        fail = True
 
-
-@pytest.mark.parametrize("name", NAMES)
-def test_python_gradient_target_and_recovery(name):
-    class PythonTarget:
         def log_density(self, x):
-            return -0.5 * x.dot(x)
+            if self.fail:
+                raise RuntimeError("deliberate callback failure")
+            return super().log_density(x)
+
+    t = Target()
+    chain, rng = make(name, target=t)
+    with pytest.raises(RuntimeError, match="deliberate"):
+        chain.step(rng)
+    np.testing.assert_array_equal(chain.sampling_state, np.zeros(3))
+    t.fail = False  # Restore the same mathematical density, not a target update.
+    assert np.all(np.isfinite(chain.draw(rng, 100)))
+
+
+def test_callbacks_cannot_mutate_or_retain_core_state():
+    class Target(Counted):
+        retained = []
 
         def log_gradient(self, x):
-            return -x
-
-    class Broken(PythonTarget):
-        def log_density(self, x):
-            raise RuntimeError("test target failure")
-
-    chain = make(name)
-    with pytest.raises(RuntimeError, match="test target failure"):
-        chain.draw(10, target=Broken())
-    samples = chain.draw(100, target=PythonTarget())
-    assert samples.shape == (3, 100)
-    assert np.isfinite(samples).all()
-
-
-def test_native_gaussian_density_and_input_validation():
-    density = target()
-    x = np.array([0.25, -0.5, 1.0])
-    np.testing.assert_allclose(density.log_gradient(x), -x)
-    assert density.log_density(x) == pytest.approx(
-        -1.5 * np.log(2 * np.pi) - 0.5 * x.dot(x)
-    )
-    with pytest.raises(ValueError):
-        core.GaussianTarget(np.zeros(3), np.zeros((3, 3)))
-    g = core.LinearPolytope(np.vstack((np.eye(3), -np.eye(3))), np.ones(6))
-    for name in ["DikinWalkKernel", "CSmMALAKernel"]:
-        with pytest.raises(ValueError):
-            getattr(core, name)(g, np.ones(3))
-
-
-@pytest.mark.parametrize("name", NAMES)
-@pytest.mark.parametrize("entry", ["draw", "step"])
-def test_changed_python_targets_start_with_fresh_cache(name, entry):
-    class MutableTarget:
-        mean = 0.0
+            value = -x.copy()
+            self.retained.append(x)
+            x[:] = 100.0
+            return value
 
         def log_density(self, x):
-            return -0.5 * np.sum((x - self.mean) ** 2)
+            value = -0.5 * x.dot(x)
+            self.retained.append(x)
+            x[:] = 100.0
+            return value
 
+    t = Target()
+    a, ra = make("CSmMALAKernel", target=t)
+    b, rb = make("CSmMALAKernel", target=Counted())
+    np.testing.assert_array_equal(a.draw(ra, 100), b.draw(rb, 100))
+    for x in t.retained:
+        x[:] = -100.0
+    assert np.max(np.abs(a.sampling_state)) <= 3.0
+
+
+def test_reentrant_and_shared_rng_access_fail_without_deadlock():
+    entered, resume = threading.Event(), threading.Event()
+
+    class Blocking(Counted):
+        def log_density(self, x):
+            entered.set()
+            assert resume.wait(5.0)
+            return super().log_density(x)
+
+    a, rng = make("GaussianRandomWalkKernel", target=Blocking())
+    b, _ = make("GaussianRandomWalkKernel")
+    with ThreadPoolExecutor(1) as pool:
+        future = pool.submit(a.step, rng)
+        try:
+            assert entered.wait(5.0)
+            with pytest.raises(RuntimeError):
+                a.step(core.RandomNumberGenerator(1))
+            with pytest.raises(RuntimeError):
+                b.step(rng)
+            with pytest.raises(RuntimeError):
+                rng.seed(2)
+        finally:
+            resume.set()
+        future.result()
+    rng.seed(2)
+
+
+def test_bad_gradients_fail_and_lease_is_released():
+    class Bad(Counted):
         def log_gradient(self, x):
-            return self.mean - x
+            return np.zeros(x.size + 1)
 
-    density = MutableTarget()
-    a, b = make(name), make(name)
-    np.testing.assert_array_equal(
-        a.draw(50, target=density), b.draw(50, target=density)
+    chain, rng = make("CSmMALAKernel", target=Bad())
+    with pytest.raises(ValueError, match="gradient dimension"):
+        chain.step(rng)
+    # Recovery is allowed with the same geometry; use a fresh chain here.
+    other, _ = make("GaussianRandomWalkKernel")
+    other.step(rng)
+
+
+def test_native_target_subclass_overrides_use_python_adapter():
+    class Overridden(core.GaussianTarget):
+        def log_density(self, x):
+            raise RuntimeError("Python override was evaluated")
+
+    target = Overridden(np.zeros(3), np.eye(3))
+    chain, rng = make("GaussianRandomWalkKernel", target=target)
+    with pytest.raises(RuntimeError, match="Python override"):
+        chain.step(rng)
+
+
+def test_callback_can_reference_chain_weakly_without_an_ownership_cycle():
+    class Observed(Counted):
+        chain = None
+
+        def log_density(self, x):
+            assert self.chain() is not None
+            return super().log_density(x)
+
+    target = Observed()
+    chain, rng = make("GaussianRandomWalkKernel", target=target)
+    target.chain = weakref.ref(chain)
+    chain.step(rng)
+    del chain
+    gc.collect()
+    assert target.chain() is None
+
+
+def test_exception_partway_through_batch_keeps_completed_transitions():
+    class Interrupted(Counted):
+        def log_density(self, x):
+            if self.densities == 4:
+                raise RuntimeError("interrupted batch")
+            return super().log_density(x)
+
+    target = Interrupted()
+    g = box(2, 100.0)
+    initial = np.zeros(2)
+    p = core.Problem(g, target)
+    c = core.bind_chain(p, core.CSmMALAKernel(initial, step_size=0.001), initial)
+    reference = core.bind_chain(
+        core.Problem(g, Counted()),
+        core.CSmMALAKernel(initial, step_size=0.001),
+        initial,
     )
-    density.mean = 0.8
-    # Rebuild only the reference context while preserving its RNG position.
-    b.reset(b.state)
-    if entry == "draw":
-        np.testing.assert_array_equal(
-            a.draw(100, target=density), b.draw(100, target=density)
-        )
-    else:
-        for _ in range(20):
-            density.mean += 0.01
-            b.reset(b.state)
-            assert a.step(density) == b.step(density)
-            np.testing.assert_array_equal(a.state, b.state)
+    rng, expected_rng = core.RandomNumberGenerator(6), core.RandomNumberGenerator(6)
+    reference.draw(expected_rng, 3)
+    with pytest.raises(RuntimeError, match="interrupted batch"):
+        c.draw(rng, 20)
+    np.testing.assert_array_equal(c.sampling_state, reference.sampling_state)
+    c.rebind_problem(core.Problem(g, Counted()))
+    assert np.isfinite(c.draw(rng, 20)).all()

@@ -1,5 +1,5 @@
-#ifndef LINE_H
-#define LINE_H
+#ifndef UNIFORM_LINE_H
+#define UNIFORM_LINE_H
 
 #include <cmath>
 #include <random>
@@ -83,4 +83,4 @@ namespace hopsy {
 
 }
 
-#endif //LINE_H
+#endif //UNIFORM_LINE_H

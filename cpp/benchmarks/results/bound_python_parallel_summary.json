@@ -1,0 +1,51 @@
+[
+  {
+    "target": "gaussian",
+    "kernel": "UniformCoordinateHitAndRunKernel",
+    "before": 25043051.19583042,
+    "after": 21950968.735695075,
+    "speedup": 0.8765293240046498
+  },
+  {
+    "target": "gaussian",
+    "kernel": "UniformHitAndRunKernel",
+    "before": 10044108.652930444,
+    "after": 8843464.336154709,
+    "speedup": 0.880462830673836
+  },
+  {
+    "target": "gaussian",
+    "kernel": "GaussianRandomWalkKernel",
+    "before": 14223471.157000214,
+    "after": 11532510.186474662,
+    "speedup": 0.8108084207559159
+  },
+  {
+    "target": "gaussian",
+    "kernel": "DikinWalkKernel",
+    "before": 2695834.1617143634,
+    "after": 2065525.137259034,
+    "speedup": 0.766191469265121
+  },
+  {
+    "target": "gaussian",
+    "kernel": "CSmMALAKernel",
+    "before": 2091482.2951864933,
+    "after": 2019695.0848971705,
+    "speedup": 0.965676395896566
+  },
+  {
+    "target": "uniform",
+    "kernel": "UniformCoordinateHitAndRunKernel",
+    "before": 99212235.01181786,
+    "after": 94648139.8665769,
+    "speedup": 0.9539966502649869
+  },
+  {
+    "target": "uniform",
+    "kernel": "UniformHitAndRunKernel",
+    "before": 12067522.98007099,
+    "after": 11739412.420693278,
+    "speedup": 0.9728104466907109
+  }
+]

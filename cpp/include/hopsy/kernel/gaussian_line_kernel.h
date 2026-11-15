@@ -1,9 +1,9 @@
-#pragma once
+#ifndef GAUSSIAN_LINE_KERNEL_H
+#define GAUSSIAN_LINE_KERNEL_H
 
 #include <boost/math/distributions/normal.hpp>
 #include <algorithm>
 #include <cmath>
-#include <limits>
 #include <random>
 #include <ranges>
 #include <stdexcept>
@@ -133,4 +133,6 @@ namespace hopsy {
             return std::clamp(value, a, b);
         }
     };
-} // namespace hopsy
+}
+
+#endif //GAUSSIAN_LINE_KERNEL_H

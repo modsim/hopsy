@@ -1,3 +1,6 @@
+> Historical contract-refactor checkpoint. The Python compatibility API below
+> has been replaced by [direct persistent bindings](../bindings/README.md).
+
 # Bound problems, kernel contracts, and coordinates
 
 `problem/problem.h`, `problem/coordinates.h`, and `sampling/chain.h` introduce

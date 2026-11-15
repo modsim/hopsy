@@ -1,0 +1,5 @@
+UniformCoordinateHitAndRunKernel 500000 4 28563897
+UniformHitAndRunKernel 500000 4 10530049
+GaussianRandomWalkKernel 500000 4 15738943
+DikinWalkKernel 500000 4 2870813
+CSmMALAKernel 500000 4 2323969
