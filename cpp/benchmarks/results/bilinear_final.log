@@ -1,0 +1,352 @@
+completed 0 before
+completed 0 after
+completed 1 after
+completed 1 before
+completed 2 before
+completed 2 after
+[
+  {
+    "variant": "before",
+    "region": "linear",
+    "dimension": 2,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 1,
+    "steps_per_second": 12611713.772324564
+  },
+  {
+    "variant": "before",
+    "region": "linear",
+    "dimension": 2,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 4,
+    "steps_per_second": 44726390.66861442
+  },
+  {
+    "variant": "before",
+    "region": "linear",
+    "dimension": 2,
+    "kernel": "UniformCoordinateHitAndRunKernel",
+    "workers": 1,
+    "steps_per_second": 69210900.91713028
+  },
+  {
+    "variant": "before",
+    "region": "linear",
+    "dimension": 2,
+    "kernel": "UniformCoordinateHitAndRunKernel",
+    "workers": 4,
+    "steps_per_second": 189811164.48803174
+  },
+  {
+    "variant": "before",
+    "region": "linear",
+    "dimension": 10,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 1,
+    "steps_per_second": 3896002.372281662
+  },
+  {
+    "variant": "before",
+    "region": "linear",
+    "dimension": 10,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 4,
+    "steps_per_second": 14340584.075159108
+  },
+  {
+    "variant": "before",
+    "region": "linear",
+    "dimension": 10,
+    "kernel": "UniformCoordinateHitAndRunKernel",
+    "workers": 1,
+    "steps_per_second": 37349674.5636034
+  },
+  {
+    "variant": "before",
+    "region": "linear",
+    "dimension": 10,
+    "kernel": "UniformCoordinateHitAndRunKernel",
+    "workers": 4,
+    "steps_per_second": 137917770.59540677
+  },
+  {
+    "variant": "after",
+    "region": "linear",
+    "dimension": 2,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 1,
+    "steps_per_second": 13021785.550768739,
+    "scaling": 1.0,
+    "relative_to_frozen_linear": 1.0325151510609165
+  },
+  {
+    "variant": "after",
+    "region": "linear",
+    "dimension": 2,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 4,
+    "steps_per_second": 46849139.45906974,
+    "scaling": 3.5977508058642544,
+    "relative_to_frozen_linear": 1.0474607666463214
+  },
+  {
+    "variant": "after",
+    "region": "linear",
+    "dimension": 2,
+    "kernel": "UniformCoordinateHitAndRunKernel",
+    "workers": 1,
+    "steps_per_second": 71682784.1825404,
+    "scaling": 1.0,
+    "relative_to_frozen_linear": 1.0357152302983288
+  },
+  {
+    "variant": "after",
+    "region": "linear",
+    "dimension": 2,
+    "kernel": "UniformCoordinateHitAndRunKernel",
+    "workers": 4,
+    "steps_per_second": 265579032.00321123,
+    "scaling": 3.704920714671371,
+    "relative_to_frozen_linear": 1.3991749785611631
+  },
+  {
+    "variant": "after",
+    "region": "vector_only",
+    "dimension": 2,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 1,
+    "steps_per_second": 11564626.41684153,
+    "scaling": 1.0,
+    "relative_to_frozen_linear": 0.9169750143092538
+  },
+  {
+    "variant": "after",
+    "region": "vector_only",
+    "dimension": 2,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 4,
+    "steps_per_second": 38433460.971762,
+    "scaling": 3.3233638153491474,
+    "relative_to_frozen_linear": 0.859301642659301
+  },
+  {
+    "variant": "after",
+    "region": "vector_only",
+    "dimension": 2,
+    "kernel": "UniformCoordinateHitAndRunKernel",
+    "workers": 1,
+    "steps_per_second": 52494383.496289164,
+    "scaling": 1.0,
+    "relative_to_frozen_linear": 0.758469876864388
+  },
+  {
+    "variant": "after",
+    "region": "vector_only",
+    "dimension": 2,
+    "kernel": "UniformCoordinateHitAndRunKernel",
+    "workers": 4,
+    "steps_per_second": 128460439.21855888,
+    "scaling": 2.4471273051075983,
+    "relative_to_frozen_linear": 0.6767802071340159
+  },
+  {
+    "variant": "after",
+    "region": "opposite",
+    "dimension": 2,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 1,
+    "steps_per_second": 6977315.498239195,
+    "scaling": 1.0,
+    "relative_to_frozen_linear": 0.5532408698927482
+  },
+  {
+    "variant": "after",
+    "region": "opposite",
+    "dimension": 2,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 4,
+    "steps_per_second": 25067504.59692123,
+    "scaling": 3.5927147917056783,
+    "relative_to_frozen_linear": 0.5604633913487613
+  },
+  {
+    "variant": "after",
+    "region": "dense_cross",
+    "dimension": 2,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 1,
+    "steps_per_second": 4390977.636951182,
+    "scaling": 1.0,
+    "relative_to_frozen_linear": 0.3481666105194081
+  },
+  {
+    "variant": "after",
+    "region": "dense_cross",
+    "dimension": 2,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 4,
+    "steps_per_second": 15721600.885359636,
+    "scaling": 3.5804329206913756,
+    "relative_to_frozen_linear": 0.35150613877707465
+  },
+  {
+    "variant": "after",
+    "region": "dense_cross",
+    "dimension": 2,
+    "kernel": "UniformCoordinateHitAndRunKernel",
+    "workers": 1,
+    "steps_per_second": 8104117.750282085,
+    "scaling": 1.0,
+    "relative_to_frozen_linear": 0.11709308277875989
+  },
+  {
+    "variant": "after",
+    "region": "dense_cross",
+    "dimension": 2,
+    "kernel": "UniformCoordinateHitAndRunKernel",
+    "workers": 4,
+    "steps_per_second": 27898425.487713955,
+    "scaling": 3.44250001633341,
+    "relative_to_frozen_linear": 0.14697989743102308
+  },
+  {
+    "variant": "after",
+    "region": "linear",
+    "dimension": 10,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 1,
+    "steps_per_second": 3943256.071853148,
+    "scaling": 1.0,
+    "relative_to_frozen_linear": 1.0121287656053997
+  },
+  {
+    "variant": "after",
+    "region": "linear",
+    "dimension": 10,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 4,
+    "steps_per_second": 14334072.223627994,
+    "scaling": 3.6350853108283285,
+    "relative_to_frozen_linear": 0.9995459144831907
+  },
+  {
+    "variant": "after",
+    "region": "linear",
+    "dimension": 10,
+    "kernel": "UniformCoordinateHitAndRunKernel",
+    "workers": 1,
+    "steps_per_second": 37797596.068171054,
+    "scaling": 1.0,
+    "relative_to_frozen_linear": 1.0119926481234764
+  },
+  {
+    "variant": "after",
+    "region": "linear",
+    "dimension": 10,
+    "kernel": "UniformCoordinateHitAndRunKernel",
+    "workers": 4,
+    "steps_per_second": 120359117.91408646,
+    "scaling": 3.1843061579103855,
+    "relative_to_frozen_linear": 0.8726875252875855
+  },
+  {
+    "variant": "after",
+    "region": "vector_only",
+    "dimension": 10,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 1,
+    "steps_per_second": 3664990.544299195,
+    "scaling": 1.0,
+    "relative_to_frozen_linear": 0.94070541906596
+  },
+  {
+    "variant": "after",
+    "region": "vector_only",
+    "dimension": 10,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 4,
+    "steps_per_second": 13373773.708081773,
+    "scaling": 3.649060903822619,
+    "relative_to_frozen_linear": 0.9325822182687765
+  },
+  {
+    "variant": "after",
+    "region": "vector_only",
+    "dimension": 10,
+    "kernel": "UniformCoordinateHitAndRunKernel",
+    "workers": 1,
+    "steps_per_second": 28848366.291909788,
+    "scaling": 1.0,
+    "relative_to_frozen_linear": 0.77238601484421
+  },
+  {
+    "variant": "after",
+    "region": "vector_only",
+    "dimension": 10,
+    "kernel": "UniformCoordinateHitAndRunKernel",
+    "workers": 4,
+    "steps_per_second": 88767715.02960402,
+    "scaling": 3.077044784144257,
+    "relative_to_frozen_linear": 0.64362782726536
+  },
+  {
+    "variant": "after",
+    "region": "opposite",
+    "dimension": 10,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 1,
+    "steps_per_second": 2914668.6309239212,
+    "scaling": 1.0,
+    "relative_to_frozen_linear": 0.7481177762263449
+  },
+  {
+    "variant": "after",
+    "region": "opposite",
+    "dimension": 10,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 4,
+    "steps_per_second": 10595210.28015401,
+    "scaling": 3.6351337396441643,
+    "relative_to_frozen_linear": 0.7388269699912106
+  },
+  {
+    "variant": "after",
+    "region": "dense_cross",
+    "dimension": 10,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 1,
+    "steps_per_second": 1776305.143428577,
+    "scaling": 1.0,
+    "relative_to_frozen_linear": 0.45593020067600687
+  },
+  {
+    "variant": "after",
+    "region": "dense_cross",
+    "dimension": 10,
+    "kernel": "UniformHitAndRunKernel",
+    "workers": 4,
+    "steps_per_second": 6601765.000997302,
+    "scaling": 3.716571460382505,
+    "relative_to_frozen_linear": 0.46035537788401104
+  },
+  {
+    "variant": "after",
+    "region": "dense_cross",
+    "dimension": 10,
+    "kernel": "UniformCoordinateHitAndRunKernel",
+    "workers": 1,
+    "steps_per_second": 3339364.448218318,
+    "scaling": 1.0,
+    "relative_to_frozen_linear": 0.08940812703820637
+  },
+  {
+    "variant": "after",
+    "region": "dense_cross",
+    "dimension": 10,
+    "kernel": "UniformCoordinateHitAndRunKernel",
+    "workers": 4,
+    "steps_per_second": 12121823.648865538,
+    "scaling": 3.629979248097046,
+    "relative_to_frozen_linear": 0.08789167339737468
+  }
+]

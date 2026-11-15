@@ -1,0 +1,359 @@
+{
+  "platform": "Linux-6.18.55-1-lts-x86_64-with-glibc2.44",
+  "python": "3.14.8 (main, Oct  2 2026, 10:23:31) [GCC 16.2.1 20260810]",
+  "cpus": "0,1,2,3",
+  "steps": 1000000,
+  "thinning": 20,
+  "worker_local": false,
+  "repetitions_per_case": 15,
+  "module_sha256": {
+    "before": "cce4a7cc517fe025b8512193c35e9f0c6504918f7e5e86ed6d07d341521223e5",
+    "after": "f95e6b60e28b771a86dea5f42f7b6099141d386407910678f5e9d9d008873005"
+  },
+  "rows": [
+    {
+      "variant": "before",
+      "region": "linear",
+      "dimension": 2,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 1,
+      "steps_per_second": 12995785.817522828
+    },
+    {
+      "variant": "before",
+      "region": "linear",
+      "dimension": 2,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 4,
+      "steps_per_second": 45124595.94533344
+    },
+    {
+      "variant": "before",
+      "region": "linear",
+      "dimension": 2,
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "workers": 1,
+      "steps_per_second": 67246542.56172505
+    },
+    {
+      "variant": "before",
+      "region": "linear",
+      "dimension": 2,
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "workers": 4,
+      "steps_per_second": 258898352.53660572
+    },
+    {
+      "variant": "before",
+      "region": "linear",
+      "dimension": 10,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 1,
+      "steps_per_second": 3942965.81963251
+    },
+    {
+      "variant": "before",
+      "region": "linear",
+      "dimension": 10,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 4,
+      "steps_per_second": 14640824.450010726
+    },
+    {
+      "variant": "before",
+      "region": "linear",
+      "dimension": 10,
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "workers": 1,
+      "steps_per_second": 37558353.93833322
+    },
+    {
+      "variant": "before",
+      "region": "linear",
+      "dimension": 10,
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "workers": 4,
+      "steps_per_second": 137493827.80865374
+    },
+    {
+      "variant": "after",
+      "region": "linear",
+      "dimension": 2,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 1,
+      "steps_per_second": 12859085.956493415,
+      "scaling": 1.0,
+      "relative_to_frozen_linear": 0.9894812162227933
+    },
+    {
+      "variant": "after",
+      "region": "linear",
+      "dimension": 2,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 4,
+      "steps_per_second": 43589639.03006385,
+      "scaling": 3.3897929586552396,
+      "relative_to_frozen_linear": 0.9659840297045734
+    },
+    {
+      "variant": "after",
+      "region": "linear",
+      "dimension": 2,
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "workers": 1,
+      "steps_per_second": 70042161.88646065,
+      "scaling": 1.0,
+      "relative_to_frozen_linear": 1.0415726849030122
+    },
+    {
+      "variant": "after",
+      "region": "linear",
+      "dimension": 2,
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "workers": 4,
+      "steps_per_second": 215997731.62308043,
+      "scaling": 3.083824453808491,
+      "relative_to_frozen_linear": 0.8342955044201776
+    },
+    {
+      "variant": "after",
+      "region": "vector_only",
+      "dimension": 2,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 1,
+      "steps_per_second": 11153213.500271693,
+      "scaling": 1.0,
+      "relative_to_frozen_linear": 0.8582177066378928
+    },
+    {
+      "variant": "after",
+      "region": "vector_only",
+      "dimension": 2,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 4,
+      "steps_per_second": 36820506.20834953,
+      "scaling": 3.301336086451908,
+      "relative_to_frozen_linear": 0.8159742029148811
+    },
+    {
+      "variant": "after",
+      "region": "vector_only",
+      "dimension": 2,
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "workers": 1,
+      "steps_per_second": 50981163.07166305,
+      "scaling": 1.0,
+      "relative_to_frozen_linear": 0.7581231856621902
+    },
+    {
+      "variant": "after",
+      "region": "vector_only",
+      "dimension": 2,
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "workers": 4,
+      "steps_per_second": 120199690.13155875,
+      "scaling": 2.3577274995197106,
+      "relative_to_frozen_linear": 0.4642736771164416
+    },
+    {
+      "variant": "after",
+      "region": "opposite",
+      "dimension": 2,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 1,
+      "steps_per_second": 6784321.777192922,
+      "scaling": 1.0,
+      "relative_to_frozen_linear": 0.5220401345831126
+    },
+    {
+      "variant": "after",
+      "region": "opposite",
+      "dimension": 2,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 4,
+      "steps_per_second": 22961939.179435708,
+      "scaling": 3.3845592726199416,
+      "relative_to_frozen_linear": 0.5088563941326618
+    },
+    {
+      "variant": "after",
+      "region": "dense_cross",
+      "dimension": 2,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 1,
+      "steps_per_second": 4313638.718352527,
+      "scaling": 1.0,
+      "relative_to_frozen_linear": 0.33192596268678465
+    },
+    {
+      "variant": "after",
+      "region": "dense_cross",
+      "dimension": 2,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 4,
+      "steps_per_second": 15890191.65651725,
+      "scaling": 3.683709437443584,
+      "relative_to_frozen_linear": 0.35214036433185025
+    },
+    {
+      "variant": "after",
+      "region": "dense_cross",
+      "dimension": 2,
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "workers": 1,
+      "steps_per_second": 10146216.826797888,
+      "scaling": 1.0,
+      "relative_to_frozen_linear": 0.15088086971140202
+    },
+    {
+      "variant": "after",
+      "region": "dense_cross",
+      "dimension": 2,
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "workers": 4,
+      "steps_per_second": 34483819.29663159,
+      "scaling": 3.398687400958547,
+      "relative_to_frozen_linear": 0.13319443309997855
+    },
+    {
+      "variant": "after",
+      "region": "linear",
+      "dimension": 10,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 1,
+      "steps_per_second": 3909065.198882003,
+      "scaling": 1.0,
+      "relative_to_frozen_linear": 0.9914022534555811
+    },
+    {
+      "variant": "after",
+      "region": "linear",
+      "dimension": 10,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 4,
+      "steps_per_second": 14371242.477214273,
+      "scaling": 3.676388534354573,
+      "relative_to_frozen_linear": 0.9815869677478268
+    },
+    {
+      "variant": "after",
+      "region": "linear",
+      "dimension": 10,
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "workers": 1,
+      "steps_per_second": 36977996.87744967,
+      "scaling": 1.0,
+      "relative_to_frozen_linear": 0.9845478568673048
+    },
+    {
+      "variant": "after",
+      "region": "linear",
+      "dimension": 10,
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "workers": 4,
+      "steps_per_second": 122020280.0186237,
+      "scaling": 3.2998077322310406,
+      "relative_to_frozen_linear": 0.8874600552137937
+    },
+    {
+      "variant": "after",
+      "region": "vector_only",
+      "dimension": 10,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 1,
+      "steps_per_second": 3673102.8659860543,
+      "scaling": 1.0,
+      "relative_to_frozen_linear": 0.9315583837164464
+    },
+    {
+      "variant": "after",
+      "region": "vector_only",
+      "dimension": 10,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 4,
+      "steps_per_second": 13423101.893218558,
+      "scaling": 3.6544312487189465,
+      "relative_to_frozen_linear": 0.916826913610642
+    },
+    {
+      "variant": "after",
+      "region": "vector_only",
+      "dimension": 10,
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "workers": 1,
+      "steps_per_second": 29766467.182040498,
+      "scaling": 1.0,
+      "relative_to_frozen_linear": 0.7925391839832447
+    },
+    {
+      "variant": "after",
+      "region": "vector_only",
+      "dimension": 10,
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "workers": 4,
+      "steps_per_second": 107040048.04667458,
+      "scaling": 3.5959943580828044,
+      "relative_to_frozen_linear": 0.7785080228884105
+    },
+    {
+      "variant": "after",
+      "region": "opposite",
+      "dimension": 10,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 1,
+      "steps_per_second": 3006836.746956393,
+      "scaling": 1.0,
+      "relative_to_frozen_linear": 0.7625825037551642
+    },
+    {
+      "variant": "after",
+      "region": "opposite",
+      "dimension": 10,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 4,
+      "steps_per_second": 10935413.702314027,
+      "scaling": 3.636849826776651,
+      "relative_to_frozen_linear": 0.7469124255708165
+    },
+    {
+      "variant": "after",
+      "region": "dense_cross",
+      "dimension": 10,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 1,
+      "steps_per_second": 1842660.2937804463,
+      "scaling": 1.0,
+      "relative_to_frozen_linear": 0.46732849790521
+    },
+    {
+      "variant": "after",
+      "region": "dense_cross",
+      "dimension": 10,
+      "kernel": "UniformHitAndRunKernel",
+      "workers": 4,
+      "steps_per_second": 6824948.145515717,
+      "scaling": 3.7038558699897357,
+      "relative_to_frozen_linear": 0.46615873093886573
+    },
+    {
+      "variant": "after",
+      "region": "dense_cross",
+      "dimension": 10,
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "workers": 1,
+      "steps_per_second": 7478989.872146063,
+      "scaling": 1.0,
+      "relative_to_frozen_linear": 0.19912986294409388
+    },
+    {
+      "variant": "after",
+      "region": "dense_cross",
+      "dimension": 10,
+      "kernel": "UniformCoordinateHitAndRunKernel",
+      "workers": 4,
+      "steps_per_second": 25248867.51485414,
+      "scaling": 3.3759729517602746,
+      "relative_to_frozen_linear": 0.18363637057215595
+    }
+  ]
+}

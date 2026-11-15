@@ -166,3 +166,25 @@ PYTHONPATH=cpp/build-python/core/bindings cpp/.benchmark-venv/bin/python \
 `HOPSY_BUILD_PYTHON_TESTS` to register the suite with CTest. No legacy package,
 facade, or installed extension is changed. API performance measurements and their
 reproduction commands are in [README_direct_bindings.md](../benchmarks/README_direct_bindings.md).
+
+## Bilinear-constraint regions
+
+```python
+geometry = core.BilinearPolytope(
+    A, b, split=1, cross_terms=[np.ones((1, 1))],
+    bilinear_bounds=np.array([0.2]),
+)
+assert core.supports_geometry(kernel, geometry)
+```
+
+The explicit partition is `z=[x,y]`; constraints are `A z <= b` and
+`x.T @ B[k] @ y + affine[k] @ z <= bilinear_bounds[k]`. The same constructor order
+is used in C++, with optional affine rows last. An arbitrary quadratic matrix is
+not a supported input. Line domains are complete unions of intervals.
+Only uniform/Gaussian-displacement Hit-and-Run supports this geometry. Other
+kernels, including overrelaxation, fail clearly at binding. Dense directions are
+needed to mix opposite-sign components in the [2D example](../examples/bilinear.py);
+coordinate updates can be reducible despite preserving the invariant measure.
+The [analytic product example](../examples/bilinear_product.py) checks means and
+marginals on `xy<=0.2` against exact formulas. See the
+[contract, numerical limits, and benchmarks](../benchmarks/README_bilinear.md).

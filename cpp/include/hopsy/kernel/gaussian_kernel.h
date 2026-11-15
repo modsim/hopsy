@@ -10,6 +10,7 @@
 #include <hopsy/geometry/workspace.h>
 #include <hopsy/kernel/drift.h>
 #include <hopsy/kernel/gaussian_traits.h>
+#include <hopsy/kernel/geometry_support.h>
 #include <hopsy/kernel/metric.h>
 #include <hopsy/target/traits.h>
 #include <hopsy/random_number_generator.h>
@@ -103,6 +104,8 @@ namespace hopsy {
         template <typename Target, typename Geometry, typename Workspace>
         void propose(const State &state, RandomNumberGenerator &rng, const Target &target,
                      const Geometry &geometry, Workspace &workspace) {
+            static_assert(kernel_supports_geometry_v<GaussianKernel, Geometry>,
+                          "Gaussian-family kernels do not support BilinearPolytope");
             require_idle();
             if (state.size() != proposal_.state.size())
                 throw std::invalid_argument("GaussianKernel state dimension changed");

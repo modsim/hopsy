@@ -5,6 +5,7 @@
 
 #include <hopsy/kernel/direction.h>
 #include <hopsy/kernel/traits.h>
+#include <hopsy/kernel/geometry_support.h>
 #include <hopsy/random_number_generator.h>
 #include <hopsy/target/traits.h>
 
@@ -49,6 +50,9 @@ namespace hopsy {
         template <typename Target, typename Geometry, typename Workspace>
         void propose(const State &state, RandomNumberGenerator &rng, const Target &,
                      const Geometry &geometry, Workspace &workspace) {
+            static_assert(
+                kernel_supports_geometry_v<HitAndRunKernel, Geometry>,
+                "Hit-and-Run line kernel does not support this geometry's interval unions");
             const auto &direction = direction_generator_.generate(rng);
             const auto &domain = geometry.line_domain(state, direction, workspace);
             proposal_.step = line_kernel_.propose(rng, domain);

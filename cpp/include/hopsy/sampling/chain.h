@@ -6,11 +6,17 @@
 #include <utility>
 #include <hopsy/problem/problem.h>
 #include <hopsy/sampling/step.h>
+#include <hopsy/kernel/geometry_support.h>
 
 namespace hopsy {
     namespace detail {
         template <typename P, typename K, typename S>
         void validate_binding(const P &problem, const K &kernel, const S &state) {
+            if constexpr (!kernel_supports_geometry_v<K, typename P::geometry_type>)
+                throw std::invalid_argument(
+                    "kernel does not support this geometry: BilinearPolytope requires uniform or "
+                    "Gaussian-displacement Hit-and-Run; Gaussian-family and overrelaxed kernels "
+                    "are unsupported");
             if (state.size() == 0 || !state.allFinite() ||
                 state.size() != kernel.proposal().state.size())
                 throw std::invalid_argument(

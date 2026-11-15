@@ -7,6 +7,7 @@ add_executable(
         gaussian_cache_test.cpp
         problem_chain_test.cpp
         owned_chain_test.cpp
+        bilinear_polytope_test.cpp
         hit_and_run_test.cpp
         linear_polytope_test.cpp
         line_kernel_test.cpp

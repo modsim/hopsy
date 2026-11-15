@@ -6,6 +6,9 @@
 #include <nanobind/stl/unique_ptr.h>
 #include <nanobind/stl/shared_ptr.h>
 #include <hopsy/geometry/linear_polytope.h>
+#include <hopsy/geometry/bilinear_polytope.h>
+#include <nanobind/stl/vector.h>
+#include <nanobind/stl/string.h>
 #include <hopsy/kernel/direction_generator.h>
 #include <hopsy/kernel/gaussian_kernel.h>
 #include <hopsy/kernel/gaussian_line_kernel.h>
@@ -23,6 +26,7 @@ namespace hopsy::bindings {
     using State = Vector<double>;
     using DenseMatrix = Matrix<double>;
     using Geometry = LinearPolytope<double>;
+    using Bilinear = BilinearPolytope<double>;
     using Coordinates = AffineCoordinates<double>;
     using Uniform = UniformTarget;
     using Gaussian = GaussianTarget;
@@ -43,8 +47,8 @@ namespace hopsy::bindings {
             return value;
         }
     };
-    template <typename T, typename C = IdentityCoordinates>
-    using P = Problem<std::reference_wrapper<const Geometry>,
+    template <typename T, typename C = IdentityCoordinates, typename G = Geometry>
+    using P = Problem<std::reference_wrapper<const G>,
                       std::conditional_t<std::same_as<T, PythonTarget>, PythonTarget,
                                          std::reference_wrapper<const T>>,
                       std::conditional_t<std::same_as<C, IdentityCoordinates>, C,
@@ -124,12 +128,38 @@ namespace hopsy::bindings {
             "problem"_a, "kernel"_a, "initial_state"_a, nb::keep_alive<0, 2>());
     }
     template <typename Kernel> void bind_chains(nb::module_ &m, const std::string &name) {
+        m.def(
+            "supports_geometry",
+            [](const Kernel &, const Geometry &) {
+                return kernel_supports_geometry_v<Kernel, Geometry>;
+            },
+            "kernel"_a, "geometry"_a);
+        m.def(
+            "supports_geometry",
+            [](const Kernel &, const Bilinear &) {
+                return kernel_supports_geometry_v<Kernel, Bilinear>;
+            },
+            "kernel"_a, "geometry"_a);
         bind_chain_type<P<Uniform>, Kernel>(m, "_" + name + "UniformChain");
         bind_chain_type<P<Gaussian>, Kernel>(m, "_" + name + "GaussianChain");
         bind_chain_type<P<PythonTarget>, Kernel>(m, "_" + name + "PythonChain");
         bind_chain_type<P<Uniform, Coordinates>, Kernel>(m, "_" + name + "AffineUniformChain");
         bind_chain_type<P<Gaussian, Coordinates>, Kernel>(m, "_" + name + "AffineGaussianChain");
         bind_chain_type<P<PythonTarget, Coordinates>, Kernel>(m, "_" + name + "AffinePythonChain");
+        if constexpr (kernel_supports_geometry_v<Kernel, Bilinear>) {
+            bind_chain_type<P<Uniform, IdentityCoordinates, Bilinear>, Kernel>(
+                m, "_" + name + "BilinearUniformChain");
+            bind_chain_type<P<Gaussian, IdentityCoordinates, Bilinear>, Kernel>(
+                m, "_" + name + "BilinearGaussianChain");
+            bind_chain_type<P<PythonTarget, IdentityCoordinates, Bilinear>, Kernel>(
+                m, "_" + name + "BilinearPythonChain");
+            bind_chain_type<P<Uniform, Coordinates, Bilinear>, Kernel>(
+                m, "_" + name + "BilinearAffineUniformChain");
+            bind_chain_type<P<Gaussian, Coordinates, Bilinear>, Kernel>(
+                m, "_" + name + "BilinearAffineGaussianChain");
+            bind_chain_type<P<PythonTarget, Coordinates, Bilinear>, Kernel>(
+                m, "_" + name + "BilinearAffinePythonChain");
+        }
     }
     inline void valid_initial(const State &x) {
         if (!x.size() || !x.allFinite())
