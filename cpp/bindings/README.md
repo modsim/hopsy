@@ -1,5 +1,10 @@
 # Experimental hit-and-run bindings
 
+The current bound-problem contracts and optional PolyRound coordinate mapping
+are described in [README_bound_contract.md](../benchmarks/README_bound_contract.md).
+A small Python 3 Gaussian sampling example is in
+[examples/gaussian.py](../examples/gaussian.py), with its run command in the docstring.
+
 This directory builds `_hopsy_core` with nanobind. It contains the bindings,
 Python tests, and a usage example. No core headers are replaced.
 
@@ -168,3 +173,61 @@ example smoke checks.
 Nanobind references:
 - https://nanobind.readthedocs.io/en/latest/eigen.html
 - https://nanobind.readthedocs.io/en/latest/ownership.html
+
+
+## Gaussian-family bindings
+
+`GaussianRandomWalkKernel`, `DikinWalkKernel`, and `CSmMALAKernel` accept
+`(geometry, initial_state, seed=0, step_size=1.0)`. Their `step_size` property is
+a positive finite standard-deviation multiplier, readable/writable between
+completed transitions. They provide `state` (a detached copy), `dimension`,
+`reset`, `seed`, `step`, `draw`, and `draw_into`. They use separate owning
+contexts and do not change Hit-and-Run state/candidate ownership.
+
+```python
+from concurrent.futures import ThreadPoolExecutor
+import numpy as np
+import _hopsy_core as h
+
+n = 10
+geometry = h.LinearPolytope(np.vstack((np.eye(n), -np.eye(n))), np.full(2*n, 3.))
+target = h.GaussianTarget(np.zeros(n), np.eye(n))
+chains = [h.CSmMALAKernel(geometry, np.zeros(n), seed=i, step_size=0.3)
+          for i in range(4)]
+with ThreadPoolExecutor(4) as pool:
+    samples = list(pool.map(lambda c: c.draw(100000, target=target), chains))
+```
+
+`GaussianTarget` is an immutable native double-precision Gaussian density with
+log density and gradient. Native target draws release the GIL for the complete
+batch. Geometry and this target may be shared; each concurrent task must use a
+distinct chain. Uniform targets also release the GIL. Python targets retain the
+GIL and require `log_gradient` for CSmMALA, in addition to `log_density`.
+Those callbacks receive detached state copies. Thread speedups measured with
+native targets should not be assumed for Python callbacks.
+
+Dikin/CSmMALA construction and reset require a strict-interior initial state and
+full-rank constraint normals. State-dependent factors initialize lazily in the
+kernel; wrapper exception recovery reconstructs the context from the last
+accepted state. RNG consumption and completed transitions are not rolled back.
+CSmMALA currently uses the Dikin metric only (legacy `fisher_weight=0`) and clips
+gradient norm at 1. Scale has no implicit dimension normalization.
+
+The actual pybind11-multiprocessing versus nanobind-thread comparison and
+reproducible local build commands are documented in
+`../benchmarks/README_python_profile.md`.
+
+
+### Target caches and batch boundaries
+
+Gaussian-family chains cache accepted-state density and unscaled preconditioned
+gradient data within each draw batch. Step-size changes preserve these caches.
+Target changes between Python `draw`, `draw_into`, or `step` calls are safe:
+these entry points start with fresh target caches. During a batch, targets must
+remain fixed mathematical functions. C++ callers using repeated low-level
+`step` calls can retain caches across transitions, but must call
+`invalidate_target_cache()` after mutating a target in place. Different target
+types/addresses are detected automatically. See
+`../benchmarks/README_csmala_cache.md` for the explicit pending-proposal lifecycle
+and matched single-chain benchmarks. No stored Gaussian proposal correction is
+exposed or retained; Hit-and-Run still stores its line normalization correction.

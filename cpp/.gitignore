@@ -1,0 +1,5 @@
+# Local benchmark builds, copied legacy Python package, and isolated environment.
+/build-legacy/
+/build-python/
+/benchmark-python/
+/.benchmark-venv/

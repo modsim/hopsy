@@ -1,0 +1,234 @@
+{
+  "metadata": {
+    "python": "3.14.8",
+    "platform": "Linux-6.18.55-1-lts-x86_64-with-glibc2.44",
+    "numpy": "2.5.4",
+    "old_module": "/home/codexdev/hopsy/cpp/benchmark-python/hopsy/core.cpython-314-x86_64-linux-gnu.so",
+    "new_module": "/home/codexdev/hopsy/cpp/build-python/core/bindings/_hopsy_core.cpython-314-x86_64-linux-gnu.so",
+    "samples_per_chain": 100000,
+    "chains": 4,
+    "warmup": 20000,
+    "repeats": 3,
+    "target": "N(0,I_10) on [-3,3]^10",
+    "csmala_fisher_weight": 0.0,
+    "legacy_clipping": "norm > 1"
+  },
+  "summary": [
+    {
+      "family": "grw",
+      "case": "old_serial",
+      "thinning": 1,
+      "seconds": 0.48603930299941567,
+      "steps_per_second": 822978.7128973824,
+      "ess_per_sample": 0.02834706885696325,
+      "ess_per_second": 23303.885672972432
+    },
+    {
+      "family": "grw",
+      "case": "old_processes",
+      "thinning": 1,
+      "seconds": 1.2671573700008594,
+      "steps_per_second": 315667.1850472122,
+      "ess_per_sample": 0.02834706885696325,
+      "ess_per_second": 8948.239430417085
+    },
+    {
+      "family": "grw",
+      "case": "new_serial",
+      "thinning": 1,
+      "seconds": 0.12211675999969884,
+      "steps_per_second": 3275553.6586541147,
+      "ess_per_sample": 0.028758666191024896,
+      "ess_per_second": 93139.50886711587
+    },
+    {
+      "family": "grw",
+      "case": "new_threads",
+      "thinning": 1,
+      "seconds": 0.03334048699980485,
+      "steps_per_second": 11997425.232641062,
+      "ess_per_sample": 0.028758666191024896,
+      "ess_per_second": 345029.94741730345
+    },
+    {
+      "family": "dikin",
+      "case": "old_serial",
+      "thinning": 1,
+      "seconds": 0.9535236100000475,
+      "steps_per_second": 419496.69185431086,
+      "ess_per_sample": 0.008413556546384005,
+      "ess_per_second": 3529.4591379372705
+    },
+    {
+      "family": "dikin",
+      "case": "old_processes",
+      "thinning": 1,
+      "seconds": 1.414373854000587,
+      "steps_per_second": 282810.65778230515,
+      "ess_per_sample": 0.008413556546384005,
+      "ess_per_second": 2361.576056537791
+    },
+    {
+      "family": "dikin",
+      "case": "new_serial",
+      "thinning": 1,
+      "seconds": 0.6122648790005769,
+      "steps_per_second": 653312.0120378864,
+      "ess_per_sample": 0.009640813766314775,
+      "ess_per_second": 6190.847714394676
+    },
+    {
+      "family": "dikin",
+      "case": "new_threads",
+      "thinning": 1,
+      "seconds": 0.1708227449998958,
+      "steps_per_second": 2341608.5486756694,
+      "ess_per_sample": 0.009640813766314775,
+      "ess_per_second": 22446.437121263887
+    },
+    {
+      "family": "csmala",
+      "case": "old_serial",
+      "thinning": 1,
+      "seconds": 1.0666448020001553,
+      "steps_per_second": 375007.68695438857,
+      "ess_per_sample": 0.012156883915599291,
+      "ess_per_second": 4559.8942457565845
+    },
+    {
+      "family": "csmala",
+      "case": "old_processes",
+      "thinning": 1,
+      "seconds": 1.4032865139997739,
+      "steps_per_second": 285045.1393991409,
+      "ess_per_sample": 0.012202167530768854,
+      "ess_per_second": 3463.032563145848
+    },
+    {
+      "family": "csmala",
+      "case": "new_serial",
+      "thinning": 1,
+      "seconds": 0.8091083729996171,
+      "steps_per_second": 494371.35166093416,
+      "ess_per_sample": 0.01160777926988987,
+      "ess_per_second": 5654.125415519964
+    },
+    {
+      "family": "csmala",
+      "case": "new_threads",
+      "thinning": 1,
+      "seconds": 0.20125853100034874,
+      "steps_per_second": 1987493.3897798692,
+      "ess_per_sample": 0.01160777926988987,
+      "ess_per_second": 23073.773776241756
+    },
+    {
+      "family": "grw",
+      "case": "old_serial",
+      "thinning": 20,
+      "seconds": 2.499451317000421,
+      "steps_per_second": 3200702.4684124514,
+      "ess_per_sample": 0.5400230121274451,
+      "ess_per_second": 86422.64939579202
+    },
+    {
+      "family": "grw",
+      "case": "old_processes",
+      "thinning": 20,
+      "seconds": 1.8153114649994677,
+      "steps_per_second": 4406957.2380530005,
+      "ess_per_sample": 0.5400230121274451,
+      "ess_per_second": 119029.27073865377
+    },
+    {
+      "family": "grw",
+      "case": "new_serial",
+      "thinning": 20,
+      "seconds": 2.5703448960011883,
+      "steps_per_second": 3112422.7773657897,
+      "ess_per_sample": 0.5397922966189089,
+      "ess_per_second": 84003.09195216412
+    },
+    {
+      "family": "grw",
+      "case": "new_threads",
+      "thinning": 20,
+      "seconds": 0.6306214060005004,
+      "steps_per_second": 12685899.850335324,
+      "ess_per_sample": 0.5397922966189089,
+      "ess_per_second": 342484.3874971824
+    },
+    {
+      "family": "dikin",
+      "case": "old_serial",
+      "thinning": 20,
+      "seconds": 11.87918384600016,
+      "steps_per_second": 673446.939092005,
+      "ess_per_sample": 0.21585204052819904,
+      "ess_per_second": 7274.2554845392115
+    },
+    {
+      "family": "dikin",
+      "case": "old_processes",
+      "thinning": 20,
+      "seconds": 4.238620713998898,
+      "steps_per_second": 1887406.432375133,
+      "ess_per_sample": 0.21585204052819904,
+      "ess_per_second": 20259.103721166088
+    },
+    {
+      "family": "dikin",
+      "case": "new_serial",
+      "thinning": 20,
+      "seconds": 12.057294588999866,
+      "steps_per_second": 663498.7592737905,
+      "ess_per_sample": 0.21458728919537468,
+      "ess_per_second": 7097.742446734238
+    },
+    {
+      "family": "dikin",
+      "case": "new_threads",
+      "thinning": 20,
+      "seconds": 3.0053313539992814,
+      "steps_per_second": 2661936.0921231424,
+      "ess_per_sample": 0.21458728919537468,
+      "ess_per_second": 28522.136909303877
+    },
+    {
+      "family": "csmala",
+      "case": "old_serial",
+      "thinning": 20,
+      "seconds": 14.311408518000462,
+      "steps_per_second": 558994.5944131103,
+      "ess_per_sample": 0.27378157208678544,
+      "ess_per_second": 7652.120942321816
+    },
+    {
+      "family": "csmala",
+      "case": "old_processes",
+      "thinning": 20,
+      "seconds": 4.952726296000037,
+      "steps_per_second": 1615271.9778722737,
+      "ess_per_sample": 0.2808325622258189,
+      "ess_per_second": 22386.2811943299
+    },
+    {
+      "family": "csmala",
+      "case": "new_serial",
+      "thinning": 20,
+      "seconds": 16.1431671320006,
+      "steps_per_second": 495565.70495647046,
+      "ess_per_sample": 0.2726918536304597,
+      "ess_per_second": 6764.677474178249
+    },
+    {
+      "family": "csmala",
+      "case": "new_threads",
+      "thinning": 20,
+      "seconds": 4.042101769999135,
+      "steps_per_second": 1979168.37704997,
+      "ess_per_sample": 0.2726918536304597,
+      "ess_per_second": 27082.765224585994
+    }
+  ]
+}

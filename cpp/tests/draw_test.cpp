@@ -6,43 +6,43 @@
 #include <stdexcept>
 
 namespace {
-struct Target {};
-struct Geometry {};
-struct Workspace {};
+    struct Target {};
+    struct Geometry {};
+    struct Workspace {};
 
-struct IncrementKernel {
-    template <typename> static constexpr bool always_accept = true;
-    int proposals = 0;
-    int acceptances = 0;
+    struct IncrementKernel {
+        template <typename> static constexpr bool always_accept = true;
+        int proposals = 0;
+        int acceptances = 0;
 
-    void propose(const Eigen::VectorXd&, hopsy::RandomNumberGenerator&,
-                 const Target&, const Geometry&, Workspace&) { ++proposals; }
-    void accept(Eigen::VectorXd& state, const Target&, const Geometry&, Workspace&) {
-        state.array() += 1;
-        ++acceptances;
-    }
-};
+        void propose(const Eigen::VectorXd &, hopsy::RandomNumberGenerator &, const Target &,
+                     const Geometry &, Workspace &) {
+            ++proposals;
+        }
+        void accept(Eigen::VectorXd &state, const Geometry &, Workspace &) {
+            state.array() += 1;
+            ++acceptances;
+        }
+    };
 
-struct AlternatingKernel : IncrementKernel {
-    template <typename> static constexpr bool always_accept = false;
-    int rejections = 0;
-    double log_acceptance_ratio(const Eigen::VectorXd&, const Target&,
-                                const Geometry&, Workspace&) {
-        return proposals % 2 == 1 ? 0.0 : -std::numeric_limits<double>::infinity();
-    }
-    void reject(const Eigen::VectorXd&, const Target&, const Geometry&, Workspace&) {
-        ++rejections;
-    }
-};
+    struct AlternatingKernel : IncrementKernel {
+        template <typename> static constexpr bool always_accept = false;
+        int rejections = 0;
+        double log_acceptance_ratio(const Eigen::VectorXd &, const Target &, const Geometry &,
+                                    Workspace &) {
+            return proposals % 2 == 1 ? 0.0 : -std::numeric_limits<double>::infinity();
+        }
+        void reject(const Eigen::VectorXd &) noexcept { ++rejections; }
+    };
 
-struct Fixture {
-    IncrementKernel kernel;
-    Eigen::VectorXd state = Eigen::VectorXd::Zero(2);
-    hopsy::RandomNumberGenerator rng{42};
-    Target target;
-    Geometry geometry;
-    Workspace workspace;
-};
+    struct Fixture {
+        IncrementKernel kernel;
+        Eigen::VectorXd state = Eigen::VectorXd::Zero(2);
+        hopsy::RandomNumberGenerator rng{42};
+        Target target;
+        Geometry geometry;
+        Workspace workspace;
+    };
 } // namespace
 
 TEST_CASE_METHOD(Fixture, "draw allocates columns and honors thinning", "[sampling][draw]") {
@@ -59,7 +59,7 @@ TEST_CASE_METHOD(Fixture, "draw allocates columns and honors thinning", "[sampli
 
 TEST_CASE_METHOD(Fixture, "draw_into reuses an existing matrix", "[sampling][draw]") {
     Eigen::MatrixXd samples = Eigen::MatrixXd::Constant(2, 3, -1);
-    const auto* storage = samples.data();
+    const auto *storage = samples.data();
     hopsy::draw_into(kernel, state, rng, target, geometry, workspace, samples);
     CHECK(samples.data() == storage);
     for (Eigen::Index col = 0; col < samples.cols(); ++col) {
@@ -121,8 +121,9 @@ TEST_CASE_METHOD(Fixture, "draw validates arguments before taking steps", "[samp
     }
     SECTION("negative thinning") {
         Eigen::MatrixXd samples(2, 3);
-        CHECK_THROWS_AS(hopsy::draw_into(kernel, state, rng, target, geometry, workspace, samples, -1),
-                        std::invalid_argument);
+        CHECK_THROWS_AS(
+            hopsy::draw_into(kernel, state, rng, target, geometry, workspace, samples, -1),
+            std::invalid_argument);
     }
     SECTION("wrong output dimension") {
         Eigen::MatrixXd samples(3, 2);
@@ -135,9 +136,7 @@ TEST_CASE_METHOD(Fixture, "draw validates arguments before taking steps", "[samp
 
 TEST_CASE_METHOD(Fixture, "draw thinning counts rejected attempts too", "[sampling][draw]") {
     AlternatingKernel alternating;
-    const auto samples = hopsy::draw(
-        alternating, state, rng, target, geometry, workspace, 3, 2
-    );
+    const auto samples = hopsy::draw(alternating, state, rng, target, geometry, workspace, 3, 2);
     REQUIRE(samples.cols() == 3);
     for (Eigen::Index col = 0; col < samples.cols(); ++col) {
         CHECK((samples.col(col).array() == double(col + 1)).all());
@@ -149,13 +148,14 @@ TEST_CASE_METHOD(Fixture, "draw thinning counts rejected attempts too", "[sampli
 
 TEST_CASE_METHOD(Fixture, "draw_into writes into mapped storage with padding", "[sampling][draw]") {
     double storage[15];
-    for (auto &value : storage) value = -1.;
+    for (auto &value : storage)
+        value = -1.;
     using Map = Eigen::Map<Eigen::MatrixXd, Eigen::Unaligned, Eigen::OuterStride<>>;
     Map samples(storage, 2, 3, Eigen::OuterStride<>(5));
     hopsy::draw_into(kernel, state, rng, target, geometry, workspace, samples);
     for (int col = 0; col < 3; ++col) {
         for (int row = 0; row < 5; ++row) {
-            CHECK(storage[5*col + row] == (row < 2 ? double(col + 1) : -1.));
+            CHECK(storage[5 * col + row] == (row < 2 ? double(col + 1) : -1.));
         }
     }
     CHECK(kernel.proposals == 3);

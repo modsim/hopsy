@@ -1,0 +1,32 @@
+Box [-1,1]^100; uniform cycling-coordinate hit-and-run
+20,000 samples/chain x 100 steps/sample; 3 repeats; 1,000 warm-up steps/chain
+Old: 1.8.0.dev23 (/home/codexdev/hopsy/cpp/benchmark-python/hopsy/__init__.py)
+New: /home/codexdev/hopsy/cpp/build-python/core/bindings/_hopsy_core.cpython-314-x86_64-linux-gnu.so
+Expected coordinate means: 0; expected second moment: 1/3.
+Parallel timings include pool startup, shutdown, and data transfer.
+
+old_1_process      repeat 1:    0.4847 s |    4,126,428 steps/s | mean=+0.00052 | max|coord mean|=0.01245
+new_1_thread       repeat 1:    0.3795 s |    5,269,757 steps/s | mean=+0.00006 | max|coord mean|=0.01017
+old_4_processes    repeat 1:    1.6973 s |    4,713,429 steps/s | mean=+0.00043 | max|coord mean|=0.00502
+new_4_threads      repeat 1:    0.4148 s |   19,285,633 steps/s | mean=-0.00013 | max|coord mean|=0.00565
+new_1_thread       repeat 2:    0.3857 s |    5,184,901 steps/s | mean=+0.00010 | max|coord mean|=0.00989
+old_4_processes    repeat 2:    1.6493 s |    4,850,650 steps/s | mean=-0.00002 | max|coord mean|=0.00641
+new_4_threads      repeat 2:    0.4006 s |   19,969,432 steps/s | mean=-0.00045 | max|coord mean|=0.00523
+old_1_process      repeat 2:    0.4608 s |    4,339,934 steps/s | mean=-0.00071 | max|coord mean|=0.01191
+old_4_processes    repeat 3:    1.7065 s |    4,687,980 steps/s | mean=-0.00036 | max|coord mean|=0.00655
+new_4_threads      repeat 3:    0.4215 s |   18,977,984 steps/s | mean=+0.00001 | max|coord mean|=0.00565
+old_1_process      repeat 3:    0.4863 s |    4,112,288 steps/s | mean=+0.00048 | max|coord mean|=0.01121
+new_1_thread       repeat 3:    0.3951 s |    5,061,895 steps/s | mean=+0.00066 | max|coord mean|=0.01309
+
+Median wall times and aggregate throughput (four-chain runs do 4x the work):
+old_1_process         0.4847 s |    4,126,428 steps/s | mean=+0.00010 | E[x²]=0.33315
+new_1_thread          0.3857 s |    5,184,901 steps/s | mean=+0.00027 | E[x²]=0.33349
+old_4_processes       1.6973 s |    4,713,429 steps/s | mean=+0.00002 | E[x²]=0.33335
+new_4_threads         0.4148 s |   19,285,633 steps/s | mean=-0.00019 | E[x²]=0.33329
+
+New/old throughput, one chain: 1.26x
+New/old throughput, four chains: 4.09x
+Old four/one aggregate throughput: 1.14x
+New four/one aggregate throughput: 3.72x
+
+Saved cpp/benchmarks/results/python_hit_and_run.csv and cpp/benchmarks/results/python_hit_and_run.json

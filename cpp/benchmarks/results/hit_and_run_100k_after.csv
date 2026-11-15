@@ -1,0 +1,7 @@
+direction,dimension,total_ns,fused_baseline_ns,direction_ns,geometry_ns,line_draw_ns,materialization_ns,quadratic_target_ratio_ns,negative_MH_decision_ns
+coordinate,8,20.9,21.1,2.9,10.0,7.1,0.6,3.7,9.1
+general,8,204.2,201.6,132.6,36.4,7.4,2.2,3.4,9.6
+coordinate,64,129.3,129.5,2.8,101.6,6.9,0.6,16.2,9.1
+general,64,2484.7,2423.6,856.2,1142.8,7.2,14.7,16.0,9.5
+coordinate,256,433.4,427.1,2.7,342.2,6.7,0.6,87.1,8.7
+general,256,30005.7,29819.8,3386.4,24482.4,7.1,58.7,70.3,9.5

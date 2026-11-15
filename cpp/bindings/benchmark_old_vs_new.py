@@ -102,7 +102,7 @@ def run_old(np, old, problem, count, args, seed):
     chains = [
         old.MarkovChain(
             problem=problem,
-            proposal=old.UniformHitAndRunProposal,
+            proposal=old.UniformCoordinateHitAndRunProposal,
             starting_point=np.zeros(DIMENSION),
         )
         for _ in range(count)
@@ -125,7 +125,9 @@ def run_old(np, old, problem, count, args, seed):
 
 def run_new(np, new, geometry, count, args, seed):
     chains = [
-        new.UniformHitAndRunKernel(geometry, np.zeros(DIMENSION), seed=seed + i)
+        new.UniformCoordinateHitAndRunKernel(
+            geometry, np.zeros(DIMENSION), seed=seed + i
+        )
         for i in range(count)
     ]
     for k in chains:

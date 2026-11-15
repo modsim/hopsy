@@ -1,0 +1,3 @@
+new_grw,42,3000000,0.7,3806841.80608,0.286534333333
+[ perf record: Woken up 24 times to write data ]
+[ perf record: Captured and wrote 6.579 MB cpp/build/new_grw.perf (818 samples) ]

@@ -1,0 +1,33 @@
+{
+  "steps": 100000,
+  "seed": 42,
+  "sigma": 0.3,
+  "warmup": 20000,
+  "executable": "cpp/build/gaussian_family_counts",
+  "calls": {
+    "old_grw": {
+      "density": 98112,
+      "gradient": 0
+    },
+    "new_grw": {
+      "density": 196224,
+      "gradient": 0
+    },
+    "old_dikin": {
+      "density": 99924,
+      "gradient": 0
+    },
+    "new_dikin": {
+      "density": 199848,
+      "gradient": 0
+    },
+    "old_csmala": {
+      "density": 99947,
+      "gradient": 99947
+    },
+    "new_csmala": {
+      "density": 199894,
+      "gradient": 199947
+    }
+  }
+}

@@ -1,0 +1,14 @@
+Running 4 test cases...
+[1;34;49mEntering test module "CSmMALAProposalTestSuite"
+[0;39;49m[1;34;49mextern/hops/tests/MarkovChain/Proposal/CSmMALATestSuite.cpp(15): Entering test suite "CSmMALAProposal"
+[0;39;49m[1;34;49mextern/hops/tests/MarkovChain/Proposal/CSmMALATestSuite.cpp(17): Entering test case "DimensionNames"
+[0;39;49m[1;34;49mextern/hops/tests/MarkovChain/Proposal/CSmMALATestSuite.cpp(17): Leaving test case "DimensionNames"; testing time: 111us
+[0;39;49m[1;34;49mextern/hops/tests/MarkovChain/Proposal/CSmMALATestSuite.cpp(60): Entering test case "GaussianInCube"
+[0;39;49m[1;34;49mextern/hops/tests/MarkovChain/Proposal/CSmMALATestSuite.cpp(60): Leaving test case "GaussianInCube"; testing time: 158us
+[0;39;49m[1;34;49mextern/hops/tests/MarkovChain/Proposal/CSmMALATestSuite.cpp(104): Entering test case "GaussianInWideCubeHasCorrectStd"
+[0;39;49m[1;34;49mextern/hops/tests/MarkovChain/Proposal/CSmMALATestSuite.cpp(104): Leaving test case "GaussianInWideCubeHasCorrectStd"; testing time: 15728us
+[0;39;49m[1;34;49mextern/hops/tests/MarkovChain/Proposal/CSmMALATestSuite.cpp(151): Entering test case "OtherGaussianInWideCubeHasCorrectStd"
+[0;39;49m[1;34;49mextern/hops/tests/MarkovChain/Proposal/CSmMALATestSuite.cpp(151): Leaving test case "OtherGaussianInWideCubeHasCorrectStd"; testing time: 25400us
+[0;39;49m[1;34;49mextern/hops/tests/MarkovChain/Proposal/CSmMALATestSuite.cpp(15): Leaving test suite "CSmMALAProposal"; testing time: 41474us
+[0;39;49m[1;34;49mLeaving test module "CSmMALAProposalTestSuite"; testing time: 41485us
+[0;39;49m

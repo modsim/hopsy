@@ -5,47 +5,46 @@
 #include <stdexcept>
 
 namespace {
-struct Target {};
-struct Geometry {};
-struct Workspace {};
+    struct Target {};
+    struct Geometry {};
+    struct Workspace {};
 
-// A non-Eigen state verifies that step does not inspect position storage.
-struct State { int position = 0; };
+    // A non-Eigen state verifies that step does not inspect position storage.
+    struct State {
+        int position = 0;
+    };
 
-struct AlwaysAcceptKernel {
-    template <typename> static constexpr bool always_accept = true;
-    int proposals = 0;
-    int acceptances = 0;
-    int candidate = 0;
+    struct AlwaysAcceptKernel {
+        template <typename> static constexpr bool always_accept = true;
+        int proposals = 0;
+        int acceptances = 0;
+        int candidate = 0;
 
-    void propose(const State& state, hopsy::RandomNumberGenerator&,
-                 const Target&, const Geometry&, Workspace&) {
-        ++proposals;
-        candidate = state.position + 1;
-    }
-    void accept(State& state, const Target&, const Geometry&, Workspace&) {
-        ++acceptances;
-        state.position = candidate;
-    }
-    // Deliberately no log_acceptance_ratio or reject: the discarded
-    // if constexpr branch must not require either operation.
-};
+        void propose(const State &state, hopsy::RandomNumberGenerator &, const Target &,
+                     const Geometry &, Workspace &) {
+            ++proposals;
+            candidate = state.position + 1;
+        }
+        void accept(State &state, const Geometry &, Workspace &) {
+            ++acceptances;
+            state.position = candidate;
+        }
+        // Deliberately no log_acceptance_ratio or reject: the discarded
+        // if constexpr branch must not require either operation.
+    };
 
-struct MHKernel : AlwaysAcceptKernel {
-    template <typename> static constexpr bool always_accept = false;
-    double ratio = 0;
-    int evaluations = 0;
-    int rejections = 0;
+    struct MHKernel : AlwaysAcceptKernel {
+        template <typename> static constexpr bool always_accept = false;
+        double ratio = 0;
+        int evaluations = 0;
+        int rejections = 0;
 
-    double log_acceptance_ratio(const State&, const Target&,
-                                const Geometry&, Workspace&) {
-        ++evaluations;
-        return ratio;
-    }
-    void reject(const State&, const Target&, const Geometry&, Workspace&) {
-        ++rejections;
-    }
-};
+        double log_acceptance_ratio(const State &, const Target &, const Geometry &, Workspace &) {
+            ++evaluations;
+            return ratio;
+        }
+        void reject(const State &) noexcept { ++rejections; }
+    };
 } // namespace
 
 TEST_CASE("step supports an always-accept kernel without MH methods", "[sampling][step]") {
@@ -76,16 +75,13 @@ TEST_CASE("step handles deterministic MH outcomes", "[sampling][step]") {
 
     SECTION("zero ratio") { kernel.ratio = 0; }
     SECTION("positive ratio") { kernel.ratio = 2; }
-    SECTION("positive infinity") {
-        kernel.ratio = std::numeric_limits<double>::infinity();
-    }
+    SECTION("positive infinity") { kernel.ratio = std::numeric_limits<double>::infinity(); }
     SECTION("negative infinity") {
         kernel.ratio = -std::numeric_limits<double>::infinity();
         expected_acceptance = false;
     }
 
-    CHECK(hopsy::step(kernel, state, rng, target, geometry, workspace)
-          == expected_acceptance);
+    CHECK(hopsy::step(kernel, state, rng, target, geometry, workspace) == expected_acceptance);
     CHECK(state.position == (expected_acceptance ? 8 : 7));
     CHECK(kernel.proposals == 1);
     CHECK(kernel.evaluations == 1);

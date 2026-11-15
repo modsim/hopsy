@@ -1,0 +1,5 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+NamespaceIndentation: All
+ColumnLimit: 100
+SortIncludes: Never

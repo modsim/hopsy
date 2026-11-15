@@ -1,0 +1,72 @@
+{
+  "metadata": {
+    "python": "3.14.8",
+    "platform": "Linux-6.18.55-1-lts-x86_64-with-glibc2.44",
+    "numpy": "2.5.4",
+    "old_module": "/home/codexdev/hopsy/cpp/benchmark-python/hopsy/core.cpython-314-x86_64-linux-gnu.so",
+    "new_module": "/home/codexdev/hopsy/cpp/build-python/core/bindings/_hopsy_core.cpython-314-x86_64-linux-gnu.so",
+    "samples_per_chain": 1000,
+    "chains": 4,
+    "warmup": 20000,
+    "repeats": 1,
+    "target": "N(0,I_10) on [-3,3]^10",
+    "csmala_fisher_weight": 0.0,
+    "legacy_clipping": "norm > 1"
+  },
+  "summary": [
+    {
+      "family": "grw",
+      "case": "old_processes",
+      "thinning": 1,
+      "seconds": 1.1837922819995583,
+      "steps_per_second": 3378.97117663544,
+      "ess_per_sample": 0.019812231853480765,
+      "ess_per_second": 66.94496037773004
+    },
+    {
+      "family": "grw",
+      "case": "new_threads",
+      "thinning": 1,
+      "seconds": 0.0011658999992505414,
+      "steps_per_second": 3430825.973557991,
+      "ess_per_sample": 0.021720425123075905,
+      "ess_per_second": 74518.99866897034
+    },
+    {
+      "family": "dikin",
+      "case": "old_processes",
+      "thinning": 1,
+      "seconds": 1.1773425219998899,
+      "steps_per_second": 3397.481977636729,
+      "ess_per_sample": 0.011292229205868793,
+      "ess_per_second": 38.365145214282336
+    },
+    {
+      "family": "dikin",
+      "case": "new_threads",
+      "thinning": 1,
+      "seconds": 0.003396886999325943,
+      "steps_per_second": 1177548.7382399635,
+      "ess_per_sample": 0.012180032862119109,
+      "ess_per_second": 14342.582328509649
+    },
+    {
+      "family": "csmala",
+      "case": "old_processes",
+      "thinning": 1,
+      "seconds": 1.1392367530006595,
+      "steps_per_second": 3511.1226788148438,
+      "ess_per_sample": 0.01447570445225119,
+      "ess_per_second": 50.82597419412016
+    },
+    {
+      "family": "csmala",
+      "case": "new_threads",
+      "thinning": 1,
+      "seconds": 0.004259520999767119,
+      "steps_per_second": 939072.7267734312,
+      "ess_per_sample": 0.017161652077842836,
+      "ess_per_second": 16116.039412676791
+    }
+  ]
+}

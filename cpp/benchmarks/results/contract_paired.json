@@ -1,0 +1,90 @@
+[
+  {
+    "kernel": "coordinate_hr",
+    "dimension": 10,
+    "median_ns": {
+      "before": 24.71383,
+      "direct": 24.25283,
+      "bound": 23.3857
+    },
+    "bound_over_before": 0.9462596449032787,
+    "checksum": "4.6122585255884649"
+  },
+  {
+    "kernel": "dense_hr",
+    "dimension": 10,
+    "median_ns": {
+      "before": 273.69629,
+      "direct": 274.90773,
+      "bound": 278.949
+    },
+    "bound_over_before": 1.0191917471734822,
+    "checksum": "1.842468025216915"
+  },
+  {
+    "kernel": "coordinate_hr",
+    "dimension": 100,
+    "median_ns": {
+      "before": 185.23375,
+      "direct": 186.43176,
+      "bound": 182.6786
+    },
+    "bound_over_before": 0.9862058075269761,
+    "checksum": "-14.118384853709468"
+  },
+  {
+    "kernel": "dense_hr",
+    "dimension": 100,
+    "median_ns": {
+      "before": 4393.15549,
+      "direct": 4130.51318,
+      "bound": 4199.94311
+    },
+    "bound_over_before": 0.9560196809696804,
+    "checksum": "-11.544433706178683"
+  },
+  {
+    "kernel": "coordinate_hr_normal",
+    "dimension": 10,
+    "median_ns": {
+      "before": 44.90859,
+      "direct": 45.18499,
+      "bound": 43.78417
+    },
+    "bound_over_before": 0.9749620284226248,
+    "checksum": "-6.4773456162406937"
+  },
+  {
+    "kernel": "grw",
+    "dimension": 10,
+    "median_ns": {
+      "before": 225.09304,
+      "direct": 224.87545,
+      "bound": 200.07862
+    },
+    "bound_over_before": 0.8888707531783302,
+    "checksum": "-6.7356995901497587"
+  },
+  {
+    "kernel": "dikin",
+    "dimension": 10,
+    "median_ns": {
+      "before": 1287.89225,
+      "direct": 1245.22352,
+      "bound": 1247.41891
+    },
+    "bound_over_before": 0.968573970376792,
+    "checksum": "15.305277245712933"
+  },
+  {
+    "kernel": "csmala",
+    "dimension": 10,
+    "median_ns": {
+      "before": 1507.45473,
+      "direct": 1485.39433,
+      "bound": 1484.49857
+    },
+    "bound_over_before": 0.9847715758601918,
+    "checksum": "1.4145324751050223"
+  }
+]

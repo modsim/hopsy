@@ -1,0 +1,54 @@
+{
+  "platform": "Linux-6.18.55-1-lts-x86_64-with-glibc2.44",
+  "python": "3.14.8",
+  "numpy": "2.5.4",
+  "samples": 500000,
+  "repeats": 5,
+  "warmup": 20000,
+  "box_radius": 3,
+  "dimension": 10,
+  "summary": [
+    {
+      "mode": "old_grw",
+      "steps_per_second": 4579924.89216,
+      "ess_per_sample": 0.029523854212348547,
+      "ess_per_second": 134598.95974980004,
+      "acceptance": 0.28712
+    },
+    {
+      "mode": "new_grw",
+      "steps_per_second": 4136759.27602,
+      "ess_per_sample": 0.029523854212348547,
+      "ess_per_second": 121901.26580861844,
+      "acceptance": 0.28712
+    },
+    {
+      "mode": "old_dikin",
+      "steps_per_second": 769450.693628,
+      "ess_per_sample": 0.010614493384842112,
+      "ess_per_second": 8342.319459188371,
+      "acceptance": 0.26881
+    },
+    {
+      "mode": "new_dikin",
+      "steps_per_second": 746841.713937,
+      "ess_per_sample": 0.010614493384842112,
+      "ess_per_second": 7927.346432108432,
+      "acceptance": 0.26881
+    },
+    {
+      "mode": "old_csmala",
+      "steps_per_second": 630243.132057,
+      "ess_per_sample": 0.013003947520828354,
+      "ess_per_second": 8195.648614631722,
+      "acceptance": 0.352428
+    },
+    {
+      "mode": "new_csmala",
+      "steps_per_second": 567164.38843,
+      "ess_per_sample": 0.013003947520828148,
+      "ess_per_second": 7375.375942826312,
+      "acceptance": 0.352428
+    }
+  ]
+}

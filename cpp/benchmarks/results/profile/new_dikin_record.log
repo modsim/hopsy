@@ -1,0 +1,3 @@
+new_dikin,42,3000000,0.3,688147.321405,0.269103333333
+[ perf record: Woken up 132 times to write data ]
+[ perf record: Captured and wrote 34.861 MB cpp/build/new_dikin.perf (4338 samples) ]

@@ -1,0 +1,19 @@
+diff --git a/src/hops/MarkovChain/Proposal/CSmMALAProposal.hpp b/src/hops/MarkovChain/Proposal/CSmMALAProposal.hpp
+index 82f1db9..c7bee58 100644
+--- a/src/hops/MarkovChain/Proposal/CSmMALAProposal.hpp
++++ b/src/hops/MarkovChain/Proposal/CSmMALAProposal.hpp
+@@ -300,3 +300,3 @@ namespace hops {
+             double norm = gradient.value().norm();
+-            if (norm != 0) {
++            if (norm > 1.0) {
+                 gradient.value() /= norm;
+diff --git a/tests/MarkovChain/Proposal/CSmMALATestSuite.cpp b/tests/MarkovChain/Proposal/CSmMALATestSuite.cpp
+index a7e7450..2f121a1 100644
+--- a/tests/MarkovChain/Proposal/CSmMALATestSuite.cpp
++++ b/tests/MarkovChain/Proposal/CSmMALATestSuite.cpp
+@@ -95,3 +95,4 @@ BOOST_AUTO_TEST_SUITE(CSmMALAProposal)
+         Eigen::VectorXd expectedProposal(3);
+-        expectedProposal << 0.9999741429740745, -0.98150954639435795, -0.99999996305021499;
++        // Updated seeded trajectory after clipping gradients at norm 1.
++        expectedProposal << 0.99998892116975835, -0.9998083991988681, -0.99999977573668819;
+         BOOST_CHECK(proposal.isApprox(expectedProposal));

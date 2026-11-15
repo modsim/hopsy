@@ -1,0 +1,30 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 4K of event 'cpu/cycles/Pu'
+# Event count (approx.): 23131800465
+#
+# Overhead  Command          Shared Object            Symbol
+# ........  ...............  .......................  ........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
+#
+    12.86%  gaussian_family  gaussian_family_profile  [.] Eigen::internal::gebp_kernel<double, double, long, Eigen::internal::blas_data_mapper<double, long, 0, 0, 1>, 4, 4, false, false>::operator()(Eigen::internal::blas_data_mapper<double, long, 0, 0, 1> const&, double const*, double const*, long, long, long, double, long, long, long, long) [clone .isra.0]
+    12.75%  gaussian_family  gaussian_family_profile  [.] Eigen::LLT<Eigen::Matrix<double, -1, -1, 0, -1, -1>, 1>& Eigen::LLT<Eigen::Matrix<double, -1, -1, 0, -1, -1>, 1>::compute<Eigen::Matrix<double, -1, -1, 0, -1, -1> >(Eigen::EigenBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> > const&) [clone .isra.0]
+    11.12%  gaussian_family  gaussian_family_profile  [.] Eigen::internal::triangular_solve_vector<double, double, long, 1, 2, false, 1>::run(long, double const*, long, double*)
+     9.29%  gaussian_family  gaussian_family_profile  [.] Eigen::internal::general_matrix_vector_product<long, double, Eigen::internal::const_blas_data_mapper<double, long, 0>, 0, false, double, Eigen::internal::const_blas_data_mapper<double, long, 1>, false, 0>::run(long, long, Eigen::internal::const_blas_data_mapper<double, long, 0> const&, Eigen::internal::const_blas_data_mapper<double, long, 1> const&, double*, long, double) [clone .isra.0]
+     6.22%  gaussian_family  gaussian_family_profile  [.] double std::normal_distribution<double>::operator()<hops::RandomNumberGenerator>(hops::RandomNumberGenerator&, std::normal_distribution<double>::param_type const&) [clone .isra.0]
+     5.21%  gaussian_family  gaussian_family_profile  [.] Eigen::internal::lhs_process_one_packet<4, 2l, 1l, double, double, double, double __vector(2), double __vector(2), double __vector(2), double __vector(2), Eigen::internal::gebp_traits<double, double, false, false, 1, 0>, Eigen::internal::BlasLinearMapper<double, long, 0, 1>, Eigen::internal::blas_data_mapper<double, long, 0, 0, 1> >::operator()(Eigen::internal::blas_data_mapper<double, long, 0, 0, 1> const&, double const*, double const*, double, long, long, long, long, long, long, int, long, long, long, long, long) [clone .isra.0]
+     4.88%  gaussian_family  gaussian_family_profile  [.] hops::CSmMALAProposal<LegacyNormal, Eigen::Matrix<double, -1, -1, 0, -1, -1> >::computeLogAcceptanceProbability()
+     4.72%  gaussian_family  gaussian_family_profile  [.] hops::DikinEllipsoidCalculator<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<double, -1, 1, 0, -1, 1> >::computeDikinEllipsoid(Eigen::Matrix<double, -1, 1, 0, -1, 1> const&)
+     4.35%  gaussian_family  gaussian_family_profile  [.] Eigen::internal::general_matrix_vector_product<long, double, Eigen::internal::const_blas_data_mapper<double, long, 1>, 1, false, double, Eigen::internal::const_blas_data_mapper<double, long, 0>, false, 0>::run(long, long, Eigen::internal::const_blas_data_mapper<double, long, 1> const&, Eigen::internal::const_blas_data_mapper<double, long, 0> const&, double*, long, double) [clone .constprop.0]
+     3.61%  gaussian_family  gaussian_family_profile  [.] Eigen::internal::triangular_solve_vector<double, double, long, 1, 1, false, 0>::run(long, double const*, long, double*)
+     3.12%  gaussian_family  gaussian_family_profile  [.] Eigen::internal::gemm_pack_lhs<double, long, Eigen::internal::const_blas_data_mapper<double, long, 1>, 4, 2, double __vector(2), 1, false, false>::operator()(double*, Eigen::internal::const_blas_data_mapper<double, long, 1> const&, long, long, long, long) [clone .isra.0]
+     2.93%  gaussian_family  gaussian_family_profile  [.] Eigen::internal::gemm_pack_rhs<double, long, Eigen::internal::const_blas_data_mapper<double, long, 0>, 4, 0, false, false>::operator()(double*, Eigen::internal::const_blas_data_mapper<double, long, 0> const&, long, long, long, long) [clone .isra.0]
+     1.25%  gaussian_family  libc.so.6                [.] malloc
+     1.19%  gaussian_family  gaussian_family_profile  [.] hops::CSmMALAProposal<LegacyNormal, Eigen::Matrix<double, -1, -1, 0, -1, -1> >::computeTruncatedGradient(Eigen::Matrix<double, -1, 1, 0, -1, 1>) [clone .isra.0]
+
+
+#
+# (Tip: Order by the overhead of source file name and line number: perf report -s srcline)
+#
