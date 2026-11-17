@@ -334,3 +334,31 @@ TEST_CASE("Identity and affine bindings allocate no Eigen buffers while drawing"
                                  hopsy::AffineCoordinates(T, State::Ones(3)));
     run(mapped);
 }
+
+TEST_CASE("Output gradient callbacks reuse chain buffers", "[problem][allocation]") {
+    struct OutputNormal {
+        double log_density(const State &x) const { return -0.5*x.squaredNorm(); }
+        State log_gradient(const State &) const {
+            throw std::logic_error("allocating gradient path must not be used");
+        }
+        void log_gradient(const State &x, State &out) const { out = -x; }
+    };
+    auto geometry = box(2);
+    auto run = [&](auto coordinates) {
+        State state = State::Zero(2);
+        auto problem = hopsy::Problem(std::cref(geometry), OutputNormal{}, coordinates);
+        hopsy::CSmMALAKernel<State> kernel(state, {}, {}, 0.1);
+        auto chain = hopsy::bind_chain(problem, kernel, state);
+        hopsy::RandomNumberGenerator rng(41);
+        chain.step(rng);
+        const bool previous = Eigen::internal::is_malloc_allowed();
+        struct Restore {
+            bool value;
+            ~Restore() { Eigen::internal::set_is_malloc_allowed(value); }
+        } restore{previous};
+        Eigen::internal::set_is_malloc_allowed(false);
+        for (int i=0; i<100; ++i) chain.step(rng);
+    };
+    run(hopsy::IdentityCoordinates{});
+    run(hopsy::AffineCoordinates<double>(Matrix::Identity(2, 2), State::Zero(2)));
+}

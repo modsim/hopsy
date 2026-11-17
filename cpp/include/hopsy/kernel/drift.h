@@ -28,7 +28,10 @@ namespace hopsy {
         void compute(const State &state, typename State::Scalar sigma, const Target &target,
                      const Metric &metric, const Geometry &, const Workspace &,
                      State &displacement) const {
-            displacement = target.log_gradient(state);
+            if constexpr (requires { target.log_gradient(state, displacement); })
+                target.log_gradient(state, displacement);
+            else
+                displacement = target.log_gradient(state);
             const auto norm = displacement.stableNorm();
             if (norm > 1.)
                 displacement /= norm;

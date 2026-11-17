@@ -10,8 +10,8 @@ namespace hopsy::bindings {
         // cycle when returning one of those existing objects.
         cls.def_prop_ro("geometry", &Problem::geometry, nb::rv_policy::reference)
             .def_prop_ro("target", [](const Problem &p) -> nb::object {
-                if constexpr (std::same_as<Target, PythonTarget>)
-                    return p.target().owner;
+                if constexpr (runtime_target<Target>)
+                    return p.target().methods->owner;
                 else
                     return nb::cast(&p.target(), nb::rv_policy::reference);
             });
@@ -22,8 +22,16 @@ namespace hopsy::bindings {
     }
     template <typename Target, typename G>
     nb::object make_problem(const G &g, const Target &t, nb::handle coordinates) {
+        if constexpr (runtime_target<Target>) {
+            const auto *native = t.methods->native;
+            Index dimension = g.num_dimension();
+            if (!coordinates.is_none() && !nb::isinstance<IdentityCoordinates>(coordinates))
+                dimension = nb::cast<const Coordinates &>(coordinates).target_dimension();
+            if (native && size_t(dimension) != native->dimension)
+                throw nb::value_error("target dimension mismatch");
+        }
         auto target = [&] {
-            if constexpr (std::same_as<Target, PythonTarget>)
+            if constexpr (runtime_target<Target>)
                 return t;
             else
                 return std::cref(t);
@@ -55,6 +63,31 @@ NB_MODULE(_hopsy_core, m) {
     using namespace hopsy;
     using namespace hopsy::bindings;
     m.doc() = "Direct C++ problems, kernels, explicit RNGs, and persistent chain bindings.";
+    nb::class_<PythonTargetBase>(m, "PythonTarget", nb::is_weak_referenceable()).def(nb::init<>());
+    nb::class_<CapsuleTarget>(m, "CapsuleTarget")
+        .def(nb::init<nb::object>(), "capsule"_a)
+        .def_prop_ro("dimension", [](const CapsuleTarget &t) { return t.descriptor->dimension; })
+        .def("log_density", &capsule_evaluate<0>, "x"_a)
+        .def("log_gradient", &capsule_evaluate<1>, "x"_a)
+        .def("log_hessian", &capsule_evaluate<2>, "x"_a);
+    m.def("debug_target", [](nb::handle target, const State &x, int order) {
+        auto methods = std::make_shared<TargetMethods>(target);
+        if (order < 0 || order > methods->order) throw nb::value_error("target does not provide requested derivative order");
+        nb::dict result;
+        double density;
+        State gradient;
+        DenseMatrix hessian;
+        {
+            nb::gil_scoped_release release;
+            density = RuntimeTarget<0>{methods}.log_density(x);
+            if (order >= 1) gradient = RuntimeTarget<1>{methods}.log_gradient(x);
+            if (order >= 2) hessian = RuntimeTarget<2>{methods}.log_hessian(x);
+        }
+        result["log_density"] = density;
+        if (order >= 1) result["log_gradient"] = nb::cast(gradient);
+        if (order >= 2) result["log_hessian"] = nb::cast(hessian);
+        return result;
+    }, "target"_a, "x"_a, "order"_a = 0);
     nb::class_<Geometry>(m, "LinearPolytope")
         .def(
             "__init__",
@@ -139,16 +172,24 @@ NB_MODULE(_hopsy_core, m) {
             "state"_a);
     bind_problem<Uniform, IdentityCoordinates>(m, "_UniformProblem");
     bind_problem<Gaussian, IdentityCoordinates>(m, "_GaussianProblem");
-    bind_problem<PythonTarget, IdentityCoordinates>(m, "_PythonProblem");
+    bind_problem<RuntimeTarget<0>, IdentityCoordinates>(m, "_Runtime0Problem");
+    bind_problem<RuntimeTarget<1>, IdentityCoordinates>(m, "_Runtime1Problem");
+    bind_problem<RuntimeTarget<2>, IdentityCoordinates>(m, "_Runtime2Problem");
     bind_problem<Uniform, Coordinates>(m, "_AffineUniformProblem");
     bind_problem<Gaussian, Coordinates>(m, "_AffineGaussianProblem");
-    bind_problem<PythonTarget, Coordinates>(m, "_AffinePythonProblem");
+    bind_problem<RuntimeTarget<0>, Coordinates>(m, "_AffineRuntime0Problem");
+    bind_problem<RuntimeTarget<1>, Coordinates>(m, "_AffineRuntime1Problem");
+    bind_problem<RuntimeTarget<2>, Coordinates>(m, "_AffineRuntime2Problem");
     bind_problem<Uniform, IdentityCoordinates, Bilinear>(m, "_BilinearUniformProblem");
     bind_problem<Gaussian, IdentityCoordinates, Bilinear>(m, "_BilinearGaussianProblem");
-    bind_problem<PythonTarget, IdentityCoordinates, Bilinear>(m, "_BilinearPythonProblem");
+    bind_problem<RuntimeTarget<0>, IdentityCoordinates, Bilinear>(m, "_BilinearRuntime0Problem");
+    bind_problem<RuntimeTarget<1>, IdentityCoordinates, Bilinear>(m, "_BilinearRuntime1Problem");
+    bind_problem<RuntimeTarget<2>, IdentityCoordinates, Bilinear>(m, "_BilinearRuntime2Problem");
     bind_problem<Uniform, Coordinates, Bilinear>(m, "_BilinearAffineUniformProblem");
     bind_problem<Gaussian, Coordinates, Bilinear>(m, "_BilinearAffineGaussianProblem");
-    bind_problem<PythonTarget, Coordinates, Bilinear>(m, "_BilinearAffinePythonProblem");
+    bind_problem<RuntimeTarget<0>, Coordinates, Bilinear>(m, "_BilinearAffineRuntime0Problem");
+    bind_problem<RuntimeTarget<1>, Coordinates, Bilinear>(m, "_BilinearAffineRuntime1Problem");
+    bind_problem<RuntimeTarget<2>, Coordinates, Bilinear>(m, "_BilinearAffineRuntime2Problem");
     m.def(
         "Problem",
         [](const Geometry &g, nb::handle t, nb::handle c) {
@@ -156,13 +197,10 @@ NB_MODULE(_hopsy_core, m) {
                 return make_problem(g, nb::cast<const Uniform &>(t), c);
             if (t.type().is(nb::type<Gaussian>()))
                 return make_problem(g, nb::cast<const Gaussian &>(t), c);
-            nb::object method = nb::getattr(t, "log_density");
-            if (!PyCallable_Check(method.ptr()))
-                throw nb::type_error("target.log_density must be callable");
-            PythonTarget target{nb::borrow<nb::object>(t), std::move(method),
-                                nb::hasattr(t, "log_gradient") ? nb::getattr(t, "log_gradient")
-                                                               : nb::object()};
-            return make_problem(g, target, c);
+            auto methods = std::make_shared<TargetMethods>(t);
+            if (methods->order == 2) return make_problem(g, RuntimeTarget<2>{methods}, c);
+            if (methods->order == 1) return make_problem(g, RuntimeTarget<1>{methods}, c);
+            return make_problem(g, RuntimeTarget<0>{methods}, c);
         },
         "geometry"_a, "target"_a, "coordinates"_a = nb::none(), nb::keep_alive<0, 1>(),
         nb::keep_alive<0, 2>(), nb::keep_alive<0, 3>());
@@ -173,13 +211,10 @@ NB_MODULE(_hopsy_core, m) {
                 return make_problem(g, nb::cast<const Uniform &>(t), c);
             if (t.type().is(nb::type<Gaussian>()))
                 return make_problem(g, nb::cast<const Gaussian &>(t), c);
-            nb::object method = nb::getattr(t, "log_density");
-            if (!PyCallable_Check(method.ptr()))
-                throw nb::type_error("target.log_density must be callable");
-            PythonTarget target{nb::borrow<nb::object>(t), std::move(method),
-                                nb::hasattr(t, "log_gradient") ? nb::getattr(t, "log_gradient")
-                                                               : nb::object()};
-            return make_problem(g, target, c);
+            auto methods = std::make_shared<TargetMethods>(t);
+            if (methods->order == 2) return make_problem(g, RuntimeTarget<2>{methods}, c);
+            if (methods->order == 1) return make_problem(g, RuntimeTarget<1>{methods}, c);
+            return make_problem(g, RuntimeTarget<0>{methods}, c);
         },
         "geometry"_a, "target"_a, "coordinates"_a = nb::none(), nb::keep_alive<0, 1>(),
         nb::keep_alive<0, 2>(), nb::keep_alive<0, 3>());
@@ -211,8 +246,12 @@ NB_MODULE(_hopsy_core, m) {
     bind_random_coordinate_types(m);
     unsupported_bilinear<P<Uniform, IdentityCoordinates, Bilinear>>(m);
     unsupported_bilinear<P<Gaussian, IdentityCoordinates, Bilinear>>(m);
-    unsupported_bilinear<P<PythonTarget, IdentityCoordinates, Bilinear>>(m);
+    unsupported_bilinear<P<RuntimeTarget<0>, IdentityCoordinates, Bilinear>>(m);
+    unsupported_bilinear<P<RuntimeTarget<1>, IdentityCoordinates, Bilinear>>(m);
+    unsupported_bilinear<P<RuntimeTarget<2>, IdentityCoordinates, Bilinear>>(m);
     unsupported_bilinear<P<Uniform, Coordinates, Bilinear>>(m);
     unsupported_bilinear<P<Gaussian, Coordinates, Bilinear>>(m);
-    unsupported_bilinear<P<PythonTarget, Coordinates, Bilinear>>(m);
+    unsupported_bilinear<P<RuntimeTarget<0>, Coordinates, Bilinear>>(m);
+    unsupported_bilinear<P<RuntimeTarget<1>, Coordinates, Bilinear>>(m);
+    unsupported_bilinear<P<RuntimeTarget<2>, Coordinates, Bilinear>>(m);
 }

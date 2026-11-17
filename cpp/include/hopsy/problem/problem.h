@@ -91,7 +91,10 @@ namespace hopsy {
             TargetEvaluation(const Problem &problem, const State &initial)
                 : problem_(problem),
                   mapped_(problem.coordinates().target_dimension(initial.size())),
-                  gradient_(initial), volume_gradient_(initial) {}
+                  gradient_(initial), volume_gradient_(initial) {
+                if constexpr (requires { problem_.target().log_gradient(mapped_, target_gradient_); })
+                    target_gradient_.resize(mapped_.size());
+            }
             TargetEvaluation &target(const Problem &) noexcept { return *this; }
             double log_density(const State &state) const {
                 problem_.coordinates().to_target(state, mapped_);
@@ -103,8 +106,13 @@ namespace hopsy {
                                   const Vector<typename State::Scalar> &x) { t.log_gradient(x); }
             {
                 problem_.coordinates().to_target(state, mapped_);
-                const auto &gradient = problem_.target().log_gradient(mapped_);
-                problem_.coordinates().pullback_gradient(state, gradient, gradient_);
+                if constexpr (requires { problem_.target().log_gradient(mapped_, target_gradient_); }) {
+                    problem_.target().log_gradient(mapped_, target_gradient_);
+                    problem_.coordinates().pullback_gradient(state, target_gradient_, gradient_);
+                } else {
+                    const auto &gradient = problem_.target().log_gradient(mapped_);
+                    problem_.coordinates().pullback_gradient(state, gradient, gradient_);
+                }
                 if constexpr (!constant_coordinate_volume<typename Problem::coordinates_type>) {
                     problem_.coordinates().log_volume_gradient(state, volume_gradient_);
                     gradient_ += volume_gradient_;
@@ -117,6 +125,7 @@ namespace hopsy {
             // Per-chain evaluation buffers; shared problem/target stay immutable.
             mutable Vector<typename State::Scalar> mapped_;
             mutable State gradient_, volume_gradient_;
+            mutable Vector<typename State::Scalar> target_gradient_;
         };
     } // namespace detail
 

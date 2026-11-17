@@ -31,37 +31,19 @@ namespace hopsy::bindings {
     using Uniform = UniformTarget;
     using Gaussian = GaussianTarget;
 
-    // The sole Python-specific target adapter. Methods are captured at problem
-    // construction, and inputs are copied so callbacks cannot mutate core state.
-    struct PythonTarget {
-        nb::object owner, density, gradient;
-        double log_density(const State &x) const {
-            return nb::cast<double>(density(nb::cast(x, nb::rv_policy::copy)));
-        }
-        State log_gradient(const State &x) const {
-            if (!gradient || !PyCallable_Check(gradient.ptr()))
-                throw nb::type_error("target.log_gradient must be callable");
-            State value = nb::cast<State>(gradient(nb::cast(x, nb::rv_policy::copy)));
-            if (value.size() != x.size())
-                throw std::invalid_argument("target gradient dimension mismatch");
-            return value;
-        }
-    };
+}
+#include "targets.h"
+namespace hopsy::bindings {
     template <typename T, typename C = IdentityCoordinates, typename G = Geometry>
     using P = Problem<std::reference_wrapper<const G>,
-                      std::conditional_t<std::same_as<T, PythonTarget>, PythonTarget,
+                      std::conditional_t<runtime_target<T>, T,
                                          std::reference_wrapper<const T>>,
                       std::conditional_t<std::same_as<C, IdentityCoordinates>, C,
                                          std::reference_wrapper<const C>>>;
 
-    template <typename P>
-    constexpr bool native_target = !std::same_as<typename P::target_type, PythonTarget>;
-    template <typename P, typename F> decltype(auto) evaluate(F &&f) {
-        if constexpr (native_target<P>) {
-            nb::gil_scoped_release release;
-            return std::forward<F>(f)();
-        } else
-            return std::forward<F>(f)();
+    template <typename F> decltype(auto) evaluate(F &&f) {
+        nb::gil_scoped_release release;
+        return std::forward<F>(f)();
     }
     inline void valid_output(const nb::DRef<DenseMatrix> &out) {
         if (out.size() && (out.innerStride() <= 0 || out.outerStride() <= 0 ||
@@ -80,19 +62,19 @@ namespace hopsy::bindings {
             .def(
                 "step",
                 [](Chain &chain, RandomNumberGenerator &rng) {
-                    return evaluate<Problem>([&] { return chain.step(rng); });
+                    return evaluate([&] { return chain.step(rng); });
                 },
                 "rng"_a)
             .def(
                 "draw",
                 [](Chain &chain, RandomNumberGenerator &rng, Index count, Index thin) {
-                    return evaluate<Problem>([&] { return chain.draw(rng, count, thin); });
+                    return evaluate([&] { return chain.draw(rng, count, thin); });
                 },
                 "rng"_a, "num_samples"_a, "thinning"_a = 1)
             .def(
                 "draw_sampling",
                 [](Chain &chain, RandomNumberGenerator &rng, Index count, Index thin) {
-                    return evaluate<Problem>([&] { return chain.draw_sampling(rng, count, thin); });
+                    return evaluate([&] { return chain.draw_sampling(rng, count, thin); });
                 },
                 "rng"_a, "num_samples"_a, "thinning"_a = 1)
             .def(
@@ -100,7 +82,7 @@ namespace hopsy::bindings {
                 [](Chain &chain, RandomNumberGenerator &rng, nb::DRef<DenseMatrix> out,
                    Index thin) {
                     valid_output(out);
-                    evaluate<Problem>([&] { chain.draw_into(rng, out, thin); });
+                    evaluate([&] { chain.draw_into(rng, out, thin); });
                 },
                 "rng"_a, "samples"_a.noconvert(), "thinning"_a = 1)
             .def(
@@ -108,7 +90,7 @@ namespace hopsy::bindings {
                 [](Chain &chain, RandomNumberGenerator &rng, nb::DRef<DenseMatrix> out,
                    Index thin) {
                     valid_output(out);
-                    evaluate<Problem>([&] { chain.draw_sampling_into(rng, out, thin); });
+                    evaluate([&] { chain.draw_sampling_into(rng, out, thin); });
                 },
                 "rng"_a, "samples"_a.noconvert(), "thinning"_a = 1)
             .def(
@@ -127,6 +109,17 @@ namespace hopsy::bindings {
             },
             "problem"_a, "kernel"_a, "initial_state"_a, nb::keep_alive<0, 2>());
     }
+    template<class Kernel, class C, class G>
+    void bind_runtime_chains(nb::module_ &m, const std::string &name) {
+        if constexpr (!std::same_as<Kernel, CSmMALAKernel<State>>)
+            bind_chain_type<P<RuntimeTarget<0>, C, G>, Kernel>(m, name + "0");
+        else
+            m.def("bind_chain", [](const P<RuntimeTarget<0>, C, G> &, Kernel &, const State &) {
+                throw nb::type_error("kernel requires log_gradient");
+            }, "problem"_a, "kernel"_a, "initial_state"_a);
+        bind_chain_type<P<RuntimeTarget<1>, C, G>, Kernel>(m, name + "1");
+        bind_chain_type<P<RuntimeTarget<2>, C, G>, Kernel>(m, name + "2");
+    }
     template <typename Kernel> void bind_chains(nb::module_ &m, const std::string &name) {
         m.def(
             "supports_geometry",
@@ -142,23 +135,21 @@ namespace hopsy::bindings {
             "kernel"_a, "geometry"_a);
         bind_chain_type<P<Uniform>, Kernel>(m, "_" + name + "UniformChain");
         bind_chain_type<P<Gaussian>, Kernel>(m, "_" + name + "GaussianChain");
-        bind_chain_type<P<PythonTarget>, Kernel>(m, "_" + name + "PythonChain");
+        bind_runtime_chains<Kernel, IdentityCoordinates, Geometry>(m, "_" + name + "Runtime");
         bind_chain_type<P<Uniform, Coordinates>, Kernel>(m, "_" + name + "AffineUniformChain");
         bind_chain_type<P<Gaussian, Coordinates>, Kernel>(m, "_" + name + "AffineGaussianChain");
-        bind_chain_type<P<PythonTarget, Coordinates>, Kernel>(m, "_" + name + "AffinePythonChain");
+        bind_runtime_chains<Kernel, Coordinates, Geometry>(m, "_" + name + "AffineRuntime");
         if constexpr (kernel_supports_geometry_v<Kernel, Bilinear>) {
             bind_chain_type<P<Uniform, IdentityCoordinates, Bilinear>, Kernel>(
                 m, "_" + name + "BilinearUniformChain");
             bind_chain_type<P<Gaussian, IdentityCoordinates, Bilinear>, Kernel>(
                 m, "_" + name + "BilinearGaussianChain");
-            bind_chain_type<P<PythonTarget, IdentityCoordinates, Bilinear>, Kernel>(
-                m, "_" + name + "BilinearPythonChain");
+            bind_runtime_chains<Kernel, IdentityCoordinates, Bilinear>(m, "_" + name + "BilinearRuntime");
             bind_chain_type<P<Uniform, Coordinates, Bilinear>, Kernel>(
                 m, "_" + name + "BilinearAffineUniformChain");
             bind_chain_type<P<Gaussian, Coordinates, Bilinear>, Kernel>(
                 m, "_" + name + "BilinearAffineGaussianChain");
-            bind_chain_type<P<PythonTarget, Coordinates, Bilinear>, Kernel>(
-                m, "_" + name + "BilinearAffinePythonChain");
+            bind_runtime_chains<Kernel, Coordinates, Bilinear>(m, "_" + name + "BilinearAffineRuntime");
         }
     }
     inline void valid_initial(const State &x) {

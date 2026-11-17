@@ -79,7 +79,7 @@ There is no mutable NumPy view into state, cached metrics, or workspace memory.
   `draw_into` uses caller-provided output. The resource guards may allocate ordinary
   bookkeeping storage at a call boundary; no such work occurs per transition.
 - Native uniform/Gaussian targets release the GIL during sampling. Python callbacks
-  retain the GIL and receive owning state copies. Overrides on subclasses of native
+  reacquire the GIL and receive owning state copies. Overrides on subclasses of native
   targets use the Python adapter, so overridden densities are respected.
 - `rng.seed(value)` reseeds only the RNG. It does not reset a kernel's retained
   direction/distribution state. Construct a fresh kernel and RNG for exact replay.
@@ -87,7 +87,7 @@ There is no mutable NumPy view into state, cached metrics, or workspace memory.
 `Problem(...)` and `bind_chain(...)` select concrete template instantiations at
 construction, like C++ template deduction. Returned Python class names beginning
 with `_` are implementation details. There is no virtual target/kernel dispatch
-inside native transition loops. The bindings are split across translation units
+inside native transition loops; capsule targets use C function pointers. The bindings are split across translation units
 by kernel family to limit compiler memory consumption.
 
 ## Operations
@@ -191,3 +191,108 @@ The [analytic product example](../examples/bilinear_product.py) checks means and
 marginals on `xy<=0.2` against exact formulas. See the
 [numerical contract](../README.md#bilinear-numerical-contract) and
 [benchmark guide](../benchmarks/README.md).
+
+## Python and capsule targets (2.0)
+
+The standalone `cpp/` build installs the 2.0 package as `hopsy` (override
+`HOPSY_PYTHON_INSTALL_DIR` to install beside the legacy package). In an uninstalled
+build, use `import _hopsy_core as hopsy` with the binding build directory on
+`PYTHONPATH`. This build is independent of the root project's legacy 1.x bindings.
+
+```python
+import hopsy
+import numpy as np
+
+class Normal(hopsy.PythonTarget):
+    def log_density(self, x):
+        return -0.5 * (x @ x)
+
+    def log_gradient(self, x):  # optional
+        return -x
+
+    def log_hessian(self, x):  # optional; requires gradient
+        return -np.eye(len(x))
+
+target = Normal()
+print(hopsy.debug_target(target, np.zeros(2), order=2))
+geometry = hopsy.LinearPolytope(np.vstack([np.eye(2), -np.eye(2)]), np.ones(4)*3)
+problem = hopsy.Problem(geometry, target)
+kernel = hopsy.CSmMALAKernel(np.zeros(2), step_size=0.2)
+chain = hopsy.bind_chain(problem, kernel, np.zeros(2))
+samples = chain.draw(hopsy.RandomNumberGenerator(42), 1000)
+```
+
+Only `log_density` is required. Duck-typed existing targets also remain supported.
+Methods are captured when constructing a problem; reconstruct it after changing
+methods. Derivatives are of the **log density**. Gradient and Hessian results must
+have shape `(n,)` and `(n,n)` respectively. Inputs are nonempty finite vectors;
+Python callbacks receive copies and cannot modify sampler state. Python exceptions
+propagate to callers. A callback may print or increment counters:
+`debug_target(..., order=0|1|2)` invokes the same C++ adapter used by samplers,
+calling density and each requested derivative once. It adds no normal sampling
+instrumentation.
+
+Runtime capability detection chooses one of three concrete C++ adapter types.
+Their constrained methods satisfy exactly `TargetDensity`,
+`DifferentiableTargetDensity`, or `TwiceDifferentiableTargetDensity`. No missing
+method is fabricated. CSmMALA rejects density-only problems at `bind_chain`;
+random walks and target-free kernels accept them. Current kernels do not consume
+Hessians, but the second derivative is available through the diagnostic interface.
+Sampling releases the GIL; Python callbacks acquire it for each invocation.
+Consequently Python targets remain useful for inspection, rather than native
+throughput. Targets and their captured bound methods stay alive with the problem.
+Avoid ownership cycles from a target back to its problem or chain.
+
+### Independent native extension
+
+[`../examples/capsule_target/gaussian.cpp`](../examples/capsule_target/gaussian.cpp)
+is a separate CPython extension using only Python, the standard library, and the
+public C header `hopsy/target_abi_v1.h`. It implements precision `[[2,1],[1,3]]`.
+Enable `HOPSY_BUILD_PYTHON_TESTS` to build it as `_capsule_gaussian`, then:
+
+```python
+import _capsule_gaussian
+native = hopsy.CapsuleTarget(_capsule_gaussian.make())
+print(hopsy.debug_target(native, np.array([0.4, -0.7]), order=2))
+problem = hopsy.Problem(geometry, native)
+```
+
+For an external CMake project, install the public header, call
+`find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)`, then
+`Python_add_library(_capsule_gaussian MODULE WITH_SOABI gaussian.cpp)` and add
+the installed header directory with `target_include_directories`. No hopsy C++
+library, Eigen, or nanobind is needed. Link the platform thread library if using
+the example's synchronization test helpers. Those helpers and invalid-descriptor
+modes are solely for the integration tests; `make()` is the normal example API.
+
+ABI v1 uses capsule name `hopsy.target.v1` and immutable descriptor
+`hopsy_target_v1`. Set `abi_version=1`, `structure_size=sizeof(hopsy_target_v1)`,
+a positive fixed dimension, context, and required density callback. Gradient and
+Hessian pointers may be null; a Hessian requires a gradient. Consumers accept a
+larger descriptor with the known prefix; incompatible versions require a new
+capsule name. The producer must supply valid, aligned descriptor memory; capsules
+are a trusted native interface, not a validator for arbitrary pointers.
+
+Callbacks receive a contiguous vector of `dimension` doubles and write either
+one density double, `dimension` gradient doubles, or `dimension*dimension`
+**row-major** Hessian doubles. Buffers are borrowed for the duration of a call.
+Return zero after writing the entire output; nonzero status becomes a
+`RuntimeError` including the code. C++ producers must catch internal exceptions
+and convert them to status codes: exceptions must never cross the C ABI.
+Callbacks must never use Python or its C API.
+
+The producer owns both descriptor and context and frees them in its capsule
+destructor. hopsy retains the capsule indirectly through the `CapsuleTarget`
+object for every problem, chain, and active evaluation. It never frees native
+resources itself, preventing double destruction. The descriptor, callbacks, and
+context must remain valid and the descriptor must stay unchanged until capsule
+destruction. A context shared between chains must support concurrent evaluation;
+otherwise users must serialize access or create a separate capsule per chain.
+
+Capsule transport alone does not release the GIL. hopsy's sampling and diagnostic
+bindings explicitly release it around native evaluation. That path performs no
+Python calls or reference counting. Native density calls allocate no buffers;
+CSmMALA writes gradients into existing per-chain buffers, including under affine
+coordinates. Diagnostic gradient/Hessian result arrays allocate at the public
+call boundary. Native producers are responsible for their own allocation and
+thread safety. Separate chains need separate kernels and RNGs.

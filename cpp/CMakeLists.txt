@@ -85,6 +85,10 @@ target_link_libraries(
 # Python bindings
 # ---------------------------------------------------------------------------
 
+if(HOPSY_BUILD_CPP_TESTS OR HOPSY_BUILD_PYTHON_TESTS)
+    enable_testing()
+endif()
+
 if(HOPSY_BUILD_PYTHON)
     find_package(
             Python 3.10
