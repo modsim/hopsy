@@ -55,7 +55,12 @@ namespace hopsy {
             bool current_drift_valid = false;
             bool candidate_drift_valid = false;
             ReverseData(const Metric &m, const State &x)
-                : metric(m), current_drift(x), candidate_drift(x), delta(x) {}
+                : metric(m), delta(x) {
+                if constexpr (!zero_drift) {
+                    current_drift = x;
+                    candidate_drift = x;
+                }
+            }
         };
 
       public:
@@ -63,8 +68,12 @@ namespace hopsy {
                        scalar_type step_size)
             : drift_(drift), metric_(metric), step_size_(step_size),
               proposal_{.state = initial_state}, noise_(initial_state),
-              drift_buffer_(initial_state), reverse_(metric, initial_state) {
+              reverse_(metric, initial_state) {
             check_step_size(step_size);
+            // Zero-drift kernels never read drift buffers; leave dynamic vectors
+            // empty instead of allocating state-sized storage for them.
+            if constexpr (!zero_drift)
+                drift_buffer_ = initial_state;
         }
 
         template <typename Geometry>

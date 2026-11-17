@@ -126,7 +126,9 @@ The geometry and initial state are already in sampling coordinates `z`; physical
 coordinates are `x = T*z + shift`. Full-column-rank rectangular maps support
 PolyRound equality elimination. Targets are evaluated in physical coordinates;
 volume corrections and pulled-back gradients are handled by the core problem.
-See [coordinate mathematics and historical benchmarks](../benchmarks/README_bound_contract.md).
+The sampling log density adds `log sqrt(det(T.T @ T))`; its gradient is
+`T.T @ grad_x log_density`. QR computes the constant volume once. Rectangular
+maps use intrinsic Euclidean volume on the affine subspace.
 
 ```python
 coordinates = core.AffineCoordinates(T, shift)
@@ -164,8 +166,8 @@ PYTHONPATH=cpp/build-python/core/bindings cpp/.benchmark-venv/bin/python \
 
 `bindings/CMakeLists.txt` links the extension to `hopsy::core`. Enable
 `HOPSY_BUILD_PYTHON_TESTS` to register the suite with CTest. No legacy package,
-facade, or installed extension is changed. API performance measurements and their
-reproduction commands are in [README_direct_bindings.md](../benchmarks/README_direct_bindings.md).
+facade, or installed extension is changed. Representative performance
+commands are in the [benchmark guide](../benchmarks/README.md).
 
 ## Bilinear-constraint regions
 
@@ -187,4 +189,5 @@ needed to mix opposite-sign components in the [2D example](../examples/bilinear.
 coordinate updates can be reducible despite preserving the invariant measure.
 The [analytic product example](../examples/bilinear_product.py) checks means and
 marginals on `xy<=0.2` against exact formulas. See the
-[contract, numerical limits, and benchmarks](../benchmarks/README_bilinear.md).
+[numerical contract](../README.md#bilinear-numerical-contract) and
+[benchmark guide](../benchmarks/README.md).

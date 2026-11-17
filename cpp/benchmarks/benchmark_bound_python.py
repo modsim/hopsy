@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Compare frozen compatibility bindings with persistent direct bindings.
+"""Measure current native-target bindings with single and four-thread batches.
 
-Select the extension using PYTHONPATH and --api before/after. Native Gaussian on
-[-3,3]^10, fixed seeds and scales. Times include Python calls and sample output,
-exclude setup/warm-up. Use --output for JSON results. Never run beside a build.
+Fixed seeds and scales on [-3,3]^10. Includes Python calls, sample output and
+thread-pool setup; excludes chain construction and warm-up.
 """
 
 import argparse
@@ -19,7 +18,6 @@ import numpy as np
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--api", choices=["before", "after"], required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--target", choices=["gaussian", "uniform"], default="gaussian")
     parser.add_argument("--steps", type=int, default=20000)
@@ -74,24 +72,14 @@ def main():
                         if "HitAndRun" not in name
                         else {}
                     )
-                    if args.api == "before":
-                        chain = getattr(core, name)(
-                            geometry, np.zeros(n), seed=42 + i, **options
-                        )
-                        draw = lambda count, thinning=1, chain=chain: chain.draw(
-                            count, thinning=thinning, target=density
-                        )
-                    else:
-                        problem = core.Problem(geometry, density)
-                        initial = np.zeros(n)
-                        kernel = getattr(core, name)(initial, **options)
-                        chain = core.bind_chain(problem, kernel, initial)
-                        rng = core.RandomNumberGenerator(42 + i)
-                        draw = (
-                            lambda count, thinning=1, chain=chain, rng=rng: chain.draw(
-                                rng, count, thinning=thinning
-                            )
-                        )
+                    problem = core.Problem(geometry, density)
+                    initial = np.zeros(n)
+                    kernel = getattr(core, name)(initial, **options)
+                    chain = core.bind_chain(problem, kernel, initial)
+                    rng = core.RandomNumberGenerator(42 + i)
+                    draw = lambda count, thinning=1, chain=chain, rng=rng: chain.draw(
+                        rng, count, thinning=thinning
+                    )
                     draw(1000)
                     draws.append(draw)
 

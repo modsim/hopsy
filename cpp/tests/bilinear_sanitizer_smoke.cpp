@@ -1,4 +1,4 @@
-// Standalone ownership/allocation smoke check; see README_bilinear.md.
+// Standalone ownership/allocation smoke check; registered with CTest.
 #include <hopsy/geometry/bilinear_polytope.h>
 #include <hopsy/kernel/hit_and_run.h>
 #include <hopsy/kernel/direction_generator.h>

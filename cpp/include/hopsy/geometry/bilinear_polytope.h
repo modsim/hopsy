@@ -42,6 +42,8 @@ namespace hopsy {
         using matrix_type = Matrix<Scalar>;
         using line_domain_type =
             std::vector<LineInterval<Scalar>, detail::SliceAllocator<LineInterval<Scalar>>>;
+        // Fixed working precision for filtered predicates, not a configurable
+        // scalar policy. Keep casts short enough to read the polynomial formulas.
         using Wide = long double;
         struct Workspace {
             typename LinearPolytope<Scalar>::workspace_type linear;

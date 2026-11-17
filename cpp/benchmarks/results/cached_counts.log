@@ -1,4 +1,0 @@
-new_csmala,steps=100000,density_calls=99947,gradient_calls=99947
-new_csmala,42,100000,0.3,635503.84184,0.35009
-old_csmala,steps=100000,density_calls=99947,gradient_calls=99947
-old_csmala,42,100000,0.3,620312.696281,0.35009

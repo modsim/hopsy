@@ -1,7 +1,8 @@
 #ifndef UNIFORM_H
 #define UNIFORM_H
 
-#include <Eigen/Dense>
+#include <concepts>
+#include <hopsy/linalg.h>
 
 #include <hopsy/target/traits.h>
 
@@ -22,9 +23,7 @@ namespace hopsy {
         ) const {
             using Scalar = typename Derived::Scalar;
 
-            return Eigen::Matrix<Scalar, Eigen::Dynamic, 1>::Zero(
-                state.size()
-            );
+            return Vector<Scalar>::Zero(state.size());
         }
 
         template<typename Derived>
@@ -34,11 +33,7 @@ namespace hopsy {
         ) const {
             using Scalar = typename Derived::Scalar;
 
-            return Eigen::Matrix<
-                Scalar,
-                Eigen::Dynamic,
-                Eigen::Dynamic
-            >::Zero(state.size(), state.size());
+            return Matrix<Scalar>::Zero(state.size(), state.size());
         }
     };
 

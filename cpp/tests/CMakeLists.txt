@@ -41,13 +41,7 @@ else()
     target_compile_options(hopsy_core_tests PRIVATE -UNDEBUG)
 endif()
 
-# Opt-in tests of the legacy reference; keep legacy dependencies off core users.
-option(HOPSY_TEST_LEGACY_REFERENCE "Test legacy CSmMALA clipping for comparisons" OFF)
-if(HOPSY_TEST_LEGACY_REFERENCE)
-    set(HOPSY_LEGACY_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/../../extern/hops/src")
-    add_executable(hopsy_legacy_csmala_tests legacy_csmala_test.cpp
-        "${HOPSY_LEGACY_SOURCE}/hops/Utility/DefaultDimensionNames.cpp")
-    target_include_directories(hopsy_legacy_csmala_tests PRIVATE "${HOPSY_LEGACY_SOURCE}")
-    target_link_libraries(hopsy_legacy_csmala_tests PRIVATE hopsy::core Catch2::Catch2WithMain)
-    catch_discover_tests(hopsy_legacy_csmala_tests)
-endif()
+# Standalone threaded ownership check, also suitable for sanitizer builds.
+add_executable(hopsy_bilinear_smoke bilinear_sanitizer_smoke.cpp)
+target_link_libraries(hopsy_bilinear_smoke PRIVATE hopsy::core)
+add_test(NAME hopsy_bilinear_smoke COMMAND hopsy_bilinear_smoke)

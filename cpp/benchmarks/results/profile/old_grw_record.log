@@ -1,3 +1,0 @@
-old_grw,42,3000000,0.7,4316070.74656,0.286534333333
-[ perf record: Woken up 21 times to write data ]
-[ perf record: Captured and wrote 5.680 MB cpp/build/old_grw.perf (706 samples) ]

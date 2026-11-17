@@ -5,8 +5,6 @@
 #include <random>
 #include <ranges>
 #include <stdexcept>
-#include <tuple>
-#include <type_traits>
 
 #include <hopsy/kernel/traits.h>
 #include <hopsy/random_number_generator.h>
@@ -28,17 +26,9 @@ namespace hopsy {
             using Interval = std::ranges::range_value_t<const LineDomain>;
             using Scalar = typename Interval::scalar_type;
 
-            // Preserve the existing fixed-one-interval instantiation exactly.
-            // A dynamic union commonly contains one interval as well; avoid
-            // two range scans in that case, with identical RNG consumption.
-            constexpr auto fixed_count = [] {
-                using Domain = std::remove_cvref_t<LineDomain>;
-                if constexpr (requires { std::tuple_size<Domain>::value; })
-                    return std::tuple_size<Domain>::value;
-                else
-                    return std::size_t{0};
-            }();
-            if constexpr (std::ranges::sized_range<const LineDomain> && fixed_count != 1) {
+            // A single chord needs only one scan, whether its container is
+            // fixed-size or a dynamically sized interval union.
+            if constexpr (std::ranges::sized_range<const LineDomain>) {
                 if (std::ranges::size(line_domain) == 1) {
                     const auto &interval = *std::ranges::begin(line_domain);
                     const Scalar length = interval.upper - interval.lower;

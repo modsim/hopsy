@@ -1,12 +1,12 @@
 #ifndef HOPSY_QUADRATIC_SLICE_H
 #define HOPSY_QUADRATIC_SLICE_H
-#include <array>
 #include <algorithm>
+#include <array>
 #include <cmath>
+#include <hopsy/geometry/line_interval.h>
 #include <limits>
 #include <optional>
 #include <stdexcept>
-#include <hopsy/geometry/line_interval.h>
 
 namespace hopsy::detail {
     struct QuadraticSlice {
@@ -28,26 +28,27 @@ namespace hopsy::detail {
     // only after exact coefficient reconstruction in an ill-conditioned geometry.
     inline QuadraticSlice quadratic_slice(long double a, long double b, long double c,
                                           std::optional<long double> exact_discriminant = {}) {
-        using W = long double;
-        const W inf = std::numeric_limits<W>::infinity();
+        const long double inf = std::numeric_limits<long double>::infinity();
         if (!std::isfinite(a) || !std::isfinite(b) || !std::isfinite(c))
             throw std::overflow_error("quadratic slice: nonfinite coefficients");
         if (a == 0) {
             if (b == 0)
                 return c <= 0 ? QuadraticSlice{{{{-inf, inf}, {0, 0}}}, 1} : QuadraticSlice{};
-            W root = -c / b;
+            long double root = -c / b;
             if (!std::isfinite(root))
                 throw std::overflow_error("quadratic slice: linear root overflow");
             return b > 0 ? QuadraticSlice{{{{-inf, root}, {0, 0}}}, 1}
                          : QuadraticSlice{{{{root, inf}, {0, 0}}}, 1};
         }
-        W aa = a, bb = b, cc = c;
-        const W scale = std::max({std::abs(a), std::abs(b), std::abs(c)});
-        const W safe_max = std::ldexp(1.L, std::numeric_limits<W>::max_exponent / 2 -
-                                               std::numeric_limits<W>::digits - 8);
-        const W safe_min = std::ldexp(1.L, std::numeric_limits<W>::min_exponent / 2 +
-                                               std::numeric_limits<W>::digits + 8);
-        const W smallest =
+        long double aa = a, bb = b, cc = c;
+        const long double scale = std::max({std::abs(a), std::abs(b), std::abs(c)});
+        const long double safe_max =
+            std::ldexp(1.L, std::numeric_limits<long double>::max_exponent / 2 -
+                                std::numeric_limits<long double>::digits - 8);
+        const long double safe_min =
+            std::ldexp(1.L, std::numeric_limits<long double>::min_exponent / 2 +
+                                std::numeric_limits<long double>::digits + 8);
+        const long double smallest =
             std::min({std::abs(a), b == 0 ? scale : std::abs(b), c == 0 ? scale : std::abs(c)});
         if (scale > safe_max || smallest < safe_min) {
             int exponent = 0;
@@ -59,7 +60,7 @@ namespace hopsy::detail {
                 throw std::overflow_error(
                     "quadratic slice: coefficient range cannot be represented");
             if (exact_discriminant) {
-                const W scaled = std::scalbn(*exact_discriminant, -2 * exponent);
+                const long double scaled = std::scalbn(*exact_discriminant, -2 * exponent);
                 if (*exact_discriminant != 0 && scaled == 0)
                     throw std::overflow_error("quadratic slice: discriminant underflow");
                 exact_discriminant = scaled;
@@ -69,7 +70,7 @@ namespace hopsy::detail {
         if (!exact_discriminant &&
             ((bb != 0 && b2.first == 0) || (aa != 0 && cc != 0 && ac.first == 0)))
             throw std::underflow_error("quadratic slice: discriminant products underflow");
-        const W discriminant =
+        const long double discriminant =
             exact_discriminant.value_or((b2.first - ac.first) + (b2.second - ac.second));
         if (!std::isfinite(discriminant))
             throw std::overflow_error("quadratic slice: discriminant overflow");
@@ -78,11 +79,11 @@ namespace hopsy::detail {
         if (discriminant == 0) {
             if (aa < 0)
                 return QuadraticSlice{{{{-inf, inf}, {0, 0}}}, 1};
-            const W root = -bb / (2 * aa);
+            const long double root = -bb / (2 * aa);
             return QuadraticSlice{{{{root, root}, {0, 0}}}, 1};
         }
-        const W q = -W(.5) * (bb + std::copysign(std::sqrt(discriminant), bb));
-        W first = q / aa, second = cc / q;
+        const long double q = -0.5L * (bb + std::copysign(std::sqrt(discriminant), bb));
+        long double first = q / aa, second = cc / q;
         if (!std::isfinite(first) || !std::isfinite(second))
             throw std::overflow_error("quadratic slice: root overflow");
         if (first == second)

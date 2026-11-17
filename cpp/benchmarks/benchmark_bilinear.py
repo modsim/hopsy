@@ -3,12 +3,11 @@
 
 Four independent chains/threads versus one, uniform target, 1k warm-up transitions,
 fixed seeds. Includes output and thread-pool setup; reports attempted transitions/s.
-Select the frozen extension with PYTHONPATH and --baseline (linear only).
+Select the current extension with PYTHONPATH.
 """
 
 import argparse
 import json
-import os
 import statistics
 import threading
 import time
@@ -21,7 +20,6 @@ import numpy as np
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--baseline", action="store_true")
     parser.add_argument("--worker-local", action="store_true")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--steps", type=int, default=200000)
@@ -29,7 +27,6 @@ def main():
     args = parser.parse_args()
     if args.steps < 20 or args.steps % 20 or args.repeats < 1:
         parser.error("positive repeats and steps divisible by 20 required")
-    os.sched_setaffinity(0, {0, 1, 2, 3})
     rows = []
     for n in [2, 10]:
         split = n // 2
@@ -38,21 +35,20 @@ def main():
         B = np.zeros((split, n - split))
         B[0, 0] = 1.0
         cases = [("linear", core.LinearPolytope(A, b))]
-        if not args.baseline:
-            dense = np.random.default_rng(13).normal(size=B.shape) / np.sqrt(B.size)
-            cases.extend(
-                [
-                    (
-                        "vector_only",
-                        core.BilinearPolytope(A, b, split, [], np.zeros(0)),
-                    ),
-                    ("opposite", core.BilinearPolytope(A, b, split, [B], np.zeros(1))),
-                    (
-                        "dense_cross",
-                        core.BilinearPolytope(A, b, split, [dense], np.array([0.2])),
-                    ),
-                ]
-            )
+        dense = np.random.default_rng(13).normal(size=B.shape) / np.sqrt(B.size)
+        cases.extend(
+            [
+                (
+                    "vector_only",
+                    core.BilinearPolytope(A, b, split, [], np.zeros(0)),
+                ),
+                ("opposite", core.BilinearPolytope(A, b, split, [B], np.zeros(1))),
+                (
+                    "dense_cross",
+                    core.BilinearPolytope(A, b, split, [dense], np.array([0.2])),
+                ),
+            ]
+        )
         for region, g in cases:
             for name in ["UniformHitAndRunKernel", "UniformCoordinateHitAndRunKernel"]:
                 if region == "opposite" and name == "UniformCoordinateHitAndRunKernel":

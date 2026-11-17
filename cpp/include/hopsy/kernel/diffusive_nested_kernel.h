@@ -1,8 +1,0 @@
-#ifndef DIFFUSIVE_NESTED_KERNEL_H
-#define DIFFUSIVE_NESTED_KERNEL_H
-
-namespace hopsy {
-
-}
-
-#endif //DIFFUSIVE_NESTED_KERNEL_H

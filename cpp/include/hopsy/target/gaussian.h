@@ -9,8 +9,6 @@
 
 namespace hopsy {
     // Immutable native density, safe to share between chains without the GIL.
-    // Keep dense precision arithmetic, including for I, to match the legacy
-    // Gaussian model in binding benchmarks rather than specialize the workload.
     class GaussianTarget {
       public:
         GaussianTarget(Vector<double> mean, const Matrix<double> &covariance)

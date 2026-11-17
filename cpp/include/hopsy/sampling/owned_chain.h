@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <unordered_set>
 #include <hopsy/sampling/chain.h>
 
@@ -48,7 +49,9 @@ namespace hopsy {
     // Nonmovable: the persistent binding references these exact member objects.
     // The borrowed objects must outlive this owner. An rvalue state selects this
     // owning overload; the original bind_chain(lvalue state) remains a view.
-    template <typename Problem, typename Kernel> class OwnedStateChain {
+    // Isolate the mutex and inline binding of independently mutated owners,
+    // just as SamplingResource isolates their kernels and RNGs.
+    template <typename Problem, typename Kernel> class alignas(64) OwnedStateChain {
       public:
         using state_type = typename Kernel::state_type;
         using scalar_type = typename Kernel::scalar_type;
@@ -143,7 +146,10 @@ namespace hopsy {
                         "rebinding requires the same coordinate map object");
             }
             auto replacement = make_binding(problem);
-            binding_ = std::move(replacement);
+            // Build the new evaluation buffers before replacing the binding.
+            // Moving a binding transfers those buffers and preserves references
+            // to this owner's state, kernel and workspace.
+            binding_.emplace(std::move(replacement));
             problem_ = &problem;
         }
         static state_type validated(const Problem &p, const Kernel &k, state_type state) {
@@ -153,14 +159,13 @@ namespace hopsy {
                                             "construct a fresh kernel for a new state");
             return state;
         }
-        std::unique_ptr<binding_type> initial_binding(const Problem &p) {
+        binding_type initial_binding(const Problem &p) {
             if constexpr (requires { kernel_.invalidate_state_cache(); })
                 kernel_.invalidate_state_cache();
             return make_binding(p);
         }
-        std::unique_ptr<binding_type> make_binding(const Problem &p) {
-            return std::make_unique<binding_type>(p, kernel_, state_, std::ref(workspace_),
-                                                  std::false_type{});
+        binding_type make_binding(const Problem &p) {
+            return binding_type(p, kernel_, state_, std::ref(workspace_), std::false_type{});
         }
         auto lock() const {
             std::unique_lock guard(mutex_, std::try_to_lock);
@@ -181,7 +186,7 @@ namespace hopsy {
         state_type state_;
         const Index sampling_dimension_, target_dimension_;
         workspace_type workspace_;
-        std::unique_ptr<binding_type> binding_;
+        std::optional<binding_type> binding_;
         mutable std::mutex mutex_;
     };
 

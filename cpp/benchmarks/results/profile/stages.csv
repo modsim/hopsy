@@ -1,8 +1,0 @@
-stage,ns
-row_divide,132.78
-reciprocal_scale,50.528
-gradient_norm,2.55729
-gradient_stable_norm,7.74958
-row_feasibility,71.9574
-eigen_feasibility,38.0479
-clipped_preconditioned_drift,184.121
