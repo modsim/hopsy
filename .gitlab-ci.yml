@@ -65,6 +65,30 @@ build-release:
       - dist/*manylinux*
     expire_in: 7 days
 
+# Compile-only check of the experimental CUDA backend (hopsy.gpu)
+build-gpu:
+  stage: build
+  variables:
+    CUDA_VERSION: "12-9"
+    CUDA_HOME: "/usr/local/cuda-12.9"
+    CUDACXX: "/usr/local/cuda-12.9/bin/nvcc"
+  before_script:
+    - dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64/cuda-rhel8.repo
+    - dnf install -y
+        cuda-nvcc-${CUDA_VERSION} cuda-cudart-devel-${CUDA_VERSION}
+        libcublas-devel-${CUDA_VERSION} libcusparse-devel-${CUDA_VERSION}
+        libcurand-devel-${CUDA_VERSION} libnvjitlink-devel-${CUDA_VERSION}
+    - export PATH="${CUDA_HOME}/bin:${PATH}"
+  script:
+    - /opt/python/cp312-cp312/bin/pip install uv
+    - uv venv
+    - source .venv/bin/activate
+    - uv build --wheel --python 3.12 -Ccmake.define.HOPSY_BUILD_GPU=ON
+  artifacts:
+    paths:
+      - dist/*.whl
+    expire_in: 7 days
+
 build-release-macos:
   stage: build
   tags:

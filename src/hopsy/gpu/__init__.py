@@ -2,14 +2,11 @@
 
 Only usable with the GPU build of hopsy. In the CPU build the compiled
 extension ``hopsy.gpu._core`` is missing and importing this package raises an
-ImportError that explains how to install the GPU build.
+ImportError that explains how to build hopsy with GPU support.
 """
 
-#TODO: Fill in the registry once decided
-_GPU_INSTALL_COMMAND = (
-    "pip install hopsy --extra-index-url "
-    "<foo>"
-)
+# No installable GPU wheel exists yet, so the hint points to a source build.
+_GPU_BUILD_COMMAND = "pip install . -Ccmake.define.HOPSY_BUILD_GPU=ON"
 
 try:
     from ._core import *
@@ -20,5 +17,7 @@ except ModuleNotFoundError as err:
         raise
     raise ImportError(
         "hopsy.gpu is not available: this is the CPU-only build of hopsy. "
-        f"To use the GPU backend, install the GPU build:\n    {_GPU_INSTALL_COMMAND}"
+        "To use the GPU backend, build hopsy from source with GPU support "
+        "(Linux x86_64, CUDA toolkit >= 12.8 with cuBLAS, cuSPARSE and cuRAND). "
+        f"From a hopsy source checkout:\n    {_GPU_BUILD_COMMAND}"
     ) from err
