@@ -21,19 +21,6 @@ option(USE_SYSTEM_EIGEN "Use system Eigen" OFF)
 option(HOPSY_NO_EIGEN_VECTORIZE "Disable Eigen vectorization" OFF)
 option(HOPSY_BUILD_GPU "Build the hopsy.gpu CUDA extension" OFF)
 
-if(HOPSY_BUILD_GPU)
-    if(NOT (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64)$"))
-        message(FATAL_ERROR "HOPSY_BUILD_GPU is only supported on Linux x86_64 "
-                            "(got ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_PROCESSOR})")
-    endif()
-    if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES AND NOT DEFINED ENV{CUDAARCHS})
-         set(CMAKE_CUDA_ARCHITECTURES "80;90")
-    endif()
-    enable_language(CUDA)
-    find_package(CUDAToolkit REQUIRED)
-    message(STATUS "hopsy.gpu: CUDA ${CUDAToolkit_VERSION}, architectures ${CMAKE_CUDA_ARCHITECTURES}")
-endif()
-
 if(HOPSY_NO_EIGEN_VECTORIZE)
     add_compile_definitions(EIGEN_DONT_VECTORIZE)
 endif()
@@ -114,3 +101,8 @@ target_compile_definitions(core PRIVATE
 
 
 install(TARGETS core DESTINATION hopsy)
+
+
+if(HOPSY_BUILD_GPU)
+    add_subdirectory(src/hopsy/gpu)
+endif()
