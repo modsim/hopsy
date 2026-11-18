@@ -24,6 +24,12 @@ set_target_properties(hopsy_gpu PROPERTIES
     CUDA_RUNTIME_LIBRARY Static
 )
 target_link_libraries(hopsy_gpu PRIVATE CUDA::cudart_static)
+# Link math libraries dynamically; Need to be available at runtime
+target_link_libraries(hopsy_gpu PRIVATE
+    CUDA::cublas
+    CUDA::cusparse
+    CUDA::curand
+)
 
 # Python extension hopsy.gpu._core; hopsy/gpu/__init__.py exports its public API.
 pybind11_add_module(hopsy_gpu_core

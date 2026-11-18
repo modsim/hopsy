@@ -1,6 +1,10 @@
 #include "device.hpp"
 
+#include <cublas_v2.h>
 #include <cuda_runtime.h>
+#include <curand.h>
+#include <cusparse.h>
+#include <library_types.h>
 
 #include <iostream>
 #include <stdexcept>
@@ -15,6 +19,26 @@ namespace hopsy {
                                              cudaGetErrorName(err) +
                                              "): " + cudaGetErrorString(err));
                 }
+            }
+
+            // "major.minor.patch" from a math library's <lib>GetProperty function.
+            template<typename Status>
+            std::string libraryVersion(Status (*getProperty)(libraryPropertyType, int *),
+                                       Status success, const char *call) {
+                const libraryPropertyType properties[] = {MAJOR_VERSION, MINOR_VERSION,
+                                                          PATCH_LEVEL};
+                std::string version;
+                for (libraryPropertyType property : properties) {
+                    int value = 0;
+                    Status status = getProperty(property, &value);
+                    if (status != success) {
+                        throw std::runtime_error(std::string(call) + " failed (status " +
+                                                 std::to_string(static_cast<int>(status)) +
+                                                 ")");
+                    }
+                    version += (version.empty() ? "" : ".") + std::to_string(value);
+                }
+                return version;
             }
         }// namespace
 
@@ -59,6 +83,18 @@ namespace hopsy {
             check(cudaGetDeviceProperties(&prop, index), "cudaGetDeviceProperties");
             return DeviceProperties{index, prop.name, prop.major, prop.minor,
                                     prop.totalGlobalMem};
+        }
+
+        std::map<std::string, std::string> mathLibraryVersions() {
+            return {
+                    {"cublas", libraryVersion(&cublasGetProperty, CUBLAS_STATUS_SUCCESS,
+                                              "cublasGetProperty")},
+                    {"cusparse", libraryVersion(&cusparseGetProperty,
+                                                CUSPARSE_STATUS_SUCCESS,
+                                                "cusparseGetProperty")},
+                    {"curand", libraryVersion(&curandGetProperty, CURAND_STATUS_SUCCESS,
+                                              "curandGetProperty")},
+            };
         }
     }// namespace gpu
 }// namespace hopsy

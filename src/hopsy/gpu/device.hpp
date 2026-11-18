@@ -2,6 +2,7 @@
 #define HOPSY_GPU_DEVICE_HPP
 
 #include <cstddef>
+#include <map>
 #include <string>
 
 // Kept free of CUDA headers; can be included from host-only translation units.
@@ -22,8 +23,8 @@ namespace hopsy {
         // True if at least one CUDA device can be used.
         bool isAvailable();
 
-        // CUDA runtime (`libcudart`) version hopsy.gpu was built against, e.g. 12020
-        // for 12.2.
+        // CUDA runtime (`libcudart`) version hopsy.gpu was built against,
+		// e.g. 12020 for 12.2.
         int runtimeVersion();
 
         // Latest CUDA version supported by the installed driver, 0 if no driver.
@@ -31,6 +32,9 @@ namespace hopsy {
 
         // Properties of device `index`.
         DeviceProperties deviceProperties(int index);
+
+        // Versions of the dynamically linked CUDA math libraries
+        std::map<std::string, std::string> mathLibraryVersions();
     }// namespace gpu
 }// namespace hopsy
 

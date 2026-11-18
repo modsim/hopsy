@@ -45,6 +45,10 @@ namespace hopsy {
             m.def("device_properties", &deviceProperties, py::arg("index") = 0,
                   "Properties of CUDA device `index`. Raises IndexError for an invalid "
                   "index.");
+            m.def("math_library_versions", &mathLibraryVersions,
+                  "Versions of the CUDA math libraries (cuBLAS, cuSPARSE, "
+                  "cuRAND) as loaded at runtime, e.g. {'cublas': '12.9.1', ...}. Works "
+                  "without a GPU or driver.");
         }
     }// namespace gpu
 }// namespace hopsy
