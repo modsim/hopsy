@@ -22,7 +22,7 @@ stages:
   - test
   - upload-artifacts
 
-pre-commit:
+.pre-commit:  # TEMP hidden for probe-jetson run
   image: python:3.14
   stage: build
   cache:
@@ -33,7 +33,7 @@ pre-commit:
     - python -m pip install uv
     - uv tool run pre-commit run --all-files
 
-build-debug:
+.build-debug:  # TEMP hidden for probe-jetson run
   stage: build
   script:
     - /opt/python/cp314-cp314/bin/pip install uv
@@ -47,7 +47,7 @@ build-debug:
       - dist/*manylinux*
     expire_in: 7 days
 
-build-release:
+.build-release:  # TEMP hidden for probe-jetson run
   stage: build
   parallel:
     matrix:
@@ -66,7 +66,7 @@ build-release:
     expire_in: 7 days
 
 # Compile-only check of the experimental CUDA backend (hopsy.gpu)
-build-gpu:
+.build-gpu:  # TEMP hidden for probe-jetson run
   stage: build
   variables:
     CUDA_VERSION: "12-9"
@@ -89,7 +89,54 @@ build-gpu:
       - dist/*.whl
     expire_in: 7 days
 
-build-release-macos:
+# TEMPORARY: probe the Jetson runner's executor and
+# JetPack/CUDA setup. Remove before the MR is merged.
+probe-jetson:
+  stage: build
+  image: quay.io/pypa/manylinux_2_28_aarch64
+  tags: [jetson]
+  variables:
+    GIT_STRATEGY: none
+    GIT_SUBMODULE_STRATEGY: none
+  script:
+    - uname -r
+    - echo "== L4T / JetPack version (from host files mounted into the container) =="
+    - cat /sys/firmware/devicetree/base/model 2>/dev/null || true
+    - cat /sys/devices/soc0/soc_id /sys/devices/soc0/revision 2>/dev/null || true
+    - ls -la /usr/lib/aarch64-linux-gnu/tegra/libcuda.so* /usr/lib/aarch64-linux-gnu/libcuda.so* || true
+    - grep -a -o -E '(R3[0-9]|r3[0-9])[._][0-9]+(\.[0-9]+)?' /usr/lib/aarch64-linux-gnu/tegra/libcuda.so.1.1 | sort -u | head || true
+    - grep -a -o -E 'CUDA [0-9]+\.[0-9]+' /usr/lib/aarch64-linux-gnu/tegra/libcuda.so.1.1 | sort -u | head || true
+    - echo "== CUDA driver API via ctypes (needs no toolkit) =="
+    - |
+      /opt/python/cp312-cp312/bin/python - <<'EOF'
+      import ctypes
+      cu = ctypes.CDLL("libcuda.so.1")
+      def check(name, *args):
+          rc = getattr(cu, name)(*args)
+          if rc != 0:
+              msg = ctypes.c_char_p()
+              cu.cuGetErrorString(rc, ctypes.byref(msg))
+              raise SystemExit(f"{name} failed: {rc} {msg.value}")
+      check("cuInit", 0)
+      v = ctypes.c_int(); check("cuDriverGetVersion", ctypes.byref(v))
+      print(f"driver supports CUDA {v.value // 1000}.{v.value % 1000 // 10}")
+      n = ctypes.c_int(); check("cuDeviceGetCount", ctypes.byref(n))
+      print("device count:", n.value)
+      for i in range(n.value):
+          d = ctypes.c_int(); check("cuDeviceGet", ctypes.byref(d), i)
+          name = ctypes.create_string_buffer(256); check("cuDeviceGetName", name, 256, d)
+          major, minor = ctypes.c_int(), ctypes.c_int()
+          check("cuDeviceGetAttribute", ctypes.byref(major), 75, d)  # COMPUTE_CAPABILITY_MAJOR
+          check("cuDeviceGetAttribute", ctypes.byref(minor), 76, d)  # COMPUTE_CAPABILITY_MINOR
+          mem = ctypes.c_size_t(); check("cuDeviceTotalMem_v2", ctypes.byref(mem), d)
+          print(f"device {i}: {name.value.decode()} sm_{major.value}{minor.value} {mem.value / 2**30:.1f} GiB")
+      ctx = ctypes.c_void_p(); check("cuCtxCreate_v2", ctypes.byref(ctx), 0, d)
+      ptr = ctypes.c_uint64(); check("cuMemAlloc_v2", ctypes.byref(ptr), 1 << 20)
+      check("cuMemFree_v2", ptr); check("cuCtxDestroy_v2", ctx)
+      print("context create + 1 MiB alloc/free: OK")
+      EOF
+
+.build-release-macos:  # TEMP hidden for probe-jetson run
   stage: build
   tags:
     - macos
@@ -109,7 +156,7 @@ build-release-macos:
       - dist/*.whl
     expire_in: 7 days
 
-test-debug:
+.test-debug:  # TEMP hidden for probe-jetson run
   stage: test
   dependencies:
     - build-debug
@@ -124,7 +171,7 @@ test-debug:
     - uv pip install hopsy --find-links dist/
     - python -m unittest -v tests
 
-test-release:
+.test-release:  # TEMP hidden for probe-jetson run
   stage: test
   dependencies:
     - build-release
@@ -141,7 +188,7 @@ test-release:
     - uv pip install hopsy --find-links dist/
     - python -m unittest -v tests
 
-test-release-macos:
+.test-release-macos:  # TEMP hidden for probe-jetson run
   stage: test
   tags:
     - macos
@@ -159,7 +206,7 @@ test-release-macos:
     - uv pip install hopsy --find-links dist/
     - python -m unittest -v tests
 
-test-integration-release:
+.test-integration-release:  # TEMP hidden for probe-jetson run
   stage: test
   dependencies:
     - build-release
@@ -181,7 +228,7 @@ test-integration-release:
   after_script:
     - pkill clickhouse || true
 
-build-docs:
+.build-docs:  # TEMP hidden for probe-jetson run
   stage: test
   image: ubuntu:24.04
   dependencies:
