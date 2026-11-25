@@ -8,6 +8,7 @@
 #include <hopsy/kernel/gaussian_line_kernel.h>
 #include <hopsy/kernel/overrelaxed_line_kernel.h>
 #include <hopsy/sampling/chain.h>
+#include <hopsy/sampling/non_reversible_parallel_tempering.h>
 #include <hopsy/target/uniform.h>
 #include <numeric>
 #include <random>
@@ -37,6 +38,32 @@ namespace {
         return false;
     }
 } // namespace
+
+TEST_CASE("NRPT preserves bilinear supports while exchanging cached workspaces", "[bilinear][nrpt]") {
+    const auto geometry = product(0.2);
+    struct Target {
+        double log_density(const V &x) const { return -2. * x.squaredNorm(); }
+    };
+    const auto problem = hopsy::Problem(std::cref(geometry), Target{});
+    const V initial = V::Constant(2, 0.2);
+    const auto kernel = [&] {
+        return hopsy::HitAndRunKernel(initial, hopsy::RandomDirectionGenerator<double>(2),
+                                      hopsy::UniformLineKernel{});
+    };
+    std::vector<hopsy::TemperingReplica<decltype(kernel())>> replicas;
+    for (std::size_t i = 0; i < 4; ++i)
+        replicas.push_back({initial, kernel(), hopsy::RandomNumberGenerator(201, i)});
+    auto sampler = hopsy::NonReversibleParallelTempering(
+        problem, hopsy::TemperatureLadder::linear(4), std::move(replicas),
+        hopsy::RandomNumberGenerator(631, 4));
+    for (int scan = 0; scan < 300; ++scan) {
+        sampler.scan(2, 3);
+        for (std::size_t slot = 0; slot < sampler.size(); ++slot)
+            REQUIRE(geometry.is_feasible(sampler.sampling_state(slot)));
+    }
+    for (auto trips : sampler.round_trips())
+        REQUIRE(trips > 0);
+}
 
 TEST_CASE("Quadratic slices retain all components and nearly linear roots", "[bilinear][numeric]") {
     auto q = hopsy::detail::quadratic_slice(1, 0, -1);
