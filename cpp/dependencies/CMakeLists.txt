@@ -141,29 +141,6 @@ endif()
 
 
 
-############
-# nanobind #
-############
-
-if(HOPSY_BUILD_PYTHON)
-    set(
-            HOPSY_NANOBIND_VERSION
-            "2.12.0"
-            CACHE STRING
-            "nanobind version used by hopsy"
-    )
-
-    FetchContent_Declare(
-            nanobind
-            GIT_REPOSITORY https://github.com/wjakob/nanobind.git
-            GIT_TAG "v${HOPSY_NANOBIND_VERSION}"
-            GIT_SHALLOW TRUE
-            GIT_SUBMODULES_RECURSE TRUE
-    )
-
-    FetchContent_MakeAvailable(nanobind)
-endif()
-
 #######
 # PCG #
 #######

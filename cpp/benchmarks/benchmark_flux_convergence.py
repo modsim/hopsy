@@ -3,40 +3,72 @@
 
 import argparse
 import json
+from functools import partial
 from pathlib import Path
 from time import perf_counter
 
 import _hopsy_core as core
 import numpy as np
 import x3cflux
-from benchmark_ecoli_nrpt import (
-    cap_unbounded_fluxes,
+from flux_benchmark_common import (
+    CSMMALA_STEP_SIZE,
+    add_model_arguments,
+    bind_tempering,
+    exchange_counts,
     interior_start,
+    load_model,
+    make_target,
     plot_flux_posteriors,
+    reconstruct_fluxes,
     replica_diagnostics,
     round_geometry,
-    summarize,
+    sampling_report,
+    validate_model_arguments,
+    varying_flux_indices,
 )
 
 MODES = ("standalone", "nrpt_parallel", "nrpt_parallel_rounded_reference")
 ESS_TARGETS = {"full": 100, "first_half": 50, "last_half": 50}
+TRACE_BATCH_SIZE = 2_000
 
 
 def write_json(path, value):
     path.write_text(json.dumps(value, indent=2, allow_nan=False) + "\n")
 
 
+def draw_traces(sampler, args, mode, steps, dimension):
+    """Keep one cold sample per scan, and a continuous post-swap trace."""
+    count = args.num_samples
+    samples = np.empty((dimension, count), order="F")
+    ids = np.empty((count + 1, len(steps)), dtype=np.intp)
+    densities = np.empty(ids.shape)
+    seconds = 0.0
+    for offset in range(0, count, TRACE_BATCH_SIZE):
+        end = min(offset + TRACE_BATCH_SIZE, count)
+        start = perf_counter()
+        draws, batch_ids, batch_densities = sampler.draw_traced(
+            end - offset, parallel=True, workers=args.workers, steps_per_slot=steps
+        )
+        seconds += perf_counter() - start
+        # Native batches include their starting state. The previous batch
+        # already wrote that snapshot, so only append the new scans.
+        if offset == 0:
+            ids[0], densities[0] = batch_ids[:, 0], batch_densities[:, 0]
+        else:
+            np.testing.assert_array_equal(ids[offset], batch_ids[:, 0])
+        samples[:, offset:end] = draws
+        ids[offset + 1 : end + 1] = batch_ids[:, 1:].T
+        densities[offset + 1 : end + 1] = batch_densities[:, 1:].T
+        print(
+            f"seed {args.seed} {mode} {end} draws, {sum(sampler.round_trips)} trips",
+            flush=True,
+        )
+    return samples, ids, densities, seconds
+
+
 def run_replicate(args):
     replicate_start = perf_counter()
-    simulator = x3cflux.create_simulator_from_fml(str(args.fml), args.configuration)
-    space = simulator.parameter_space
-    A = np.asarray(space.inequality_system.matrix)
-    b = np.asarray(space.inequality_system.bound).reshape(-1)
-    added_bounds = []
-    if args.unbounded_flux_caps is not None:
-        A, b, added_bounds = cap_unbounded_fluxes(
-            A, b, space.free_parameter_names, args.unbounded_flux_caps
-        )
+    simulator, A, b, added_bounds = load_model(args)
     center = interior_start(A, b)
     initial = center + args.fit_weight * (simulator.initial_parameters - center)
     if np.min(b - A @ initial) <= 0:
@@ -51,9 +83,6 @@ def run_replicate(args):
     ladder = core.TemperatureLadder(args.betas)
     args.output.mkdir(parents=True, exist_ok=True)
     results = {}
-
-    def make_target():
-        return core.CapsuleTarget(simulator.make_hopsy_target())
 
     def save(mode, samples, result, warmup_seconds):
         np.save(args.output / f"{mode}.npy", samples)
@@ -71,7 +100,7 @@ def run_replicate(args):
     if "standalone" in modes:
         print(f"seed {args.seed} standalone starts", flush=True)
         chain = core.bind_chain(
-            core.Problem(rounded, make_target(), coordinates),
+            core.Problem(rounded, make_target(simulator), coordinates),
             core.UniformRandomCoordinateHitAndRunKernel(rounded_start),
             rounded_start,
         )
@@ -84,7 +113,7 @@ def run_replicate(args):
         save(
             "standalone",
             samples,
-            summarize(
+            sampling_report(
                 "standalone", samples, perf_counter() - start, args.num_samples, A, b
             ),
             warmup_seconds,
@@ -96,23 +125,19 @@ def run_replicate(args):
             continue
         mixed = mode == "nrpt_parallel_rounded_reference"
         point = initial if mixed else rounded_start
-        targets = [make_target() for _ in args.betas]
-        problem = core.Problem(
-            geometry if mixed else rounded, targets[0], None if mixed else coordinates
-        )
-        kernels = (
-            [core.CSmMALAKernel(point, step_size=args.step_size) for _ in targets]
+        make_kernel = (
+            partial(core.CSmMALAKernel, step_size=args.step_size)
             if mixed
-            else [core.UniformRandomCoordinateHitAndRunKernel(point) for _ in targets]
+            else core.UniformRandomCoordinateHitAndRunKernel
         )
-        sampler = core.bind_parallel_tempering(
-            problem,
+        sampler = bind_tempering(
+            simulator,
+            geometry if mixed else rounded,
+            None if mixed else coordinates,
+            point,
             ladder,
-            kernels,
-            [point] * len(targets),
-            [core.RandomNumberGenerator(args.seed, i) for i in range(len(targets))],
-            core.RandomNumberGenerator(args.seed, len(targets)),
-            replica_targets=targets,
+            make_kernel,
+            args.seed,
             reference_basis=basis if mixed else None,
             reference_max_beta=args.reference_max_beta if mixed else 0.0,
         )
@@ -128,46 +153,23 @@ def run_replicate(args):
         sampler.draw_parallel(args.warmup, workers=args.workers, steps_per_slot=steps)
         warmup_seconds = perf_counter() - start
         sampler.reset_statistics()
-        draws, ids, densities = [], [], []
-        timed = 0.0
-        for offset in range(0, args.num_samples, 2000):
-            count = min(2000, args.num_samples - offset)
-            start = perf_counter()
-            samples, batch_ids, batch_densities = sampler.draw_traced(
-                count,
-                parallel=True,
-                workers=args.workers,
-                steps_per_slot=steps,
-            )
-            timed += perf_counter() - start
-            if ids:
-                np.testing.assert_array_equal(ids[-1][-1], batch_ids[:, 0])
-            draws.append(samples)
-            cut = int(offset > 0)
-            ids.append(batch_ids.T[cut:])
-            densities.append(batch_densities.T[cut:])
-            print(
-                f"seed {args.seed} {mode} {offset + count} draws, "
-                f"{sum(sampler.round_trips)} trips",
-                flush=True,
-            )
-        samples, ids, densities = map(
-            np.concatenate, (draws, ids, densities), (1, 0, 0)
+        samples, ids, densities, seconds = draw_traces(
+            sampler, args, mode, steps, initial.size
         )
-        result = summarize(mode, samples, timed, args.num_samples * sum(steps), A, b)
-        exchanges = [
-            {"attempts": e.attempts, "accepts": e.accepts}
-            for e in sampler.exchange_statistics
-        ]
+        result = sampling_report(
+            mode, samples, seconds, args.num_samples * sum(steps), A, b
+        )
+        exchanges = exchange_counts(sampler)
+        round_trips = sampler.round_trips
         result.update(
             workers=args.workers,
             steps_per_slot=steps,
             exchange_statistics=exchanges,
             global_communication_barrier=sum(sampler.mean_exchange_rejections()),
-            round_trips=sampler.round_trips,
-            total_round_trips=sum(sampler.round_trips),
+            round_trips=round_trips,
+            total_round_trips=sum(round_trips),
             replica_diagnostics=replica_diagnostics(
-                ids, densities, exchanges, sampler.round_trips
+                ids, densities, exchanges, round_trips
             ),
         )
         save(mode, samples, result, warmup_seconds)
@@ -271,10 +273,8 @@ def chain_ess_diagnostics(arviz, chain, names):
     }
 
 
-def aggregate(args):
-    import arviz
-
-    reports = [json.loads((p / "report.json").read_text()) for p in args.replicates]
+def load_reports(replicates):
+    reports = [json.loads((p / "report.json").read_text()) for p in replicates]
     reference = reports[0]
     for item in reports[1:]:
         for key in (
@@ -294,29 +294,32 @@ def aggregate(args):
             raise ValueError("Replicate methods differ")
     if len({item["seed"] for item in reports}) != len(reports) or len(reports) < 2:
         raise ValueError("R-hat requires at least two independently seeded replicates")
+    return reports
+
+
+def aggregate(args):
+    import arviz
+
+    reports = load_reports(args.replicates)
+    reference = reports[0]
     simulator = x3cflux.create_simulator_from_fml(
         reference["fml"], reference["configuration"]
     )
     space = simulator.parameter_space
     names = space.parameter_names
-    indices = [
-        names.index(name)
-        for name in x3cflux.get_non_constant_names(simulator)
-        if name.endswith((".n", ".x"))
-    ]
+    indices = varying_flux_indices(simulator)
     plots = {}
     modes = {}
+    first_draw = None
     for mode in reference["results"]:
         draws = np.stack([np.load(p / f"{mode}.npy") for p in args.replicates])
-        pooled = draws.transpose(1, 0, 2).reshape(draws.shape[1], -1)
+        if first_draw is None:
+            first_draw = draws[0, :, 0].copy()
         free_rhat = rhat_values(arviz, draws, space.free_parameter_names)
         tail_rhat = rhat_values(
             arviz, draws[..., draws.shape[-1] // 2 :], space.free_parameter_names
         )
-        fluxes = np.empty((len(reports), len(indices), draws.shape[-1]))
-        for out, chain in zip(fluxes, draws):
-            for draw in range(chain.shape[1]):
-                out[:, draw] = space.compute_parameters(chain[:, draw])[indices]
+        fluxes = reconstruct_fluxes(space, indices, draws)
         flux_rhat = rhat_values(arviz, fluxes, [names[i] for i in indices])
         free_ess = bulk_ess_values(arviz, draws, space.free_parameter_names)
         flux_ess = bulk_ess_values(arviz, fluxes, [names[i] for i in indices])
@@ -376,9 +379,8 @@ def aggregate(args):
             "free_tail_rhat": tail_rhat,
             "flux_rhat": flux_rhat,
         }
-        plots[("csmmala" if mode == MODES[-1] else "coordinate-hit-and-run", mode)] = (
-            pooled
-        )
+        plot_kernel = "csmmala" if mode == MODES[-1] else "coordinate-hit-and-run"
+        plots[plot_kernel, mode] = fluxes
         timing = (
             f"{elapsed:.1f}s retained"
             if total_sampling is None
@@ -418,6 +420,7 @@ def aggregate(args):
             "posterior_plots": plot_flux_posteriors(
                 simulator,
                 plots,
+                first_draw,
                 args.output,
                 reference_max_beta=reference["reference_max_beta"],
             ),
@@ -432,16 +435,14 @@ def main():
         "run", help="run one or more sampling modes for one replicate"
     )
     run.set_defaults(action=run_replicate)
-    run.add_argument("--fml", type=Path, required=True)
-    run.add_argument("--configuration", default="default")
-    run.add_argument("--unbounded-flux-caps", type=float, nargs=2)
+    add_model_arguments(run)
     run.add_argument("--betas", type=float, nargs="+", required=True)
     run.add_argument("--seed", type=int, required=True)
     run.add_argument("--fit-weight", type=float, required=True)
     run.add_argument("--num-samples", type=int, default=20_000)
     run.add_argument("--warmup", type=int, default=2_000)
     run.add_argument("--workers", type=int, required=True)
-    run.add_argument("--step-size", type=float, default=0.15)
+    run.add_argument("--step-size", type=float, default=CSMMALA_STEP_SIZE)
     run.add_argument("--reference-max-beta", type=float, default=0.5)
     run.add_argument(
         "--hit-and-run-steps",
@@ -465,6 +466,7 @@ def main():
     summary.add_argument("replicates", type=Path, nargs="+")
     args = parser.parse_args()
     if args.action is run_replicate:
+        validate_model_arguments(parser, args)
         if args.seed < 0:
             parser.error("--seed must be nonnegative")
         if not 0 <= args.fit_weight < 1:
@@ -475,10 +477,6 @@ def main():
             parser.error("--hit-and-run-steps must be positive")
         if not np.isfinite(args.step_size) or args.step_size <= 0:
             parser.error("--step-size must be finite and positive")
-        if args.unbounded_flux_caps is not None and any(
-            not np.isfinite(cap) or cap <= 0 for cap in args.unbounded_flux_caps
-        ):
-            parser.error("unbounded flux caps must be finite and positive")
         if not 1 <= args.workers <= len(args.betas):
             parser.error("--workers must be between one and the number of temperatures")
         if args.num_samples < 1000 or args.warmup < 0:

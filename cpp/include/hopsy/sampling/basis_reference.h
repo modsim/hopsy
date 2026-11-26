@@ -8,8 +8,6 @@
 #include <hopsy/kernel/direction_generator.h>
 #include <hopsy/kernel/hit_and_run.h>
 #include <hopsy/kernel/uniform_line_kernel.h>
-#include <hopsy/sampling/step.h>
-#include <hopsy/target/uniform.h>
 
 namespace hopsy {
     // Random-coordinate Hit-and-Run in an affine chart x = T z + s. Each

@@ -95,6 +95,9 @@ if(HOPSY_BUILD_PYTHON)
             REQUIRED
             COMPONENTS Interpreter Development.Module
     )
+    if(NOT COMMAND nanobind_add_module)
+        find_package(nanobind CONFIG REQUIRED)
+    endif()
     add_subdirectory(bindings)
 endif()
 
@@ -103,7 +106,6 @@ endif()
 # ---------------------------------------------------------------------------
 
 if(HOPSY_BUILD_CPP_TESTS)
-    enable_testing()
     add_subdirectory(tests)
 endif()
 
@@ -174,4 +176,8 @@ if(HOPSY_BUILD_CPP_BENCHMARKS)
     target_link_libraries(hopsy_bound_sampling_benchmark PRIVATE hopsy::core)
     add_executable(hopsy_hit_and_run_benchmark benchmarks/hit_and_run_benchmark.cpp)
     target_link_libraries(hopsy_hit_and_run_benchmark PRIVATE hopsy::core)
+    add_executable(hopsy_parallel_tempering_benchmark benchmarks/parallel_tempering_benchmark.cpp)
+    target_link_libraries(hopsy_parallel_tempering_benchmark PRIVATE hopsy::core)
+    add_executable(hopsy_parallel_tempering_comparison benchmarks/parallel_tempering_comparison.cpp)
+    target_link_libraries(hopsy_parallel_tempering_comparison PRIVATE hopsy::core)
 endif()

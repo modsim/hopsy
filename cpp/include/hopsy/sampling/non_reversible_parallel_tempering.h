@@ -6,6 +6,7 @@
 #include <concepts>
 #include <cstddef>
 #include <limits>
+#include <optional>
 #include <random>
 #include <span>
 #include <stdexcept>
@@ -239,7 +240,7 @@ namespace hopsy {
             for (std::size_t i = 0; i < edges_.size(); ++i) {
                 const double log_alpha = log_acceptance_[i];
                 rejection_sums_[i] -= std::expm1(log_alpha);
-                if (i % 2 != next_edge_)
+                if (i % 2 != next_edge_parity_)
                     continue;
                 ++edges_[i].attempts;
                 const double u = uniform(exchange_rng_);
@@ -250,11 +251,12 @@ namespace hopsy {
                 }
             }
             ++scans_;
-            next_edge_ ^= 1;
+            next_edge_parity_ ^= 1;
             record_endpoints();
         }
 
         void scan(Index local_steps = 1, Index reference_steps = 10) {
+            validate_steps(local_steps, reference_steps);
             explore_all(local_steps, reference_steps);
             communicate();
         }
@@ -291,7 +293,7 @@ namespace hopsy {
             Workspace workspace;
             [[no_unique_address]] detail::TargetEvaluation<Problem, state_type> evaluation;
             detail::LogDensityCache density_cache;
-            double beta;
+            double last_beta;
             [[no_unique_address]] typename Reference::Local alternate;
 
             Replica(const Problem &problem, TemperingReplica<Kernel> &&input, double initial_beta,
@@ -299,31 +301,28 @@ namespace hopsy {
                 : state(validated(problem, input)), kernel(std::move(input.kernel)),
                   rng(std::move(input.rng)),
                   workspace(Kernel::make_workspace(problem.geometry(), state)),
-                  evaluation(problem, state), beta(initial_beta),
+                  evaluation(problem, state), last_beta(initial_beta),
                   alternate(reference, state, problem.geometry()) {
                 const double log_density = evaluate(problem);
-                if (beta > 0. && !std::isfinite(log_density))
+                if (initial_beta > 0. && !std::isfinite(log_density))
                     throw std::invalid_argument(
                         "Initial state must have positive mass at its beta");
                 density_cache.set_state(log_density);
-                if constexpr (requires { kernel.invalidate_state_cache(); })
-                    kernel.invalidate_state_cache();
-                else if constexpr (requires { kernel.invalidate_target_cache(); })
-                    kernel.invalidate_target_cache();
+                invalidate_main_walk();
             }
 
             std::size_t explore(const Problem &problem, const Reference &reference, double next_beta,
                                 Index steps) {
                 if constexpr (!std::same_as<Reference, detail::DefaultReference>) {
                     const bool use_alternate = reference.uses(next_beta);
+                    // Only the active walk's workspace follows accepted moves. On
+                    // switching, rebuild the incoming workspace from this replica's
+                    // state. The shared untempered density remains valid.
                     if (use_alternate != alternate.active) {
-                        if (use_alternate)
+                        if (use_alternate) {
                             problem.geometry().reset_workspace(state, alternate.workspace);
-                        else {
-                            if constexpr (requires { kernel.invalidate_state_cache(); })
-                                kernel.invalidate_state_cache();
-                            else if constexpr (requires { kernel.invalidate_target_cache(); })
-                                kernel.invalidate_target_cache();
+                        } else {
+                            invalidate_main_walk();
                             problem.geometry().reset_workspace(state, workspace);
                         }
                         alternate.active = use_alternate;
@@ -336,12 +335,19 @@ namespace hopsy {
             }
 
           private:
+            void invalidate_main_walk() {
+                if constexpr (requires { kernel.invalidate_state_cache(); })
+                    kernel.invalidate_state_cache();
+                else if constexpr (requires { kernel.invalidate_target_cache(); })
+                    kernel.invalidate_target_cache();
+            }
+
             std::size_t explore_with(auto &local_kernel, auto &local_workspace,
                                      const Problem &problem, double next_beta, Index steps) {
-                if (beta != next_beta) {
+                if (last_beta != next_beta) {
                     if constexpr (requires { local_kernel.invalidate_target_cache(); })
                         local_kernel.invalidate_target_cache();
-                    beta = next_beta;
+                    last_beta = next_beta;
                 }
                 const auto run = [&](const auto &target) {
                     try {
@@ -362,7 +368,10 @@ namespace hopsy {
                 };
                 const detail::CachedTarget cached(evaluation.target(problem), density_cache);
                 const auto accepts =
-                    beta == 0. ? run(UniformTarget{}) : run(detail::PowerTarget(cached, beta));
+                    next_beta == 0. ? run(UniformTarget{})
+                                    : run(detail::PowerTarget(cached, next_beta));
+                // Uniform moves can leave the density unevaluated. Exchange
+                // needs the final untempered value, regardless of the walk used.
                 if (!density_cache.state())
                     density_cache.set_state(evaluate(problem));
                 return accepts;
@@ -384,6 +393,8 @@ namespace hopsy {
         enum class TripPhase { awaiting_hot, seeking_cold, returning_hot };
 
         void record_endpoints() noexcept {
+            // A trip counts only after a visit to hot, then cold, then hot
+            // again within this diagnostics window. Track physical IDs.
             const auto cold = replica_at_slot_.back();
             if (trip_phases_[cold] == TripPhase::seeking_cold)
                 trip_phases_[cold] = TripPhase::returning_hot;
@@ -399,7 +410,6 @@ namespace hopsy {
                     "Local and reference exploration require positive steps");
         }
         void explore_all(Index local_steps, Index reference_steps) {
-            validate_steps(local_steps, reference_steps);
             for (std::size_t i = 0; i < size(); ++i)
                 explore(i, i == 0 ? reference_steps : local_steps);
         }
@@ -426,7 +436,7 @@ namespace hopsy {
         std::vector<TripPhase> trip_phases_;
         std::vector<std::size_t> round_trips_;
         std::size_t scans_ = 0;
-        std::size_t next_edge_ = 1;
+        std::size_t next_edge_parity_ = 1;
     };
 } // namespace hopsy
 #endif

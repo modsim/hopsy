@@ -22,7 +22,7 @@ namespace hopsy::bindings {
                 return std::move(*steps_per_slot);
             }
             if (local_steps < 1 || reference_steps < 1)
-                throw std::invalid_argument("Invalid sample count or local step count");
+                throw std::invalid_argument("Local and reference exploration require positive steps");
             std::vector<Index> steps(slots, local_steps);
             steps.front() = reference_steps;
             return steps;
@@ -122,7 +122,7 @@ namespace hopsy::bindings {
         if (count == 0)
             return samples;
 
-        Index scan = 0;
+        Index completed_scans = 0;
         std::vector<std::exception_ptr> exploration_errors(slots);
         std::exception_ptr failure;
         std::barrier finish_scan(static_cast<std::ptrdiff_t>(worker_count), [&]() noexcept {
@@ -133,8 +133,8 @@ namespace hopsy::bindings {
                 }
             }
             try {
-                record_scan(samples, scan, cold, trace);
-                ++scan;
+                record_scan(samples, completed_scans, cold, trace);
+                ++completed_scans;
             } catch (...) {
                 failure = std::current_exception();
             }
@@ -152,6 +152,8 @@ namespace hopsy::bindings {
                     if (stop.stop_requested())
                         return;
                     for (Index i = 0; i < count; ++i) {
+                        // Slot assignment is fixed for this draw. On arrival of
+                        // the last worker, finish_scan records and exchanges.
                         for (std::size_t slot = worker; slot < slots; slot += worker_count) {
                             try {
                                 explore(slot, steps[slot]);

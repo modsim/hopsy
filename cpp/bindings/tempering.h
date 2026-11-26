@@ -11,7 +11,8 @@ namespace hopsy::bindings {
     std::vector<std::shared_ptr<TargetMethods>>
     private_tempering_targets(const std::vector<nb::object> &targets, std::size_t replicas);
 
-    // Dispatch once per Python call. Local transitions use the typed native sampler.
+    // Type erasure stays at the binding boundary. Each exploration batch
+    // performs its transitions in the typed native sampler.
     class TemperingBinding {
         using ReplicaTrace = Matrix<Index>;
 

@@ -303,7 +303,7 @@ the GIL, and calls on a busy sampler raise an error. Use `sampling_state(slot)`
 and `target_state(slot)` to inspect detached copies of current states.
 Exchange counts, replica indices, and round trips are snapshots.
 
-`draw_parallel` uses one native worker per slot for the duration of a draw and
+`draw_parallel` keeps its native workers for the duration of the draw and
 synchronizes before each exchange. It supports built-in targets and capsule
 targets with private contexts. For the latter, pass `replica_targets=` with
 one separately created `CapsuleTarget` per replica when binding. Every
