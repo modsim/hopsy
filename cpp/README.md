@@ -24,6 +24,8 @@ Hit-and-Run combines random dense, random coordinate or cycling coordinate direc
 
 See the [complete C++ example](examples/non_reversible_parallel_tempering.cpp) and the [Python, C++ and capsule API guide](bindings/README.md).
 
+### Chain and geometry contracts
+
 Each chain needs its own mutable kernel, workspace and RNG stream. Geometry and targets can be shared when their const operations support concurrent use. Borrowed C++ objects must outlive the chain. A pending proposal reserves its workspace until acceptance or rejection. The bound-chain API manages this lifecycle and exposes the last evaluated accepted and proposed log densities.
 
 The bilinear geometry supports uniform and Gaussian-displacement Hit-and-Run over unions of intervals. The Gaussian family and overrelaxed line kernel require linear geometry. Bilinear slices use numerical filters with an exact fallback for ambiguous boundaries. Use binary round-to-nearest arithmetic without fast-math.
@@ -36,7 +38,7 @@ From the repository root, build and install the C++ headers and CMake package in
 
 ```sh
 cmake -S cpp -B cpp/build/native -DCMAKE_BUILD_TYPE=Release \
-  -DHOPSY_BUILD_CPP_TESTS=ON -DHOPSY_BUILD_CPP_BENCHMARKS=ON
+  -DHOPSY_BUILD_CPP_TESTS=ON
 cmake --build cpp/build/native --parallel 4
 ctest --test-dir cpp/build/native --output-on-failure
 cmake --install cpp/build/native --prefix "$PWD/cpp/build/native-install"
@@ -46,12 +48,12 @@ A downstream CMake project uses `find_package(hopsy CONFIG REQUIRED)` and links 
 
 ### Python bindings
 
-Use Python 3.10 or newer with its development headers. Choose an interpreter compatible with your 13CFLUX wheel and use the same interpreter for CMake, pip and the benchmarks. The handover was tested with Python 3.14 and nanobind 3.1.0.
+Use Python 3.10 or newer with its development headers. Use the same interpreter for CMake, pip and the Python tests. The handover was tested with Python 3.14 and nanobind 3.1.0.
 
 ```sh
 python3 -m venv cpp/.benchmark-venv
 hopsy_python="$PWD/cpp/.benchmark-venv/bin/python"
-"$hopsy_python" -m pip install nanobind pytest numpy scipy matplotlib arviz
+"$hopsy_python" -m pip install nanobind pytest numpy
 cmake -S cpp -B cpp/build/python -DCMAKE_BUILD_TYPE=Release \
   -DHOPSY_BUILD_CPP_TESTS=OFF -DHOPSY_INSTALL_CPP=OFF \
   -DHOPSY_BUILD_PYTHON=ON -DHOPSY_BUILD_PYTHON_TESTS=ON \
@@ -63,93 +65,6 @@ cmake --install cpp/build/python --prefix "$PWD/cpp/build/python-install"
 PYTHONPATH="$PWD/cpp/build/python-install" "$hopsy_python" -c 'import hopsy; print(hopsy.TemperatureLadder)'
 ```
 
-For FluxML benchmarks, put `cpp/build/python/bindings` on `PYTHONPATH`. The scripts import the new extension as `_hopsy_core` and use the separate legacy `hopsy` package for rounding. Keep the `python-install` prefix out of the benchmark's `PYTHONPATH` so it does not shadow legacy hopsy.
+## Benchmarks
 
-### 13CFLUX native target wheel
-
-Use a wheel from the [`201-implement-hopsy-native-target` branch](https://jugit.fz-juelich.de/IBG-1/ModSim/Fluxomics/13CFLUX/-/tree/201-implement-hopsy-native-target?ref_type=heads) that matches your platform and Python ABI. Install the actual wheel file with `"$hopsy_python" -m pip install /path/to/downloaded.whl`. The package imports as `x3cflux`. The wheel requires the native libraries it was linked against, and installing `cyipopt` from source requires Ipopt development files and `pkg-config`.
-
-To build from the branch, use an environment with the 13CFLUX build dependencies. Its CMake project requires Boost compiled components (Log, DateTime and Test), SUNDIALS 6 or later, and FluxML. It can fetch Eigen if unavailable. The branch's `pyproject.toml` supplies the Python build dependencies and the CMake wheel target. Set `CMAKE_PREFIX_PATH` for prerequisites installed in nonstandard prefixes.
-
-```sh
-mkdir -p cpp/build
-git clone --single-branch --branch 201-implement-hopsy-native-target \
-  https://jugit.fz-juelich.de/IBG-1/ModSim/Fluxomics/13CFLUX.git cpp/build/13cflux-native-target
-wheel_dir="$(mktemp -d cpp/build/x3cflux-wheels.XXXXXX)"
-"$hopsy_python" -m pip wheel --no-deps ./cpp/build/13cflux-native-target --wheel-dir "$wheel_dir"
-"$hopsy_python" -m pip install "$wheel_dir"/x3cflux-*.whl
-git -C cpp/build/13cflux-native-target rev-parse HEAD
-```
-
-## FluxML benchmarks
-
-The two model files are in `cpp/benchmarks/`. Use `--fml` to select a model. Both scripts accept `--configuration`, `--betas`, `--num-samples`, `--warmup` and `--seed`. A sample is one retained cold draw. β lists include 0 and 1 and determine the number of temperature slots. An independent replicate is a separate invocation with its own seed, not a temperature slot.
-
-Both scripts require at least 1,000 retained draws for batch-means ESS. The single-seed script defaults to 100,000 draws and 1,000 warm-up iterations. The replicated runner defaults to 20,000 draws and 2,000 warm-up iterations. Warm-up uses the same local step counts as sampling and its draws are discarded.
-
-**Single-seed comparison.** `benchmark_ecoli_nrpt.py` compares a standalone chain to serial or parallel NRPT via `--nrpt-mode {parallel,serial,both}`. Select `--kernel {hit-and-run,gaussian-hit-and-run,csmmala,both}`, where `both` runs dense uniform Hit-and-Run and CSmMALA. `--step-size` sets the Gaussian line scale or CSmMALA proposal scale. `--round` rounds the whole problem. For CSmMALA in model coordinates use `--reference-kernel {same,rounded-coordinate,both}` with `--reference-max-beta` to select the hottest slots for rounded Hit-and-Run. `--reference-steps` sets the step count at β = 0, `--local-steps` sets it at every positive β, and `--standalone-thinning` controls standalone steps per draw. With no explicit β list, `--num-replicas` sets the length of a linear ladder. JSON goes to stdout. Use `--replica-trace` for an NPZ and `--posterior-plots` for SVGs.
-
-**Replicated comparison.** `benchmark_flux_convergence.py run` uses rounded uniform coordinate Hit-and-Run for the standalone and all-Hit-and-Run controls. Use `--method {standalone,nrpt_parallel,nrpt_parallel_rounded_reference}` to select one strategy. Omitting it runs all three. `--mixed-only` is shorthand for selecting the mixed method. In mixed runs, `--reference-max-beta` selects the inclusive Hit-and-Run cutoff and `--hit-and-run-steps` gives the number of steps at each of those slots. Every higher slot takes one CSmMALA step at `--step-size` (default 0.15). `--fit-weight` sets the start between the interior point (0) and the FluxML initial point (near 1).
-
-`--workers` controls native workers per NRPT replicate. A worker explores slots at strides of the worker count before joining the exchange barrier. Each physical replica has a separate native capsule context, so local exploration can run without the GIL. When running processes concurrently, budget the sum of their workers and cap numerical library threads.
-
-### Short NatProt smoke test
-
-This runs two independent chains of the mixed method, checks the installed capsule against the actual NatProt model, and creates convergence summaries and figures. From the repository root, with the venv and bindings set up as above, run in Bash.
-
-```bash
-hopsy_python="$PWD/cpp/.benchmark-venv/bin/python"
-export PYTHONPATH="$PWD/cpp/build/python/bindings"
-export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
-runner=cpp/benchmarks/benchmark_flux_convergence.py
-(
-  set -e
-  out="$(mktemp -d cpp/build/natprot-smoke.XXXXXX)"
-  for seed in 42 136; do
-    weight=0.33
-    if [ "$seed" -eq 136 ]; then weight=0.67; fi
-    "$hopsy_python" -u "$runner" run \
-      --fml 'cpp/benchmarks/Ecoli_NatProt_GOX.fml' --configuration default \
-      --betas 0 0.005 0.02 0.06 0.16 0.36 0.65 1 \
-      --method nrpt_parallel_rounded_reference --reference-max-beta 0.5 \
-      --hit-and-run-steps 2 --workers 4 --num-samples 1000 --warmup 20 \
-      --seed "$seed" --fit-weight "$weight" --output "$out/seed-$seed"
-  done
-  "$hopsy_python" "$runner" summarize --output "$out" "$out/seed-42" "$out/seed-136"
-  printf '%s\n' "$out"
-)
-```
-
-Use four distinct seeds for the established convergence comparison. The smoke test checks the execution path and file formats.
-
-### Harder model smoke test
-
-The supplied harder file's schema hint points to a URL that the tested FluxML parser could not load. Use a local copy without that hint. The `[12]Gluc` configuration also needs a bounded reference. The following caps reproduce the earlier benchmark's **capped** model and change its posterior support. The report lists the added inequalities.
-
-```bash
-hard_out="$(mktemp -d cpp/build/gluc-smoke.XXXXXX)"
-hard_name='e_coli_+EDP+GOX+MGOX-TPI.fml'
-"$hopsy_python" - "cpp/benchmarks/$hard_name" "$hard_out/$hard_name" <<'PY'
-from pathlib import Path
-import re
-import sys
-
-data = Path(sys.argv[1]).read_bytes()
-data = re.sub(rb'\s+xsi:schemaLocation="[^"]*"', b'', data, count=1)
-Path(sys.argv[2]).write_bytes(data)
-PY
-"$hopsy_python" -u "$runner" run \
-  --fml "$hard_out/$hard_name" --configuration '[12]Gluc' --unbounded-flux-caps 100 10000 \
-  --betas 0 0.000001 0.00001 0.0001 0.001 0.01 0.1 1 \
-  --method nrpt_parallel_rounded_reference --reference-max-beta 0.5 \
-  --hit-and-run-steps 2 --workers 4 --num-samples 1000 --warmup 20 \
-  --seed 42 --fit-weight 0.33 --output "$hard_out/seed-42"
-```
-
-### Reading the output
-
-- `run` writes `report.json`, one cold sample matrix per method as NPY (original free parameters × retained draws), and NRPT trace NPZs (scan × slot). Traces start with the post-warm-up ensemble and record replica IDs and untempered densities after swaps. The report gives exchange counts, round trips per physical replica and native draw time. `sampling_seconds` includes warm-up plus retained draws. `elapsed_seconds` also includes setup and most output work.
-- `summarize` requires at least two matching, distinctly seeded replicates. It writes `summary.json` with ArviZ rank-normalized and folded split R̂ and bulk ESS, keeping the independent cold chains distinct for diagnostics. It checks ESS thresholds of 100 per chain and 50 per half-chain for every free flux. Recorded ESS rates use summed retained-draw timer values. Measure elapsed wall time around a concurrent batch when comparing throughput.
-- The SVGs overlay normalized histograms by method for varying net and exchange fluxes reconstructed in original model coordinates. Fixed flux values are listed in the report. Round trips measure movement along the ladder. Check R̂ and ESS alongside them.
-
-See the [benchmark notes](benchmarks/README.md) for the native benchmark programs and measured NatProt results.
+See [Non-reversible parallel tempering benchmarks](benchmarks/README.md#non-reversible-parallel-tempering) for native build and run commands, 13CFLUX setup, model selection, smoke tests and measured results.

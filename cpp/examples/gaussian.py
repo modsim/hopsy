@@ -2,7 +2,7 @@
 """Sample a correlated Gaussian restricted to a box using the new C++ core.
 
 From the repository root, after building the nanobind extension:
-    PYTHONPATH=cpp/build-python/core/bindings \
+    PYTHONPATH=cpp/build/python/bindings \
         cpp/.benchmark-venv/bin/python cpp/examples/gaussian.py
 """
 

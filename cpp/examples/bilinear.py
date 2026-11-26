@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Uniform sampling in [-1,1]^2 with x*y < 0 (using its measure-equivalent closure).
 
-PYTHONPATH=cpp/build-python/core/bindings cpp/.benchmark-venv/bin/python cpp/examples/bilinear.py
+PYTHONPATH=cpp/build/python/bindings cpp/.benchmark-venv/bin/python cpp/examples/bilinear.py
 
 Dense directions and the complete feasible slice let the chain jump between
 quadrants II and IV. Coordinate directions alone cannot mix these components.

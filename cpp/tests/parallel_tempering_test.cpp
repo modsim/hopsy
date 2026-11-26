@@ -7,11 +7,13 @@
 #include <vector>
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <hopsy/geometry/bilinear_polytope.h>
 #include <hopsy/geometry/linear_polytope.h>
 #include <hopsy/kernel/direction_generator.h>
 #include <hopsy/kernel/gaussian_kernel.h>
 #include <hopsy/kernel/hit_and_run.h>
 #include <hopsy/kernel/uniform_line_kernel.h>
+#include <hopsy/sampling/draw.h>
 #include <hopsy/sampling/non_reversible_parallel_tempering.h>
 
 namespace {
@@ -368,4 +370,59 @@ TEST_CASE("NRPT split exploration is reproducible across independent slot worker
         for (std::size_t slot = 0; slot < parallel.size(); ++slot)
             REQUIRE(serial.sampling_state(slot) == parallel.sampling_state(slot));
     }
+}
+
+TEST_CASE("NRPT preserves bilinear supports while exchanging cached workspaces", "[bilinear][nrpt]") {
+    Matrix A(4, 2);
+    A.topRows(2).setIdentity();
+    A.bottomRows(2) = -A.topRows(2);
+    State b(4);
+    b << 1., 1., 0., 0.;
+    const hopsy::BilinearPolytope<> geometry(
+        A, b, 1, {Matrix::Ones(1, 1)}, State::Constant(1, 0.2));
+    struct Target {
+        double log_density(const State &x) const { return -2. * x.squaredNorm(); }
+    };
+    const auto problem = hopsy::Problem(std::cref(geometry), Target{});
+    const State initial = State::Constant(2, 0.2);
+    const auto kernel = [&] {
+        return hopsy::HitAndRunKernel(initial, hopsy::RandomDirectionGenerator<double>(2),
+                                      hopsy::UniformLineKernel{});
+    };
+    std::vector<hopsy::TemperingReplica<decltype(kernel())>> replicas;
+    for (std::size_t i = 0; i < 4; ++i)
+        replicas.push_back({initial, kernel(), hopsy::RandomNumberGenerator(201, i)});
+    auto sampler = hopsy::NonReversibleParallelTempering(
+        problem, hopsy::TemperatureLadder::linear(4), std::move(replicas),
+        hopsy::RandomNumberGenerator(631, 4));
+    for (int scan = 0; scan < 300; ++scan) {
+        sampler.scan(2, 3);
+        for (std::size_t slot = 0; slot < sampler.size(); ++slot)
+            REQUIRE(geometry.is_feasible(sampler.sampling_state(slot)));
+    }
+    for (auto trips : sampler.round_trips())
+        REQUIRE(trips > 0);
+}
+
+TEST_CASE("Raw Hit-and-Run draws reuse log density within each batch", "[hit_and_run]") {
+    struct CountedTarget {
+        mutable int calls = 0;
+        double slope = 1.;
+        double log_density(const State &state) const {
+            ++calls;
+            return slope * state[0];
+        }
+    } target;
+    State state = State::Zero(1);
+    const auto geometry = box(1, 1.);
+    auto workspace = geometry.create_workspace(state);
+    hopsy::HitAndRunKernel kernel(state, hopsy::CyclingCoordinateDirectionGenerator(1),
+                                 hopsy::UniformLineKernel{});
+    hopsy::RandomNumberGenerator rng(42);
+
+    REQUIRE(hopsy::draw(kernel, state, rng, target, geometry, workspace, 4, 2).allFinite());
+    REQUIRE(target.calls == 9);
+    target.slope = -1.;
+    REQUIRE(hopsy::draw(kernel, state, rng, target, geometry, workspace, 4, 2).allFinite());
+    REQUIRE(target.calls == 18);
 }

@@ -149,18 +149,16 @@ Target-dependent caches are invalidated once; geometry-only metric factors remai
 valid. A fresh owning binding invalidates both state- and geometry-dependent
 Gaussian caches. Do not silently mutate a bound target: create/rebind a problem
 explicitly, including after changing mathematical parameters on a Python target.
-Callbacks are captured at problem construction. Tempering controls and target
-families are a separate future feature.
+Callbacks are captured at problem construction.
 
 ## Build and validation
 
-With the existing configured isolated environment:
+After following the [Python build instructions](../README.md#python-bindings), run
+the tests and the example from the repository root.
 
 ```sh
-cmake --build cpp/build-python -j 2
-PYTHONPATH=cpp/build-python/core/bindings cpp/.benchmark-venv/bin/python \
-  -m pytest -q cpp/bindings/tests
-PYTHONPATH=cpp/build-python/core/bindings cpp/.benchmark-venv/bin/python \
+ctest --test-dir cpp/build/python --output-on-failure
+PYTHONPATH=cpp/build/python/bindings cpp/.benchmark-venv/bin/python \
   cpp/examples/gaussian.py
 ```
 
@@ -189,7 +187,7 @@ needed to mix opposite-sign components in the [2D example](../examples/bilinear.
 coordinate updates can be reducible despite preserving the invariant measure.
 The [analytic product example](../examples/bilinear_product.py) checks means and
 marginals on `xy<=0.2` against exact formulas. See the
-[numerical contract](../README.md#bilinear-numerical-contract) and
+[chain and geometry contracts](../README.md#chain-and-geometry-contracts) and
 [benchmark guide](../benchmarks/README.md).
 
 ## Python and capsule targets (2.0)
