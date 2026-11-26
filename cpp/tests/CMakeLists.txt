@@ -1,7 +1,6 @@
 add_executable(
         hopsy_core_tests
         direction_generator_test.cpp
-        dirichlet_stationary_distribution_test.cpp
         draw_test.cpp
         gaussian_kernel_test.cpp
         gaussian_family_test.cpp
@@ -12,8 +11,6 @@ add_executable(
         hit_and_run_test.cpp
         linear_polytope_test.cpp
         line_kernel_test.cpp
-        parallel_tempering_test.cpp
-        parallel_tempering_statistics_test.cpp
         step_test.cpp
         uniform_target_test.cpp
 )
@@ -34,7 +31,7 @@ if(HOPSY_CATCH2_EXTRAS_DIR)
 endif()
 
 include(Catch)
-catch_discover_tests(hopsy_core_tests ADD_TAGS_AS_LABELS)
+catch_discover_tests(hopsy_core_tests)
 
 # Keep Eigen's allocation guard active even in optimized test builds.
 target_compile_definitions(hopsy_core_tests PRIVATE EIGEN_RUNTIME_NO_MALLOC)

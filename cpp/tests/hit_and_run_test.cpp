@@ -106,6 +106,29 @@ namespace {
     };
 } // namespace
 
+TEST_CASE("Raw Hit-and-Run draws reuse log density within each batch", "[hit_and_run]") {
+    struct CountedTarget {
+        mutable int calls = 0;
+        double slope = 1.;
+        double log_density(const Vector &state) const {
+            ++calls;
+            return slope * state[0];
+        }
+    } target;
+    Vector state = Vector::Zero(1);
+    const auto geometry = box(1);
+    auto workspace = geometry.create_workspace(state);
+    hopsy::HitAndRunKernel kernel(state, hopsy::CyclingCoordinateDirectionGenerator(1),
+                                 hopsy::UniformLineKernel{});
+    hopsy::RandomNumberGenerator rng(42);
+
+    REQUIRE(hopsy::draw(kernel, state, rng, target, geometry, workspace, 4, 2).allFinite());
+    REQUIRE(target.calls == 9);
+    target.slope = -1.;
+    REQUIRE(hopsy::draw(kernel, state, rng, target, geometry, workspace, 4, 2).allFinite());
+    REQUIRE(target.calls == 18);
+}
+
 TEST_CASE("Hit-and-run adds the correctly signed Gaussian Hastings correction", "[hit_and_run]") {
     Vector state(1);
     state << -0.8;

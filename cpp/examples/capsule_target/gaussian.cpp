@@ -3,17 +3,20 @@
 #include <hopsy/target_abi_v1.h>
 #include <atomic>
 #include <chrono>
+#include <mutex>
 #include <thread>
 
 namespace {
 std::atomic<int> destroyed{0};
-std::atomic<bool> entered{false}, proceed{false};
-struct Context { bool block; int fail; };
+std::atomic<int> entered{0};
+std::atomic<bool> proceed{false};
+struct Context { bool block; int fail; std::mutex gate{}; };
 int density(void *p, const double *x, double *out) noexcept {
     auto &c = *static_cast<Context *>(p);
     if (c.fail == 1) return 17;
     if (c.block) {
-        entered = true;
+        const std::lock_guard guard(c.gate);
+        ++entered;
         auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(5);
         while (!proceed && std::chrono::steady_clock::now() < deadline)
             std::this_thread::yield();
@@ -54,11 +57,13 @@ PyObject *make(PyObject *, PyObject *args) {
     return capsule;
 }
 PyObject *count(PyObject *, PyObject *) { return PyLong_FromLong(destroyed); }
-PyObject *started(PyObject *, PyObject *) { return PyBool_FromLong(entered); }
+PyObject *started(PyObject *, PyObject *) { return PyBool_FromLong(entered.load() > 0); }
+PyObject *calls_started(PyObject *, PyObject *) { return PyLong_FromLong(entered.load()); }
 PyObject *release(PyObject *, PyObject *) { proceed = true; Py_RETURN_NONE; }
-PyObject *reset(PyObject *, PyObject *) { entered = false; proceed = false; Py_RETURN_NONE; }
+PyObject *reset(PyObject *, PyObject *) { entered = 0; proceed = false; Py_RETURN_NONE; }
 PyMethodDef methods[] = {{"make", make, METH_VARARGS, "Gaussian capsule (order, test mode)."},
     {"destroyed", count, METH_NOARGS, nullptr}, {"started", started, METH_NOARGS, nullptr},
+    {"calls_started", calls_started, METH_NOARGS, nullptr},
     {"release", release, METH_NOARGS, nullptr}, {"reset", reset, METH_NOARGS, nullptr}, {nullptr}};
 PyModuleDef module = {PyModuleDef_HEAD_INIT, "_capsule_gaussian", nullptr, -1, methods};
 }

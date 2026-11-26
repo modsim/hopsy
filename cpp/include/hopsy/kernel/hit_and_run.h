@@ -19,6 +19,7 @@ namespace hopsy {
       public:
         using state_type = State;
         using scalar_type = typename State::Scalar;
+        static constexpr bool cache_log_density = true;
 
         struct Proposal {
             State state;
@@ -63,8 +64,14 @@ namespace hopsy {
         template <typename Target, typename Geometry, typename Workspace>
         [[nodiscard]] double log_acceptance_ratio(const State &state, const Target &target,
                                                   const Geometry &, const Workspace &) const {
-            return static_cast<double>(target.log_density(proposal_.state)) -
-                   static_cast<double>(target.log_density(state)) + proposal_.log_proposal_ratio;
+            if constexpr (requires { target.log_density_increment(state, proposal_.state); }) {
+                return target.log_density_increment(state, proposal_.state) +
+                       proposal_.log_proposal_ratio;
+            } else {
+                return static_cast<double>(target.log_density(proposal_.state)) -
+                       static_cast<double>(target.log_density(state)) +
+                       proposal_.log_proposal_ratio;
+            }
         }
 
         template <typename Geometry, typename Workspace>

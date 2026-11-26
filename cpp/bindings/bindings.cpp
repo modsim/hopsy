@@ -223,6 +223,10 @@ NB_MODULE(_hopsy_core, m) {
                  return make_sampling_resource<RandomNumberGenerator>(seed);
              }),
              "seed"_a = 0)
+        .def(nb::new_([](std::uint64_t seed, std::uint64_t stream) {
+                 return make_sampling_resource<RandomNumberGenerator>(seed, stream);
+             }),
+             "seed"_a, "stream"_a)
         .def(
             "seed",
             [](RandomNumberGenerator &rng, std::uint64_t value) {
@@ -240,6 +244,7 @@ NB_MODULE(_hopsy_core, m) {
     nb::class_<GaussianLineKernel>(m, "GaussianLineKernel")
         .def(nb::init<double>(), "standard_deviation"_a);
     nb::class_<OverRelaxedLineKernel>(m, "OverRelaxedLineKernel").def(nb::init<>());
+    bind_tempering(m);
     bind_gaussian_types(m);
     bind_dense_types(m);
     bind_cycling_types(m);

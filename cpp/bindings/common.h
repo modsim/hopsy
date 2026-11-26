@@ -5,6 +5,7 @@
 #include <nanobind/eigen/dense.h>
 #include <nanobind/stl/unique_ptr.h>
 #include <nanobind/stl/shared_ptr.h>
+#include <nanobind/stl/optional.h>
 #include <hopsy/geometry/linear_polytope.h>
 #include <hopsy/geometry/bilinear_polytope.h>
 #include <nanobind/stl/vector.h>
@@ -57,6 +58,8 @@ namespace hopsy::bindings {
         auto cls = nb::class_<Chain>(m, name.c_str(), nb::is_weak_referenceable());
         cls.def_prop_ro("sampling_state", &Chain::sampling_state)
             .def_prop_ro("target_state", &Chain::target_state)
+            .def_prop_ro("state_log_density", &Chain::state_log_density)
+            .def_prop_ro("proposal_log_density", &Chain::proposal_log_density)
             .def_prop_ro("sampling_dimension", &Chain::sampling_dimension)
             .def_prop_ro("target_dimension", &Chain::target_dimension)
             .def(
@@ -203,5 +206,6 @@ namespace hopsy::bindings {
     void bind_dense_types(nb::module_ &);
     void bind_cycling_types(nb::module_ &);
     void bind_random_coordinate_types(nb::module_ &);
+    void bind_tempering(nb::module_ &);
 } // namespace hopsy::bindings
 #endif

@@ -2,7 +2,8 @@ if(NOT COMMAND nanobind_add_module)
     message(FATAL_ERROR "Configure Python and nanobind before add_subdirectory(bindings).")
 endif()
 
-nanobind_add_module(_hopsy_core NOMINSIZE bindings.cpp gaussian.cpp dense.cpp cycling.cpp random_coordinate.cpp)
+nanobind_add_module(_hopsy_core NOMINSIZE bindings.cpp gaussian.cpp dense.cpp cycling.cpp
+    random_coordinate.cpp tempering.cpp)
 target_link_libraries(_hopsy_core PRIVATE hopsy::core)
 
 set(HOPSY_PYTHON_INSTALL_DIR "hopsy" CACHE STRING

@@ -6,6 +6,7 @@
 #include <random>
 
 #include <hopsy/random_number_generator.h>
+#include <hopsy/target/log_density_cache.h>
 
 namespace hopsy {
     template <typename Kernel, typename State, typename Target, typename Geometry,
@@ -42,6 +43,20 @@ namespace hopsy {
             return accepted;
         }
     }
+
+    namespace detail {
+        template <typename Kernel, typename State, typename Target, typename Geometry,
+                  typename Workspace>
+        bool step_with_density_cache(Kernel &kernel, State &state, RandomNumberGenerator &rng,
+                                     const Target &target, const Geometry &geometry,
+                                     Workspace &workspace, LogDensityCache &cache) {
+            cache.clear_proposal();
+            const bool accepted = hopsy::step(kernel, state, rng, target, geometry, workspace);
+            if (accepted)
+                cache.accept_proposal();
+            return accepted;
+        }
+    } // namespace detail
 } // namespace hopsy
 
 #endif // STEP_H

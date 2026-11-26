@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <concepts>
 #include <cstddef>
 #include <limits>
 #include <random>
@@ -16,6 +17,12 @@
 
 namespace hopsy {
     namespace detail {
+        struct DefaultReference {
+            struct Local {
+                Local(const DefaultReference &, const auto &, const auto &) noexcept {}
+            };
+        };
+
         inline double checked_tempering_log_density(double value) {
             if (std::isnan(value) || value == std::numeric_limits<double>::infinity())
                 throw std::domain_error(
@@ -29,6 +36,13 @@ namespace hopsy {
 
             template <typename State> double log_density(const State &state) const {
                 return beta_ * checked_tempering_log_density(target_.log_density(state));
+            }
+
+            template <typename State>
+            double log_density_increment(const State &state, const State &proposal) const {
+                return target_.log_density_increment(state, proposal, [&](double value) {
+                    return beta_ * checked_tempering_log_density(value);
+                });
             }
 
             template <typename State>
@@ -95,24 +109,45 @@ namespace hopsy {
 
     // States, kernels, workspaces and local RNGs belong to physical replicas.
     // A slot contains only a beta and a physical replica index.
-    template <typename Problem, typename Kernel> class NonReversibleParallelTempering {
+    template <typename Problem, typename Kernel, typename Reference = detail::DefaultReference>
+    class NonReversibleParallelTempering {
       public:
         using state_type = typename Kernel::state_type;
         using scalar_type = typename Kernel::scalar_type;
 
+        // Optional replica problems provide private evaluation contexts for the
+        // same log density. They must share geometry and coordinates, and agree
+        // on the log density including its additive constant.
+        // An optional alternate walk selects slots by beta. Each replica keeps
+        // its own kernel and workspace for both walks in sampling coordinates.
         NonReversibleParallelTempering(Problem problem, TemperatureLadder ladder,
                                        std::vector<TemperingReplica<Kernel>> replicas,
-                                       RandomNumberGenerator exchange_rng)
-            : problem_(std::move(problem)), ladder_(std::move(ladder)),
-              exchange_rng_(std::move(exchange_rng)) {
+                                       RandomNumberGenerator exchange_rng,
+                                       std::vector<Problem> replica_problems = {},
+                                       Reference reference = {})
+            : problem_(std::move(problem)), replica_problems_(std::move(replica_problems)),
+              ladder_(std::move(ladder)), exchange_rng_(std::move(exchange_rng)),
+              reference_(std::move(reference)) {
             static_assert(detail::constant_coordinate_volume<typename Problem::coordinates_type>,
                           "Tempering with a uniform reference requires a constant-volume map");
             if (ladder_.size() < 2 || replicas.size() != ladder_.size())
                 throw std::invalid_argument("Expected one replica per inverse temperature");
+            if (!replica_problems_.empty() && replica_problems_.size() != size())
+                throw std::invalid_argument("Expected one problem per replica");
+            for (const auto &replica_problem : replica_problems_) {
+                if (&replica_problem.geometry() != &problem_.geometry())
+                    throw std::invalid_argument("Replica problems must share the same geometry");
+                if constexpr (!Problem::identity_coordinates) {
+                    if (&replica_problem.coordinates() != &problem_.coordinates())
+                        throw std::invalid_argument(
+                            "Replica problems must share the same coordinate map");
+                }
+            }
             validate_streams(replicas);
             replicas_.reserve(size());
             for (std::size_t i = 0; i < size(); ++i)
-                replicas_.emplace_back(problem_, std::move(replicas[i]), ladder_[i]);
+                replicas_.emplace_back(problem_for(i), std::move(replicas[i]), ladder_[i],
+                                       reference_);
             replica_at_slot_.resize(size());
             for (std::size_t i = 0; i < size(); ++i)
                 replica_at_slot_[i] = i;
@@ -133,6 +168,14 @@ namespace hopsy {
         const TemperatureLadder &ladder() const noexcept { return ladder_; }
         const state_type &sampling_state(std::size_t slot) const {
             return replicas_[replica_at_slot_.at(slot)].state;
+        }
+        // Cached, untempered log density of the current configuration.
+        double state_log_density(std::size_t slot) const {
+            return replicas_[replica_at_slot_.at(slot)].density_cache.state().value_or(
+                std::numeric_limits<double>::quiet_NaN());
+        }
+        std::optional<double> proposal_log_density(std::size_t slot) const {
+            return replicas_[replica_at_slot_.at(slot)].density_cache.proposal();
         }
         Vector<scalar_type> target_state(std::size_t slot) const {
             const auto &state = sampling_state(slot);
@@ -178,7 +221,9 @@ namespace hopsy {
         std::size_t explore(std::size_t slot, Index steps = 1) {
             if (steps < 1)
                 throw std::invalid_argument("Local exploration requires positive steps");
-            return replicas_[replica_at_slot_.at(slot)].explore(problem_, ladder_[slot], steps);
+            const auto replica = replica_at_slot_.at(slot);
+            return replicas_[replica].explore(problem_for(replica), reference_, ladder_[slot],
+                                              steps);
         }
 
         // Attempt disjoint neighboring exchanges. The first scan attempts odd
@@ -188,8 +233,7 @@ namespace hopsy {
             // on all edges, including the edges this scan does not attempt.
             for (std::size_t i = 0; i < edges_.size(); ++i) {
                 log_acceptance_[i] = replica_exchange_log_acceptance(
-                    ladder_[i], ladder_[i + 1], replicas_[replica_at_slot_[i]].log_density,
-                    replicas_[replica_at_slot_[i + 1]].log_density);
+                    ladder_[i], ladder_[i + 1], state_log_density(i), state_log_density(i + 1));
             }
             std::uniform_real_distribution<double> uniform(0., 1.);
             for (std::size_t i = 0; i < edges_.size(); ++i) {
@@ -233,6 +277,10 @@ namespace hopsy {
         }
 
       private:
+        const Problem &problem_for(std::size_t replica) const noexcept {
+            return replica_problems_.empty() ? problem_ : replica_problems_[replica];
+        }
+
         using Workspace = decltype(Kernel::make_workspace(
             std::declval<const Problem &>().geometry(), std::declval<const state_type &>()));
 
@@ -242,54 +290,84 @@ namespace hopsy {
             RandomNumberGenerator rng;
             Workspace workspace;
             [[no_unique_address]] detail::TargetEvaluation<Problem, state_type> evaluation;
-            double log_density;
+            detail::LogDensityCache density_cache;
             double beta;
+            [[no_unique_address]] typename Reference::Local alternate;
 
-            Replica(const Problem &problem, TemperingReplica<Kernel> &&input, double initial_beta)
+            Replica(const Problem &problem, TemperingReplica<Kernel> &&input, double initial_beta,
+                    const Reference &reference)
                 : state(validated(problem, input)), kernel(std::move(input.kernel)),
                   rng(std::move(input.rng)),
                   workspace(Kernel::make_workspace(problem.geometry(), state)),
-                  evaluation(problem, state), log_density(evaluate(problem)), beta(initial_beta) {
+                  evaluation(problem, state), beta(initial_beta),
+                  alternate(reference, state, problem.geometry()) {
+                const double log_density = evaluate(problem);
                 if (beta > 0. && !std::isfinite(log_density))
                     throw std::invalid_argument(
                         "Initial state must have positive mass at its beta");
+                density_cache.set_state(log_density);
                 if constexpr (requires { kernel.invalidate_state_cache(); })
                     kernel.invalidate_state_cache();
                 else if constexpr (requires { kernel.invalidate_target_cache(); })
                     kernel.invalidate_target_cache();
             }
 
-            std::size_t explore(const Problem &problem, double next_beta, Index steps) {
+            std::size_t explore(const Problem &problem, const Reference &reference, double next_beta,
+                                Index steps) {
+                if constexpr (!std::same_as<Reference, detail::DefaultReference>) {
+                    const bool use_alternate = reference.uses(next_beta);
+                    if (use_alternate != alternate.active) {
+                        if (use_alternate)
+                            problem.geometry().reset_workspace(state, alternate.workspace);
+                        else {
+                            if constexpr (requires { kernel.invalidate_state_cache(); })
+                                kernel.invalidate_state_cache();
+                            else if constexpr (requires { kernel.invalidate_target_cache(); })
+                                kernel.invalidate_target_cache();
+                            problem.geometry().reset_workspace(state, workspace);
+                        }
+                        alternate.active = use_alternate;
+                    }
+                    if (use_alternate)
+                        return explore_with(alternate.kernel, alternate.workspace, problem,
+                                            next_beta, steps);
+                }
+                return explore_with(kernel, workspace, problem, next_beta, steps);
+            }
+
+          private:
+            std::size_t explore_with(auto &local_kernel, auto &local_workspace,
+                                     const Problem &problem, double next_beta, Index steps) {
                 if (beta != next_beta) {
-                    if constexpr (requires { kernel.invalidate_target_cache(); })
-                        kernel.invalidate_target_cache();
+                    if constexpr (requires { local_kernel.invalidate_target_cache(); })
+                        local_kernel.invalidate_target_cache();
                     beta = next_beta;
                 }
                 const auto run = [&](const auto &target) {
                     try {
                         std::size_t accepts = 0;
                         for (Index i = 0; i < steps; ++i) {
-                            if (hopsy::step(kernel, state, rng, target, problem.geometry(),
-                                            workspace)) {
-                                log_density = std::numeric_limits<double>::quiet_NaN();
+                            if (detail::step_with_density_cache(local_kernel, state, rng, target,
+                                                                problem.geometry(), local_workspace,
+                                                                density_cache)) {
                                 ++accepts;
                             }
                         }
                         return accepts;
                     } catch (...) {
-                        kernel.reject(state);
+                        density_cache.clear_proposal();
+                        local_kernel.reject(state);
                         throw;
                     }
                 };
+                const detail::CachedTarget cached(evaluation.target(problem), density_cache);
                 const auto accepts =
-                    beta == 0. ? run(UniformTarget{})
-                               : run(detail::PowerTarget(evaluation.target(problem), beta));
-                if (std::isnan(log_density))
-                    log_density = evaluate(problem);
+                    beta == 0. ? run(UniformTarget{}) : run(detail::PowerTarget(cached, beta));
+                if (!density_cache.state())
+                    density_cache.set_state(evaluate(problem));
                 return accepts;
             }
 
-          private:
             static state_type validated(const Problem &problem, TemperingReplica<Kernel> &input) {
                 detail::validate_binding(problem, input.kernel, input.state);
                 if (input.state != input.kernel.proposal().state)
@@ -337,8 +415,10 @@ namespace hopsy {
         }
 
         const Problem problem_;
+        const std::vector<Problem> replica_problems_;
         TemperatureLadder ladder_;
         RandomNumberGenerator exchange_rng_;
+        [[no_unique_address]] Reference reference_;
         std::vector<Replica> replicas_;
         std::vector<std::size_t> replica_at_slot_;
         std::vector<ReplicaExchangeStatistics> edges_;

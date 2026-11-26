@@ -243,6 +243,83 @@ Consequently Python targets remain useful for inspection, rather than native
 throughput. Targets and their captured bound methods stay alive with the problem.
 Avoid ownership cycles from a target back to its problem or chain.
 
+### Cached log densities
+
+An ordinary bound chain exposes `chain.state_log_density` and
+`chain.proposal_log_density`. These are the cached log density of the
+accepted configuration and the density of the most recent proposal,
+regardless of whether it was accepted. They return `None` for values the
+sampler has yet to evaluate, including proposals that failed the geometry
+check. Reading them makes no target calls. Rebinding starts a fresh cache.
+Values include the coordinate map's log-volume adjustment when applicable.
+
+NRPT exposes `sampler.state_log_density(slot)` and
+`sampler.proposal_log_density(slot)` in inverse-temperature order. Both
+report untempered values and follow the configuration through exchanges.
+At beta zero, the reference batch can skip proposal likelihoods and
+evaluate the final configuration once for exchange.
+
+### Non-reversible parallel tempering
+
+`bind_parallel_tempering` takes a problem, a temperature ladder, and one
+kernel, initial state, and RNG per replica. The exchange RNG needs its own
+stream. The sampler retains the problem and copies the kernels, states, and
+RNGs. Use fresh kernels initialized at the supplied states.
+
+For a linear problem in its original coordinates with CSmMALA kernels, pass
+`reference_basis=T` to give the beta-zero slot a random-coordinate Hit-and-Run
+update along columns of `T`. `reference_max_beta` extends this walk through
+the selected cutoff, inclusive. The proposal is uniform along the chord, with
+Metropolis acceptance for the tempered target at positive beta. A square,
+full-rank rounding matrix gives the same chord draws as coordinate Hit-and-Run
+in the rounded polytope. Replicas carry their original-coordinate states through
+exchanges. The other slots use CSmMALA.
+
+Pass `workers` to `draw_parallel` or to `draw_traced` with `parallel=True` to
+give each worker several slots. The default of zero uses one worker per slot.
+Both draw methods accept `steps_per_slot`, a sequence of positive local step
+counts in ladder order. It overrides `local_steps` and `reference_steps` for
+that draw. One cold sample and one communication pass still occur each scan.
+
+```python
+ladder = hopsy.TemperatureLadder.linear(4)
+sampler = hopsy.bind_parallel_tempering(
+    problem,
+    ladder,
+    [hopsy.UniformHitAndRunKernel(initial) for _ in range(len(ladder))],
+    [initial] * len(ladder),
+    [hopsy.RandomNumberGenerator(42, stream=i) for i in range(len(ladder))],
+    hopsy.RandomNumberGenerator(43, stream=len(ladder)),
+)
+samples = sampler.draw(1_000, local_steps=1, reference_steps=1)
+exchanges = [(edge.accepts, edge.attempts) for edge in sampler.exchange_statistics]
+round_trips = sampler.round_trips
+```
+
+`draw` explores slots serially and returns one cold sample per column in target
+coordinates. `scan` runs one exploration and exchange. `explore(slot, steps)`
+and `communicate()` also allow explicit serial scheduling. Sampling releases
+the GIL, and calls on a busy sampler raise an error. Use `sampling_state(slot)`
+and `target_state(slot)` to inspect detached copies of current states.
+Exchange counts, replica indices, and round trips are snapshots.
+
+`draw_parallel` uses one native worker per slot for the duration of a draw and
+synchronizes before each exchange. It supports built-in targets and capsule
+targets with private contexts. For the latter, pass `replica_targets=` with
+one separately created `CapsuleTarget` per replica when binding. Every
+capsule must evaluate the same log density, including its additive constant,
+in the problem's target coordinates. Capsules follow physical replicas
+across exchanges. Python callback targets use the serial draw path.
+
+`draw_traced(num_samples, local_steps, reference_steps, parallel=False)`
+returns the cold draws, replica IDs by slot, and cached untempered log
+densities by slot. The two trace matrices have slots in rows. Column zero
+is the starting ensemble, followed by one column after each exchange.
+
+During warm-up, `sampler.ladder.adapted(sampler.mean_exchange_rejections())`
+constructs an updated ladder. Apply it with `sampler.set_ladder(ladder)` between
+scans. This retains exchange parity and starts a new diagnostics window.
+
 ### Independent native extension
 
 [`../examples/capsule_target/gaussian.cpp`](../examples/capsule_target/gaussian.cpp)

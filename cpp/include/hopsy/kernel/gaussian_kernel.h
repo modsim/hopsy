@@ -12,6 +12,7 @@
 #include <hopsy/kernel/gaussian_traits.h>
 #include <hopsy/kernel/geometry_support.h>
 #include <hopsy/kernel/metric.h>
+#include <hopsy/target/log_density_cache.h>
 #include <hopsy/target/traits.h>
 #include <hopsy/random_number_generator.h>
 
@@ -24,6 +25,7 @@ namespace hopsy {
         using state_type = State;
         using scalar_type = typename State::Scalar;
         static_assert(std::floating_point<scalar_type>);
+        static constexpr bool cache_log_density = true;
         static constexpr bool symmetric_proposal = gaussian_proposal_is_symmetric_v<Drift, Metric>;
         template <typename Target> static constexpr bool always_accept = false;
 
@@ -118,7 +120,7 @@ namespace hopsy {
             require_idle();
             if (state.size() != proposal_.state.size())
                 throw std::invalid_argument("GaussianKernel state dimension changed");
-            candidate_density_valid_ = false;
+            density_cache_.clear_proposal();
             proposal_.step_size = step_size_;
             if constexpr (symmetric_proposal) {
                 metric_.prepare(state, geometry, std::as_const(workspace));
@@ -166,16 +168,11 @@ namespace hopsy {
 
             double target_ratio = 0.;
             if constexpr (!target_is_uniform_v<Target>) {
-                if (!current_density_valid_) {
-                    current_log_density_ = static_cast<double>(target.log_density(state));
-                    current_density_valid_ = true;
-                }
-                if (!candidate_density_valid_) {
-                    candidate_log_density_ =
-                        static_cast<double>(target.log_density(proposal_.state));
-                    candidate_density_valid_ = true;
-                }
-                target_ratio = candidate_log_density_ - current_log_density_;
+                if constexpr (requires { target.log_density_increment(state, proposal_.state); })
+                    target_ratio = target.log_density_increment(state, proposal_.state);
+                else
+                    target_ratio = detail::CachedTarget(target, density_cache_)
+                                       .log_density_increment(state, proposal_.state);
             }
             // Target support can be narrower than geometric support. Reject
             // zero/undefined target mass before reverse gradients/factorization.
@@ -228,8 +225,7 @@ namespace hopsy {
                 throw std::logic_error("GaussianKernel accept requires a usable MH evaluation");
             geometry.reset_workspace(proposal_.state, workspace);
             state.swap(proposal_.state);
-            current_log_density_ = candidate_log_density_;
-            current_density_valid_ = candidate_density_valid_;
+            density_cache_.accept_proposal();
             if constexpr (!symmetric_proposal) {
                 std::swap(metric_, reverse_.metric);
                 reverse_.current_metric_valid = true;
@@ -250,8 +246,7 @@ namespace hopsy {
                 throw std::logic_error("GaussianKernel has a pending proposal");
         }
         void clear_target_data() noexcept {
-            current_density_valid_ = false;
-            candidate_density_valid_ = false;
+            density_cache_ = {};
             if constexpr (!symmetric_proposal) {
                 reverse_.current_drift_valid = false;
                 reverse_.candidate_drift_valid = false;
@@ -259,7 +254,7 @@ namespace hopsy {
         }
         void finish_proposal() noexcept {
             phase_ = Phase::idle;
-            candidate_density_valid_ = false;
+            density_cache_.clear_proposal();
             if constexpr (!symmetric_proposal) {
                 reverse_.candidate_metric_valid = false;
                 reverse_.candidate_drift_valid = false;
@@ -277,8 +272,8 @@ namespace hopsy {
         [[no_unique_address]] std::conditional_t<symmetric_proposal, NoReverseData, ReverseData>
             reverse_;
         Phase phase_ = Phase::idle;
-        double current_log_density_ = 0., candidate_log_density_ = 0.;
-        bool current_density_valid_ = false, candidate_density_valid_ = false;
+        // Used by direct kernel callers. Bound sampling supplies its own cache.
+        detail::LogDensityCache density_cache_;
     };
     template <typename State>
     using DikinWalkKernel = GaussianKernel<State, ZeroDrift, DikinMetric<typename State::Scalar>>;

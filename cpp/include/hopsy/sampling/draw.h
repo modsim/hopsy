@@ -20,18 +20,29 @@ namespace hopsy {
         }
 
         // A batch binds one fixed target. Start fresh so changing its parameters
-        // between batches cannot reuse stale target data. Kernels without this
-        // capability (including Hit-and-Run) compile out the hook entirely.
+        // between batches cannot reuse stale target data or gradients.
         if constexpr (requires { kernel.invalidate_target_cache(); }) {
             if (samples.cols() > 0)
                 kernel.invalidate_target_cache();
         }
-        for (Eigen::Index sample = 0; sample < samples.cols(); ++sample) {
-            for (Eigen::Index iteration = 0; iteration < thinning; ++iteration) {
-                step(kernel, state, rng, target, geometry, workspace);
+        const auto draw_batch = [&](auto transition) {
+            for (Eigen::Index sample = 0; sample < samples.cols(); ++sample) {
+                for (Eigen::Index iteration = 0; iteration < thinning; ++iteration)
+                    transition();
+                samples.col(sample) = state;
             }
-
-            samples.col(sample) = state;
+        };
+        if constexpr (detail::CachesLogDensity<Kernel> && !target_is_uniform_v<Target> &&
+                      !Kernel::template always_accept<Target> &&
+                      !requires { target.log_density_increment(state, state); }) {
+            detail::LogDensityCache cache;
+            const detail::CachedTarget cached(target, cache);
+            draw_batch([&] {
+                detail::step_with_density_cache(kernel, state, rng, cached, geometry, workspace,
+                                                cache);
+            });
+        } else {
+            draw_batch([&] { step(kernel, state, rng, target, geometry, workspace); });
         }
     }
 

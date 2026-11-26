@@ -63,21 +63,26 @@ namespace hopsy {
         bool step(RandomNumberGenerator &rng) {
             // Always-accepted line kernels never prepare a target-dependent
             // reverse distribution. Keep exception cleanup out of that path.
-            using Target = std::remove_cvref_t<decltype(sampling_target())>;
+            decltype(auto) target = transition_target();
+            using Target = std::remove_cvref_t<decltype(target)>;
             if constexpr (Kernel::template always_accept<Target>) {
-                return hopsy::step(kernel_, state_, rng, sampling_target(), problem_.geometry(),
+                return hopsy::step(kernel_, state_, rng, target, problem_.geometry(),
                                    mutable_workspace());
             } else {
                 try {
-                    return hopsy::step(kernel_, state_, rng, sampling_target(), problem_.geometry(),
-                                       mutable_workspace());
+                    return transition(rng, target, problem_.geometry(), mutable_workspace());
                 } catch (...) {
+                    density_cache_.clear_proposal();
                     kernel_.reject(state_);
                     throw;
                 }
             }
         }
         const state_type &sampling_state() const noexcept { return state_; }
+        std::optional<double> state_log_density() const noexcept { return density_cache_.state(); }
+        std::optional<double> proposal_log_density() const noexcept {
+            return density_cache_.proposal();
+        }
         Vector<scalar_type> target_state() const {
             Vector<scalar_type> result(target_dimension());
             problem_.coordinates().to_target(state_, result);
@@ -131,6 +136,24 @@ namespace hopsy {
 
       private:
         auto &mutable_workspace() noexcept { return detail::unwrap(workspace_); }
+        decltype(auto) transition_target() noexcept {
+            if constexpr (detail::CachesLogDensity<Kernel> &&
+                          !target_is_uniform_v<decltype(sampling_target())>)
+                return detail::CachedTarget(sampling_target(), density_cache_);
+            else
+                return sampling_target();
+        }
+        bool transition(RandomNumberGenerator &rng, const auto &target, const auto &geometry,
+                        auto &workspace) {
+            using Target = std::remove_cvref_t<decltype(target)>;
+            if constexpr (detail::CachesLogDensity<Kernel> && !target_is_uniform_v<Target> &&
+                          !Kernel::template always_accept<Target>) {
+                return detail::step_with_density_cache(kernel_, state_, rng, target, geometry,
+                                                       workspace, density_cache_);
+            } else {
+                return hopsy::step(kernel_, state_, rng, target, geometry, workspace);
+            }
+        }
         template <bool Sampling, typename Derived>
         void draw_into_impl(RandomNumberGenerator &rng, Eigen::MatrixBase<Derived> &samples,
                             Index thinning) {
@@ -139,13 +162,13 @@ namespace hopsy {
                 throw std::invalid_argument("Invalid output dimension or thinning");
             // Resolve the fixed binding once per batch. Cancellation surrounds
             // the batch rather than rebuilding a single-step call each time.
-            auto &target = sampling_target();
+            decltype(auto) target = transition_target();
             const auto &geometry = problem_.geometry();
             auto &workspace = mutable_workspace();
             auto draw = [&] {
                 for (Index sample = 0; sample < samples.cols(); ++sample) {
                     for (Index iteration = 0; iteration < thinning; ++iteration)
-                        hopsy::step(kernel_, state_, rng, target, geometry, workspace);
+                        transition(rng, target, geometry, workspace);
                     if constexpr (Sampling || Problem::identity_coordinates)
                         samples.col(sample) = state_;
                     else {
@@ -161,6 +184,7 @@ namespace hopsy {
                 try {
                     draw();
                 } catch (...) {
+                    density_cache_.clear_proposal();
                     kernel_.reject(state_);
                     throw;
                 }
@@ -171,6 +195,7 @@ namespace hopsy {
         state_type &state_;
         Workspace workspace_;
         [[no_unique_address]] detail::TargetEvaluation<Problem, state_type> evaluation_;
+        detail::LogDensityCache density_cache_;
     };
 
     template <typename P, typename K, typename W>

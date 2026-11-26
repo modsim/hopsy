@@ -99,6 +99,14 @@ namespace hopsy {
             auto guard = lock();
             return state_;
         }
+        std::optional<double> state_log_density() const {
+            auto guard = lock();
+            return binding_->state_log_density();
+        }
+        std::optional<double> proposal_log_density() const {
+            auto guard = lock();
+            return binding_->proposal_log_density();
+        }
         Vector<scalar_type> target_state() const {
             auto guard = lock();
             return binding_->target_state();
