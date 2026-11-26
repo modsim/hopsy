@@ -167,8 +167,10 @@ if(HOPSY_INSTALL_CPP)
 
 endif()
 
-option(HOPSY_BUILD_CPP_BENCHMARKS "Build the native parallel tempering benchmarks" OFF)
+option(HOPSY_BUILD_CPP_BENCHMARKS "Build the native sampling benchmarks" OFF)
 if(HOPSY_BUILD_CPP_BENCHMARKS)
+    add_executable(hopsy_hit_and_run_benchmark benchmarks/hit_and_run_benchmark.cpp)
+    target_link_libraries(hopsy_hit_and_run_benchmark PRIVATE hopsy::core)
     add_executable(hopsy_parallel_tempering_benchmark benchmarks/parallel_tempering_benchmark.cpp)
     target_link_libraries(hopsy_parallel_tempering_benchmark PRIVATE hopsy::core)
     add_executable(hopsy_parallel_tempering_comparison benchmarks/parallel_tempering_comparison.cpp)

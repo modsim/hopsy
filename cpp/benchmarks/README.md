@@ -158,3 +158,18 @@ including setup, warm-up and writing draws. ESS rates use this wall time.
 The full session took 8,118.5 s including pilots and diagnostics. Both
 ten-step schedules met the ESS targets in every replicate for all 27 free
 fluxes.
+
+## Kernel and geometry benchmarks
+
+The [native build](#native-c) also produces
+`cpp/build/native-benchmarks/hopsy_hit_and_run_benchmark`. It reports CSV
+timings for the components of coordinate and dense Hit-and-Run.
+
+With the [Python bindings built](../README.md#python-bindings), run a short
+linear and bilinear throughput check from the repository root.
+
+```sh
+PYTHONPATH="$PWD/cpp/build/python/bindings" cpp/.benchmark-venv/bin/python \
+  cpp/benchmarks/benchmark_bilinear.py --steps 20 --repeats 1 \
+  --output cpp/build/bilinear-smoke.json
+```
