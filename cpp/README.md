@@ -83,7 +83,7 @@ git -C cpp/build/13cflux-native-target rev-parse HEAD
 
 ## FluxML benchmarks
 
-Put the two model files in `cpp/benchmark-python/` or pass their paths with `--fml`. The models are supplied separately from the source tree. Both scripts accept `--configuration`, `--betas`, `--num-samples`, `--warmup` and `--seed`. A sample is one retained cold draw. β lists include 0 and 1 and determine the number of temperature slots. An independent replicate is a separate invocation with its own seed, not a temperature slot.
+The two model files are in `cpp/benchmarks/`. Use `--fml` to select a model. Both scripts accept `--configuration`, `--betas`, `--num-samples`, `--warmup` and `--seed`. A sample is one retained cold draw. β lists include 0 and 1 and determine the number of temperature slots. An independent replicate is a separate invocation with its own seed, not a temperature slot.
 
 Both scripts require at least 1,000 retained draws for batch-means ESS. The single-seed script defaults to 100,000 draws and 1,000 warm-up iterations. The replicated runner defaults to 20,000 draws and 2,000 warm-up iterations. Warm-up uses the same local step counts as sampling and its draws are discarded.
 
@@ -109,7 +109,7 @@ runner=cpp/benchmarks/benchmark_flux_convergence.py
     weight=0.33
     if [ "$seed" -eq 136 ]; then weight=0.67; fi
     "$hopsy_python" -u "$runner" run \
-      --fml 'cpp/benchmark-python/Ecoli_NatProt_GOX.fml' --configuration default \
+      --fml 'cpp/benchmarks/Ecoli_NatProt_GOX.fml' --configuration default \
       --betas 0 0.005 0.02 0.06 0.16 0.36 0.65 1 \
       --method nrpt_parallel_rounded_reference --reference-max-beta 0.5 \
       --hit-and-run-steps 2 --workers 4 --num-samples 1000 --warmup 20 \
@@ -129,7 +129,7 @@ The supplied harder file's schema hint points to a URL that the tested FluxML pa
 ```bash
 hard_out="$(mktemp -d cpp/build/gluc-smoke.XXXXXX)"
 hard_name='e_coli_+EDP+GOX+MGOX-TPI.fml'
-"$hopsy_python" - "cpp/benchmark-python/$hard_name" "$hard_out/$hard_name" <<'PY'
+"$hopsy_python" - "cpp/benchmarks/$hard_name" "$hard_out/$hard_name" <<'PY'
 from pathlib import Path
 import re
 import sys

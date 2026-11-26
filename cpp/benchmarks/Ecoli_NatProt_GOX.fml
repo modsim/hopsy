@@ -1,0 +1,1151 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<fluxml xmlns="http://www.13cflux.net/fluxml">
+  <info>
+    <name>E.coli Nature Protocol Zamboni et al. 2009</name>
+    <version>1.0</version>
+    <comment>Published (reference) model M0</comment>
+  </info>
+  <reactionnetwork>
+    <metabolitepools>
+      <pool atoms="5" id="AKV"/>
+      <pool atoms="2" id="AcCoA"/>
+      <pool atoms="4" id="Asp"/>
+      <pool atoms="1" id="CO2"/>
+      <pool atoms="10" id="Chor"/>
+      <pool atoms="6" id="CitICit"/>
+      <pool atoms="7" id="DAHP"/>
+      <pool atoms="4" id="E4P"/>
+      <pool atoms="6" id="F6P"/>
+      <pool atoms="6" id="FBP"/>
+      <pool atoms="6" id="G6P"/>
+      <pool atoms="3" id="GAP"/>
+      <pool atoms="6" id="GLC"/>
+      <pool atoms="6" id="GLC0"/>
+      <pool atoms="6" id="GLCU"/>
+      <pool atoms="5" id="Glu"/>
+      <pool atoms="2" id="Glx"/>
+      <pool atoms="6" id="Ile"/>
+      <pool atoms="6" id="Leu"/>
+      <pool atoms="6" id="Lys"/>
+      <pool atoms="4" id="MAL"/>
+      <pool atoms="4" id="OAA"/>
+      <pool atoms="5" id="OGA"/>
+      <pool atoms="3" id="PEP"/>
+      <pool atoms="6" id="PG6"/>
+      <pool atoms="3" id="PGA"/>
+      <pool atoms="3" id="PYR"/>
+      <pool atoms="9" id="Phe"/>
+      <pool atoms="5" id="Pro"/>
+      <pool atoms="5" id="R5P"/>
+      <pool atoms="5" id="Ru5P"/>
+      <pool atoms="7" id="S7P"/>
+      <pool atoms="3" id="Ser"/>
+      <pool atoms="4" id="SucFUM"/>
+      <pool atoms="4" id="Thr"/>
+      <pool atoms="9" id="Tyr"/>
+      <pool atoms="5" id="Val"/>
+      <pool atoms="5" id="X5P"/>
+    </metabolitepools>
+    <reaction id="uptU">
+      <reduct cfg="ABCDEF" id="GLCU"/>
+      <rproduct cfg="ABCDEF" id="GLC"/>
+    </reaction>
+    <reaction id="upt0">
+      <reduct cfg="ABCDEF" id="GLC0"/>
+      <rproduct cfg="ABCDEF" id="GLC"/>
+    </reaction>
+    <reaction id="upt">
+      <reduct cfg="ABCDEF" id="GLC"/>
+      <rproduct cfg="ABCDEF" id="G6P"/>
+    </reaction>
+    <reaction id="emp1">
+      <reduct cfg="ABCDEF" id="G6P"/>
+      <rproduct cfg="ABCDEF" id="F6P"/>
+    </reaction>
+    <reaction id="emp2">
+      <reduct cfg="ABCDEF" id="F6P"/>
+      <rproduct cfg="ABCDEF" id="FBP"/>
+    </reaction>
+    <reaction id="emp3">
+      <reduct cfg="ABCDEF" id="FBP"/>
+      <rproduct cfg="CBA" id="GAP"/>
+      <rproduct cfg="DEF" id="GAP"/>
+    </reaction>
+    <reaction id="emp4">
+      <reduct cfg="ABC" id="GAP"/>
+      <rproduct cfg="ABC" id="PGA"/>
+    </reaction>
+    <reaction id="emp5">
+      <reduct cfg="ABC" id="PGA"/>
+      <rproduct cfg="ABC" id="PEP"/>
+    </reaction>
+    <reaction id="emp6">
+      <reduct cfg="ABC" id="PEP"/>
+      <rproduct cfg="ABC" id="PYR"/>
+    </reaction>
+
+    <reaction id="ppp1">
+      <reduct cfg="ABCDEF" id="G6P"/>
+      <rproduct cfg="ABCDEF" id="PG6"/>
+    </reaction>
+    <reaction id="ppp1a">
+	    <reduct cfg="ABCDEF" id="PG6"/>
+	    <rproduct cfg="BCDEF" id="Ru5P"/>
+	    <rproduct cfg="A" id="CO2"/>
+    </reaction>
+    <reaction id="ppp2">
+      <reduct cfg="ABCDE" id="Ru5P"/>
+      <rproduct cfg="ABCDE" id="X5P"/>
+    </reaction>
+    <reaction id="ppp3">
+      <reduct cfg="ABCDE" id="Ru5P"/>
+      <rproduct cfg="ABCDE" id="R5P"/>
+    </reaction>
+    <reaction id="ppp4">
+      <reduct cfg="ABCDE" id="X5P"/>
+      <reduct cfg="abcd" id="E4P"/>
+      <rproduct cfg="CDE" id="GAP"/>
+      <rproduct cfg="ABabcd" id="F6P"/>
+    </reaction>
+    <reaction id="ppp5">
+      <reduct cfg="ABCDE" id="X5P"/>
+      <reduct cfg="abcde" id="R5P"/>
+      <rproduct cfg="ABabcde" id="S7P"/>
+      <rproduct cfg="CDE" id="GAP"/>
+    </reaction>
+    <reaction id="ppp6">
+      <reduct cfg="ABC" id="GAP"/>
+      <reduct cfg="abcdefg" id="S7P"/>
+      <rproduct cfg="defg" id="E4P"/>
+      <rproduct cfg="abcABC" id="F6P"/>
+    </reaction>
+    <reaction id="tca1">
+      <reduct cfg="ABC" id="PYR"/>
+      <rproduct cfg="BC" id="AcCoA"/>
+      <rproduct cfg="A" id="CO2"/>
+    </reaction>
+    <reaction id="tca2">
+      <reduct cfg="ABCD" id="OAA"/>
+      <reduct cfg="ab" id="AcCoA"/>
+      <rproduct cfg="DCBAba" id="CitICit"/>
+    </reaction>
+    <reaction id="tca3">
+      <reduct cfg="ABCDEF" id="CitICit"/>
+      <rproduct cfg="ABCEF" id="OGA"/>
+      <rproduct cfg="D" id="CO2"/>
+    </reaction>
+    <reaction id="tca4">
+      <reduct cfg="ABCDE" id="OGA"/>
+      <rproduct cfg="BCDE" id="SucFUM"/>
+      <rproduct cfg="A" id="CO2"/>
+    </reaction>
+    <reaction id="tca5a">
+      <reduct cfg="ABCD" id="SucFUM"/>
+      <rproduct cfg="ABCD" id="MAL"/>
+    </reaction>
+    <reaction id="tca5b">
+      <reduct cfg="ABCD" id="SucFUM"/>
+      <rproduct cfg="DCBA" id="MAL"/>
+    </reaction>
+    <reaction id="tca6">
+      <reduct cfg="ABCD" id="MAL"/>
+      <rproduct cfg="ABCD" id="OAA"/>
+    </reaction>
+    <reaction id="gs1">
+      <reduct cfg="ABCDEF" id="CitICit"/>
+      <rproduct cfg="AB" id="Glx"/>
+      <rproduct cfg="DCEF" id="SucFUM"/>
+    </reaction>
+    <reaction id="gs2">
+      <reduct cfg="AB" id="Glx"/>
+      <reduct cfg="ab" id="AcCoA"/>
+      <rproduct cfg="ABba" id="MAL"/>
+    </reaction>
+    <reaction id="ana1">
+      <reduct cfg="ABC" id="PEP"/>
+      <reduct cfg="a" id="CO2"/>
+      <rproduct cfg="ABCa" id="OAA"/>
+    </reaction>
+    <reaction id="ana2">
+      <reduct cfg="ABCD" id="OAA"/>
+      <rproduct cfg="ABC" id="PEP"/>
+      <rproduct cfg="D" id="CO2"/>
+    </reaction>
+    <reaction id="ana3">
+      <reduct cfg="ABCD" id="MAL"/>
+      <rproduct cfg="ABC" id="PYR"/>
+      <rproduct cfg="D" id="CO2"/>
+    </reaction>
+    <reaction id="coOut">
+      <reduct cfg="A" id="CO2"/>
+    </reaction>
+    <reaction id="BM_pga1">
+      <reduct cfg="ABC" id="PGA"/>
+      <rproduct cfg="ABC" id="Ser"/>
+    </reaction>
+    <reaction id="BM_pga1_aux">
+      <reduct cfg="ABC" id="Ser"/>
+    </reaction>
+    <reaction id="BM_pyr2">
+      <reduct cfg="ABC" id="PYR"/>
+      <reduct cfg="abc" id="PYR"/>
+      <rproduct cfg="ABbcC" id="Val"/>
+      <rproduct cfg="a" id="CO2"/>
+    </reaction>
+    <reaction id="BM_pyr2_aux">
+      <reduct cfg="ABCDE" id="Val"/>
+    </reaction>
+    <reaction id="BM_pyr3">
+      <reduct cfg="ABC" id="PYR"/>
+      <reduct cfg="abc" id="PYR"/>
+      <rproduct cfg="ABbcC" id="AKV"/>
+      <rproduct cfg="a" id="CO2"/>
+    </reaction>
+    <reaction id="BM_pyr4">
+      <reduct cfg="ABCDE" id="AKV"/>
+      <reduct cfg="ab" id="AcCoA"/>
+      <rproduct cfg="abBCDE" id="Leu"/>
+      <rproduct cfg="A" id="CO2"/>
+    </reaction>
+    <reaction id="BM_pyr4_aux">
+      <reduct cfg="ABCDEF" id="Leu"/>
+    </reaction>
+    <reaction id="BM_pep1">
+      <reduct cfg="ABC" id="PEP"/>
+      <reduct cfg="abcd" id="E4P"/>
+      <rproduct cfg="ABCabcd" id="DAHP"/>
+    </reaction>
+    <reaction id="BM_pep2">
+      <reduct cfg="ABC" id="PEP"/>
+      <reduct cfg="abcdefg" id="DAHP"/>
+      <rproduct cfg="ABCabcdefg" id="Chor"/>
+    </reaction>
+    <reaction id="BM_pep3a">
+      <reduct cfg="ABCDEFGHIJ" id="Chor"/>
+      <rproduct cfg="ABCEFGHIJ" id="Phe"/>
+      <rproduct cfg="D" id="CO2"/>
+    </reaction>
+    <reaction id="BM_pep3b">
+      <reduct cfg="ABCDEFGHIJ" id="Chor"/>
+      <rproduct cfg="ABCEJIHGF" id="Phe"/>
+      <rproduct cfg="D" id="CO2"/>
+    </reaction>
+    <reaction id="BM_pep3_aux">
+      <reduct cfg="ABCEFGHIJ" id="Phe"/>
+    </reaction>
+    <reaction id="BM_pep4a">
+      <reduct cfg="ABCDEFGHIJ" id="Chor"/>
+      <rproduct cfg="ABCEFGHIJ" id="Tyr"/>
+      <rproduct cfg="D" id="CO2"/>
+    </reaction>
+    <reaction id="BM_pep4b">
+      <reduct cfg="ABCDEFGHIJ" id="Chor"/>
+      <rproduct cfg="ABCEJIHGF" id="Tyr"/>
+      <rproduct cfg="D" id="CO2"/>
+    </reaction>
+    <reaction id="BM_pep4_aux">
+      <reduct cfg="ABCEFGHIJ" id="Tyr"/>
+    </reaction>
+    <reaction id="BM_oga1">
+      <reduct cfg="ABCDE" id="OGA"/>
+      <rproduct cfg="ABCDE" id="Glu"/>
+    </reaction>
+    <reaction id="BM_oga1_aux">
+      <reduct cfg="ABCDE" id="Glu"/>
+    </reaction>
+    <reaction id="BM_oga2">
+      <reduct cfg="ABCDE" id="Glu"/>
+      <rproduct cfg="ABCDE" id="Pro"/>
+    </reaction>
+    <reaction id="BM_oga2_aux">
+      <reduct cfg="ABCDE" id="Pro"/>
+    </reaction>
+    <reaction id="BM_oaa1">
+      <reduct cfg="ABCD" id="OAA"/>
+      <rproduct cfg="ABCD" id="Asp"/>
+    </reaction>
+    <reaction id="BM_oaa1_aux">
+      <reduct cfg="ABCD" id="Asp"/>
+    </reaction>
+    <reaction id="BM_oaa3">
+      <reduct cfg="ABCD" id="Asp"/>
+      <rproduct cfg="ABCD" id="Thr"/>
+    </reaction>
+    <reaction id="BM_oaa3_aux">
+      <reduct cfg="ABCD" id="Thr"/>
+    </reaction>
+    <reaction id="BM_oaa4">
+      <reduct cfg="ABCD" id="Thr"/>
+      <reduct cfg="abc" id="PYR"/>
+      <rproduct cfg="ABbCDc" id="Ile"/>
+      <rproduct cfg="a" id="CO2"/>
+    </reaction>
+    <reaction id="BM_oaa4_aux">
+      <reduct cfg="ABCDEF" id="Ile"/>
+    </reaction>
+    <reaction id="BM_oaa6a">
+      <reduct cfg="ABCD" id="OAA"/>
+      <reduct cfg="abc" id="PYR"/>
+      <rproduct cfg="ABCDcb" id="Lys"/>
+      <rproduct cfg="a" id="CO2"/>
+    </reaction>
+    <reaction id="BM_oaa6b">
+      <reduct cfg="ABCD" id="OAA"/>
+      <reduct cfg="abc" id="PYR"/>
+      <rproduct cfg="abcDCB" id="Lys"/>
+      <rproduct cfg="A" id="CO2"/>
+    </reaction>
+    <reaction id="BM_oaa6_aux">
+      <reduct cfg="ABCDEF" id="Lys"/>
+    </reaction>
+    <reaction id="BM_G6P">
+      <reduct cfg="ABCDEF" id="G6P"/>
+    </reaction>
+    <reaction id="BM_F6P">
+      <reduct cfg="ABCDEF" id="F6P"/>
+    </reaction>
+    <reaction id="BM_GAP">
+      <reduct cfg="ABC" id="GAP"/>
+    </reaction>
+    <reaction id="BM_PGA">
+      <reduct cfg="ABC" id="PGA"/>
+    </reaction>
+    <reaction id="BM_PEP">
+      <reduct cfg="ABC" id="PEP"/>
+    </reaction>
+    <reaction id="BM_PYR">
+      <reduct cfg="ABC" id="PYR"/>
+    </reaction>
+    <reaction id="BM_R5P">
+      <reduct cfg="ABCDE" id="R5P"/>
+    </reaction>
+    <reaction id="BM_Ac">
+      <reduct cfg="AB" id="AcCoA"/>
+    </reaction>
+    <reaction id="BM_OAA">
+      <reduct cfg="ABCD" id="OAA"/>
+    </reaction>
+    <reaction id="BM_OGA">
+      <reduct cfg="ABCDE" id="OGA"/>
+    </reaction>
+  </reactionnetwork>
+  <constraints>
+    <net>
+      <textual>
+
+<!--Directionality assumptions-->
+0 &lt;= ppp1;
+0 &lt;= emp6;
+0 &lt;=emp5;
+0 &lt;=emp2;
+0 &lt;=emp1;
+0 &lt;=emp3;
+0 &lt;=emp4;
+<!-- Anaplerotic fluxes-->
+0 &lt;= ana1;
+0 &lt;= ana2;
+0 &lt;= gs1;
+0 &lt;= ppp1a;
+
+<!-- Gluconeogenetic fluxes-->
+
+
+<!--Uptake of labeled specy-->
+4*uptU-upt0=0;
+
+<!--Scrambling reaction-->
+tca5a-tca5b=0;
+
+<!-- Biomass effluxes-->
+BM_oaa6a-BM_oaa6b=0; BM_pep3a-BM_pep3b=0; BM_pep4a-BM_pep4b=0; 2*BM_pyr2_aux+2*BM_pyr4_aux+BM_oaa4_aux+BM_oaa6_aux=0.387162; 2*BM_pep3_aux+2*BM_pep4_aux=0.109620; BM_oga1_aux+BM_oga2_aux=0.185230; BM_oaa1_aux+BM_oaa3_aux+BM_oaa4_aux+BM_oaa6_aux=0.184927; 0.0001 &lt;= ana3; BM_Ac=0.226560; BM_F6P=0.008640; BM_G6P=0.006487; BM_GAP=0.012921; BM_OAA=0.030407; BM_OGA=0.008160; BM_PEP=0.006240; BM_PGA=0.048837; BM_PYR=0.049680; BM_R5P=0.066092; BM_pga1_aux=0.144642; BM_pyr4_aux=0.064982;
+
+<!-- Box constraints -->
+ana1 &lt;= 10; emp1 &gt;= -100; emp1 &lt;= 10; emp6 &gt;= -100; emp6&lt;= 100; tca1 &gt;= -100; tca1 &lt;= 10; upt &lt;= 10
+
+</textual>
+    </net>
+    <xch>
+      <textual>tca5a-tca5b=0; BM_oaa4=0; BM_oaa6a=0; BM_oaa6b=0; BM_oga2=0; BM_pep1=0; BM_pep2=0; BM_pep3a=0; BM_pep3b=0; BM_pep4a=0; BM_pep4b=0; BM_pyr2=0; BM_pyr3=0; BM_pyr4=0; ana1=0; ana2=0; ana3=0;  gs1=0; gs2=0; ppp1=0; tca1=0; tca2=0; tca3=0; tca4=0; upt=0;
+ppp1a=0;
+<!-- Box constraints -->
+
+<!--ppp4 &lt;= 5; ppp5 &lt;= 10; ppp6 &lt;= 5; -->
+
+ppp4 &lt;= 100; ppp5 &lt;= 100; ppp6 &lt;= 100;
+
+emp1&lt;= 100;
+
+BM_oaa1&lt;= 100;
+
+BM_oaa3&lt;= 100;
+
+BM_oga1&lt;= 100;
+
+BM_pga1&lt;= 100;
+
+emp2&lt;= 100;
+emp3&lt;= 100;
+emp4&lt;= 100;
+emp5&lt;= 100;
+emp6&lt;= 100;
+ppp2&lt;= 100;
+ppp3&lt;= 100;
+
+tca5b&lt;= 100;
+tca6&lt;= 100;
+
+</textual>
+    </xch>
+  </constraints>
+  <configuration name="default" stationary="true">
+    <input pool="GLCU" type="isotopomer">
+      <label cfg="111111" purity="0.99">1.00</label>
+	</input>
+    <input pool="GLC0" type="isotopomer">
+<!-- Here the purity attribute confirms naturally labeled glucose, the labeling pattern is not influences by 0.99-->
+      <label cfg="000000" purity="0.99">1.00</label>
+    </input>
+    <measurement>
+      <model>
+        <labelingmeasurement>
+          <group id="ms_group_1" scale="auto">
+            <textual>Asp[1,2,3,4]#M0,1,2,3,4</textual>
+          </group>
+          <group id="ms_group_2" scale="auto">
+            <textual>Asp[1,2,3,4]#M0,1,2,3,4</textual>
+          </group>
+          <group id="ms_group_3" scale="auto">
+            <textual>Asp[2,3,4]#M0,1,2,3</textual>
+          </group>
+          <group id="ms_group_4" scale="auto">
+            <textual>Asp[2,3,4]#M0,1,2,3</textual>
+          </group>
+          <group id="ms_group_5" scale="auto">
+            <textual>Asp[1,2]#M0,1,2</textual>
+          </group>
+          <group id="ms_group_6" scale="auto">
+            <textual>Glu[1,2,3,4,5]#M0,1,2,3,4,5</textual>
+          </group>
+          <group id="ms_group_7" scale="auto">
+            <textual>Glu[2,3,4,5]#M0,1,2,3,4</textual>
+          </group>
+          <group id="ms_group_8" scale="auto">
+            <textual>Glu[2,3,4,5]#M0,1,2,3,4</textual>
+          </group>
+          <group id="ms_group_9" scale="auto">
+            <textual>Ile[1,2,3,4,5,6]#M0,1,2,3,4,5,6</textual>
+          </group>
+          <group id="ms_group_10" scale="auto">
+            <textual>Ile[2,3,4,5,6]#M0,1,2,3,4,5</textual>
+          </group>
+          <group id="ms_group_11" scale="auto">
+            <textual>Ile[2,3,4,5,6]#M0,1,2,3,4,5</textual>
+          </group>
+          <group id="ms_group_12" scale="auto">
+            <textual>Leu[1,2,3,4,5,6]#M0,1,2,3,4,5,6</textual>
+          </group>
+          <group id="ms_group_13" scale="auto">
+            <textual>Leu[2,3,4,5,6]#M0,1,2,3,4,5</textual>
+          </group>
+          <group id="ms_group_14" scale="auto">
+            <textual>Leu[2,3,4,5,6]#M0,1,2,3,4,5</textual>
+          </group>
+          <group id="ms_group_15" scale="auto">
+            <textual>Lys[1,2,3,4,5,6]#M0,1,2,3,4,5,6</textual>
+          </group>
+          <group id="ms_group_16" scale="auto">
+            <textual>Phe[1,2,3,4,5,6,7,8,9]#M0,1,2,3,4,5,6,7,8,9</textual>
+          </group>
+          <group id="ms_group_17" scale="auto">
+            <textual>Phe[2,3,4,5,6,7,8,9]#M0,1,2,3,4,5,6,7,8</textual>
+          </group>
+          <group id="ms_group_18" scale="auto">
+            <textual>Phe[1,2]#M0,1,2</textual>
+          </group>
+          <group id="ms_group_19" scale="auto">
+            <textual>Pro[2,3,4,5]#M0,1,2,3,4</textual>
+          </group>
+          <group id="ms_group_20" scale="auto">
+            <textual>Pro[2,3,4,5]#M0,1,2,3,4</textual>
+          </group>
+          <group id="ms_group_21" scale="auto">
+            <textual>Ser[1,2,3]#M0,1,2,3</textual>
+          </group>
+          <group id="ms_group_22" scale="auto">
+            <textual>Ser[1,2,3]#M0,1,2,3</textual>
+          </group>
+          <group id="ms_group_23" scale="auto">
+            <textual>Ser[2,3]#M0,1,2</textual>
+          </group>
+          <group id="ms_group_24" scale="auto">
+            <textual>Ser[2,3]#M0,1,2</textual>
+          </group>
+          <group id="ms_group_25" scale="auto">
+            <textual>Ser[1,2]#M0,1,2</textual>
+          </group>
+          <group id="ms_group_26" scale="auto">
+            <textual>Thr[1,2,3,4]#M0,1,2,3,4</textual>
+          </group>
+          <group id="ms_group_27" scale="auto">
+            <textual>Thr[1,2,3,4]#M0,1,2,3,4</textual>
+          </group>
+          <group id="ms_group_28" scale="auto">
+            <textual>Thr[2,3,4]#M0,1,2,3</textual>
+          </group>
+          <group id="ms_group_29" scale="auto">
+            <textual>Tyr[1,2,3,4,5,6,7,8,9]#M0,1,2,3,4,5,6,7,8,9</textual>
+          </group>
+          <group id="ms_group_30" scale="auto">
+            <textual>Tyr[2,3,4,5,6,7,8,9]#M0,1,2,3,4,5,6,7,8</textual>
+          </group>
+          <group id="ms_group_31" scale="auto">
+            <textual>Tyr[2,3,4,5,6,7,8,9]#M0,1,2,3,4,5,6,7,8</textual>
+          </group>
+          <group id="ms_group_32" scale="auto">
+            <textual>Val[1,2,3,4,5]#M0,1,2,3,4,5</textual>
+          </group>
+          <group id="ms_group_33" scale="auto">
+            <textual>Val[1,2,3,4,5]#M0,1,2,3,4,5</textual>
+          </group>
+          <group id="ms_group_34" scale="auto">
+            <textual>Val[2,3,4,5]#M0,1,2,3,4</textual>
+          </group>
+          <group id="ms_group_35" scale="auto">
+            <textual>Val[1,2]#M0,1,2</textual>
+          </group>
+        </labelingmeasurement>
+        <fluxmeasurement>
+          <netflux id="fm_1">
+            <textual>upt</textual>
+          </netflux>
+        </fluxmeasurement>
+      </model>
+      <data>
+        <datum id="fm_1" stddev="0.2">2.3</datum>
+        <datum id="ms_group_1" stddev="0.020" weight="0">0.513</datum>
+        <datum id="ms_group_1" stddev="0.020" weight="1">0.214</datum>
+        <datum id="ms_group_1" stddev="0.020" weight="2">0.192</datum>
+        <datum id="ms_group_1" stddev="0.020" weight="3">0.047</datum>
+        <datum id="ms_group_1" stddev="0.020" weight="4">0.012</datum>
+        <datum id="ms_group_2" stddev="0.020" weight="0">0.508</datum>
+        <datum id="ms_group_2" stddev="0.020" weight="1">0.203</datum>
+        <datum id="ms_group_2" stddev="0.020" weight="2">0.192</datum>
+        <datum id="ms_group_2" stddev="0.020" weight="3">0.056</datum>
+        <datum id="ms_group_2" stddev="0.020" weight="4">0.019</datum>
+        <datum id="ms_group_3" stddev="0.020" weight="0">0.556</datum>
+        <datum id="ms_group_3" stddev="0.020" weight="1">0.250</datum>
+        <datum id="ms_group_3" stddev="0.020" weight="2">0.144</datum>
+        <datum id="ms_group_3" stddev="0.020" weight="3">0.034</datum>
+        <datum id="ms_group_4" stddev="0.020" weight="0">0.541</datum>
+        <datum id="ms_group_4" stddev="0.020" weight="1">0.251</datum>
+        <datum id="ms_group_4" stddev="0.020" weight="2">0.142</datum>
+        <datum id="ms_group_4" stddev="0.020" weight="3">0.051</datum>
+        <datum id="ms_group_5" stddev="0.020" weight="0">0.704</datum>
+        <datum id="ms_group_5" stddev="0.020" weight="1">0.143</datum>
+        <datum id="ms_group_5" stddev="0.020" weight="2">0.142</datum>
+        <datum id="ms_group_6" stddev="0.020" weight="0">0.375</datum>
+        <datum id="ms_group_6" stddev="0.020" weight="1">0.244</datum>
+        <datum id="ms_group_6" stddev="0.020" weight="2">0.235</datum>
+        <datum id="ms_group_6" stddev="0.020" weight="3">0.088</datum>
+        <datum id="ms_group_6" stddev="0.020" weight="4">0.026</datum>
+        <datum id="ms_group_6" stddev="0.020" weight="5">0.020</datum>
+        <datum id="ms_group_7" stddev="0.020" weight="0">0.431</datum>
+        <datum id="ms_group_7" stddev="0.020" weight="1">0.297</datum>
+        <datum id="ms_group_7" stddev="0.020" weight="2">0.191</datum>
+        <datum id="ms_group_7" stddev="0.020" weight="3">0.051</datum>
+        <datum id="ms_group_7" stddev="0.020" weight="4">0.010</datum>
+        <datum id="ms_group_8" stddev="0.020" weight="0">0.410</datum>
+        <datum id="ms_group_8" stddev="0.020" weight="1">0.304</datum>
+        <datum id="ms_group_8" stddev="0.020" weight="2">0.199</datum>
+        <datum id="ms_group_8" stddev="0.020" weight="3">0.056</datum>
+        <datum id="ms_group_8" stddev="0.020" weight="4">0.010</datum>
+        <datum id="ms_group_9" stddev="0.020" weight="0">0.380</datum>
+        <datum id="ms_group_9" stddev="0.020" weight="1">0.209</datum>
+        <datum id="ms_group_9" stddev="0.020" weight="2">0.253</datum>
+        <datum id="ms_group_9" stddev="0.020" weight="3">0.082</datum>
+        <datum id="ms_group_9" stddev="0.020" weight="4">0.039</datum>
+        <datum id="ms_group_9" stddev="0.020" weight="5">0.004</datum>
+        <datum id="ms_group_9" stddev="0.020" weight="6">0.001</datum>
+        <datum id="ms_group_10" stddev="0.020" weight="0">0.397</datum>
+        <datum id="ms_group_10" stddev="0.020" weight="1">0.248</datum>
+        <datum id="ms_group_10" stddev="0.020" weight="2">0.220</datum>
+        <datum id="ms_group_10" stddev="0.020" weight="3">0.079</datum>
+        <datum id="ms_group_10" stddev="0.020" weight="4">0.024</datum>
+        <datum id="ms_group_10" stddev="0.020" weight="5">0.020</datum>
+        <datum id="ms_group_11" stddev="0.020" weight="0">0.382</datum>
+        <datum id="ms_group_11" stddev="0.020" weight="1">0.242</datum>
+        <datum id="ms_group_11" stddev="0.020" weight="2">0.235</datum>
+        <datum id="ms_group_11" stddev="0.020" weight="3">0.082</datum>
+        <datum id="ms_group_11" stddev="0.020" weight="4">0.026</datum>
+        <datum id="ms_group_11" stddev="0.020" weight="5">0.006</datum>
+        <datum id="ms_group_12" stddev="0.020" weight="0">0.386</datum>
+        <datum id="ms_group_12" stddev="0.020" weight="1">0.179</datum>
+        <datum id="ms_group_12" stddev="0.020" weight="2">0.281</datum>
+        <datum id="ms_group_12" stddev="0.020" weight="3">0.068</datum>
+        <datum id="ms_group_12" stddev="0.020" weight="4">0.050</datum>
+        <datum id="ms_group_12" stddev="0.020" weight="5">0.003</datum>
+        <datum id="ms_group_12" stddev="0.020" weight="6">0.002</datum>
+        <datum id="ms_group_13" stddev="0.020" weight="0">0.408</datum>
+        <datum id="ms_group_13" stddev="0.020" weight="1">0.231</datum>
+        <datum id="ms_group_13" stddev="0.020" weight="2">0.229</datum>
+        <datum id="ms_group_13" stddev="0.020" weight="3">0.075</datum>
+        <datum id="ms_group_13" stddev="0.020" weight="4">0.026</datum>
+        <datum id="ms_group_13" stddev="0.020" weight="5">0.020</datum>
+        <datum id="ms_group_14" stddev="0.020" weight="0">0.363</datum>
+        <datum id="ms_group_14" stddev="0.020" weight="1">0.224</datum>
+        <datum id="ms_group_14" stddev="0.020" weight="2">0.261</datum>
+        <datum id="ms_group_14" stddev="0.020" weight="3">0.086</datum>
+        <datum id="ms_group_14" stddev="0.020" weight="4">0.032</datum>
+        <datum id="ms_group_14" stddev="0.020" weight="5">0.007</datum>
+        <datum id="ms_group_15" stddev="0.020" weight="0">0.359</datum>
+        <datum id="ms_group_15" stddev="0.020" weight="1">0.241</datum>
+        <datum id="ms_group_15" stddev="0.020" weight="2">0.196</datum>
+        <datum id="ms_group_15" stddev="0.020" weight="3">0.113</datum>
+        <datum id="ms_group_15" stddev="0.020" weight="4">0.046</datum>
+        <datum id="ms_group_15" stddev="0.020" weight="5">0.012</datum>
+        <datum id="ms_group_15" stddev="0.020" weight="6">0.002</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="0">0.294</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="1">0.164</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="2">0.146</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="3">0.163</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="4">0.095</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="5">0.045</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="6">0.028</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="7">0.011</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="8">0.003</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="9">0.001</datum>
+        <datum id="ms_group_17" stddev="0.020" weight="0">0.304</datum>
+        <datum id="ms_group_17" stddev="0.020" weight="1">0.178</datum>
+        <datum id="ms_group_17" stddev="0.020" weight="2">0.201</datum>
+        <datum id="ms_group_17" stddev="0.020" weight="3">0.118</datum>
+        <datum id="ms_group_17" stddev="0.020" weight="4">0.087</datum>
+        <datum id="ms_group_17" stddev="0.020" weight="5">0.039</datum>
+        <datum id="ms_group_17" stddev="0.020" weight="6">0.023</datum>
+        <datum id="ms_group_17" stddev="0.020" weight="7">0.004</datum>
+        <datum id="ms_group_17" stddev="0.020" weight="8">0.002</datum>
+        <datum id="ms_group_18" stddev="0.020" weight="0">0.754</datum>
+        <datum id="ms_group_18" stddev="0.020" weight="1">0.076</datum>
+        <datum id="ms_group_18" stddev="0.020" weight="2">0.159</datum>
+        <datum id="ms_group_19" stddev="0.020" weight="0">0.448</datum>
+        <datum id="ms_group_19" stddev="0.020" weight="1">0.285</datum>
+        <datum id="ms_group_19" stddev="0.020" weight="2">0.182</datum>
+        <datum id="ms_group_19" stddev="0.020" weight="3">0.054</datum>
+        <datum id="ms_group_19" stddev="0.020" weight="4">0.010</datum>
+        <datum id="ms_group_20" stddev="0.020" weight="0">0.365</datum>
+        <datum id="ms_group_20" stddev="0.020" weight="1">0.324</datum>
+        <datum id="ms_group_20" stddev="0.020" weight="2">0.207</datum>
+        <datum id="ms_group_20" stddev="0.020" weight="3">0.058</datum>
+        <datum id="ms_group_20" stddev="0.020" weight="4">0.024</datum>
+        <datum id="ms_group_21" stddev="0.020" weight="0">0.655</datum>
+        <datum id="ms_group_21" stddev="0.020" weight="1">0.141</datum>
+        <datum id="ms_group_21" stddev="0.020" weight="2">0.091</datum>
+        <datum id="ms_group_21" stddev="0.020" weight="3">0.097</datum>
+        <datum id="ms_group_22" stddev="0.020" weight="0">0.633</datum>
+        <datum id="ms_group_22" stddev="0.020" weight="1">0.140</datum>
+        <datum id="ms_group_22" stddev="0.020" weight="2">0.100</datum>
+        <datum id="ms_group_22" stddev="0.020" weight="3">0.110</datum>
+        <datum id="ms_group_23" stddev="0.020" weight="0">0.692</datum>
+        <datum id="ms_group_23" stddev="0.020" weight="1">0.180</datum>
+        <datum id="ms_group_23" stddev="0.020" weight="2">0.117</datum>
+        <datum id="ms_group_24" stddev="0.020" weight="0">0.678</datum>
+        <datum id="ms_group_24" stddev="0.020" weight="1">0.190</datum>
+        <datum id="ms_group_24" stddev="0.020" weight="2">0.122</datum>
+        <datum id="ms_group_25" stddev="0.020" weight="0">0.719</datum>
+        <datum id="ms_group_25" stddev="0.020" weight="1">0.090</datum>
+        <datum id="ms_group_25" stddev="0.020" weight="2">0.181</datum>
+        <datum id="ms_group_26" stddev="0.020" weight="0">0.520</datum>
+        <datum id="ms_group_26" stddev="0.020" weight="1">0.215</datum>
+        <datum id="ms_group_26" stddev="0.020" weight="2">0.185</datum>
+        <datum id="ms_group_26" stddev="0.020" weight="3">0.042</datum>
+        <datum id="ms_group_26" stddev="0.020" weight="4">0.017</datum>
+        <datum id="ms_group_27" stddev="0.020" weight="0">0.513</datum>
+        <datum id="ms_group_27" stddev="0.020" weight="1">0.200</datum>
+        <datum id="ms_group_27" stddev="0.020" weight="2">0.197</datum>
+        <datum id="ms_group_27" stddev="0.020" weight="3">0.051</datum>
+        <datum id="ms_group_27" stddev="0.020" weight="4">0.018</datum>
+        <datum id="ms_group_28" stddev="0.020" weight="0">0.571</datum>
+        <datum id="ms_group_28" stddev="0.020" weight="1">0.244</datum>
+        <datum id="ms_group_28" stddev="0.020" weight="2">0.135</datum>
+        <datum id="ms_group_28" stddev="0.020" weight="3">0.034</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="0">0.331</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="1">0.184</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="2">0.134</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="3">0.148</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="4">0.078</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="5">0.042</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="6">0.021</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="7">0.020</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="8">0.002</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="9">0.006</datum>
+        <datum id="ms_group_30" stddev="0.020" weight="0">0.349</datum>
+        <datum id="ms_group_30" stddev="0.020" weight="1">0.154</datum>
+        <datum id="ms_group_30" stddev="0.020" weight="2">0.226</datum>
+        <datum id="ms_group_30" stddev="0.020" weight="3">0.106</datum>
+        <datum id="ms_group_30" stddev="0.020" weight="4">0.075</datum>
+        <datum id="ms_group_30" stddev="0.020" weight="5">0.032</datum>
+        <datum id="ms_group_30" stddev="0.020" weight="6">0.013</datum>
+        <datum id="ms_group_30" stddev="0.020" weight="7">0.001</datum>
+        <datum id="ms_group_30" stddev="0.020" weight="8">0.000</datum>
+        <datum id="ms_group_31" stddev="0.020" weight="0">0.323</datum>
+        <datum id="ms_group_31" stddev="0.020" weight="1">0.172</datum>
+        <datum id="ms_group_31" stddev="0.020" weight="2">0.198</datum>
+        <datum id="ms_group_31" stddev="0.020" weight="3">0.120</datum>
+        <datum id="ms_group_31" stddev="0.020" weight="4">0.087</datum>
+        <datum id="ms_group_31" stddev="0.020" weight="5">0.029</datum>
+        <datum id="ms_group_31" stddev="0.020" weight="6">0.021</datum>
+        <datum id="ms_group_31" stddev="0.020" weight="7">0.004</datum>
+        <datum id="ms_group_31" stddev="0.020" weight="8">0.003</datum>
+        <datum id="ms_group_32" stddev="0.020" weight="0">0.511</datum>
+        <datum id="ms_group_32" stddev="0.020" weight="1">0.147</datum>
+        <datum id="ms_group_32" stddev="0.020" weight="2">0.168</datum>
+        <datum id="ms_group_32" stddev="0.020" weight="3">0.115</datum>
+        <datum id="ms_group_32" stddev="0.020" weight="4">0.017</datum>
+        <datum id="ms_group_32" stddev="0.020" weight="5">0.016</datum>
+        <datum id="ms_group_33" stddev="0.020" weight="0">0.495</datum>
+        <datum id="ms_group_33" stddev="0.020" weight="1">0.142</datum>
+        <datum id="ms_group_33" stddev="0.020" weight="2">0.169</datum>
+        <datum id="ms_group_33" stddev="0.020" weight="3">0.125</datum>
+        <datum id="ms_group_33" stddev="0.020" weight="4">0.022</datum>
+        <datum id="ms_group_33" stddev="0.020" weight="5">0.020</datum>
+        <datum id="ms_group_34" stddev="0.020" weight="0">0.504</datum>
+        <datum id="ms_group_34" stddev="0.020" weight="1">0.163</datum>
+        <datum id="ms_group_34" stddev="0.020" weight="2">0.251</datum>
+        <datum id="ms_group_34" stddev="0.020" weight="3">0.036</datum>
+        <datum id="ms_group_34" stddev="0.020" weight="4">0.025</datum>
+        <datum id="ms_group_35" stddev="0.020" weight="0">0.714</datum>
+        <datum id="ms_group_35" stddev="0.020" weight="1">0.098</datum>
+        <datum id="ms_group_35" stddev="0.020" weight="2">0.177</datum>
+      </data>
+    </measurement>
+    <simulation method="auto" type="auto">
+      <variables>
+	<fluxvalue flux="BM_oaa1_aux" type="net">.0994699318615556</fluxvalue>
+        <fluxvalue flux="BM_oaa6_aux" type="net">5.732895400823524e-10</fluxvalue>
+        <fluxvalue flux="BM_oga1_aux" type="net">.0923411335685081</fluxvalue>
+        <fluxvalue flux="BM_pep3_aux" type="net">.026454794520616835</fluxvalue>
+        <fluxvalue flux="BM_pyr2_aux" type="net">.12851070241624213</fluxvalue>
+        <fluxvalue flux="ana1" type="net">0</fluxvalue>
+        <fluxvalue flux="emp1" type="net">1.32</fluxvalue>
+        <fluxvalue flux="emp6" type="net">4.22</fluxvalue>
+        <fluxvalue flux="tca1" type="net">4.72</fluxvalue>
+	<fluxvalue flux="upt" type="net">2.20</fluxvalue>
+	<fluxvalue flux="BM_oaa1" type="xch">1</fluxvalue>
+        <fluxvalue flux="BM_oaa3" type="xch">1</fluxvalue>
+        <fluxvalue flux="BM_oga1" type="xch">1</fluxvalue>
+        <fluxvalue flux="BM_pga1" type="xch">1</fluxvalue>
+        <fluxvalue flux="emp1" type="xch">0.46</fluxvalue>
+				<fluxvalue flux="emp2" type="xch">0.46</fluxvalue>
+        <fluxvalue flux="emp3" type="xch">0.42</fluxvalue>
+        <fluxvalue flux="emp4" type="xch">0.13</fluxvalue>
+        <fluxvalue flux="emp5" type="xch">0.99</fluxvalue>
+				<fluxvalue flux="emp6" type="xch">0.99</fluxvalue>
+        <fluxvalue flux="ppp2" type="xch">0.49</fluxvalue>
+        <fluxvalue flux="ppp3" type="xch">0.15</fluxvalue>
+        <fluxvalue flux="ppp4" type="xch">0.37</fluxvalue>
+        <fluxvalue flux="ppp5" type="xch">0.12</fluxvalue>
+        <fluxvalue flux="ppp6" type="xch">0.88</fluxvalue>
+        <fluxvalue flux="tca5b" type="xch">0.55</fluxvalue>
+	<fluxvalue flux="tca6" type="xch">0.55</fluxvalue>
+      </variables>
+    </simulation>
+  </configuration>
+  <configuration name="default_prior" stationary="true">
+    <input pool="GLCU" type="isotopomer">
+      <label cfg="111111" purity="0.99">1.00</label>
+	</input>
+    <input pool="GLC0" type="isotopomer">
+<!-- Here the purity attribute confirms naturally labeled glucose, the labeling pattern is not influences by 0.99-->
+      <label cfg="000000" purity="0.99">1.00</label>
+    </input>
+    <measurement>
+      <model>
+        <fluxmeasurement>
+          <netflux id="fm_1">
+            <textual>upt</textual>
+          </netflux>
+        </fluxmeasurement>
+      </model>
+      <data>
+        <datum id="fm_1" stddev="0.2">2.3</datum>
+      </data>
+    </measurement>
+    <simulation method="auto" type="auto">
+      <variables>
+	<fluxvalue flux="BM_oaa1_aux" type="net">.0994699318615556</fluxvalue>
+        <fluxvalue flux="BM_oaa6_aux" type="net">5.732895400823524e-10</fluxvalue>
+        <fluxvalue flux="BM_oga1_aux" type="net">.0923411335685081</fluxvalue>
+        <fluxvalue flux="BM_pep3_aux" type="net">.026454794520616835</fluxvalue>
+        <fluxvalue flux="BM_pyr2_aux" type="net">.12851070241624213</fluxvalue>
+        <fluxvalue flux="ana1" type="net">0</fluxvalue>
+        <fluxvalue flux="emp1" type="net">1.32</fluxvalue>
+        <fluxvalue flux="emp6" type="net">4.22</fluxvalue>
+        <fluxvalue flux="tca1" type="net">4.72</fluxvalue>
+	<fluxvalue flux="upt" type="net">2.20</fluxvalue>
+	<fluxvalue flux="BM_oaa1" type="xch">1</fluxvalue>
+        <fluxvalue flux="BM_oaa3" type="xch">1</fluxvalue>
+        <fluxvalue flux="BM_oga1" type="xch">1</fluxvalue>
+        <fluxvalue flux="BM_pga1" type="xch">1</fluxvalue>
+        <fluxvalue flux="emp1" type="xch">0.46</fluxvalue>
+				<fluxvalue flux="emp2" type="xch">0.46</fluxvalue>
+        <fluxvalue flux="emp3" type="xch">0.42</fluxvalue>
+        <fluxvalue flux="emp4" type="xch">0.13</fluxvalue>
+        <fluxvalue flux="emp5" type="xch">0.99</fluxvalue>
+				<fluxvalue flux="emp6" type="xch">0.99</fluxvalue>
+        <fluxvalue flux="ppp2" type="xch">0.49</fluxvalue>
+        <fluxvalue flux="ppp3" type="xch">0.15</fluxvalue>
+        <fluxvalue flux="ppp4" type="xch">0.37</fluxvalue>
+        <fluxvalue flux="ppp5" type="xch">0.12</fluxvalue>
+        <fluxvalue flux="ppp6" type="xch">0.88</fluxvalue>
+        <fluxvalue flux="tca5b" type="xch">0.55</fluxvalue>
+	<fluxvalue flux="tca6" type="xch">0.55</fluxvalue>
+      </variables>
+    </simulation>
+  </configuration>
+  <configuration name="default_likelihood" stationary="true">
+    <input pool="GLCU" type="isotopomer">
+      <label cfg="111111" purity="0.99">1.00</label>
+	</input>
+    <input pool="GLC0" type="isotopomer">
+<!-- Here the purity attribute confirms naturally labeled glucose, the labeling pattern is not influences by 0.99-->
+      <label cfg="000000" purity="0.99">1.00</label>
+    </input>
+    <measurement>
+      <model>
+        <labelingmeasurement>
+          <group id="ms_group_1" scale="auto">
+            <textual>Asp[1,2,3,4]#M0,1,2,3,4</textual>
+          </group>
+          <group id="ms_group_2" scale="auto">
+            <textual>Asp[1,2,3,4]#M0,1,2,3,4</textual>
+          </group>
+          <group id="ms_group_3" scale="auto">
+            <textual>Asp[2,3,4]#M0,1,2,3</textual>
+          </group>
+          <group id="ms_group_4" scale="auto">
+            <textual>Asp[2,3,4]#M0,1,2,3</textual>
+          </group>
+          <group id="ms_group_5" scale="auto">
+            <textual>Asp[1,2]#M0,1,2</textual>
+          </group>
+          <group id="ms_group_6" scale="auto">
+            <textual>Glu[1,2,3,4,5]#M0,1,2,3,4,5</textual>
+          </group>
+          <group id="ms_group_7" scale="auto">
+            <textual>Glu[2,3,4,5]#M0,1,2,3,4</textual>
+          </group>
+          <group id="ms_group_8" scale="auto">
+            <textual>Glu[2,3,4,5]#M0,1,2,3,4</textual>
+          </group>
+          <group id="ms_group_9" scale="auto">
+            <textual>Ile[1,2,3,4,5,6]#M0,1,2,3,4,5,6</textual>
+          </group>
+          <group id="ms_group_10" scale="auto">
+            <textual>Ile[2,3,4,5,6]#M0,1,2,3,4,5</textual>
+          </group>
+          <group id="ms_group_11" scale="auto">
+            <textual>Ile[2,3,4,5,6]#M0,1,2,3,4,5</textual>
+          </group>
+          <group id="ms_group_12" scale="auto">
+            <textual>Leu[1,2,3,4,5,6]#M0,1,2,3,4,5,6</textual>
+          </group>
+          <group id="ms_group_13" scale="auto">
+            <textual>Leu[2,3,4,5,6]#M0,1,2,3,4,5</textual>
+          </group>
+          <group id="ms_group_14" scale="auto">
+            <textual>Leu[2,3,4,5,6]#M0,1,2,3,4,5</textual>
+          </group>
+          <group id="ms_group_15" scale="auto">
+            <textual>Lys[1,2,3,4,5,6]#M0,1,2,3,4,5,6</textual>
+          </group>
+          <group id="ms_group_16" scale="auto">
+            <textual>Phe[1,2,3,4,5,6,7,8,9]#M0,1,2,3,4,5,6,7,8,9</textual>
+          </group>
+          <group id="ms_group_17" scale="auto">
+            <textual>Phe[2,3,4,5,6,7,8,9]#M0,1,2,3,4,5,6,7,8</textual>
+          </group>
+          <group id="ms_group_18" scale="auto">
+            <textual>Phe[1,2]#M0,1,2</textual>
+          </group>
+          <group id="ms_group_19" scale="auto">
+            <textual>Pro[2,3,4,5]#M0,1,2,3,4</textual>
+          </group>
+          <group id="ms_group_20" scale="auto">
+            <textual>Pro[2,3,4,5]#M0,1,2,3,4</textual>
+          </group>
+          <group id="ms_group_21" scale="auto">
+            <textual>Ser[1,2,3]#M0,1,2,3</textual>
+          </group>
+          <group id="ms_group_22" scale="auto">
+            <textual>Ser[1,2,3]#M0,1,2,3</textual>
+          </group>
+          <group id="ms_group_23" scale="auto">
+            <textual>Ser[2,3]#M0,1,2</textual>
+          </group>
+          <group id="ms_group_24" scale="auto">
+            <textual>Ser[2,3]#M0,1,2</textual>
+          </group>
+          <group id="ms_group_25" scale="auto">
+            <textual>Ser[1,2]#M0,1,2</textual>
+          </group>
+          <group id="ms_group_26" scale="auto">
+            <textual>Thr[1,2,3,4]#M0,1,2,3,4</textual>
+          </group>
+          <group id="ms_group_27" scale="auto">
+            <textual>Thr[1,2,3,4]#M0,1,2,3,4</textual>
+          </group>
+          <group id="ms_group_28" scale="auto">
+            <textual>Thr[2,3,4]#M0,1,2,3</textual>
+          </group>
+          <group id="ms_group_29" scale="auto">
+            <textual>Tyr[1,2,3,4,5,6,7,8,9]#M0,1,2,3,4,5,6,7,8,9</textual>
+          </group>
+          <group id="ms_group_30" scale="auto">
+            <textual>Tyr[2,3,4,5,6,7,8,9]#M0,1,2,3,4,5,6,7,8</textual>
+          </group>
+          <group id="ms_group_31" scale="auto">
+            <textual>Tyr[2,3,4,5,6,7,8,9]#M0,1,2,3,4,5,6,7,8</textual>
+          </group>
+          <group id="ms_group_32" scale="auto">
+            <textual>Val[1,2,3,4,5]#M0,1,2,3,4,5</textual>
+          </group>
+          <group id="ms_group_33" scale="auto">
+            <textual>Val[1,2,3,4,5]#M0,1,2,3,4,5</textual>
+          </group>
+          <group id="ms_group_34" scale="auto">
+            <textual>Val[2,3,4,5]#M0,1,2,3,4</textual>
+          </group>
+          <group id="ms_group_35" scale="auto">
+            <textual>Val[1,2]#M0,1,2</textual>
+          </group>
+        </labelingmeasurement>
+      </model>
+      <data>
+        <datum id="ms_group_1" stddev="0.020" weight="0">0.513</datum>
+        <datum id="ms_group_1" stddev="0.020" weight="1">0.214</datum>
+        <datum id="ms_group_1" stddev="0.020" weight="2">0.192</datum>
+        <datum id="ms_group_1" stddev="0.020" weight="3">0.047</datum>
+        <datum id="ms_group_1" stddev="0.020" weight="4">0.012</datum>
+        <datum id="ms_group_2" stddev="0.020" weight="0">0.508</datum>
+        <datum id="ms_group_2" stddev="0.020" weight="1">0.203</datum>
+        <datum id="ms_group_2" stddev="0.020" weight="2">0.192</datum>
+        <datum id="ms_group_2" stddev="0.020" weight="3">0.056</datum>
+        <datum id="ms_group_2" stddev="0.020" weight="4">0.019</datum>
+        <datum id="ms_group_3" stddev="0.020" weight="0">0.556</datum>
+        <datum id="ms_group_3" stddev="0.020" weight="1">0.250</datum>
+        <datum id="ms_group_3" stddev="0.020" weight="2">0.144</datum>
+        <datum id="ms_group_3" stddev="0.020" weight="3">0.034</datum>
+        <datum id="ms_group_4" stddev="0.020" weight="0">0.541</datum>
+        <datum id="ms_group_4" stddev="0.020" weight="1">0.251</datum>
+        <datum id="ms_group_4" stddev="0.020" weight="2">0.142</datum>
+        <datum id="ms_group_4" stddev="0.020" weight="3">0.051</datum>
+        <datum id="ms_group_5" stddev="0.020" weight="0">0.704</datum>
+        <datum id="ms_group_5" stddev="0.020" weight="1">0.143</datum>
+        <datum id="ms_group_5" stddev="0.020" weight="2">0.142</datum>
+        <datum id="ms_group_6" stddev="0.020" weight="0">0.375</datum>
+        <datum id="ms_group_6" stddev="0.020" weight="1">0.244</datum>
+        <datum id="ms_group_6" stddev="0.020" weight="2">0.235</datum>
+        <datum id="ms_group_6" stddev="0.020" weight="3">0.088</datum>
+        <datum id="ms_group_6" stddev="0.020" weight="4">0.026</datum>
+        <datum id="ms_group_6" stddev="0.020" weight="5">0.020</datum>
+        <datum id="ms_group_7" stddev="0.020" weight="0">0.431</datum>
+        <datum id="ms_group_7" stddev="0.020" weight="1">0.297</datum>
+        <datum id="ms_group_7" stddev="0.020" weight="2">0.191</datum>
+        <datum id="ms_group_7" stddev="0.020" weight="3">0.051</datum>
+        <datum id="ms_group_7" stddev="0.020" weight="4">0.010</datum>
+        <datum id="ms_group_8" stddev="0.020" weight="0">0.410</datum>
+        <datum id="ms_group_8" stddev="0.020" weight="1">0.304</datum>
+        <datum id="ms_group_8" stddev="0.020" weight="2">0.199</datum>
+        <datum id="ms_group_8" stddev="0.020" weight="3">0.056</datum>
+        <datum id="ms_group_8" stddev="0.020" weight="4">0.010</datum>
+        <datum id="ms_group_9" stddev="0.020" weight="0">0.380</datum>
+        <datum id="ms_group_9" stddev="0.020" weight="1">0.209</datum>
+        <datum id="ms_group_9" stddev="0.020" weight="2">0.253</datum>
+        <datum id="ms_group_9" stddev="0.020" weight="3">0.082</datum>
+        <datum id="ms_group_9" stddev="0.020" weight="4">0.039</datum>
+        <datum id="ms_group_9" stddev="0.020" weight="5">0.004</datum>
+        <datum id="ms_group_9" stddev="0.020" weight="6">0.001</datum>
+        <datum id="ms_group_10" stddev="0.020" weight="0">0.397</datum>
+        <datum id="ms_group_10" stddev="0.020" weight="1">0.248</datum>
+        <datum id="ms_group_10" stddev="0.020" weight="2">0.220</datum>
+        <datum id="ms_group_10" stddev="0.020" weight="3">0.079</datum>
+        <datum id="ms_group_10" stddev="0.020" weight="4">0.024</datum>
+        <datum id="ms_group_10" stddev="0.020" weight="5">0.020</datum>
+        <datum id="ms_group_11" stddev="0.020" weight="0">0.382</datum>
+        <datum id="ms_group_11" stddev="0.020" weight="1">0.242</datum>
+        <datum id="ms_group_11" stddev="0.020" weight="2">0.235</datum>
+        <datum id="ms_group_11" stddev="0.020" weight="3">0.082</datum>
+        <datum id="ms_group_11" stddev="0.020" weight="4">0.026</datum>
+        <datum id="ms_group_11" stddev="0.020" weight="5">0.006</datum>
+        <datum id="ms_group_12" stddev="0.020" weight="0">0.386</datum>
+        <datum id="ms_group_12" stddev="0.020" weight="1">0.179</datum>
+        <datum id="ms_group_12" stddev="0.020" weight="2">0.281</datum>
+        <datum id="ms_group_12" stddev="0.020" weight="3">0.068</datum>
+        <datum id="ms_group_12" stddev="0.020" weight="4">0.050</datum>
+        <datum id="ms_group_12" stddev="0.020" weight="5">0.003</datum>
+        <datum id="ms_group_12" stddev="0.020" weight="6">0.002</datum>
+        <datum id="ms_group_13" stddev="0.020" weight="0">0.408</datum>
+        <datum id="ms_group_13" stddev="0.020" weight="1">0.231</datum>
+        <datum id="ms_group_13" stddev="0.020" weight="2">0.229</datum>
+        <datum id="ms_group_13" stddev="0.020" weight="3">0.075</datum>
+        <datum id="ms_group_13" stddev="0.020" weight="4">0.026</datum>
+        <datum id="ms_group_13" stddev="0.020" weight="5">0.020</datum>
+        <datum id="ms_group_14" stddev="0.020" weight="0">0.363</datum>
+        <datum id="ms_group_14" stddev="0.020" weight="1">0.224</datum>
+        <datum id="ms_group_14" stddev="0.020" weight="2">0.261</datum>
+        <datum id="ms_group_14" stddev="0.020" weight="3">0.086</datum>
+        <datum id="ms_group_14" stddev="0.020" weight="4">0.032</datum>
+        <datum id="ms_group_14" stddev="0.020" weight="5">0.007</datum>
+        <datum id="ms_group_15" stddev="0.020" weight="0">0.359</datum>
+        <datum id="ms_group_15" stddev="0.020" weight="1">0.241</datum>
+        <datum id="ms_group_15" stddev="0.020" weight="2">0.196</datum>
+        <datum id="ms_group_15" stddev="0.020" weight="3">0.113</datum>
+        <datum id="ms_group_15" stddev="0.020" weight="4">0.046</datum>
+        <datum id="ms_group_15" stddev="0.020" weight="5">0.012</datum>
+        <datum id="ms_group_15" stddev="0.020" weight="6">0.002</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="0">0.294</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="1">0.164</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="2">0.146</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="3">0.163</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="4">0.095</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="5">0.045</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="6">0.028</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="7">0.011</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="8">0.003</datum>
+        <datum id="ms_group_16" stddev="0.020" weight="9">0.001</datum>
+        <datum id="ms_group_17" stddev="0.020" weight="0">0.304</datum>
+        <datum id="ms_group_17" stddev="0.020" weight="1">0.178</datum>
+        <datum id="ms_group_17" stddev="0.020" weight="2">0.201</datum>
+        <datum id="ms_group_17" stddev="0.020" weight="3">0.118</datum>
+        <datum id="ms_group_17" stddev="0.020" weight="4">0.087</datum>
+        <datum id="ms_group_17" stddev="0.020" weight="5">0.039</datum>
+        <datum id="ms_group_17" stddev="0.020" weight="6">0.023</datum>
+        <datum id="ms_group_17" stddev="0.020" weight="7">0.004</datum>
+        <datum id="ms_group_17" stddev="0.020" weight="8">0.002</datum>
+        <datum id="ms_group_18" stddev="0.020" weight="0">0.754</datum>
+        <datum id="ms_group_18" stddev="0.020" weight="1">0.076</datum>
+        <datum id="ms_group_18" stddev="0.020" weight="2">0.159</datum>
+        <datum id="ms_group_19" stddev="0.020" weight="0">0.448</datum>
+        <datum id="ms_group_19" stddev="0.020" weight="1">0.285</datum>
+        <datum id="ms_group_19" stddev="0.020" weight="2">0.182</datum>
+        <datum id="ms_group_19" stddev="0.020" weight="3">0.054</datum>
+        <datum id="ms_group_19" stddev="0.020" weight="4">0.010</datum>
+        <datum id="ms_group_20" stddev="0.020" weight="0">0.365</datum>
+        <datum id="ms_group_20" stddev="0.020" weight="1">0.324</datum>
+        <datum id="ms_group_20" stddev="0.020" weight="2">0.207</datum>
+        <datum id="ms_group_20" stddev="0.020" weight="3">0.058</datum>
+        <datum id="ms_group_20" stddev="0.020" weight="4">0.024</datum>
+        <datum id="ms_group_21" stddev="0.020" weight="0">0.655</datum>
+        <datum id="ms_group_21" stddev="0.020" weight="1">0.141</datum>
+        <datum id="ms_group_21" stddev="0.020" weight="2">0.091</datum>
+        <datum id="ms_group_21" stddev="0.020" weight="3">0.097</datum>
+        <datum id="ms_group_22" stddev="0.020" weight="0">0.633</datum>
+        <datum id="ms_group_22" stddev="0.020" weight="1">0.140</datum>
+        <datum id="ms_group_22" stddev="0.020" weight="2">0.100</datum>
+        <datum id="ms_group_22" stddev="0.020" weight="3">0.110</datum>
+        <datum id="ms_group_23" stddev="0.020" weight="0">0.692</datum>
+        <datum id="ms_group_23" stddev="0.020" weight="1">0.180</datum>
+        <datum id="ms_group_23" stddev="0.020" weight="2">0.117</datum>
+        <datum id="ms_group_24" stddev="0.020" weight="0">0.678</datum>
+        <datum id="ms_group_24" stddev="0.020" weight="1">0.190</datum>
+        <datum id="ms_group_24" stddev="0.020" weight="2">0.122</datum>
+        <datum id="ms_group_25" stddev="0.020" weight="0">0.719</datum>
+        <datum id="ms_group_25" stddev="0.020" weight="1">0.090</datum>
+        <datum id="ms_group_25" stddev="0.020" weight="2">0.181</datum>
+        <datum id="ms_group_26" stddev="0.020" weight="0">0.520</datum>
+        <datum id="ms_group_26" stddev="0.020" weight="1">0.215</datum>
+        <datum id="ms_group_26" stddev="0.020" weight="2">0.185</datum>
+        <datum id="ms_group_26" stddev="0.020" weight="3">0.042</datum>
+        <datum id="ms_group_26" stddev="0.020" weight="4">0.017</datum>
+        <datum id="ms_group_27" stddev="0.020" weight="0">0.513</datum>
+        <datum id="ms_group_27" stddev="0.020" weight="1">0.200</datum>
+        <datum id="ms_group_27" stddev="0.020" weight="2">0.197</datum>
+        <datum id="ms_group_27" stddev="0.020" weight="3">0.051</datum>
+        <datum id="ms_group_27" stddev="0.020" weight="4">0.018</datum>
+        <datum id="ms_group_28" stddev="0.020" weight="0">0.571</datum>
+        <datum id="ms_group_28" stddev="0.020" weight="1">0.244</datum>
+        <datum id="ms_group_28" stddev="0.020" weight="2">0.135</datum>
+        <datum id="ms_group_28" stddev="0.020" weight="3">0.034</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="0">0.331</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="1">0.184</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="2">0.134</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="3">0.148</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="4">0.078</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="5">0.042</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="6">0.021</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="7">0.020</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="8">0.002</datum>
+        <datum id="ms_group_29" stddev="0.020" weight="9">0.006</datum>
+        <datum id="ms_group_30" stddev="0.020" weight="0">0.349</datum>
+        <datum id="ms_group_30" stddev="0.020" weight="1">0.154</datum>
+        <datum id="ms_group_30" stddev="0.020" weight="2">0.226</datum>
+        <datum id="ms_group_30" stddev="0.020" weight="3">0.106</datum>
+        <datum id="ms_group_30" stddev="0.020" weight="4">0.075</datum>
+        <datum id="ms_group_30" stddev="0.020" weight="5">0.032</datum>
+        <datum id="ms_group_30" stddev="0.020" weight="6">0.013</datum>
+        <datum id="ms_group_30" stddev="0.020" weight="7">0.001</datum>
+        <datum id="ms_group_30" stddev="0.020" weight="8">0.000</datum>
+        <datum id="ms_group_31" stddev="0.020" weight="0">0.323</datum>
+        <datum id="ms_group_31" stddev="0.020" weight="1">0.172</datum>
+        <datum id="ms_group_31" stddev="0.020" weight="2">0.198</datum>
+        <datum id="ms_group_31" stddev="0.020" weight="3">0.120</datum>
+        <datum id="ms_group_31" stddev="0.020" weight="4">0.087</datum>
+        <datum id="ms_group_31" stddev="0.020" weight="5">0.029</datum>
+        <datum id="ms_group_31" stddev="0.020" weight="6">0.021</datum>
+        <datum id="ms_group_31" stddev="0.020" weight="7">0.004</datum>
+        <datum id="ms_group_31" stddev="0.020" weight="8">0.003</datum>
+        <datum id="ms_group_32" stddev="0.020" weight="0">0.511</datum>
+        <datum id="ms_group_32" stddev="0.020" weight="1">0.147</datum>
+        <datum id="ms_group_32" stddev="0.020" weight="2">0.168</datum>
+        <datum id="ms_group_32" stddev="0.020" weight="3">0.115</datum>
+        <datum id="ms_group_32" stddev="0.020" weight="4">0.017</datum>
+        <datum id="ms_group_32" stddev="0.020" weight="5">0.016</datum>
+        <datum id="ms_group_33" stddev="0.020" weight="0">0.495</datum>
+        <datum id="ms_group_33" stddev="0.020" weight="1">0.142</datum>
+        <datum id="ms_group_33" stddev="0.020" weight="2">0.169</datum>
+        <datum id="ms_group_33" stddev="0.020" weight="3">0.125</datum>
+        <datum id="ms_group_33" stddev="0.020" weight="4">0.022</datum>
+        <datum id="ms_group_33" stddev="0.020" weight="5">0.020</datum>
+        <datum id="ms_group_34" stddev="0.020" weight="0">0.504</datum>
+        <datum id="ms_group_34" stddev="0.020" weight="1">0.163</datum>
+        <datum id="ms_group_34" stddev="0.020" weight="2">0.251</datum>
+        <datum id="ms_group_34" stddev="0.020" weight="3">0.036</datum>
+        <datum id="ms_group_34" stddev="0.020" weight="4">0.025</datum>
+        <datum id="ms_group_35" stddev="0.020" weight="0">0.714</datum>
+        <datum id="ms_group_35" stddev="0.020" weight="1">0.098</datum>
+        <datum id="ms_group_35" stddev="0.020" weight="2">0.177</datum>
+      </data>
+    </measurement>
+    <simulation method="auto" type="auto">
+      <variables>
+	<fluxvalue flux="BM_oaa1_aux" type="net">.0994699318615556</fluxvalue>
+        <fluxvalue flux="BM_oaa6_aux" type="net">5.732895400823524e-10</fluxvalue>
+        <fluxvalue flux="BM_oga1_aux" type="net">.0923411335685081</fluxvalue>
+        <fluxvalue flux="BM_pep3_aux" type="net">.026454794520616835</fluxvalue>
+        <fluxvalue flux="BM_pyr2_aux" type="net">.12851070241624213</fluxvalue>
+        <fluxvalue flux="ana1" type="net">0</fluxvalue>
+        <fluxvalue flux="emp1" type="net">1.32</fluxvalue>
+        <fluxvalue flux="emp6" type="net">4.22</fluxvalue>
+        <fluxvalue flux="tca1" type="net">4.72</fluxvalue>
+	<fluxvalue flux="upt" type="net">2.20</fluxvalue>
+	<fluxvalue flux="BM_oaa1" type="xch">1</fluxvalue>
+        <fluxvalue flux="BM_oaa3" type="xch">1</fluxvalue>
+        <fluxvalue flux="BM_oga1" type="xch">1</fluxvalue>
+        <fluxvalue flux="BM_pga1" type="xch">1</fluxvalue>
+        <fluxvalue flux="emp1" type="xch">0.46</fluxvalue>
+				<fluxvalue flux="emp2" type="xch">0.46</fluxvalue>
+        <fluxvalue flux="emp3" type="xch">0.42</fluxvalue>
+        <fluxvalue flux="emp4" type="xch">0.13</fluxvalue>
+        <fluxvalue flux="emp5" type="xch">0.99</fluxvalue>
+				<fluxvalue flux="emp6" type="xch">0.99</fluxvalue>
+        <fluxvalue flux="ppp2" type="xch">0.49</fluxvalue>
+        <fluxvalue flux="ppp3" type="xch">0.15</fluxvalue>
+        <fluxvalue flux="ppp4" type="xch">0.37</fluxvalue>
+        <fluxvalue flux="ppp5" type="xch">0.12</fluxvalue>
+        <fluxvalue flux="ppp6" type="xch">0.88</fluxvalue>
+        <fluxvalue flux="tca5b" type="xch">0.55</fluxvalue>
+	<fluxvalue flux="tca6" type="xch">0.55</fluxvalue>
+      </variables>
+    </simulation>
+  </configuration>
+
+</fluxml>

@@ -1,0 +1,3680 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<fluxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.13cflux.net/fluxml http://www.13cflux.net/fluxml" xmlns="http://www.13cflux.net/fluxml">
+
+    <info>
+
+        <date>2018-04-25 13:40:56</date>
+
+        <comment>info@13cflux.net
+            model adapted from: https://doi.org/10.1016/j.ymben.2015.01.001
+            properties: ISOTOPICALLY STATIONARY 13C-MFA
+            Data generating model for study-C
+            Measurement setup is the Antoniewicz https://www.nature.com/articles/s41596-019-0204-0 MS setup
+        </comment>
+
+    </info>
+
+    <reactionnetwork>
+
+        <metabolitepools>
+
+            <pool atoms="6" id="G6P">
+
+                <annotation name="inchi">
+                    InChI=1S/C6H13O9P/c7-3-2(1-14-16(11,12)13)15-6(10)5(9)4(3)8/h2-10H,1H2,(H2,11,12,13)/t2-,3-,4+,5-,6+/m1/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="6" id="F6P">
+
+                <annotation name="inchi">
+                    InChI=1S/C6H13O9P/c7-2-6(10)5(9)4(8)3(15-6)1-14-16(11,12)13/h3-5,7-10H,1-2H2,(H2,11,12,13)/t3-,4-,5+,6?/m1/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="3" id="GAP">
+
+                <annotation name="inchi">InChI=1S/C3H7O6P/c4-1-3(5)2-9-10(6,7)8/h1,3,5H,2H2,(H2,6,7,8)/t3-/m0/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="3" id="_3PG">
+
+                <annotation name="name">3PG</annotation>
+
+                <annotation name="inchi">
+                    InChI=1S/C3H7O7P/c4-2(3(5)6)1-10-11(7,8)9/h2,4H,1H2,(H,5,6)(H2,7,8,9)/t2-/m1/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="3" id="PEP">
+
+                <annotation name="inchi">InChI=1S/C3H5O6P/c1-2(3(4)5)9-10(6,7)8/h1H2,(H,4,5)(H2,6,7,8)</annotation>
+
+            </pool>
+
+            <pool atoms="3" id="Pyr">
+
+                <annotation name="inchi">InChI=1S/C3H4O3/c1-2(4)3(5)6/h1H3,(H,5,6)</annotation>
+
+            </pool>
+
+            <pool atoms="2" id="AcCoA">
+
+                <annotation name="inchi">
+                    InChI=1S/C23H38N7O17P3S/c1-12(31)51-7-6-25-14(32)4-5-26-21(35)18(34)23(2,3)9-44-50(41,42)47-49(39,40)43-8-13-17(46-48(36,37)38)16(33)22(45-13)30-11-29-15-19(24)27-10-28-20(15)30/h10-11,13,16-18,22,33-34H,4-9H2,1-3H3,(H,25,32)(H,26,35)(H,39,40)(H,41,42)(H2,24,27,28)(H2,36,37,38)/t13-,16-,17-,18+,22-/m1/s1
+                </annotation>
+
+                <annotation name="indexes">0,11</annotation>
+
+            </pool>
+
+            <pool atoms="4" id="OAC">
+
+                <annotation name="inchi">InChI=1S/C4H4O5/c5-2(4(8)9)1-3(6)7/h1H2,(H,6,7)(H,8,9)</annotation>
+
+            </pool>
+
+            <pool atoms="6" id="Cit">
+
+                <annotation name="inchi">
+                    InChI=1S/C6H8O7/c7-3(8)1-6(13,5(11)12)2-4(9)10/h13H,1-2H2,(H,7,8)(H,9,10)(H,11,12)
+                </annotation>
+
+            </pool>
+
+            <pool atoms="6" id="ICit">
+
+                <annotation name="inchi">
+                    InChI=1S/C6H8O7/c7-3(8)1-2(5(10)11)4(9)6(12)13/h2,4,9H,1H2,(H,7,8)(H,10,11)(H,12,13)
+                </annotation>
+
+            </pool>
+
+            <pool atoms="4" id="Suc">
+
+                <annotation name="inchi">InChI=1S/C4H6O4/c5-3(6)1-2-4(7)8/h1-2H2,(H,5,6)(H,7,8)</annotation>
+
+            </pool>
+
+            <pool atoms="4" id="Fum">
+
+                <annotation name="inchi">InChI=1S/C4H4O4/c5-3(6)1-2-4(7)8/h1-2H,(H,5,6)(H,7,8)/b2-1+</annotation>
+
+            </pool>
+
+            <pool atoms="4" id="Mal">
+
+                <annotation name="inchi">InChI=1S/C4H6O5/c5-2(4(8)9)1-3(6)7/h2,5H,1H2,(H,6,7)(H,8,9)/t2-/m0/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="5" id="Ru5P">
+
+                <annotation name="inchi">
+                    InChI=1S/C5H11O8P/c6-1-3(7)5(9)4(8)2-13-14(10,11)12/h4-6,8-9H,1-2H2,(H2,10,11,12)/t4-,5+/m1/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="5" id="X5P">
+
+                <annotation name="inchi">
+                    InChI=1S/C5H11O8P/c6-1-3(7)5(9)4(8)2-13-14(10,11)12/h4-6,8-9H,1-2H2,(H2,10,11,12)/t4-,5-/m1/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="5" id="R5P">
+
+                <annotation name="inchi">
+                    InChI=1S/C5H11O8P/c6-3-2(1-12-14(9,10)11)13-5(8)4(3)7/h2-8H,1H2,(H2,9,10,11)/t2-,3-,4-,5?/m1/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="7" id="S7P">
+
+                <annotation name="inchi">
+                    InChI=1S/C7H15O10P/c8-1-3(9)5(11)7(13)6(12)4(10)2-17-18(14,15)16/h4-8,10-13H,1-2H2,(H2,14,15,16)/t4-,5-,6-,7+/m1/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="4" id="E4P">
+
+                <annotation name="inchi">
+                    InChI=1S/C4H9O7P/c5-1-3(6)4(7)2-11-12(8,9)10/h1,3-4,6-7H,2H2,(H2,8,9,10)/t3-,4+/m0/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="6" id="FBP">
+
+                <annotation name="inchi">
+                    InChI=1S/C6H14O12P2/c7-4-3(1-16-19(10,11)12)18-6(9,5(4)8)2-17-20(13,14)15/h3-5,7-9H,1-2H2,(H2,10,11,12)(H2,13,14,15)/t3-,4-,5+,6?/m1/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="5" id="AKG">
+
+                <annotation name="inchi">InChI=1S/C5H6O5/c6-3(5(9)10)1-2-4(7)8/h1-2H2,(H,7,8)(H,9,10)</annotation>
+
+            </pool>
+
+            <pool atoms="5" id="Glu">
+
+                <annotation name="inchi">InChI=1S/C5H9NO4/c6-3(5(9)10)1-2-4(7)8/h3H,1-2,6H2,(H,7,8)(H,9,10)/t3-/m0/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="5" id="Gln">
+
+                <annotation name="inchi">
+                    InChI=1S/C5H10N2O3/c6-3(5(9)10)1-2-4(7)8/h3H,1-2,6H2,(H2,7,8)(H,9,10)/t3-/m0/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="5" id="Pro">
+
+                <annotation name="inchi">InChI=1S/C5H9NO2/c7-5(8)4-2-1-3-6-4/h4,6H,1-3H2,(H,7,8)/t4-/m0/s1</annotation>
+
+            </pool>
+
+            <pool atoms="4" id="Asp">
+
+                <annotation name="inchi">InChI=1S/C4H7NO4/c5-2(4(8)9)1-3(6)7/h2H,1,5H2,(H,6,7)(H,8,9)/t2-/m0/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="4" id="Asn">
+
+                <annotation name="inchi">InChI=1S/C4H8N2O3/c5-2(4(8)9)1-3(6)7/h2H,1,5H2,(H2,6,7)(H,8,9)/t2-/m0/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="4" id="Thr">
+
+                <annotation name="inchi">InChI=1S/C4H9NO3/c1-2(6)3(5)4(7)8/h2-3,6H,5H2,1H3,(H,7,8)/t2-,3+/m1/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="6" id="Ile">
+
+                <annotation name="inchi">InChI=1S/C6H13NO2/c1-3-4(2)5(7)6(8)9/h4-5H,3,7H2,1-2H3,(H,8,9)/t4-,5-/m0/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="5" id="Met">
+
+                <annotation name="inchi">InChI=1S/C5H11NO2S/c1-9-3-2-4(6)5(7)8/h4H,2-3,6H2,1H3,(H,7,8)/t4-/m0/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="3" id="DHAP">
+
+                <annotation name="inchi">InChI=1S/C3H7O6P/c4-1-3(5)2-9-10(6,7)8/h4H,1-2H2,(H2,6,7,8)</annotation>
+
+            </pool>
+
+            <pool atoms="3" id="Ser">
+
+                <annotation name="inchi">InChI=1S/C3H7NO3/c4-2(1-5)3(6)7/h2,5H,1,4H2,(H,6,7)/t2-/m0/s1</annotation>
+
+            </pool>
+
+            <pool atoms="9" id="Tyr">
+
+                <annotation name="inchi">
+                    InChI=1S/C9H11NO3/c10-8(9(12)13)5-6-1-3-7(11)4-2-6/h1-4,8,11H,5,10H2,(H,12,13)/t8-/m0/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="9" id="Phe">
+
+                <annotation name="inchi">
+                    InChI=1S/C9H11NO2/c10-8(9(11)12)6-7-4-2-1-3-5-7/h1-5,8H,6,10H2,(H,11,12)/t8-/m0/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="1" id="CO2">
+
+                <annotation name="inchi">InChI=1S/CO2/c2-1-3</annotation>
+
+            </pool>
+
+            <pool atoms="1" id="CO2_aux">
+
+                <annotation name="inchi">InChI=1S/CO2/c2-1-3</annotation>
+
+            </pool>
+
+            <pool atoms="2" id="Gly">
+
+                <annotation name="inchi">InChI=1S/C2H5NO2/c3-1-2(4)5/h1,3H2,(H,4,5)</annotation>
+
+            </pool>
+
+            <pool id="BM_ext">
+
+                <annotation name="name">BM.ext</annotation>
+
+            </pool>
+
+            <pool id="BM"/>
+
+            <pool atoms="1" id="MEETHF"/>
+
+            <pool atoms="6" id="Lys">
+
+                <annotation name="inchi">InChI=1S/C6H14N2O2/c7-4-2-1-3-5(8)6(9)10/h5H,1-4,7-8H2,(H,9,10)/t5-/m0/s1
+                </annotation>
+
+            </pool>
+
+
+            <pool atoms="6" id="Gluc_ext">
+
+                <annotation name="name">Gluc.ext</annotation>
+
+                <annotation name="inchi">
+                    InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3-,4+,5-,6?/m1/s1
+                </annotation>
+
+            </pool>
+
+            <pool atoms="6" id="_6PG">
+
+                <annotation name="name">6PG</annotation>
+
+                <annotation name="inchi">
+                    InChI=1S/C6H13O10P/c7-2(1-16-17(13,14)15)3(8)4(9)5(10)6(11)12/h2-5,7-10H,1H2,(H,11,12)(H2,13,14,15)
+                </annotation>
+
+            </pool>
+
+            <pool atoms="2" id="TK_C2">
+
+                <annotation name="name">TK-C2</annotation>
+
+            </pool>
+
+            <pool atoms="3" id="TA_C3">
+
+                <annotation name="name">TA-C3</annotation>
+
+            </pool>
+
+            <pool atoms="6" id="KDPG">
+
+                <annotation name="inchi">
+                    InChI=1S/C6H11O9P/c7-3(1-4(8)6(10)11)5(9)2-15-16(12,13)14/h3,5,7,9H,1-2H2,(H,10,11)(H2,12,13,14)
+                </annotation>
+
+            </pool>
+
+            <pool atoms="4" id="SucCoA">
+
+                <annotation name="inchi">
+                    InChI=1S/C25H40N7O19P3S/c1-25(2,20(38)23(39)28-6-5-14(33)27-7-8-55-16(36)4-3-15(34)35)10-48-54(45,46)51-53(43,44)47-9-13-19(50-52(40,41)42)18(37)24(49-13)32-12-31-17-21(26)29-11-30-22(17)32/h11-13,18-20,24,37-38H,3-10H2,1-2H3,(H,27,33)(H,28,39)(H,34,35)(H,43,44)(H,45,46)(H2,26,29,30)(H2,40,41,42)
+                </annotation>
+
+                <annotation name="indexes">2,3,14,15</annotation>
+
+            </pool>
+
+
+            <pool atoms="2" id="Glyox">
+
+                <annotation name="inchi">InChI=1S/C2H2O3/c3-1-2(4)5/h1H,(H,4,5)/p-1</annotation>
+
+            </pool>
+
+            <pool atoms="2" id="Ac">
+
+                <annotation name="inchi">InChI=1S/C2H4O2/c1-2(3)4/h1H3,(H,3,4)</annotation>
+
+            </pool>
+
+            <pool atoms="3" id="Cys">
+
+                <annotation name="inchi">InChI=1S/C3H7NO2S/c4-2(1-7)3(5)6/h2,7H,1,4H2,(H,5,6)</annotation>
+
+            </pool>
+
+            <pool atoms="3" id="Mglx">
+                <annotation name="inchi">InChI=1S/C3H4O2/c1-3(5)2-4/h2H,1H3</annotation>
+            </pool>
+
+            <pool atoms="3" id="Lact">
+                <annotation name="inchi">InChI=1S/C3H6O3/c1-2(4)3(5)6/h2,4H,1H3,(H,5,6)/p-1/t2-/m1/s1</annotation>
+            </pool>
+
+            <pool atoms="5" id="Val">
+
+                <annotation name="inchi">InChI=1S/C5H11NO2/c1-3(2)4(6)5(7)8/h3-4H,6H2,1-2H3,(H,7,8)</annotation>
+
+            </pool>
+
+            <pool atoms="3" id="Ala">
+
+                <annotation name="inchi">InChI=1S/C3H7NO2/c1-2(4)3(5)6/h2H,4H2,1H3,(H,5,6)</annotation>
+
+            </pool>
+
+            <pool atoms="6" id="Arg">
+
+                <annotation name="inchi">
+                    InChI=1S/C6H14N4O2/c7-4(5(11)12)2-1-3-10-6(8)9/h4H,1-3,7H2,(H,11,12)(H4,8,9,10)
+                </annotation>
+
+            </pool>
+
+            <pool atoms="1" id="FTHF"/>
+
+            <pool atoms="11" id="Trp">
+
+                <annotation name="inchi">
+                    InChI=1S/C11H12N2O2/c12-9(11(14)15)5-7-6-13-10-4-2-1-3-8(7)10/h1-4,6,9,13H,5,12H2,(H,14,15)
+                </annotation>
+
+            </pool>
+
+            <pool atoms="6" id="His">
+
+                <annotation name="inchi">InChI=1S/C6H9N3O2/c7-5(6(10)11)1-4-2-8-3-9-4/h2-3,5H,1,7H2,(H,8,9)(H,10,11)
+                </annotation>
+
+            </pool>
+
+            <pool atoms="7" id="LL_DAP">
+
+                <annotation name="name">LL-DAP</annotation>
+
+                <annotation name="inchi">
+                    InChI=1S/C7H14N2O4/c8-4(6(10)11)2-1-3-5(9)7(12)13/h4-5H,1-3,8-9H2,(H,10,11)(H,12,13)
+                </annotation>
+
+            </pool>
+
+            <pool atoms="1" id="METHF"/>
+
+            <pool atoms="6" id="Leu">
+
+                <annotation name="inchi">InChI=1S/C6H13NO2/c1-4(2)3-5(7)6(8)9/h4-5H,3,7H2,1-2H3,(H,8,9)</annotation>
+
+            </pool>
+
+
+            <pool atoms="1" id="CO2_unlabeled"/>
+
+            <pool atoms="1" id="CO2_out"/>
+
+            <pool atoms="1" id="CO2_unlabeled_in"/>
+
+            <pool id="O2"/>
+
+            <pool id="O2_ext">
+
+                <annotation name="name">O2.ext</annotation>
+
+            </pool>
+
+            <pool id="NH3"/>
+
+            <pool id="NH3_ext">
+
+                <annotation name="name">NH3.ext</annotation>
+
+            </pool>
+
+            <pool id="SO4"/>
+
+            <pool id="SO4_ext">
+
+                <annotation name="name">SO4.ext</annotation>
+
+            </pool>
+
+            <pool id="BM_out"/>
+
+
+            <pool id="NADPH"/>
+
+            <pool id="NADP"/>
+
+            <pool id="NADH"/>
+
+            <pool id="ATP"/>
+
+            <pool id="ADP"/>
+
+            <pool id="NAD"/>
+
+            <pool id="Pi"/>
+
+            <pool id="Pi_ext">
+                <annotation name="name">Pi.ext</annotation>
+            </pool>
+
+            <pool id="FADH2"/>
+
+            <pool id="FAD"/>
+
+            <pool id="THF"/>
+
+            <pool id="THF_ext">
+                <annotation name="name">THF.ext</annotation>
+            </pool>
+
+        </metabolitepools>
+
+        <reaction bidirectional="false" id="Glc_upt">
+
+            <annotation name="pathway">UPT</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="Gluc_ext"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="G6P"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="EMP1_v1">
+
+            <annotation name="pathway">Glycolysis</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="PEP"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#3@1" id="Pyr"/>
+
+        </reaction>
+
+        <reaction id="EMP2_v2">
+
+            <annotation name="pathway">Glycolysis</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="G6P"/>
+
+            <rproduct cfg="C#1@1 C#6@1 C#2@1 C#3@1 C#4@1 C#5@1" id="F6P"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="EMP3_v3">
+
+            <annotation name="pathway">Glycolysis</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="F6P"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="FBP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+        </reaction>
+
+        <reaction id="EMP4_v4">
+
+            <annotation name="pathway">Glycolysis</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="FBP"/>
+
+            <rproduct cfg="C#4@1 C#1@1 C#3@1" id="GAP"/>
+
+            <rproduct cfg="C#5@1 C#2@1 C#6@1" id="DHAP"/>
+
+        </reaction>
+
+        <!--
+        <reaction id="EMP5_v5">
+            <annotation name="pathway">Glycolysis</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="DHAP"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#3@1" id="GAP"/>
+
+        </reaction>
+        -->
+
+        <reaction id="EMP6_v6">
+
+            <annotation name="pathway">Glycolysis</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="GAP"/>
+
+            <reduct cfg="" id="NAD"/>
+
+            <reduct cfg="" id="ADP"/>
+
+            <reduct cfg="" id="Pi"/>
+
+            <rproduct cfg="C#2@1 C#3@1 C#1@1" id="_3PG"/>
+
+            <rproduct cfg="" id="ATP"/>
+
+            <rproduct cfg="" id="NADH"/>
+
+        </reaction>
+
+        <reaction id="EMP7_v7">
+
+            <annotation name="pathway">Glycolysis</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="_3PG"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#3@1" id="PEP"/>
+
+        </reaction>
+
+        <reaction id="EMP8_v8">
+
+            <annotation name="pathway">Glycolysis</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="PEP"/>
+
+            <reduct cfg="" id="ADP"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#3@1" id="Pyr"/>
+
+            <rproduct cfg="" id="ATP"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="PPP1_v9">
+
+            <annotation name="pathway">PPP</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="G6P"/>
+
+            <reduct cfg="" id="NADP"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="_6PG"/>
+
+            <rproduct cfg="" id="NADPH"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="PPP2_v10">
+
+            <annotation name="pathway">PPP</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="_6PG"/>
+
+            <reduct cfg="" id="NADP"/>
+
+            <rproduct cfg="C#5@1 C#1@1 C#4@1 C#2@1 C#3@1" id="Ru5P"/>
+
+            <rproduct cfg="C#6@1" id="CO2"/>
+
+            <rproduct cfg="" id="NADPH"/>
+
+        </reaction>
+
+        <reaction id="PPP3_v11">
+
+            <annotation name="pathway">PPP</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="Ru5P"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="X5P"/>
+
+        </reaction>
+
+        <reaction id="PPP4_v12">
+
+            <annotation name="pathway">PPP</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="Ru5P"/>
+
+            <rproduct cfg="C#2@1 C#4@1 C#5@1 C#3@1 C#1@1" id="R5P"/>
+
+        </reaction>
+
+        <reaction id="PPP5_v13">
+
+            <annotation name="pathway">PPP</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="X5P"/>
+
+            <rproduct cfg="C#5@1 C#2@1 C#4@1" id="GAP"/>
+
+            <rproduct cfg="C#1@1 C#3@1" id="TK_C2"/>
+
+        </reaction>
+
+        <reaction id="PPP6_v14">
+
+            <annotation name="pathway">PPP</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="F6P"/>
+
+            <rproduct cfg="C#5@1 C#1@1 C#4@1 C#3@1" id="E4P"/>
+
+            <rproduct cfg="C#6@1 C#2@1" id="TK_C2"/>
+
+        </reaction>
+
+        <reaction id="PPP7_minus_v15">
+
+            <annotation name="pathway">PPP</annotation>
+
+            <reduct cfg="C#1@2 C#2@2 C#3@2 C#4@2 C#5@2" id="R5P"/>
+
+            <reduct cfg="C#1@1 C#2@1" id="TK_C2"/>
+
+            <rproduct cfg="C#1@1 C#5@2 C#2@1 C#4@2 C#1@2 C#3@2 C#2@2" id="S7P"/>
+
+        </reaction>
+
+        <reaction id="PPP8_minus_v16">
+
+            <annotation name="pathway">PPP</annotation>
+
+            <reduct cfg="C#1@2 C#2@2 C#3@2" id="GAP"/>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="TA_C3"/>
+
+            <rproduct cfg="C#2@2 C#3@1 C#3@2 C#1@2 C#1@1 C#2@1" id="F6P"/>
+
+        </reaction>
+
+        <reaction id="PPP9_v17">
+
+            <annotation name="pathway">PPP</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1 C#7@1" id="S7P"/>
+
+            <rproduct cfg="C#7@1 C#2@1 C#6@1 C#4@1" id="E4P"/>
+
+            <rproduct cfg="C#1@1 C#3@1 C#5@1" id="TA_C3"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="PPP10_v18">
+
+            <annotation name="pathway">EDP</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="_6PG"/>
+
+            <rproduct cfg="C#4@1 C#1@1 C#3@1 C#5@1 C#2@1 C#6@1" id="KDPG"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="PPP11_v19">
+
+            <annotation name="pathway">EDP</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="KDPG"/>
+
+            <rproduct cfg="C#1@1 C#4@1 C#6@1" id="Pyr"/>
+
+            <rproduct cfg="C#3@1 C#2@1 C#5@1" id="GAP"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="MGOX1_v20">
+            <annotation name="pathway">MGOX</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="DHAP"/>
+
+            <rproduct cfg="C#2@1 C#1@1 C#3@1" id="Mglx"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="MGOX2_v21">
+
+            <annotation name="pathway">MGOX</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="Mglx"/>
+
+            <rproduct cfg="C#1@1 C#3@1 C#2@1" id="Lact"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="TCA1_v22">
+
+            <annotation name="pathway">TCA</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="Pyr"/>
+
+            <reduct cfg="" id="NAD"/>
+
+            <rproduct cfg="C#1@1 C#2@1" id="AcCoA"/>
+
+            <rproduct cfg="C#3@1" id="CO2"/>
+
+            <rproduct cfg="" id="NADH"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="TCA2_v23">
+
+            <annotation name="pathway">TCA</annotation>
+
+            <reduct cfg="C#1@1 C#2@1" id="AcCoA"/>
+
+            <reduct cfg="C#1@2 C#2@2 C#3@2 C#4@2" id="OAC"/>
+
+            <rproduct cfg="C#1@1 C#1@2 C#2@1 C#3@2 C#4@2 C#2@2" id="Cit"/>
+
+        </reaction>
+
+        <reaction id="TCA3_v24">
+
+            <annotation name="pathway">TCA</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="Cit"/>
+
+            <rproduct cfg="C#1@1 C#6@1 C#3@1 C#2@1 C#5@1 C#4@1" id="ICit"/>
+
+        </reaction>
+
+        <reaction id="TCA4_v25">
+
+            <annotation name="pathway">TCA</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="ICit"/>
+
+            <reduct cfg="" id="NADP"/>
+
+            <rproduct cfg="C#2@1 C#1@1 C#4@1 C#3@1 C#6@1" id="AKG"/>
+
+            <rproduct cfg="C#5@1" id="CO2"/>
+
+            <rproduct cfg="" id="NADPH"/>
+
+        </reaction>
+
+        <reaction id="TCA7_v26">
+
+            <annotation name="pathway">TCA</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="AKG"/>
+
+            <reduct cfg="" id="NAD"/>
+
+            <rproduct cfg="C#2@1 C#1@1 C#4@1 C#3@1" id="SucCoA"/>
+
+            <rproduct cfg="C#5@1" id="CO2"/>
+
+            <rproduct cfg="" id="NADH"/>
+
+        </reaction>
+
+        <reaction id="TCA6_v27___1 TCA6_v27___2">
+
+            <annotation name="pathway">TCA</annotation>
+
+            <annotation name="name">TCA6_v27</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1" id="SucCoA"/>
+
+            <reduct cfg="" id="ADP"/>
+
+            <reduct cfg="" id="Pi"/>
+
+            <rproduct id="Suc">
+
+                <variant cfg="C#1@1 C#2@1 C#3@1 C#4@1"/>
+
+                <variant cfg="C#2@1 C#1@1 C#4@1 C#3@1"/>
+
+            </rproduct>
+
+            <rproduct cfg="" id="ATP"/>
+
+        </reaction>
+
+        <reaction id="TCA7_v28___1 TCA7_v28___2">
+
+            <annotation name="pathway">TCA</annotation>
+
+            <annotation name="name">TCA7_v28</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1" id="Suc"/>
+
+            <reduct cfg="" id="FAD"/>
+
+            <rproduct id="Fum">
+
+                <variant cfg="C#1@1 C#2@1 C#3@1 C#4@1"/>
+
+                <variant cfg="C#2@1 C#1@1 C#4@1 C#3@1"/>
+
+            </rproduct>
+
+            <rproduct cfg="" id="FADH2"/>
+
+        </reaction>
+
+        <reaction id="TCA8_v29___1 TCA8_v29___2">
+
+            <annotation name="pathway">TCA</annotation>
+
+            <annotation name="name">TCA8_v29</annotation>
+
+            <reduct id="Fum">
+
+                <variant cfg="C#1@1 C#2@1 C#3@1 C#4@1"/>
+
+                <variant cfg="C#2@1 C#1@1 C#4@1 C#3@1"/>
+
+            </reduct>
+
+            <rproduct cfg="C#2@1 C#1@1 C#4@1 C#3@1" id="Mal"/>
+
+        </reaction>
+
+        <reaction id="TCA9_v30">
+
+            <annotation name="pathway">TCA</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1" id="Mal"/>
+
+            <reduct cfg="" id="NAD"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#3@1 C#4@1" id="OAC"/>
+
+            <rproduct cfg="" id="NADH"/>
+
+        </reaction>
+
+        <reaction id="GOX1_v31___1 GOX1_v31___2">
+
+            <annotation name="pathway">Glyox</annotation>
+
+            <annotation name="name">GOX1_v31</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="ICit"/>
+
+            <rproduct cfg="C#4@1 C#6@1" id="Glyox"/>
+
+            <rproduct id="Suc">
+
+                <variant cfg="C#1@1 C#2@1 C#3@1 C#5@1"/>
+
+                <variant cfg="C#2@1 C#1@1 C#5@1 C#3@1"/>
+
+            </rproduct>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="GOX2_v32">
+
+            <annotation name="pathway">Glyox</annotation>
+
+            <reduct cfg="C#1@2 C#2@2" id="AcCoA"/>
+
+            <reduct cfg="C#1@1 C#2@1" id="Glyox"/>
+
+            <rproduct cfg="C#1@2 C#1@1 C#2@2 C#2@1" id="Mal"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="ANA1_v33">
+
+            <annotation name="pathway">Amphibolic R.</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1" id="Mal"/>
+
+            <reduct cfg="" id="NADP"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#4@1" id="Pyr"/>
+
+            <rproduct cfg="C#3@1" id="CO2"/>
+
+            <rproduct cfg="" id="NADPH"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="ANA2_v34">
+
+            <annotation name="pathway">Amphibolic R.</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1" id="Mal"/>
+
+            <reduct cfg="" id="NAD"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#4@1" id="Pyr"/>
+
+            <rproduct cfg="C#3@1" id="CO2"/>
+
+            <rproduct cfg="" id="NADH"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="ANA3_v35">
+
+            <annotation name="pathway">Amphibolic R.</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="PEP"/>
+
+            <reduct cfg="C#1@2" id="CO2"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#1@2 C#3@1" id="OAC"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="ANA4_v36">
+
+            <annotation name="pathway">Amphibolic R.</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1" id="OAC"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#4@1" id="PEP"/>
+
+            <rproduct cfg="C#3@1" id="CO2"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+        </reaction>
+
+        <reaction id="MAC1_minus_v37">
+
+            <annotation name="pathway">Mixed Acid Fermentation</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="Lact"/>
+
+            <reduct cfg="" id="NAD"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#3@1" id="Pyr"/>
+
+            <rproduct cfg="" id="NADH"/>
+
+        </reaction>
+
+        <reaction id="MAC2_v38">
+
+            <annotation name="pathway">Mixed Acid Fermentation</annotation>
+
+            <reduct cfg="C#1@1 C#2@1" id="AcCoA"/>
+
+            <reduct cfg="" id="ADP"/>
+
+            <reduct cfg="" id="Pi"/>
+
+            <rproduct cfg="C#1@1 C#2@1" id="Ac"/>
+
+            <rproduct cfg="" id="ATP"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AA1_v39">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="AKG"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <reduct cfg="" id="NH3"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="Glu"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AA2_v40">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="Glu"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="" id="NH3"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="Gln"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AA3_v41">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="Glu"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <rproduct cfg="C#2@1 C#1@1 C#4@1 C#3@1 C#5@1" id="Pro"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AA4_v42">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@9 C#2@9 C#3@9 C#4@9 C#5@9" id="Glu"/>
+
+            <reduct cfg="C#1@7" id="CO2"/>
+
+            <reduct cfg="C#1@10 C#2@10 C#3@10 C#4@10 C#5@10" id="Gln"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <reduct cfg="C#1@11 C#2@11 C#3@11 C#4@11" id="Asp"/>
+
+            <reduct cfg="C#1@8 C#2@8" id="AcCoA"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <rproduct cfg="C#2@9 C#1@9 C#4@9 C#3@9 C#5@9 C#1@7" id="Arg"/>
+
+            <rproduct cfg="C#1@10 C#2@10 C#3@10 C#4@10 C#5@10" id="AKG"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="C#2@11 C#1@11 C#4@11 C#3@11" id="Fum"/>
+
+            <rproduct cfg="C#1@8 C#2@8" id="Ac"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AA5_v43">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@2 C#2@2 C#3@2 C#4@2" id="OAC"/>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="Glu"/>
+
+            <rproduct cfg="C#1@2 C#2@2 C#3@2 C#4@2" id="Asp"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="AKG"/>
+
+        </reaction>
+
+
+        <reaction bidirectional="false" id="AA6_v44">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@3 C#2@3 C#3@3 C#4@3" id="Asp"/>
+
+            <reduct cfg="" id="NH3"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <rproduct cfg="C#1@3 C#2@3 C#3@3 C#4@3" id="Asn"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AA23_v45">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@2 C#2@2 C#3@2" id="Pyr"/>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="Glu"/>
+
+            <rproduct cfg="C#1@2 C#2@2 C#3@2" id="Ala"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="AKG"/>
+
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AA7_v46">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="_3PG"/>
+
+            <reduct cfg="C#1@2 C#2@2 C#3@2 C#4@2 C#5@2" id="Glu"/>
+
+            <reduct cfg="" id="NAD"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#3@1" id="Ser"/>
+
+            <rproduct cfg="" id="NADH"/>
+
+            <rproduct cfg="C#1@2 C#2@2 C#3@2 C#4@2 C#5@2" id="AKG"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+        </reaction>
+
+        <reaction id="AA8_v47">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="Ser"/>
+
+            <reduct cfg="" id="THF"/>
+
+            <rproduct cfg="C#2@1 C#3@1" id="Gly"/>
+
+            <rproduct cfg="C#1@1" id="MEETHF"/>
+
+        </reaction>
+
+        <reaction id="AA9_v48">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@1 C#2@1" id="Gly"/>
+
+            <reduct cfg="" id="THF"/>
+
+            <reduct cfg="" id="NAD"/>
+
+            <rproduct cfg="C#2@1" id="CO2"/>
+
+            <rproduct cfg="C#1@1" id="MEETHF"/>
+
+            <rproduct cfg="" id="NH3"/>
+
+            <rproduct cfg="" id="NADH"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AA10_v49">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1" id="Thr"/>
+
+            <reduct cfg="" id="NAD"/>
+
+            <rproduct cfg="C#3@1 C#4@1" id="Gly"/>
+
+            <rproduct cfg="C#1@1 C#2@1" id="AcCoA"/>
+
+            <rproduct cfg="" id="NADH"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AA11_v50">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@10 C#2@10 C#3@10" id="Ser"/>
+
+            <reduct cfg="C#1@1 C#2@1" id="AcCoA"/>
+
+            <reduct cfg="" id="SO4"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <rproduct cfg="C#1@10 C#2@10 C#3@10" id="Cys"/>
+
+            <rproduct cfg="C#1@1 C#2@1" id="Ac"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AA12_v51___1 AA12_v51___2 AA12_v51___3 AA12_v51___4">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <annotation name="name">AA12_v51</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1" id="Asp"/>
+
+            <reduct cfg="C#1@6 C#2@6 C#3@6" id="Pyr"/>
+
+            <reduct cfg="C#1@2 C#2@2 C#3@2 C#4@2 C#5@2" id="Glu"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="C#1@5 C#2@5 C#3@5 C#4@5" id="SucCoA"/>
+
+            <rproduct id="LL_DAP">
+
+                <variant cfg="C#3@1 C#1@6 C#1@1 C#2@6 C#2@1 C#3@6 C#4@1"/>
+
+                <variant cfg="C#3@1 C#1@1 C#1@6 C#2@1 C#2@6 C#4@1 C#3@6"/>
+
+            </rproduct>
+
+            <rproduct cfg="C#1@2 C#2@2 C#3@2 C#4@2 C#5@2" id="AKG"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct id="Suc">
+
+                <variant cfg="C#1@5 C#2@5 C#3@5 C#4@5"/>
+
+                <variant cfg="C#2@5 C#1@5 C#4@5 C#3@5"/>
+
+            </rproduct>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AA13_v52___1 AA13_v52___2">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <annotation name="name">AA13_v52</annotation>
+
+            <reduct id="LL_DAP">
+
+                <variant cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1 C#7@1"/>
+
+                <variant cfg="C#1@1 C#3@1 C#2@1 C#5@1 C#4@1 C#7@1 C#6@1"/>
+
+            </reduct>
+
+            <rproduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#7@1" id="Lys"/>
+
+            <rproduct cfg="C#6@1" id="CO2"/>
+
+        </reaction>
+
+
+        <reaction bidirectional="false" id="AA14_v53">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@3 C#2@3 C#3@3 C#4@3" id="Asp"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <rproduct cfg="C#3@3 C#1@3 C#2@3 C#4@3" id="Thr"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AA15_v54___1 AA15_v54___2">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <annotation name="name">AA15_v54</annotation>
+
+            <reduct cfg="C#1@3 C#2@3 C#3@3 C#4@3" id="Asp"/>
+
+            <reduct cfg="C#1@6" id="METHF"/>
+
+            <reduct cfg="C#1@7 C#2@7 C#3@7" id="Cys"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1" id="SucCoA"/>
+
+            <rproduct cfg="C#1@6 C#1@3 C#3@3 C#2@3 C#4@3" id="Met"/>
+
+            <rproduct cfg="C#1@7 C#2@7 C#3@7" id="Pyr"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct id="Suc">
+
+                <variant cfg="C#1@1 C#2@1 C#3@1 C#4@1"/>
+
+                <variant cfg="C#2@1 C#1@1 C#4@1 C#3@1"/>
+
+            </rproduct>
+
+            <rproduct cfg="" id="NH3"/>
+
+            <rproduct cfg="" id="THF"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AA16_v55">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@2 C#2@2 C#3@2" id="Pyr"/>
+
+            <reduct cfg="C#1@3 C#2@3 C#3@3" id="Pyr"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <reduct cfg="C#1@4 C#2@4 C#3@4 C#4@4 C#5@4" id="Glu"/>
+
+            <rproduct cfg="C#1@2 C#2@2 C#1@3 C#2@3 C#3@3" id="Val"/>
+
+            <rproduct cfg="C#3@2" id="CO2"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="C#1@4 C#2@4 C#3@4 C#4@4 C#5@4" id="AKG"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AA17_v56">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@3 C#2@3 C#3@3" id="Pyr"/>
+
+            <reduct cfg="C#1@4 C#2@4 C#3@4" id="Pyr"/>
+
+            <reduct cfg="C#1@2 C#2@2" id="AcCoA"/>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="Glu"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <reduct cfg="" id="NAD"/>
+
+            <rproduct cfg="C#1@4 C#1@3 C#2@4 C#2@3 C#1@2 C#2@2" id="Leu"/>
+
+            <rproduct cfg="C#3@3" id="CO2"/>
+
+            <rproduct cfg="C#3@4" id="CO2"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="AKG"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="" id="NADH"/>
+
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AA18_v57">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@3 C#2@3 C#3@3 C#4@3" id="Thr"/>
+
+            <reduct cfg="C#1@4 C#2@4 C#3@4" id="Pyr"/>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="Glu"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <rproduct cfg="C#1@4 C#2@3 C#1@3 C#2@4 C#3@3 C#4@3" id="Ile"/>
+
+            <rproduct cfg="C#3@4" id="CO2"/>
+
+            <rproduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="AKG"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="" id="NH3"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AA19_v58">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@5 C#2@5 C#3@5 C#4@5" id="E4P"/>
+
+            <reduct cfg="C#1@3 C#2@3 C#3@3" id="PEP"/>
+
+            <reduct cfg="C#1@4 C#2@4 C#3@4" id="PEP"/>
+
+            <reduct cfg="C#1@6 C#2@6 C#3@6 C#4@6 C#5@6" id="Glu"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <rproduct cfg="C#3@5 C#1@5 C#4@5 C#1@4 C#2@5 C#1@3 C#2@4 C#2@3 C#3@3" id="Phe"/>
+
+            <rproduct cfg="C#3@4" id="CO2"/>
+
+            <rproduct cfg="C#1@6 C#2@6 C#3@6 C#4@6 C#5@6" id="AKG"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AA20_v59">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@5 C#2@5 C#3@5 C#4@5" id="E4P"/>
+
+            <reduct cfg="C#1@3 C#2@3 C#3@3" id="PEP"/>
+
+            <reduct cfg="C#1@4 C#2@4 C#3@4" id="PEP"/>
+
+            <reduct cfg="C#1@2 C#2@2 C#3@2 C#4@2 C#5@2" id="Glu"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <reduct cfg="" id="NAD"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <rproduct cfg="C#1@4 C#2@5 C#1@5 C#4@5 C#1@3 C#2@4 C#3@5 C#2@3 C#3@3" id="Tyr"/>
+
+            <rproduct cfg="C#3@4" id="CO2"/>
+
+            <rproduct cfg="C#1@2 C#2@2 C#3@2 C#4@2 C#5@2" id="AKG"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="" id="NADH"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AA21_v60">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@8 C#2@8 C#3@8 C#4@8" id="E4P"/>
+
+            <reduct cfg="C#1@6 C#2@6 C#3@6" id="PEP"/>
+
+            <reduct cfg="C#1@7 C#2@7 C#3@7" id="PEP"/>
+
+            <reduct cfg="C#1@10 C#2@10 C#3@10 C#4@10 C#5@10" id="R5P"/>
+
+            <reduct cfg="C#1@5 C#2@5 C#3@5" id="Ser"/>
+
+            <reduct cfg="C#1@4 C#2@4 C#3@4 C#4@4 C#5@4" id="Gln"/>
+
+            <reduct cfg="" id="NADPH"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <rproduct cfg="C#3@8 C#4@8 C#1@8 C#2@8 C#1@5 C#5@10 C#4@10 C#1@6 C#2@5 C#2@6 C#3@5" id="Trp"/>
+
+            <rproduct cfg="C#3@6" id="CO2"/>
+
+            <rproduct cfg="C#1@7 C#2@7 C#3@7" id="Pyr"/>
+
+            <rproduct cfg="C#3@10 C#1@10 C#2@10" id="GAP"/>
+
+            <rproduct cfg="C#1@4 C#2@4 C#3@4 C#4@4 C#5@4" id="Glu"/>
+
+            <rproduct cfg="" id="NADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+        </reaction>
+
+
+        <reaction bidirectional="false" id="AA22_v61">
+
+            <annotation name="pathway">Amino Acid Biosynthesis</annotation>
+
+            <reduct cfg="C#1@8 C#2@8 C#3@8 C#4@8 C#5@8" id="R5P"/>
+
+            <reduct cfg="C#1@6" id="FTHF"/>
+
+            <reduct cfg="C#1@9 C#2@9 C#3@9 C#4@9 C#5@9" id="Gln"/>
+
+            <reduct cfg="C#1@7 C#2@7 C#3@7 C#4@7" id="Asp"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="" id="ATP"/>
+
+            <reduct cfg="" id="NAD"/>
+
+            <reduct cfg="" id="NAD"/>
+
+            <rproduct cfg="C#3@8 C#5@8 C#1@6 C#4@8 C#2@8 C#1@8" id="His"/>
+
+            <rproduct cfg="" id="NADH"/>
+
+            <rproduct cfg="" id="NADH"/>
+
+            <rproduct cfg="C#1@9 C#2@9 C#3@9 C#4@9 C#5@9" id="AKG"/>
+
+            <rproduct cfg="C#2@7 C#1@7 C#4@7 C#3@7" id="Fum"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+            <rproduct cfg="" id="THF"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="C1_v62">
+
+            <annotation name="pathway">One Carbon Metabolism</annotation>
+
+            <reduct cfg="C#1@1" id="MEETHF"/>
+
+            <reduct cfg="" id="NADH"/>
+
+            <rproduct cfg="C#1@1" id="METHF"/>
+
+            <rproduct cfg="" id="NAD"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="C2_v63">
+
+            <annotation name="pathway">One Carbon Metabolism</annotation>
+
+            <reduct cfg="C#1@1" id="MEETHF"/>
+
+            <reduct cfg="" id="NADP"/>
+
+            <rproduct cfg="C#1@1" id="FTHF"/>
+
+            <rproduct cfg="" id="NADPH"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="OXP1_v64">
+
+            <annotation name="pathway">Oxidative Phosphorylation</annotation>
+
+            <!-- <comment>use half reaction rate of match nature protocol https://www.nature.com/articles/s41596-019-0204-0#MOESM5</comment> -->
+
+            <reduct cfg="" id="NADH"/>
+
+            <reduct cfg="" id="NADH"/>
+
+            <reduct cfg="" id="O2"/>
+
+            <reduct cfg="" id="ADP"/>
+
+            <reduct cfg="" id="ADP"/>
+
+            <reduct cfg="" id="ADP"/>
+
+            <reduct cfg="" id="Pi"/>
+
+            <reduct cfg="" id="Pi"/>
+
+            <reduct cfg="" id="Pi"/>
+
+            <rproduct id="NAD"/>
+
+            <rproduct id="NAD"/>
+
+            <rproduct id="ATP"/>
+
+            <rproduct id="ATP"/>
+
+            <rproduct id="ATP"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="OXP2_v65">
+
+            <annotation name="pathway">Oxidative Phosphorylation</annotation>
+
+            <!-- <comment>use half reaction rate of match nature protocol https://www.nature.com/articles/s41596-019-0204-0#MOESM5</comment> -->
+
+            <reduct cfg="" id="FADH2"/>
+
+            <reduct cfg="" id="FADH2"/>
+
+            <reduct cfg="" id="O2"/>
+
+            <reduct cfg="" id="ADP"/>
+
+            <reduct cfg="" id="Pi"/>
+
+            <rproduct id="FAD"/>
+
+            <rproduct id="FAD"/>
+
+            <rproduct id="ATP"/>
+
+        </reaction>
+
+        <reaction id="TH1_v66">
+
+            <annotation name="pathway">Transhydrogenation</annotation>
+
+            <reduct cfg="" id="NADH"/>
+
+            <reduct cfg="" id="NADP"/>
+
+            <rproduct id="NADPH"/>
+
+            <rproduct id="NAD"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="ATPH1_v67">
+
+            <annotation name="pathway">ATP Hydrolysis</annotation>
+
+            <reduct cfg="" id="ATP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+        </reaction>
+
+
+        <reaction id="TP1_v68">
+
+            <annotation name="pathway">Transport</annotation>
+
+            <reduct cfg="C#1@1 C#2@1" id="Ac"/>
+
+        </reaction>
+
+        <reaction id="TP2_v69">
+
+            <annotation name="pathway">Transport</annotation>
+
+            <reduct cfg="C#1@1" id="CO2"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="TP3_v70">
+
+            <annotation name="pathway">Transport</annotation>
+
+            <reduct cfg="" id="O2_ext"/>
+
+            <rproduct id="O2"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="TP4_v71">
+
+            <annotation name="pathway">Transport</annotation>
+
+            <reduct cfg="" id="NH3_ext"/>
+
+            <rproduct id="NH3"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="TP5_v72">
+
+            <annotation name="pathway">Transport</annotation>
+
+            <reduct cfg="" id="SO4_ext"/>
+
+            <rproduct id="SO4"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="TP6_v73">
+
+            <annotation name="pathway">Transport</annotation>
+
+            <reduct cfg="" id="Pi_ext"/>
+
+            <rproduct id="Pi"/>
+
+        </reaction>
+
+
+        <reaction bidirectional="false" id="GAS1_CO2_ext">
+
+            <annotation name="pathway">Diluation reactions</annotation>
+
+            <reduct cfg="C#1@1" id="CO2_unlabeled_in"/>
+
+            <rproduct cfg="C#1@1" id="CO2_unlabeled"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="GAS2_v74">
+
+            <annotation name="pathway">Diluation reactions</annotation>
+
+            <reduct cfg="C#1@1" id="CO2_unlabeled"/>
+
+            <reduct cfg="C#1@2" id="CO2"/>
+
+            <rproduct cfg="C#1@1" id="CO2_aux"/>
+
+            <rproduct cfg="C#1@2" id="CO2_out"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="GAS2_v74_aux">
+
+            <annotation name="pathway">Diluation reactions</annotation>
+
+            <reduct cfg="C#1@1" id="CO2_aux"/>
+
+            <rproduct cfg="C#1@1" id="CO2"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="GAS3_CO2_out">
+
+            <annotation name="pathway">Diluation Reactions</annotation>
+
+            <reduct cfg="C#1@1" id="CO2_out"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="mu2_v75">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="" id="BM"/>
+
+            <rproduct id="BM_out"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Arg_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="Arg"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="G6P_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="G6P"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="F6P_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="F6P"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="R5P_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="R5P"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="_3PG_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="_3PG"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="PEP_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="PEP"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Pyr_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="Pyr"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AcCoA_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1" id="AcCoA"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="AKG_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="AKG"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="OAC_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1" id="OAC"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Tyr_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1 C#7@1 C#8@1 C#9@1" id="Tyr"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Phe_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1 C#7@1 C#8@1 C#9@1" id="Phe"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Ala_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="Ala"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Val_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="Val"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="mu_1">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="" id="BM_ext"/>
+
+            <rproduct id="BM"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Pro_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="Pro"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Gln_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="Gln"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Glu_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="Glu"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Asn_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1" id="Asn"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Ile_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="Ile"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Met_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1" id="Met"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Ser_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="Ser"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Gly_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1" id="Gly"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Cys_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="Cys"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="MEETHF_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1" id="MEETHF"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="THF_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="" id="THF_ext"/>
+
+            <rproduct cfg="" id="THF"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Pi_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="" id="Pi_ext"/>
+
+            <rproduct cfg="" id="Pi"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Lys_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="Lys"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="GAP_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1" id="GAP"/>
+
+        </reaction>
+
+
+        <reaction bidirectional="false" id="His_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="His"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Trp_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1 C#7@1 C#8@1 C#9@1 C#10@1 C#11@1" id="Trp"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Thr_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1" id="Thr"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Leu_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1 C#5@1 C#6@1" id="Leu"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="Asp_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="C#1@1 C#2@1 C#3@1 C#4@1" id="Asp"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="NH3_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="" id="NH3"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="NAD_to_NADH_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct id="NAD"/>
+
+            <rproduct id="NADH"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="NADPH_to_NADP_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct id="NADPH"/>
+
+            <rproduct id="NADP"/>
+
+        </reaction>
+
+        <reaction bidirectional="false" id="ATP_to_ADP_bm">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="" id="ATP"/>
+
+            <rproduct cfg="" id="ADP"/>
+
+        </reaction>
+
+
+        <reaction bidirectional="false" id="mu_3">
+
+            <annotation name="pathway">Biomass</annotation>
+
+            <reduct cfg="" id="BM_out"/>
+
+        </reaction>
+
+    </reactionnetwork>
+
+    <constraints>
+
+        <net>
+            <!-- ' 0.48281 Ala + 0.27801 Arg + 0.23758 Asn + 0.23758 Asp + 0.086075 Cys + 0.28666 Glu + 0.28666 Gln + 0.44833 Gly + 0.081498 His + 0.21323 Ile + 0.37635 Leu + 0.27357 Lys + 0.10967 Met + 0.15213 Phe + 0.17727 Pro + 0.23795 Ser + 0.24982 Thr + 0.1388 Tyr + 0.30822 Val + 0.35453 G6P + 0.0709 F6P + 0.089531 GAP + 0.49154 3PG + 0.0828 Pyr + 1.8523 AcCoA + 0.0869 AKG + 0.27698 OAC + 0.053426 Trp + 0.60289 R5P + 0.0511 PEP + 31.2511 ATP + 4.1067 NADPH + 0.35471 MEETHF + 1.1516 NAD + 2.863 NH3 -> 1.1516 NADH + 31.2511 ADP + 4.1067 NADP + 0.35471 THF + 32.2192 Pi + 35.9152 Biomass_tpiA' -->
+            <textual>
+                0=0.48281*mu2_v75-Ala_bm;
+                0=0.27801*mu2_v75-Arg_bm;
+                0=0.23758*mu2_v75-Asn_bm;
+                0=0.23758*mu2_v75-Asp_bm;
+                0=0.086075*mu2_v75-Cys_bm;
+                0=0.28666*mu2_v75-Glu_bm;
+                0=0.28666*mu2_v75-Gln_bm;
+                0=0.44833*mu2_v75-Gly_bm;
+                0=0.081498*mu2_v75-His_bm;
+                0=0.21323*mu2_v75-Ile_bm;
+                0=0.37635*mu2_v75-Leu_bm;
+                0=0.27357*mu2_v75-Lys_bm;
+                0=0.10967*mu2_v75-Met_bm;
+                0=0.15213*mu2_v75-Phe_bm;
+                0=0.17727*mu2_v75-Pro_bm;
+                0=0.23795*mu2_v75-Ser_bm;
+                0=0.24982*mu2_v75-Thr_bm;
+                0=0.1388*mu2_v75-Tyr_bm;
+                0=0.30822*mu2_v75-Val_bm;
+                0=0.35453*mu2_v75-G6P_bm;
+                0=0.0709*mu2_v75-F6P_bm;
+                0=0.089531*mu2_v75-GAP_bm;
+                0=0.49154*mu2_v75-_3PG_bm;
+                0=0.0828*mu2_v75-Pyr_bm;
+                0=1.8523*mu2_v75-AcCoA_bm;
+                0=0.0869*mu2_v75-AKG_bm;
+                0=0.27698*mu2_v75-OAC_bm;
+                0=0.053426*mu2_v75-Trp_bm;
+                0=0.60289*mu2_v75-R5P_bm;
+                0=0.0511*mu2_v75-PEP_bm;
+                <!-- cofactors for biomass-->
+                0=1.1516*mu2_v75-NAD_to_NADH_bm;
+                0=4.1067*mu2_v75-NADPH_to_NADP_bm;
+                0=31.2511*mu2_v75-ATP_to_ADP_bm;
+                0=2.863*mu2_v75-NH3_bm;
+                0=0.35471*mu2_v75-MEETHF_bm;
+                0=0.35471*mu2_v75-THF_bm;
+                0=32.2192*mu2_v75-Pi_bm;
+
+                EMP1_v1=Glc_upt;
+                GAS2_v74_aux=GAS2_v74;
+                mu2_v75>=0;
+                MAC2_v38>=0;
+                Glc_upt>=0;
+
+                GAS2_v74&lt;=25;
+                EMP2_v2&gt;=0;
+            </textual>
+
+        </net>
+
+        <xch>
+
+            <textual>
+                GOX1_v31___1+GOX1_v31___2&lt;=20000;
+                TCA6_v27___1+TCA6_v27___2&lt;=20000;
+                TCA7_v28___1+TCA7_v28___2&lt;=20000;
+                TCA8_v29___1+TCA8_v29___2&lt;=20000;
+            </textual>
+
+        </xch>
+
+    </constraints>
+
+    <configuration name="[U]Gluc" stationary="true">
+
+        <input pool="Gluc_ext" type="isotopomer">
+          <label cfg="000000" purity="0.996">0.8</label>
+          <label cfg="111111" purity="0.996">0.2</label>
+        </input>
+
+        <input pool="BM_ext" type="isotopomer"/>
+
+        <input pool="CO2_unlabeled_in" type="isotopomer">
+
+            <label cfg="0">1.0</label>
+
+        </input>
+
+        <input pool="O2_ext" type="isotopomer"/>
+
+        <input pool="NH3_ext" type="isotopomer"/>
+
+        <input pool="SO4_ext" type="isotopomer"/>
+
+        <input pool="Pi_ext" type="isotopomer"/>
+
+        <input pool="THF_ext" type="isotopomer"/>
+
+        <measurement>
+            <model>
+                <labelingmeasurement>
+                    <group id="ms_group_0_ala_232" scale="auto">
+                        <textual>Ala[1,2]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_1_ala_260" scale="auto">
+                        <textual>Ala#M0,1,2,3</textual>
+                    </group>
+                    <group id="ms_group_2_gly_218" scale="auto">
+                        <textual>Gly[1]#M0,1</textual>
+                    </group>
+                    <group id="ms_group_3_gly_246" scale="auto">
+                        <textual>Gly#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_4_val_260" scale="auto">
+                        <textual>Val[1-4]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_5_val_288" scale="auto">
+                        <textual>Val#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_6_leu_274" scale="auto">
+                        <textual>Leu[1-5]#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_7_ile_274" scale="auto">
+                        <textual>Ile[1-5]#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_8_pro_258" scale="auto">
+                        <textual>Pro[1-4]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_9_met_218" scale="auto">
+                        <textual>Met[1-4]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_10_met_320" scale="auto">
+                        <textual>Met#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_11_ser_362" scale="auto">
+                        <textual>Ser[1,2]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_12_ser_390" scale="auto">
+                        <textual>Ser#M0,1,2,3</textual>
+                    </group>
+                    <group id="ms_group_13_thr_376" scale="auto">
+                        <textual>Thr[1-3]#M0,1,2,3</textual>
+                    </group>
+                    <group id="ms_group_14_ser_404" scale="auto">
+                        <textual>Thr#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_15_phe_302" scale="auto">
+                        <textual>Phe[8,9]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_16_phe_308" scale="auto">
+                        <textual>Phe[1-8]#M0,1,2,3,4,5,6,7,8</textual>
+                    </group>
+                    <group id="ms_group_17_phe_336" scale="auto">
+                        <textual>Phe#M0,1,2,3,4,5,6,7,8,9</textual>
+                    </group>
+                    <group id="ms_group_18_asp_302" scale="auto">
+                        <textual>Asp[2,4]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_19_asp_390" scale="auto">
+                        <textual>Asp[1-3]#M0,1,2,3</textual>
+                    </group>
+                    <group id="ms_group_20_asp_418" scale="auto">
+                        <textual>Asp#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_21_glu_330" scale="auto">
+                        <textual>Glu[1-4]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_22_glu_432" scale="auto">
+                        <textual>Glu#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_23_lys_329" scale="auto">
+                        <textual>Lys[1-5]#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_24_lys_431" scale="auto">
+                        <textual>Lys#M0,1,2,3,4,5,6</textual>
+                    </group>
+                    <!-- was not measured in nat prot https://www.nature.com/articles/s41596-019-0204-0#Sec49
+                    <group id="ms_group_25_his_338" scale="auto">
+                        <textual>His[1-5]#M0,1,2,3,4,5</textual>
+                    </group>
+                    group id="ms_group_26_his_440" scale="auto">
+                        <textual>His#M0,1,2,3,4,5,6</textual>
+                    </group>
+                    -->
+                    <group id="ms_group_27_tyr_302" scale="auto">
+                        <textual>Tyr[8,9]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_28_r5p_173" scale="auto">
+                        <textual>R5P[1,2]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_29_r5p_284" scale="auto">
+                        <textual>R5P[2-5]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_30_g6p_173" scale="auto">
+                        <textual>G6P[1,2]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_31_g6p_370" scale="auto">
+                        <textual>G6P[2-6]#M0,1,2,3,4,5</textual>
+                    </group>
+                </labelingmeasurement>
+                <fluxmeasurement>
+                    <netflux id="fp_0">
+                        <textual>mu2_v75</textual>
+                    </netflux>
+                    <netflux id="fp_1">
+                        <textual>Glc_upt</textual>
+                    </netflux>
+                    <netflux id="fp_2">
+                        <textual>MAC2_v38</textual>
+                    </netflux>
+                </fluxmeasurement>
+            </model>
+
+            <data>
+        <datum id="ms_group_28_r5p_173" stddev="0.006" weight="0">0.7682779627995806</datum>
+        <datum id="ms_group_28_r5p_173" stddev="0.006" weight="1">0.04817822223047143</datum>
+        <datum id="ms_group_28_r5p_173" stddev="0.006" weight="2">0.18354381496991964</datum>
+        <datum id="ms_group_15_phe_302" stddev="0.004" weight="0">0.7686318199446794</datum>
+        <datum id="ms_group_15_phe_302" stddev="0.004" weight="1">0.04922271192067169</datum>
+        <datum id="ms_group_15_phe_302" stddev="0.004" weight="2">0.18214546813464091</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="0">0.42956560616567524</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="1">0.197264643168182</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="2">0.19095290176553273</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="3">0.11397627635673889</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="4">0.04674667133864273</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="5">0.017511249994857734</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="6">0.003982651210301771</datum>
+        <datum id="ms_group_18_asp_302" stddev="0.004" weight="0">0.7322202477330892</datum>
+        <datum id="ms_group_18_asp_302" stddev="0.004" weight="1">0.12917971555983018</datum>
+        <datum id="ms_group_18_asp_302" stddev="0.004" weight="2">0.1386000367070579</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="0">0.49327390320603315</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="1">0.2607952060865503</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="2">0.18058145639775663</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="3">0.05420762275093969</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="4">0.011141811558654348</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="0">0.45358957263973776</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="1">0.22095559248841895</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="2">0.22183774857233848</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="3">0.07306497519608518</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="4">0.025409432732660678</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="5">0.005142678370686887</datum>
+        <datum id="ms_group_11_ser_362" stddev="0.004" weight="0">0.7542492747340385</datum>
+        <datum id="ms_group_11_ser_362" stddev="0.004" weight="1">0.07630699074983377</datum>
+        <datum id="ms_group_11_ser_362" stddev="0.004" weight="2">0.16944373451611258</datum>
+        <datum id="ms_group_12_ser_390" stddev="0.004" weight="0">0.7359964949759799</datum>
+        <datum id="ms_group_12_ser_390" stddev="0.004" weight="1">0.06913305242306983</datum>
+        <datum id="ms_group_12_ser_390" stddev="0.004" weight="2">0.03226028856956245</datum>
+        <datum id="ms_group_12_ser_390" stddev="0.004" weight="3">0.16261016403137596</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="0">0.5511050176248783</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="1">0.19026735775692685</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="2">0.1821156523761041</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="3">0.059886642339488094</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="4">0.01662532990255088</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="0">0.6918045208323523</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="1">0.05205895527234519</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="2">0.06302072541158757</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="3">0.04927395019917144</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="4">0.0070395859646241584</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="5">0.1368022623199102</datum>
+        <datum id="ms_group_30_g6p_173" stddev="0.006" weight="0">0.7807296984317029</datum>
+        <datum id="ms_group_30_g6p_173" stddev="0.006" weight="1">0.023267322105026873</datum>
+        <datum id="ms_group_30_g6p_173" stddev="0.006" weight="2">0.19600297946326486</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="0">0.38996004786760097</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="1">0.12108860659471693</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="2">0.2355421366241905</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="3">0.06794069132362679</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="4">0.11557583734470794</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="5">0.02789797757421483</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="6">0.03442245861569428</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="7">0.004174973190375365</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="8">0.003397270864809809</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="0">0.37933610919252886</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="1">0.11665679225283249</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="2">0.16105079085467605</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="3">0.13463662897387135</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="4">0.10528031935717073</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="5">0.05052428155919052</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="6">0.026974877155962564</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="7">0.019152216593026166</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="8">0.0031593997863527522</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="9">0.0032285842743269367</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="0">0.45300862798401503</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="1">0.21861662746666335</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="2">0.2235471380329753</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="3">0.07356665004819177</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="4">0.025896783804490526</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="5">0.005364172663592784</datum>
+        <datum id="ms_group_2_gly_218" stddev="0.004" weight="0">0.7925578386907521</datum>
+        <datum id="ms_group_2_gly_218" stddev="0.004" weight="1">0.20744216130922163</datum>
+        <datum id="ms_group_3_gly_246" stddev="0.004" weight="0">0.7475865768350063</datum>
+        <datum id="ms_group_3_gly_246" stddev="0.004" weight="1">0.09549588881799005</datum>
+        <datum id="ms_group_3_gly_246" stddev="0.004" weight="2">0.15691753434698708</datum>
+        <datum id="ms_group_13_thr_376" stddev="0.006" weight="0">0.5965145364843967</datum>
+        <datum id="ms_group_13_thr_376" stddev="0.006" weight="1">0.2360658779181173</datum>
+        <datum id="ms_group_13_thr_376" stddev="0.006" weight="2">0.13670060461236716</datum>
+        <datum id="ms_group_13_thr_376" stddev="0.006" weight="3">0.03071898098506185</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="0">0.5767277975328229</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="1">0.10017321551206708</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="2">0.2695729517195603</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="3">0.02303361566306345</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="4">0.030492419572457654</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="0">0.6490477258950736</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="1">0.05267947704485229</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="2">0.20063661640578004</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="3">0.014163386767551762</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="4">0.08347279388667615</datum>
+        <datum id="ms_group_19_asp_390" stddev="0.004" weight="0">0.5965145364843967</datum>
+        <datum id="ms_group_19_asp_390" stddev="0.004" weight="1">0.2360658779181173</datum>
+        <datum id="ms_group_19_asp_390" stddev="0.004" weight="2">0.13670060461236716</datum>
+        <datum id="ms_group_19_asp_390" stddev="0.004" weight="3">0.03071898098506185</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="0">0.4727231022368776</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="1">0.31086783778230226</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="2">0.1573213421545028</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="3">0.05271277391092266</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="4">0.006374943915322791</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="0">0.453008627984015</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="1">0.21861662746666333</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="2">0.22354713803297527</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="3">0.07356665004819177</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="4">0.02589678380449053</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="5">0.005364172663592784</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="0">0.560940173599967</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="1">0.09877547439815891</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="2">0.15660909498377815</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="3">0.13867811671936003</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="4">0.016221418532838164</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="5">0.028775721765868782</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="0">0.5511050176248783</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="1">0.19026735775692685</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="2">0.1821156523761041</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="3">0.05988664233948809</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="4">0.01662532990255088</datum>
+        <datum id="ms_group_27_tyr_302" stddev="0.004" weight="0">0.7686318199446796</datum>
+        <datum id="ms_group_27_tyr_302" stddev="0.004" weight="1">0.049222711920671694</datum>
+        <datum id="ms_group_27_tyr_302" stddev="0.004" weight="2">0.18214546813464094</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="0">0.45719867799312586</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="1">0.19894103951018993</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="2">0.23446418566777896</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="3">0.07412986921074564</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="4">0.028946552929782966</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="5">0.0063196746883408764</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="0">0.4932739032060332</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="1">0.2607952060865503</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="2">0.18058145639775663</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="3">0.05420762275093969</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="4">0.011141811558654348</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="0">0.43673717513295873</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="1">0.2651500449565131</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="2">0.18380733168806332</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="3">0.08525216745855829</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="4">0.025603116002383908</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="5">0.0034501647614561125</datum>
+        <datum id="ms_group_0_ala_232" stddev="0.004" weight="0">0.7594259658010272</datum>
+        <datum id="ms_group_0_ala_232" stddev="0.004" weight="1">0.06595324628280677</datum>
+        <datum id="ms_group_0_ala_232" stddev="0.004" weight="2">0.17462078791615177</datum>
+        <datum id="ms_group_1_ala_260" stddev="0.004" weight="0">0.738637074396447</datum>
+        <datum id="ms_group_1_ala_260" stddev="0.004" weight="1">0.0659181589400567</datum>
+        <datum id="ms_group_1_ala_260" stddev="0.004" weight="2">0.03065498356110478</datum>
+        <datum id="ms_group_1_ala_260" stddev="0.004" weight="3">0.16478978310237677</datum>
+        <datum id="fp_1" stddev="0.165">3.3</datum>
+        <datum id="fp_0" stddev="0.009519394031220662">0.19038788062441322</datum>
+        <datum id="fp_2" stddev="0.07158987">1.4317974</datum>
+            </data>
+        </measurement>
+
+        <simulation method="auto" type="auto">
+	    <variables>
+                <fluxvalue flux="Glc_upt" type="net">3.3</fluxvalue>
+                <fluxvalue flux="mu2_v75" type="net">0.19038788062441322</fluxvalue>
+                <fluxvalue flux="MAC2_v38" type="net">1.4317974</fluxvalue>
+
+                <fluxvalue flux="EMP7_v7" type="net">2.772088706838619</fluxvalue>
+                <fluxvalue flux="TCA1_v22" type="net">5.557377836090755</fluxvalue>
+                <fluxvalue flux="TCA9_v30" type="net">3.4123091938942047</fluxvalue>
+                <fluxvalue flux="ANA2_v34" type="net">0.00003</fluxvalue>
+                <fluxvalue flux="ANA3_v35" type="net">0.6600211206758616</fluxvalue>
+                <fluxvalue flux="TH1_v66" type="net">0.03630116163717239</fluxvalue>
+                <fluxvalue flux="ATPH1_v67" type="net">21.06457406637012</fluxvalue>
+                <fluxvalue flux="GAS2_v74" type="net">15.92960974751192</fluxvalue>
+
+                <fluxvalue flux="AA8_v47" type="xch">0.013200422413517232</fluxvalue>
+                <fluxvalue flux="AA9_v48" type="xch">0.0</fluxvalue>
+                <fluxvalue flux="EMP2_v2" type="xch">66.00211206758615</fluxvalue>
+                <fluxvalue flux="EMP4_v4" type="xch">3.4684109891516526</fluxvalue>
+                <fluxvalue flux="EMP6_v6" type="xch">1.6038513232423437</fluxvalue>
+                <fluxvalue flux="EMP7_v7" type="xch">3.71921901500848</fluxvalue>
+                <fluxvalue flux="EMP8_v8" type="xch">1.9569626228039296</fluxvalue>
+                <fluxvalue flux="GOX1_v31___1" type="xch">0.0</fluxvalue>
+                <fluxvalue flux="MAC1_minus_v37" type="xch">7.025924829594547</fluxvalue>
+                <fluxvalue flux="MAC2_v38" type="xch">3.2869051809657908</fluxvalue>
+                <fluxvalue flux="PPP3_v11" type="xch">1.6764536465166884</fluxvalue>
+                <fluxvalue flux="PPP4_v12" type="xch">261.6092714966879</fluxvalue>
+                <fluxvalue flux="PPP5_v13" type="xch">0.739223655156965</fluxvalue>
+                <fluxvalue flux="PPP6_v14" type="xch">0.2508080258568274</fluxvalue>
+                <fluxvalue flux="PPP7_minus_v15" type="xch">0.06930221767096548</fluxvalue>
+                <fluxvalue flux="PPP8_minus_v16" type="xch">1.5807505840186884</fluxvalue>
+                <fluxvalue flux="PPP9_v17" type="xch">1.1055353771320682</fluxvalue>
+                <fluxvalue flux="TCA3_v24" type="xch">15.229987359595507</fluxvalue>
+                <fluxvalue flux="TCA4_v25" type="xch">0.13200422413517232</fluxvalue>
+                <fluxvalue flux="TCA6_v27___1" type="xch">0.663321226279241</fluxvalue>
+                <fluxvalue flux="TCA7_v26" type="xch">0.08580274568786202</fluxvalue>
+                <fluxvalue flux="TCA7_v28___1" type="xch">154.29643748599955</fluxvalue>
+                <fluxvalue flux="TCA8_v29___1" type="xch">50.40251288041217</fluxvalue>
+                <fluxvalue flux="TCA9_v30" type="xch">2.8314906076994464</fluxvalue>
+                <fluxvalue flux="TH1_v66" type="xch">6.9203214502864085</fluxvalue>
+            </variables>
+
+        </simulation>
+
+    </configuration>
+
+    <configuration name="[12]Gluc" stationary="true">
+
+        <input pool="Gluc_ext" type="isotopomer">
+
+            <label cfg="000011" purity="0.996">1.0</label>
+
+        </input>
+
+        <input pool="BM_ext" type="isotopomer"/>
+
+        <input pool="CO2_unlabeled_in" type="isotopomer">
+
+            <label cfg="0">1.0</label>
+
+        </input>
+
+        <input pool="O2_ext" type="isotopomer"/>
+
+        <input pool="NH3_ext" type="isotopomer"/>
+
+        <input pool="SO4_ext" type="isotopomer"/>
+
+        <input pool="Pi_ext" type="isotopomer"/>
+
+        <input pool="THF_ext" type="isotopomer"/>
+
+        <measurement>
+            <model>
+                <labelingmeasurement>
+                    <group id="ms_group_0_ala_232" scale="auto">
+                        <textual>Ala[1,2]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_1_ala_260" scale="auto">
+                        <textual>Ala#M0,1,2,3</textual>
+                    </group>
+                    <group id="ms_group_2_gly_218" scale="auto">
+                        <textual>Gly[1]#M0,1</textual>
+                    </group>
+                    <group id="ms_group_3_gly_246" scale="auto">
+                        <textual>Gly#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_4_val_260" scale="auto">
+                        <textual>Val[1-4]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_5_val_288" scale="auto">
+                        <textual>Val#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_6_leu_274" scale="auto">
+                        <textual>Leu[1-5]#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_7_ile_274" scale="auto">
+                        <textual>Ile[1-5]#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_8_pro_258" scale="auto">
+                        <textual>Pro[1-4]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_9_met_218" scale="auto">
+                        <textual>Met[1-4]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_10_met_320" scale="auto">
+                        <textual>Met#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_11_ser_362" scale="auto">
+                        <textual>Ser[1,2]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_12_ser_390" scale="auto">
+                        <textual>Ser#M0,1,2,3</textual>
+                    </group>
+                    <group id="ms_group_13_thr_376" scale="auto">
+                        <textual>Thr[1-3]#M0,1,2,3</textual>
+                    </group>
+                    <group id="ms_group_14_ser_404" scale="auto">
+                        <textual>Thr#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_15_phe_302" scale="auto">
+                        <textual>Phe[8,9]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_16_phe_308" scale="auto">
+                        <textual>Phe[1-8]#M0,1,2,3,4,5,6,7,8</textual>
+                    </group>
+                    <group id="ms_group_17_phe_336" scale="auto">
+                        <textual>Phe#M0,1,2,3,4,5,6,7,8,9</textual>
+                    </group>
+                    <group id="ms_group_18_asp_302" scale="auto">
+                        <textual>Asp[2,4]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_19_asp_390" scale="auto">
+                        <textual>Asp[1-3]#M0,1,2,3</textual>
+                    </group>
+                    <group id="ms_group_20_asp_418" scale="auto">
+                        <textual>Asp#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_21_glu_330" scale="auto">
+                        <textual>Glu[1-4]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_22_glu_432" scale="auto">
+                        <textual>Glu#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_23_lys_329" scale="auto">
+                        <textual>Lys[1-5]#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_24_lys_431" scale="auto">
+                        <textual>Lys#M0,1,2,3,4,5,6</textual>
+                    </group>
+                    <!-- was not measured in nat prot https://www.nature.com/articles/s41596-019-0204-0#Sec49
+                    <group id="ms_group_25_his_338" scale="auto">
+                        <textual>His[1-5]#M0,1,2,3,4,5</textual>
+                    </group>
+                    group id="ms_group_26_his_440" scale="auto">
+                        <textual>His#M0,1,2,3,4,5,6</textual>
+                    </group>
+                    -->
+                    <group id="ms_group_27_tyr_302" scale="auto">
+                        <textual>Tyr[8,9]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_28_r5p_173" scale="auto">
+                        <textual>R5P[1,2]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_29_r5p_284" scale="auto">
+                        <textual>R5P[2-5]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_30_g6p_173" scale="auto">
+                        <textual>G6P[1,2]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_31_g6p_370" scale="auto">
+                        <textual>G6P[2-6]#M0,1,2,3,4,5</textual>
+                    </group>
+                </labelingmeasurement>
+                <fluxmeasurement>
+                    <netflux id="fp_0">
+                        <textual>mu2_v75</textual>
+                    </netflux>
+                    <netflux id="fp_1">
+                        <textual>Glc_upt</textual>
+                    </netflux>
+                    <netflux id="fp_2">
+                        <textual>MAC2_v38</textual>
+                    </netflux>
+                </fluxmeasurement>
+            </model>
+
+            <data>
+        <datum id="ms_group_28_r5p_173" stddev="0.006" weight="0">0.8581884128820304</datum>
+        <datum id="ms_group_28_r5p_173" stddev="0.006" weight="1">0.11047813487470763</datum>
+        <datum id="ms_group_28_r5p_173" stddev="0.006" weight="2">0.0313334522432338</datum>
+        <datum id="ms_group_15_phe_302" stddev="0.004" weight="0">0.7006515832505854</datum>
+        <datum id="ms_group_15_phe_302" stddev="0.004" weight="1">0.22202920695019474</datum>
+        <datum id="ms_group_15_phe_302" stddev="0.004" weight="2">0.077319209799212</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="0">0.11511186379878095</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="1">0.1401782555104146</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="2">0.2766722187870613</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="3">0.21218758302030602</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="4">0.16839922427818502</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="5">0.0693196180511605</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="6">0.018131236554022784</datum>
+        <datum id="ms_group_18_asp_302" stddev="0.004" weight="0">0.47310822266961783</datum>
+        <datum id="ms_group_18_asp_302" stddev="0.004" weight="1">0.24613651101390477</datum>
+        <datum id="ms_group_18_asp_302" stddev="0.004" weight="2">0.28075526631645487</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="0">0.16230409175673832</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="1">0.24757853804103133</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="2">0.30453373167764647</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="3">0.208043625890143</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="4">0.07754001263437524</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="0">0.13152971727826512</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="1">0.1803331919421899</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="2">0.2917903741005566</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="3">0.21837429234157082</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="4">0.13099597930765214</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="5">0.046976445029693795</datum>
+        <datum id="ms_group_11_ser_362" stddev="0.004" weight="0">0.7656190416930795</datum>
+        <datum id="ms_group_11_ser_362" stddev="0.004" weight="1">0.13034974623972456</datum>
+        <datum id="ms_group_11_ser_362" stddev="0.004" weight="2">0.10403121206718074</datum>
+        <datum id="ms_group_12_ser_390" stddev="0.004" weight="0">0.7448434925618144</datum>
+        <datum id="ms_group_12_ser_390" stddev="0.004" weight="1">0.1054259129334639</datum>
+        <datum id="ms_group_12_ser_390" stddev="0.004" weight="2">0.13262944576069344</datum>
+        <datum id="ms_group_12_ser_390" stddev="0.004" weight="3">0.01710114874401608</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="0">0.2479258879805342</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="1">0.20507226338220072</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="2">0.3117509933071096</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="3">0.15376079787418542</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="4">0.08149005745591842</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="0">0.0054801309330181165</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="1">0.05816868468896437</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="2">0.8856528201799815</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="3">0.04590623468933415</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="4">0.004678387841084731</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="5">0.00011374166760782375</datum>
+        <datum id="ms_group_30_g6p_173" stddev="0.006" weight="0">0.9317779000976488</datum>
+        <datum id="ms_group_30_g6p_173" stddev="0.006" weight="1">0.05048367818224432</datum>
+        <datum id="ms_group_30_g6p_173" stddev="0.006" weight="2">0.01773842172010134</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="0">0.24728493040073934</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="1">0.24923844928933703</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="2">0.2635280609887173</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="3">0.14363525846601632</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="4">0.07035870852286853</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="5">0.02054748848327477</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="6">0.0049010907460316465</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="7">0.000454763802252302</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="8">5.124930070042754e-05</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="0">0.23891830753861557</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="1">0.22782945167742275</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="2">0.26028035500835905</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="3">0.15309488212271138</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="4">0.0823406822939854</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="5">0.02846588399931494</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="6">0.007813306754062428</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="7">0.0011316140708832014</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="8">0.00011842399287173288</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="9">7.092541711911636e-06</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="0">0.12970995262428522</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="1">0.17747496835668689</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="2">0.29122568820852945</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="3">0.21931343373505666</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="4">0.13319260838430047</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="5">0.0490833486910703</datum>
+        <datum id="ms_group_2_gly_218" stddev="0.004" weight="0">0.6865212024588961</datum>
+        <datum id="ms_group_2_gly_218" stddev="0.004" weight="1">0.3134787975410778</datum>
+        <datum id="ms_group_3_gly_246" stddev="0.004" weight="0">0.6031321046665923</datum>
+        <datum id="ms_group_3_gly_246" stddev="0.004" weight="1">0.2047905029390705</datum>
+        <datum id="ms_group_3_gly_246" stddev="0.004" weight="2">0.19207739239432076</datum>
+        <datum id="ms_group_13_thr_376" stddev="0.006" weight="0">0.30104152965367664</datum>
+        <datum id="ms_group_13_thr_376" stddev="0.006" weight="1">0.3013950359258314</datum>
+        <datum id="ms_group_13_thr_376" stddev="0.006" weight="2">0.27813035551834164</datum>
+        <datum id="ms_group_13_thr_376" stddev="0.006" weight="3">0.11943307890209369</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="0">0.18564949718093435</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="1">0.13629291637949395</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="2">0.37916389929680144</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="3">0.12999778493859845</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="4">0.16889590220414316</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="0">0.07137950912802042</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="1">0.6577327647711021</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="2">0.24668263728214326</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="3">0.020943337798592622</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="4">0.0032617510200754368</datum>
+        <datum id="ms_group_19_asp_390" stddev="0.004" weight="0">0.30104152965367664</datum>
+        <datum id="ms_group_19_asp_390" stddev="0.004" weight="1">0.3013950359258314</datum>
+        <datum id="ms_group_19_asp_390" stddev="0.004" weight="2">0.27813035551834164</datum>
+        <datum id="ms_group_19_asp_390" stddev="0.004" weight="3">0.11943307890209369</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="0">0.22905922750684032</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="1">0.3013105087334415</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="2">0.2836931934974295</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="3">0.15737932282535327</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="4">0.02855774743686407</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="0">0.12970995262428522</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="1">0.17747496835668689</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="2">0.29122568820852945</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="3">0.21931343373505666</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="4">0.1331926083843005</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="5">0.0490833486910703</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="0">0.17661790873688257</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="1">0.10668190251458516</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="2">0.38622209688532666</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="3">0.12421496538423743</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="4">0.19672278426772682</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="5">0.00954034221121212</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="0">0.24792588798053417</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="1">0.20507226338220072</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="2">0.3117509933071096</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="3">0.15376079787418542</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="4">0.08149005745591842</datum>
+        <datum id="ms_group_27_tyr_302" stddev="0.004" weight="0">0.7006515832505855</datum>
+        <datum id="ms_group_27_tyr_302" stddev="0.004" weight="1">0.22202920695019474</datum>
+        <datum id="ms_group_27_tyr_302" stddev="0.004" weight="2">0.077319209799212</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="0">0.09955887129330325</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="1">0.15918087997428887</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="2">0.26653814352156513</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="3">0.24554276114815007</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="4">0.15085780723436434</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="5">0.07832153682829288</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="0">0.16230409175673832</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="1">0.24757853804103133</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="2">0.30453373167764647</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="3">0.208043625890143</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="4">0.07754001263437524</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="0">0.18864411313980645</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="1">0.2153190308546884</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="2">0.28624294935406935</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="3">0.19153797100033917</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="4">0.09877077709332963</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="5">0.01948515855770059</datum>
+        <datum id="ms_group_0_ala_232" stddev="0.004" weight="0">0.4308706269646776</datum>
+        <datum id="ms_group_0_ala_232" stddev="0.004" weight="1">0.1581599067678697</datum>
+        <datum id="ms_group_0_ala_232" stddev="0.004" weight="2">0.4109694662674383</datum>
+        <datum id="ms_group_1_ala_260" stddev="0.004" weight="0">0.4099093734494962</datum>
+        <datum id="ms_group_1_ala_260" stddev="0.004" weight="1">0.09713048791782193</datum>
+        <datum id="ms_group_1_ala_260" stddev="0.004" weight="2">0.4697459025536205</datum>
+        <datum id="ms_group_1_ala_260" stddev="0.004" weight="3">0.02321423607904666</datum>
+        <datum id="fp_1" stddev="0.165">3.3</datum>
+        <datum id="fp_0" stddev="0.009519394031220662">0.19038788062441322</datum>
+        <datum id="fp_2" stddev="0.07158987">1.4317974</datum>
+            </data>
+        </measurement>
+
+        <simulation method="auto" type="auto">
+	    <variables>
+                <fluxvalue flux="Glc_upt" type="net">3.3</fluxvalue>
+                <fluxvalue flux="mu2_v75" type="net">0.19038788062441322</fluxvalue>
+                <fluxvalue flux="MAC2_v38" type="net">1.4317974</fluxvalue>
+
+                <fluxvalue flux="EMP7_v7" type="net">2.772088706838619</fluxvalue>
+                <fluxvalue flux="TCA1_v22" type="net">5.557377836090755</fluxvalue>
+                <fluxvalue flux="TCA9_v30" type="net">3.4123091938942047</fluxvalue>
+                <fluxvalue flux="ANA2_v34" type="net">0.00003</fluxvalue>
+                <fluxvalue flux="ANA3_v35" type="net">0.6600211206758616</fluxvalue>
+                <fluxvalue flux="TH1_v66" type="net">0.03630116163717239</fluxvalue>
+                <fluxvalue flux="ATPH1_v67" type="net">21.06457406637012</fluxvalue>
+                <fluxvalue flux="GAS2_v74" type="net">15.92960974751192</fluxvalue>
+
+                <fluxvalue flux="AA8_v47" type="xch">0.013200422413517232</fluxvalue>
+                <fluxvalue flux="AA9_v48" type="xch">0.0</fluxvalue>
+                <fluxvalue flux="EMP2_v2" type="xch">66.00211206758615</fluxvalue>
+                <fluxvalue flux="EMP4_v4" type="xch">3.4684109891516526</fluxvalue>
+                <fluxvalue flux="EMP6_v6" type="xch">1.6038513232423437</fluxvalue>
+                <fluxvalue flux="EMP7_v7" type="xch">3.71921901500848</fluxvalue>
+                <fluxvalue flux="EMP8_v8" type="xch">1.9569626228039296</fluxvalue>
+                <fluxvalue flux="GOX1_v31___1" type="xch">0.0</fluxvalue>
+                <fluxvalue flux="MAC1_minus_v37" type="xch">7.025924829594547</fluxvalue>
+                <fluxvalue flux="MAC2_v38" type="xch">3.2869051809657908</fluxvalue>
+                <fluxvalue flux="PPP3_v11" type="xch">1.6764536465166884</fluxvalue>
+                <fluxvalue flux="PPP4_v12" type="xch">261.6092714966879</fluxvalue>
+                <fluxvalue flux="PPP5_v13" type="xch">0.739223655156965</fluxvalue>
+                <fluxvalue flux="PPP6_v14" type="xch">0.2508080258568274</fluxvalue>
+                <fluxvalue flux="PPP7_minus_v15" type="xch">0.06930221767096548</fluxvalue>
+                <fluxvalue flux="PPP8_minus_v16" type="xch">1.5807505840186884</fluxvalue>
+                <fluxvalue flux="PPP9_v17" type="xch">1.1055353771320682</fluxvalue>
+                <fluxvalue flux="TCA3_v24" type="xch">15.229987359595507</fluxvalue>
+                <fluxvalue flux="TCA4_v25" type="xch">0.13200422413517232</fluxvalue>
+                <fluxvalue flux="TCA6_v27___1" type="xch">0.663321226279241</fluxvalue>
+                <fluxvalue flux="TCA7_v26" type="xch">0.08580274568786202</fluxvalue>
+                <fluxvalue flux="TCA7_v28___1" type="xch">154.29643748599955</fluxvalue>
+                <fluxvalue flux="TCA8_v29___1" type="xch">50.40251288041217</fluxvalue>
+                <fluxvalue flux="TCA9_v30" type="xch">2.8314906076994464</fluxvalue>
+                <fluxvalue flux="TH1_v66" type="xch">6.9203214502864085</fluxvalue>
+
+            </variables>
+
+        </simulation>
+
+    </configuration>
+
+    <configuration name="[16]Gluc" stationary="true">
+
+        <input pool="Gluc_ext" type="isotopomer">
+
+            <label cfg="100001" purity="0.996">1.0</label>
+
+        </input>
+
+        <input pool="BM_ext" type="isotopomer"/>
+
+        <input pool="CO2_unlabeled_in" type="isotopomer">
+
+            <label cfg="0">1.0</label>
+
+        </input>
+
+        <input pool="O2_ext" type="isotopomer"/>
+
+        <input pool="NH3_ext" type="isotopomer"/>
+
+        <input pool="SO4_ext" type="isotopomer"/>
+
+        <input pool="Pi_ext" type="isotopomer"/>
+
+        <input pool="THF_ext" type="isotopomer"/>
+
+        <measurement>
+            <model>
+                <labelingmeasurement>
+                    <group id="ms_group_0_ala_232" scale="auto">
+                        <textual>Ala[1,2]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_1_ala_260" scale="auto">
+                        <textual>Ala#M0,1,2,3</textual>
+                    </group>
+                    <group id="ms_group_2_gly_218" scale="auto">
+                        <textual>Gly[1]#M0,1</textual>
+                    </group>
+                    <group id="ms_group_3_gly_246" scale="auto">
+                        <textual>Gly#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_4_val_260" scale="auto">
+                        <textual>Val[1-4]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_5_val_288" scale="auto">
+                        <textual>Val#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_6_leu_274" scale="auto">
+                        <textual>Leu[1-5]#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_7_ile_274" scale="auto">
+                        <textual>Ile[1-5]#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_8_pro_258" scale="auto">
+                        <textual>Pro[1-4]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_9_met_218" scale="auto">
+                        <textual>Met[1-4]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_10_met_320" scale="auto">
+                        <textual>Met#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_11_ser_362" scale="auto">
+                        <textual>Ser[1,2]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_12_ser_390" scale="auto">
+                        <textual>Ser#M0,1,2,3</textual>
+                    </group>
+                    <group id="ms_group_13_thr_376" scale="auto">
+                        <textual>Thr[1-3]#M0,1,2,3</textual>
+                    </group>
+                    <group id="ms_group_14_ser_404" scale="auto">
+                        <textual>Thr#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_15_phe_302" scale="auto">
+                        <textual>Phe[8,9]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_16_phe_308" scale="auto">
+                        <textual>Phe[1-8]#M0,1,2,3,4,5,6,7,8</textual>
+                    </group>
+                    <group id="ms_group_17_phe_336" scale="auto">
+                        <textual>Phe#M0,1,2,3,4,5,6,7,8,9</textual>
+                    </group>
+                    <group id="ms_group_18_asp_302" scale="auto">
+                        <textual>Asp[2,4]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_19_asp_390" scale="auto">
+                        <textual>Asp[1-3]#M0,1,2,3</textual>
+                    </group>
+                    <group id="ms_group_20_asp_418" scale="auto">
+                        <textual>Asp#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_21_glu_330" scale="auto">
+                        <textual>Glu[1-4]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_22_glu_432" scale="auto">
+                        <textual>Glu#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_23_lys_329" scale="auto">
+                        <textual>Lys[1-5]#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_24_lys_431" scale="auto">
+                        <textual>Lys#M0,1,2,3,4,5,6</textual>
+                    </group>
+                    <!-- was not measured in nat prot https://www.nature.com/articles/s41596-019-0204-0#Sec49
+                    <group id="ms_group_25_his_338" scale="auto">
+                        <textual>His[1-5]#M0,1,2,3,4,5</textual>
+                    </group>
+                    group id="ms_group_26_his_440" scale="auto">
+                        <textual>His#M0,1,2,3,4,5,6</textual>
+                    </group>
+                    -->
+                    <group id="ms_group_27_tyr_302" scale="auto">
+                        <textual>Tyr[8,9]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_28_r5p_173" scale="auto">
+                        <textual>R5P[1,2]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_29_r5p_284" scale="auto">
+                        <textual>R5P[2-5]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_30_g6p_173" scale="auto">
+                        <textual>G6P[1,2]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_31_g6p_370" scale="auto">
+                        <textual>G6P[2-6]#M0,1,2,3,4,5</textual>
+                    </group>
+                </labelingmeasurement>
+            </model>
+
+            <data>
+        <datum id="ms_group_28_r5p_173" stddev="0.006" weight="0">0.03007537240891675</datum>
+        <datum id="ms_group_28_r5p_173" stddev="0.006" weight="1">0.9451464016013419</datum>
+        <datum id="ms_group_28_r5p_173" stddev="0.006" weight="2">0.02477822598971319</datum>
+        <datum id="ms_group_15_phe_302" stddev="0.004" weight="0">0.7952146992015856</datum>
+        <datum id="ms_group_15_phe_302" stddev="0.004" weight="1">0.16372513204386946</datum>
+        <datum id="ms_group_15_phe_302" stddev="0.004" weight="2">0.041060168754536976</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="0">0.0007499966184306336</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="1">0.026506799750342258</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="2">0.24446590596283155</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="3">0.4347257877634402</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="4">0.24735499633462638</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="5">0.04254546986188812</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="6">0.003651043708372175</datum>
+        <datum id="ms_group_18_asp_302" stddev="0.004" weight="0">0.18012056913264612</datum>
+        <datum id="ms_group_18_asp_302" stddev="0.004" weight="1">0.6163435151885877</datum>
+        <datum id="ms_group_18_asp_302" stddev="0.004" weight="2">0.20353591567874363</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="0">0.0026950441629124944</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="1">0.05961753872051722</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="2">0.3697982408484826</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="3">0.5102407947646288</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="4">0.05764838150339329</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="0">0.001732380494700709</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="1">0.04259699604492316</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="2">0.29086072344398606</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="3">0.46351902425099495</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="4">0.18494894631611564</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="5">0.016341929449207714</datum>
+        <datum id="ms_group_11_ser_362" stddev="0.004" weight="0">0.04707593049360597</datum>
+        <datum id="ms_group_11_ser_362" stddev="0.004" weight="1">0.8551054784709812</datum>
+        <datum id="ms_group_11_ser_362" stddev="0.004" weight="2">0.09781859103539754</datum>
+        <datum id="ms_group_12_ser_390" stddev="0.004" weight="0">0.03535992253341789</datum>
+        <datum id="ms_group_12_ser_390" stddev="0.004" weight="1">0.8409092870948023</datum>
+        <datum id="ms_group_12_ser_390" stddev="0.004" weight="2">0.09817848655524991</datum>
+        <datum id="ms_group_12_ser_390" stddev="0.004" weight="3">0.025552303816517807</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="0">0.010628720582525756</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="1">0.22448853656535747</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="2">0.43054100869701223</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="3">0.30313386205223986</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="4">0.031207872102813013</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="0">0.03838680036737202</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="1">0.8910080273507005</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="2">0.06590227754972679</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="3">0.004469262048808028</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="4">0.00022923778937308412</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="5">4.394894010345743e-06</datum>
+        <datum id="ms_group_30_g6p_173" stddev="0.006" weight="0">0.026686413996829823</datum>
+        <datum id="ms_group_30_g6p_173" stddev="0.006" weight="1">0.9562964981288323</datum>
+        <datum id="ms_group_30_g6p_173" stddev="0.006" weight="2">0.017017087874332315</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="0">0.000619781899069751</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="1">0.023018634986099372</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="2">0.24341181916400612</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="3">0.5404613609346912</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="4">0.17167562656005</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="5">0.019673843544970388</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="6">0.0010884776064902693</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="7">4.9706655121760654e-05</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="8">7.486494385058361e-07</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="0">0.000359859210804874</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="1">0.0177442687048874</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="2">0.2288544594646099</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="3">0.5318110847070846</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="4">0.17613095705438492</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="5">0.03983375077090635</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="6">0.004988321166331059</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="7">0.00026416588735168986</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="8">1.2928874464456049e-05</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="9">2.0415911315706226e-07</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="0">0.001559879025502947</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="1">0.03972763842729855</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="2">0.28672314115701125</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="3">0.46578813080896736</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="4">0.18955810699307973</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="5">0.016643103588069114</datum>
+        <datum id="ms_group_2_gly_218" stddev="0.004" weight="0">0.5012802860520813</datum>
+        <datum id="ms_group_2_gly_218" stddev="0.004" weight="1">0.49871971394789266</datum>
+        <datum id="ms_group_3_gly_246" stddev="0.004" weight="0">0.43877214209486737</datum>
+        <datum id="ms_group_3_gly_246" stddev="0.004" weight="1">0.42502737370048266</datum>
+        <datum id="ms_group_3_gly_246" stddev="0.004" weight="2">0.1362004842046335</datum>
+        <datum id="ms_group_13_thr_376" stddev="0.006" weight="0">0.019558477695298598</datum>
+        <datum id="ms_group_13_thr_376" stddev="0.006" weight="1">0.29660502793718846</datum>
+        <datum id="ms_group_13_thr_376" stddev="0.006" weight="2">0.5148773368503257</datum>
+        <datum id="ms_group_13_thr_376" stddev="0.006" weight="3">0.16895915751713061</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="0">0.006360799975182769</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="1">0.13107539475460156</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="2">0.6909716213555014</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="3">0.16188920334089552</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="4">0.009702980573789943</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="0">0.6552929798763648</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="1">0.3168350734423496</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="2">0.02534132067093541</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="3">0.0024743108598429394</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="4">5.631515044127644e-05</datum>
+        <datum id="ms_group_19_asp_390" stddev="0.004" weight="0">0.019558477695298598</datum>
+        <datum id="ms_group_19_asp_390" stddev="0.004" weight="1">0.29660502793718846</datum>
+        <datum id="ms_group_19_asp_390" stddev="0.004" weight="2">0.5148773368503257</datum>
+        <datum id="ms_group_19_asp_390" stddev="0.004" weight="3">0.16895915751713061</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="0">0.005527857547592079</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="1">0.09786078156821731</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="2">0.35829583276632826</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="3">0.41710968600007026</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="4">0.12120584211772067</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="0">0.0015598790255029473</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="1">0.03972763842729855</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="2">0.28672314115701125</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="3">0.4657881308089673</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="4">0.18955810699307973</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="5">0.016643103588069114</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="0">0.002659932490840721</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="1">0.0946212107648704</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="2">0.7037097921784965</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="3">0.16624364720728288</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="4">0.030300482523567433</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="5">0.0024649348349129953</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="0">0.010628720582525756</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="1">0.22448853656535744</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="2">0.43054100869701223</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="3">0.30313386205223986</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="4">0.031207872102813016</datum>
+        <datum id="ms_group_27_tyr_302" stddev="0.004" weight="0">0.7952146992015857</datum>
+        <datum id="ms_group_27_tyr_302" stddev="0.004" weight="1">0.1637251320438695</datum>
+        <datum id="ms_group_27_tyr_302" stddev="0.004" weight="2">0.04106016875453699</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="0">0.000755510033280106</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="1">0.02117389392876303</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="2">0.1975775986350956</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="3">0.6281293567344263</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="4">0.14381314078961982</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="5">0.008550499878779557</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="0">0.0026950441629124944</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="1">0.05961753872051721</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="2">0.3697982408484826</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="3">0.5102407947646288</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="4">0.05764838150339329</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="0">0.003004019750856448</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="1">0.07107241238332047</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="2">0.2827256208117815</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="3">0.3945316337257232</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="4">0.2262787939152242</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="5">0.022387519413027742</datum>
+        <datum id="ms_group_0_ala_232" stddev="0.004" weight="0">0.07975462353483194</datum>
+        <datum id="ms_group_0_ala_232" stddev="0.004" weight="1">0.8217416680385674</datum>
+        <datum id="ms_group_0_ala_232" stddev="0.004" weight="2">0.09850370842658637</datum>
+        <datum id="ms_group_1_ala_260" stddev="0.004" weight="0">0.03335145190271038</datum>
+        <datum id="ms_group_1_ala_260" stddev="0.004" weight="1">0.8427716170896817</datum>
+        <datum id="ms_group_1_ala_260" stddev="0.004" weight="2">0.09885315399162334</datum>
+        <datum id="ms_group_1_ala_260" stddev="0.004" weight="3">0.025023777015969726</datum>
+            </data>
+        </measurement>
+
+        <simulation method="auto" type="auto">
+            <variables>
+                <fluxvalue flux="Glc_upt" type="net">3.3</fluxvalue>
+                <fluxvalue flux="mu2_v75" type="net">0.19038788062441322</fluxvalue>
+                <fluxvalue flux="MAC2_v38" type="net">1.4317974</fluxvalue>
+
+                <fluxvalue flux="EMP7_v7" type="net">2.772088706838619</fluxvalue>
+                <fluxvalue flux="TCA1_v22" type="net">5.557377836090755</fluxvalue>
+                <fluxvalue flux="TCA9_v30" type="net">3.4123091938942047</fluxvalue>
+                <fluxvalue flux="ANA2_v34" type="net">0.00003</fluxvalue>
+                <fluxvalue flux="ANA3_v35" type="net">0.6600211206758616</fluxvalue>
+                <fluxvalue flux="TH1_v66" type="net">0.03630116163717239</fluxvalue>
+                <fluxvalue flux="GAS2_v74" type="net">15.92960974751192</fluxvalue>
+                <fluxvalue flux="ATPH1_v67" type="net">21.06457406637012</fluxvalue>
+
+                <fluxvalue flux="AA8_v47" type="xch">0.013200422413517232</fluxvalue>
+                <fluxvalue flux="AA9_v48" type="xch">0.0</fluxvalue>
+                <fluxvalue flux="EMP2_v2" type="xch">66.00211206758615</fluxvalue>
+                <fluxvalue flux="EMP4_v4" type="xch">3.4684109891516526</fluxvalue>
+                <fluxvalue flux="EMP6_v6" type="xch">1.6038513232423437</fluxvalue>
+                <fluxvalue flux="EMP7_v7" type="xch">3.71921901500848</fluxvalue>
+                <fluxvalue flux="EMP8_v8" type="xch">1.9569626228039296</fluxvalue>
+                <fluxvalue flux="GOX1_v31___1" type="xch">0.0</fluxvalue>
+                <fluxvalue flux="MAC1_minus_v37" type="xch">7.025924829594547</fluxvalue>
+                <fluxvalue flux="MAC2_v38" type="xch">3.2869051809657908</fluxvalue>
+                <fluxvalue flux="PPP3_v11" type="xch">1.6764536465166884</fluxvalue>
+                <fluxvalue flux="PPP4_v12" type="xch">261.6092714966879</fluxvalue>
+                <fluxvalue flux="PPP5_v13" type="xch">0.739223655156965</fluxvalue>
+                <fluxvalue flux="PPP6_v14" type="xch">0.2508080258568274</fluxvalue>
+                <fluxvalue flux="PPP7_minus_v15" type="xch">0.06930221767096548</fluxvalue>
+                <fluxvalue flux="PPP8_minus_v16" type="xch">1.5807505840186884</fluxvalue>
+                <fluxvalue flux="PPP9_v17" type="xch">1.1055353771320682</fluxvalue>
+                <fluxvalue flux="TCA3_v24" type="xch">15.229987359595507</fluxvalue>
+                <fluxvalue flux="TCA4_v25" type="xch">0.13200422413517232</fluxvalue>
+                <fluxvalue flux="TCA6_v27___1" type="xch">0.663321226279241</fluxvalue>
+                <fluxvalue flux="TCA7_v26" type="xch">0.08580274568786202</fluxvalue>
+                <fluxvalue flux="TCA7_v28___1" type="xch">154.29643748599955</fluxvalue>
+                <fluxvalue flux="TCA8_v29___1" type="xch">50.40251288041217</fluxvalue>
+                <fluxvalue flux="TCA9_v30" type="xch">2.8314906076994464</fluxvalue>
+                <fluxvalue flux="TH1_v66" type="xch">6.9203214502864085</fluxvalue>
+            </variables>
+
+        </simulation>
+
+    </configuration>
+
+    <configuration name="[1]+[456]Gluc" stationary="true">
+
+        <input pool="Gluc_ext" type="isotopomer">
+
+            <label cfg="000001" purity="0.996">0.5</label>
+            <label cfg="111000" purity="0.996">0.5</label>
+
+        </input>
+
+        <input pool="BM_ext" type="isotopomer"/>
+
+        <input pool="CO2_unlabeled_in" type="isotopomer">
+
+            <label cfg="0">1.0</label>
+
+        </input>
+
+        <input pool="O2_ext" type="isotopomer"/>
+
+        <input pool="NH3_ext" type="isotopomer"/>
+
+        <input pool="SO4_ext" type="isotopomer"/>
+
+        <input pool="Pi_ext" type="isotopomer"/>
+
+        <input pool="THF_ext" type="isotopomer"/>
+
+        <measurement>
+            <model>
+                <labelingmeasurement>
+                    <group id="ms_group_0_ala_232" scale="auto">
+                        <textual>Ala[1,2]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_1_ala_260" scale="auto">
+                        <textual>Ala#M0,1,2,3</textual>
+                    </group>
+                    <group id="ms_group_2_gly_218" scale="auto">
+                        <textual>Gly[1]#M0,1</textual>
+                    </group>
+                    <group id="ms_group_3_gly_246" scale="auto">
+                        <textual>Gly#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_4_val_260" scale="auto">
+                        <textual>Val[1-4]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_5_val_288" scale="auto">
+                        <textual>Val#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_6_leu_274" scale="auto">
+                        <textual>Leu[1-5]#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_7_ile_274" scale="auto">
+                        <textual>Ile[1-5]#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_8_pro_258" scale="auto">
+                        <textual>Pro[1-4]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_9_met_218" scale="auto">
+                        <textual>Met[1-4]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_10_met_320" scale="auto">
+                        <textual>Met#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_11_ser_362" scale="auto">
+                        <textual>Ser[1,2]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_12_ser_390" scale="auto">
+                        <textual>Ser#M0,1,2,3</textual>
+                    </group>
+                    <group id="ms_group_13_thr_376" scale="auto">
+                        <textual>Thr[1-3]#M0,1,2,3</textual>
+                    </group>
+                    <group id="ms_group_14_ser_404" scale="auto">
+                        <textual>Thr#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_15_phe_302" scale="auto">
+                        <textual>Phe[8,9]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_16_phe_308" scale="auto">
+                        <textual>Phe[1-8]#M0,1,2,3,4,5,6,7,8</textual>
+                    </group>
+                    <group id="ms_group_17_phe_336" scale="auto">
+                        <textual>Phe#M0,1,2,3,4,5,6,7,8,9</textual>
+                    </group>
+                    <group id="ms_group_18_asp_302" scale="auto">
+                        <textual>Asp[2,4]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_19_asp_390" scale="auto">
+                        <textual>Asp[1-3]#M0,1,2,3</textual>
+                    </group>
+                    <group id="ms_group_20_asp_418" scale="auto">
+                        <textual>Asp#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_21_glu_330" scale="auto">
+                        <textual>Glu[1-4]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_22_glu_432" scale="auto">
+                        <textual>Glu#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_23_lys_329" scale="auto">
+                        <textual>Lys[1-5]#M0,1,2,3,4,5</textual>
+                    </group>
+                    <group id="ms_group_24_lys_431" scale="auto">
+                        <textual>Lys#M0,1,2,3,4,5,6</textual>
+                    </group>
+                    <!-- was not measured in nat prot https://www.nature.com/articles/s41596-019-0204-0#Sec49
+                    <group id="ms_group_25_his_338" scale="auto">
+                        <textual>His[1-5]#M0,1,2,3,4,5</textual>
+                    </group>
+                    group id="ms_group_26_his_440" scale="auto">
+                        <textual>His#M0,1,2,3,4,5,6</textual>
+                    </group>
+                    -->
+                    <group id="ms_group_27_tyr_302" scale="auto">
+                        <textual>Tyr[8,9]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_28_r5p_173" scale="auto">
+                        <textual>R5P[1,2]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_29_r5p_284" scale="auto">
+                        <textual>R5P[2-5]#M0,1,2,3,4</textual>
+                    </group>
+                    <group id="ms_group_30_g6p_173" scale="auto">
+                        <textual>G6P[1,2]#M0,1,2</textual>
+                    </group>
+                    <group id="ms_group_31_g6p_370" scale="auto">
+                        <textual>G6P[2-6]#M0,1,2,3,4,5</textual>
+                    </group>
+                </labelingmeasurement>
+            </model>
+
+            <data>
+        <datum id="ms_group_28_r5p_173" stddev="0.006" weight="0">0.4912077945999636</datum>
+        <datum id="ms_group_28_r5p_173" stddev="0.006" weight="1">0.07171764913376168</datum>
+        <datum id="ms_group_28_r5p_173" stddev="0.006" weight="2">0.4370745562662466</datum>
+        <datum id="ms_group_15_phe_302" stddev="0.004" weight="0">0.5587428135783331</datum>
+        <datum id="ms_group_15_phe_302" stddev="0.004" weight="1">0.09652288197911812</datum>
+        <datum id="ms_group_15_phe_302" stddev="0.004" weight="2">0.34473430444254094</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="0">0.12110504289034499</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="1">0.22480639802499197</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="2">0.25205322349717746</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="3">0.20956667764553025</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="4">0.12196739967834266</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="5">0.05514576892189441</datum>
+        <datum id="ms_group_24_lys_431" stddev="0.006" weight="6">0.015355489341649584</datum>
+        <datum id="ms_group_18_asp_302" stddev="0.004" weight="0">0.46594266613367685</datum>
+        <datum id="ms_group_18_asp_302" stddev="0.004" weight="1">0.3023765921262377</datum>
+        <datum id="ms_group_18_asp_302" stddev="0.004" weight="2">0.23168074174006303</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="0">0.16547949002985907</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="1">0.31294475213605233</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="2">0.3093740806980848</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="3">0.1618109733800612</datum>
+        <datum id="ms_group_21_glu_330" stddev="0.004" weight="4">0.050390703755876995</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="0">0.13933809379189038</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="1">0.2556329639313487</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="2">0.2950078553406183</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="3">0.20218850466092758</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="4">0.08647125569146925</datum>
+        <datum id="ms_group_22_glu_432" stddev="0.004" weight="5">0.021361326583674088</datum>
+        <datum id="ms_group_11_ser_362" stddev="0.004" weight="0">0.4702882715949911</datum>
+        <datum id="ms_group_11_ser_362" stddev="0.004" weight="1">0.14335740867582725</datum>
+        <datum id="ms_group_11_ser_362" stddev="0.004" weight="2">0.38635431972916645</datum>
+        <datum id="ms_group_12_ser_390" stddev="0.004" weight="0">0.4422809933142265</datum>
+        <datum id="ms_group_12_ser_390" stddev="0.004" weight="1">0.13305488589690767</datum>
+        <datum id="ms_group_12_ser_390" stddev="0.004" weight="2">0.05643032114578526</datum>
+        <datum id="ms_group_12_ser_390" stddev="0.004" weight="3">0.36823379964306857</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="0">0.23222335461033966</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="1">0.2857685973885487</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="2">0.2667044249521564</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="3">0.16820711994187457</datum>
+        <datum id="ms_group_14_ser_404" stddev="0.006" weight="4">0.047096503107029015</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="0">0.09281179141537751</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="1">0.39804052850342436</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="2">0.41833476038491363</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="3">0.08530899303213997</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="4">0.005178004145106972</datum>
+        <datum id="ms_group_31_g6p_370" stddev="0.006" weight="5">0.00032592251902837505</datum>
+        <datum id="ms_group_30_g6p_173" stddev="0.006" weight="0">0.49824753567979013</datum>
+        <datum id="ms_group_30_g6p_173" stddev="0.006" weight="1">0.029283846010331436</datum>
+        <datum id="ms_group_30_g6p_173" stddev="0.006" weight="2">0.4724686183098731</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="0">0.10189646705321939</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="1">0.09197214225478426</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="2">0.21004976731767533</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="3">0.1780936466008105</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="4">0.17598219500236828</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="5">0.14202051839079832</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="6">0.06119160522940281</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="7">0.03792512212311188</datum>
+        <datum id="ms_group_16_phe_308" stddev="0.004" weight="8">0.0008685360277666884</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="0">0.09474009348845214</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="1">0.08767606940960518</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="2">0.14063674790035405</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="3">0.20768083506444268</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="4">0.13779335221351097</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="5">0.15932105499162985</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="6">0.09183752403698192</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="7">0.04438399315390111</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="8">0.03511963928097357</datum>
+        <datum id="ms_group_17_phe_336" stddev="0.004" weight="9">0.0008106904600872708</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="0">0.13827103985757377</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="1">0.2539123476868628</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="2">0.29467262047268805</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="3">0.2033808433101389</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="4">0.08762064441546578</datum>
+        <datum id="ms_group_23_lys_329" stddev="0.006" weight="5">0.022142504257199613</datum>
+        <datum id="ms_group_2_gly_218" stddev="0.004" weight="0">0.5577748716430062</datum>
+        <datum id="ms_group_2_gly_218" stddev="0.004" weight="1">0.44222512835696764</datum>
+        <datum id="ms_group_3_gly_246" stddev="0.004" weight="0">0.48852547210238695</datum>
+        <datum id="ms_group_3_gly_246" stddev="0.004" weight="1">0.215056756122138</datum>
+        <datum id="ms_group_3_gly_246" stddev="0.004" weight="2">0.2964177717754585</datum>
+        <datum id="ms_group_13_thr_376" stddev="0.006" weight="0">0.2766102156086106</datum>
+        <datum id="ms_group_13_thr_376" stddev="0.006" weight="1">0.35476766999212755</datum>
+        <datum id="ms_group_13_thr_376" stddev="0.006" weight="2">0.2694616250690115</datum>
+        <datum id="ms_group_13_thr_376" stddev="0.006" weight="3">0.09916048933019357</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="0">0.24987685288205866</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="1">0.27675530675444454</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="2">0.29987591039347844</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="3">0.12362918864169335</datum>
+        <datum id="ms_group_4_val_260" stddev="0.004" weight="4">0.049862741328296205</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="0">0.41914568437905886</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="1">0.09905718964299219</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="2">0.391472787074</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="3">0.0833356223127528</datum>
+        <datum id="ms_group_29_r5p_284" stddev="0.006" weight="4">0.006988716591130063</datum>
+        <datum id="ms_group_19_asp_390" stddev="0.004" weight="0">0.2766102156086106</datum>
+        <datum id="ms_group_19_asp_390" stddev="0.004" weight="1">0.35476766999212755</datum>
+        <datum id="ms_group_19_asp_390" stddev="0.004" weight="2">0.2694616250690115</datum>
+        <datum id="ms_group_19_asp_390" stddev="0.004" weight="3">0.09916048933019357</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="0">0.14918582896810667</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="1">0.3187633392616398</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="2">0.3087590545841763</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="3">0.177612102977045</datum>
+        <datum id="ms_group_9_met_218" stddev="0.006" weight="4">0.04567967420896086</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="0">0.13827103985757375</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="1">0.2539123476868628</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="2">0.294672620472688</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="3">0.2033808433101389</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="4">0.08762064441546578</datum>
+        <datum id="ms_group_7_ile_274" stddev="0.004" weight="5">0.02214250425719961</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="0">0.22793073852245785</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="1">0.2720868587587367</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="2">0.2068770941276318</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="3">0.18040665320926189</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="4">0.06722297656107334</datum>
+        <datum id="ms_group_5_val_288" stddev="0.004" weight="5">0.04547567882080947</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="0">0.23222335461033966</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="1">0.2857685973885487</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="2">0.2667044249521564</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="3">0.16820711994187457</datum>
+        <datum id="ms_group_20_asp_418" stddev="0.004" weight="4">0.047096503107029015</datum>
+        <datum id="ms_group_27_tyr_302" stddev="0.004" weight="0">0.5587428135783331</datum>
+        <datum id="ms_group_27_tyr_302" stddev="0.004" weight="1">0.09652288197911812</datum>
+        <datum id="ms_group_27_tyr_302" stddev="0.004" weight="2">0.34473430444254094</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="0">0.1360105162695682</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="1">0.2645070691087536</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="2">0.2893400868216597</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="3">0.20394302449470258</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="4">0.0834773599839072</datum>
+        <datum id="ms_group_6_leu_274" stddev="0.004" weight="5">0.022721943321373138</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="0">0.16547949002985907</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="1">0.31294475213605233</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="2">0.3093740806980848</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="3">0.1618109733800612</datum>
+        <datum id="ms_group_8_pro_258" stddev="0.004" weight="4">0.050390703755876995</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="0">0.12524639983766267</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="1">0.261102228131293</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="2">0.2754866041430804</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="3">0.21358128896546438</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="4">0.10288781230317502</datum>
+        <datum id="ms_group_10_met_320" stddev="0.006" weight="5">0.021695666619258282</datum>
+        <datum id="ms_group_0_ala_232" stddev="0.004" weight="0">0.49987683771310976</datum>
+        <datum id="ms_group_0_ala_232" stddev="0.004" weight="1">0.27682349518390814</datum>
+        <datum id="ms_group_0_ala_232" stddev="0.004" weight="2">0.22329966710296772</datum>
+        <datum id="ms_group_1_ala_260" stddev="0.004" weight="0">0.4559737945955245</datum>
+        <datum id="ms_group_1_ala_260" stddev="0.004" weight="1">0.2917970752432581</datum>
+        <datum id="ms_group_1_ala_260" stddev="0.004" weight="2">0.04857598812655856</datum>
+        <datum id="ms_group_1_ala_260" stddev="0.004" weight="3">0.20365314203464427</datum>
+            </data>
+        </measurement>
+
+        <simulation method="auto" type="auto">
+            <variables>
+                <fluxvalue flux="Glc_upt" type="net">3.3</fluxvalue>
+                <fluxvalue flux="mu2_v75" type="net">0.19038788062441322</fluxvalue>
+                <fluxvalue flux="MAC2_v38" type="net">1.4317974</fluxvalue>
+
+                <fluxvalue flux="EMP7_v7" type="net">2.772088706838619</fluxvalue>
+                <fluxvalue flux="TCA1_v22" type="net">5.557377836090755</fluxvalue>
+                <fluxvalue flux="TCA9_v30" type="net">3.4123091938942047</fluxvalue>
+                <fluxvalue flux="ANA2_v34" type="net">0.00003</fluxvalue>
+                <fluxvalue flux="ANA3_v35" type="net">0.6600211206758616</fluxvalue>
+                <fluxvalue flux="TH1_v66" type="net">0.03630116163717239</fluxvalue>
+                <fluxvalue flux="ATPH1_v67" type="net">21.06457406637012</fluxvalue>
+                <fluxvalue flux="GAS2_v74" type="net">15.92960974751192</fluxvalue>
+
+                <fluxvalue flux="AA8_v47" type="xch">0.013200422413517232</fluxvalue>
+                <fluxvalue flux="AA9_v48" type="xch">0.0</fluxvalue>
+                <fluxvalue flux="EMP2_v2" type="xch">66.00211206758615</fluxvalue>
+                <fluxvalue flux="EMP4_v4" type="xch">3.4684109891516526</fluxvalue>
+                <fluxvalue flux="EMP6_v6" type="xch">1.6038513232423437</fluxvalue>
+                <fluxvalue flux="EMP7_v7" type="xch">3.71921901500848</fluxvalue>
+                <fluxvalue flux="EMP8_v8" type="xch">1.9569626228039296</fluxvalue>
+                <fluxvalue flux="GOX1_v31___1" type="xch">0.0</fluxvalue>
+                <fluxvalue flux="MAC1_minus_v37" type="xch">7.025924829594547</fluxvalue>
+                <fluxvalue flux="MAC2_v38" type="xch">3.2869051809657908</fluxvalue>
+                <fluxvalue flux="PPP3_v11" type="xch">1.6764536465166884</fluxvalue>
+                <fluxvalue flux="PPP4_v12" type="xch">261.6092714966879</fluxvalue>
+                <fluxvalue flux="PPP5_v13" type="xch">0.739223655156965</fluxvalue>
+                <fluxvalue flux="PPP6_v14" type="xch">0.2508080258568274</fluxvalue>
+                <fluxvalue flux="PPP7_minus_v15" type="xch">0.06930221767096548</fluxvalue>
+                <fluxvalue flux="PPP8_minus_v16" type="xch">1.5807505840186884</fluxvalue>
+                <fluxvalue flux="PPP9_v17" type="xch">1.1055353771320682</fluxvalue>
+                <fluxvalue flux="TCA3_v24" type="xch">15.229987359595507</fluxvalue>
+                <fluxvalue flux="TCA4_v25" type="xch">0.13200422413517232</fluxvalue>
+                <fluxvalue flux="TCA6_v27___1" type="xch">0.663321226279241</fluxvalue>
+                <fluxvalue flux="TCA7_v26" type="xch">0.08580274568786202</fluxvalue>
+                <fluxvalue flux="TCA7_v28___1" type="xch">154.29643748599955</fluxvalue>
+                <fluxvalue flux="TCA8_v29___1" type="xch">50.40251288041217</fluxvalue>
+                <fluxvalue flux="TCA9_v30" type="xch">2.8314906076994464</fluxvalue>
+                <fluxvalue flux="TH1_v66" type="xch">6.9203214502864085</fluxvalue>
+            </variables>
+
+        </simulation>
+
+    </configuration>
+
+</fluxml>

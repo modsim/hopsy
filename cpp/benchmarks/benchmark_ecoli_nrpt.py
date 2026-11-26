@@ -29,9 +29,7 @@ from flux_benchmark_common import (
 
 NUM_SAMPLES = 100_000
 KERNELS = ("hit-and-run", "csmmala")
-DEFAULT_FML = (
-    Path(__file__).resolve().parents[1] / "benchmark-python" / "Ecoli_NatProt_GOX.fml"
-)
+DEFAULT_FML = Path(__file__).with_name("Ecoli_NatProt_GOX.fml").resolve()
 
 
 def run_kernel(args, kernel, simulator, geometry, coordinates, initial, ladder, A, b):
