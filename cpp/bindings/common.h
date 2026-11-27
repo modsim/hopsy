@@ -6,6 +6,8 @@
 #include <nanobind/stl/unique_ptr.h>
 #include <nanobind/stl/shared_ptr.h>
 #include <nanobind/stl/optional.h>
+#include <nanobind/stl/tuple.h>
+#include <limits>
 #include <hopsy/geometry/linear_polytope.h>
 #include <hopsy/geometry/bilinear_polytope.h>
 #include <nanobind/stl/vector.h>
@@ -72,6 +74,24 @@ namespace hopsy::bindings {
                 "draw",
                 [](Chain &chain, RandomNumberGenerator &rng, Index count, Index thin) {
                     return evaluate([&] { return chain.draw(rng, count, thin); });
+                },
+                "rng"_a, "num_samples"_a, "thinning"_a = 1)
+            .def(
+                "draw_traced",
+                [](Chain &chain, RandomNumberGenerator &rng, Index count, Index thin) {
+                    if (count < 0 || thin < 1)
+                        throw std::invalid_argument("Invalid sample count or thinning");
+                    const auto missing = std::numeric_limits<double>::quiet_NaN();
+                    State accepted(count), proposed(count);
+                    auto samples = evaluate([&] {
+                        return chain.draw_observed(rng, count, thin,
+                            [&](Index i, const auto &binding) {
+                                accepted[i] = binding.state_log_density().value_or(missing);
+                                proposed[i] = binding.proposal_log_density().value_or(missing);
+                            });
+                    });
+                    return std::make_tuple(std::move(samples), std::move(accepted),
+                                           std::move(proposed));
                 },
                 "rng"_a, "num_samples"_a, "thinning"_a = 1)
             .def(

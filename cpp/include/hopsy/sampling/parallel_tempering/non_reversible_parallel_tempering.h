@@ -13,7 +13,8 @@
 #include <utility>
 #include <vector>
 #include <hopsy/sampling/chain.h>
-#include <hopsy/sampling/temperature_ladder.h>
+#include <hopsy/sampling/parallel.h>
+#include <hopsy/sampling/parallel_tempering/temperature_ladder.h>
 #include <hopsy/target/uniform.h>
 
 namespace hopsy {
@@ -23,6 +24,19 @@ namespace hopsy {
                 Local(const DefaultReference &, const auto &, const auto &) noexcept {}
             };
         };
+
+        inline void validate_tempering_steps(Index local, Index reference) {
+            if (local < 1 || reference < 1)
+                throw std::invalid_argument(
+                    "Local and reference exploration require positive steps");
+        }
+
+        inline std::vector<Index> tempering_steps(std::size_t slots, Index local, Index reference) {
+            validate_tempering_steps(local, reference);
+            std::vector<Index> steps(slots, local);
+            steps.front() = reference;
+            return steps;
+        }
 
         inline double checked_tempering_log_density(double value) {
             if (std::isnan(value) || value == std::numeric_limits<double>::infinity())
@@ -106,6 +120,12 @@ namespace hopsy {
     struct ReplicaExchangeStatistics {
         std::size_t attempts = 0;
         std::size_t accepts = 0;
+    };
+
+    template <typename Scalar> struct TemperingTrace {
+        Matrix<Scalar> samples;
+        Matrix<Index> replica_ids;
+        Matrix<double> log_densities;
     };
 
     // States, kernels, workspaces and local RNGs belong to physical replicas.
@@ -256,29 +276,83 @@ namespace hopsy {
         }
 
         void scan(Index local_steps = 1, Index reference_steps = 10) {
-            validate_steps(local_steps, reference_steps);
-            explore_all(local_steps, reference_steps);
+            detail::validate_tempering_steps(local_steps, reference_steps);
+            for (std::size_t slot = 0; slot < size(); ++slot)
+                explore(slot, slot == 0 ? reference_steps : local_steps);
             communicate();
+        }
+
+        // Observers run at the synchronization point on the finishing worker.
+        // No workers means serial execution. Zero uses one worker per slot.
+        // In parallel, shared problem resources must support concurrent const calls.
+        template <typename Before, typename After = decltype(detail::ignore_sample)>
+        void run_scans(Index count, std::span<const Index> steps, std::optional<std::size_t> workers,
+                       const Before &before_exchange, const After &after_exchange = {}) {
+            if (count < 0)
+                throw std::invalid_argument("Sample count must be nonnegative");
+            if (steps.size() != size() ||
+                std::ranges::any_of(steps, [](Index step) { return step < 1; }))
+                throw std::invalid_argument("Expected one positive step count per slot");
+            if (workers && *workers > size())
+                throw std::invalid_argument("Workers must not exceed the number of temperature slots");
+            detail::for_each_round(
+                size(), count, workers, [&](std::size_t slot) { explore(slot, steps[slot]); },
+                [&](Index scan) {
+                    before_exchange(scan);
+                    communicate();
+                    after_exchange(scan);
+                });
         }
 
         // One column per scan at beta one, in target coordinates, after
         // exploration and before communication, as in annealing.py.
         Matrix<scalar_type> draw(Index count, Index local_steps = 1, Index reference_steps = 10) {
-            if (count < 0)
-                throw std::invalid_argument("Sample count must be nonnegative");
-            validate_steps(local_steps, reference_steps);
-            Matrix<scalar_type> samples(
-                problem_.coordinates().target_dimension(sampling_state(0).size()), count);
-            for (Index i = 0; i < count; ++i) {
-                explore_all(local_steps, reference_steps);
-                auto column = samples.col(i);
-                problem_.coordinates().to_target(sampling_state(size() - 1), column);
-                communicate();
-            }
-            return samples;
+            return draw(count, detail::tempering_steps(size(), local_steps, reference_steps));
+        }
+
+        Matrix<scalar_type> draw(Index count, std::span<const Index> steps,
+                                 std::optional<std::size_t> workers = {}) {
+            return draw_impl(count, steps, workers, detail::ignore_sample);
+        }
+
+        // Trace columns are in slot order. Record the initial ensemble and
+        // the post-exchange ensemble of every scan.
+        TemperingTrace<scalar_type> draw_traced(Index count, std::span<const Index> steps,
+                                               std::optional<std::size_t> workers = {}) {
+            if (count < 0 || count == std::numeric_limits<Index>::max())
+                throw std::invalid_argument("Trace requires room for the initial snapshot");
+            TemperingTrace<scalar_type> trace{
+                {}, Matrix<Index>(size(), count + 1), Matrix<double>(size(), count + 1)};
+            const auto snapshot = [&](Index column) {
+                for (std::size_t slot = 0; slot < size(); ++slot) {
+                    trace.replica_ids(slot, column) = static_cast<Index>(replica_at_slot_[slot]);
+                    trace.log_densities(slot, column) = state_log_density(slot);
+                }
+            };
+            snapshot(0);
+            trace.samples = draw_impl(count, steps, workers, [&](Index scan) {
+                snapshot(scan + 1);
+            });
+            return trace;
         }
 
       private:
+        template <typename After>
+        Matrix<scalar_type> draw_impl(Index count, std::span<const Index> steps,
+                                     std::optional<std::size_t> workers, const After &after) {
+            if (count < 0)
+                throw std::invalid_argument("Sample count must be nonnegative");
+            const auto cold = size() - 1;
+            const auto &coordinates = problem_.coordinates();
+            Matrix<scalar_type> samples(coordinates.target_dimension(sampling_state(cold).size()),
+                                        count);
+            run_scans(count, steps, workers, [&](Index scan) {
+                auto column = samples.col(scan);
+                coordinates.to_target(sampling_state(cold), column);
+            }, after);
+            return samples;
+        }
+
         const Problem &problem_for(std::size_t replica) const noexcept {
             return replica_problems_.empty() ? problem_ : replica_problems_[replica];
         }
@@ -361,8 +435,7 @@ namespace hopsy {
                         }
                         return accepts;
                     } catch (...) {
-                        density_cache.clear_proposal();
-                        local_kernel.reject(state);
+                        detail::cancel_transition(local_kernel, state, density_cache);
                         throw;
                     }
                 };
@@ -404,15 +477,6 @@ namespace hopsy {
             trip_phases_[hot] = TripPhase::seeking_cold;
         }
 
-        static void validate_steps(Index local_steps, Index reference_steps) {
-            if (local_steps < 1 || reference_steps < 1)
-                throw std::invalid_argument(
-                    "Local and reference exploration require positive steps");
-        }
-        void explore_all(Index local_steps, Index reference_steps) {
-            for (std::size_t i = 0; i < size(); ++i)
-                explore(i, i == 0 ? reference_steps : local_steps);
-        }
         void validate_streams(std::vector<TemperingReplica<Kernel>> &replicas) {
             std::vector<decltype(exchange_rng_.stream())> streams;
             streams.reserve(replicas.size() + 1);

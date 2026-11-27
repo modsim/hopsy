@@ -7,6 +7,20 @@
 #include <hopsy/sampling/step.h>
 
 namespace hopsy {
+    namespace detail {
+        inline constexpr auto ignore_sample = [](Eigen::Index, const auto &...) {};
+
+        template <typename Step, typename Record>
+        void collect_draws(Eigen::Index count, Eigen::Index thinning, const Step &step,
+                           const Record &record) {
+            for (Eigen::Index sample = 0; sample < count; ++sample) {
+                for (Eigen::Index iteration = 0; iteration < thinning; ++iteration)
+                    step();
+                record(sample);
+            }
+        }
+    } // namespace detail
+
     template <typename Kernel, typename State, typename Target, typename Geometry,
               typename Workspace, typename Derived>
     void draw_into(Kernel &kernel, State &state, RandomNumberGenerator &rng, const Target &target,
@@ -25,24 +39,23 @@ namespace hopsy {
             if (samples.cols() > 0)
                 kernel.invalidate_target_cache();
         }
-        const auto draw_batch = [&](auto transition) {
-            for (Eigen::Index sample = 0; sample < samples.cols(); ++sample) {
-                for (Eigen::Index iteration = 0; iteration < thinning; ++iteration)
-                    transition();
-                samples.col(sample) = state;
-            }
-        };
+        const auto record = [&](Eigen::Index sample) { samples.col(sample) = state; };
         if constexpr (detail::CachesLogDensity<Kernel> && !target_is_uniform_v<Target> &&
                       !Kernel::template always_accept<Target> &&
                       !requires { target.log_density_increment(state, state); }) {
             detail::LogDensityCache cache;
             const detail::CachedTarget cached(target, cache);
-            draw_batch([&] {
-                detail::step_with_density_cache(kernel, state, rng, cached, geometry, workspace,
-                                                cache);
-            });
+            detail::collect_draws(
+                samples.cols(), thinning,
+                [&] {
+                    detail::step_with_density_cache(kernel, state, rng, cached, geometry, workspace,
+                                                    cache);
+                },
+                record);
         } else {
-            draw_batch([&] { step(kernel, state, rng, target, geometry, workspace); });
+            detail::collect_draws(
+                samples.cols(), thinning,
+                [&] { step(kernel, state, rng, target, geometry, workspace); }, record);
         }
     }
 

@@ -10,7 +10,7 @@
 #include <hopsy/kernel/gaussian_kernel.h>
 #include <hopsy/kernel/hit_and_run.h>
 #include <hopsy/kernel/uniform_line_kernel.h>
-#include <hopsy/sampling/non_reversible_parallel_tempering.h>
+#include <hopsy/sampling/parallel_tempering/non_reversible_parallel_tempering.h>
 
 namespace {
     using State = hopsy::Vector<double>;

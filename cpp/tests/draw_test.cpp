@@ -1,7 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 #include <hopsy/sampling/draw.h>
+#include <hopsy/sampling/parallel.h>
 
 #include <Eigen/Core>
+#include <array>
 #include <limits>
 #include <stdexcept>
 
@@ -81,6 +83,29 @@ TEST_CASE_METHOD(Fixture, "draw_into supports batches in matrix blocks", "[sampl
     }
     CHECK((state.array() == 4).all());
     CHECK(kernel.proposals == 4);
+}
+
+TEST_CASE("Independent C++ draws keep their own state and output", "[sampling][parallel]") {
+    constexpr std::size_t chains = 5;
+    std::array<Eigen::MatrixXd, chains> samples;
+    hopsy::parallel_for(chains, 2, [&](std::size_t i) {
+        Fixture chain;
+        chain.state.setConstant(static_cast<double>(i));
+        samples[i] = hopsy::draw(chain.kernel, chain.state, chain.rng, chain.target,
+                                 chain.geometry, chain.workspace, 3, 2);
+    });
+    for (std::size_t i = 0; i < chains; ++i) {
+        REQUIRE(samples[i].cols() == 3);
+        for (Eigen::Index sample = 0; sample < samples[i].cols(); ++sample) {
+            const double expected = static_cast<double>(i) + 2.0 * (sample + 1);
+            CHECK((samples[i].col(sample).array() == expected).all());
+        }
+    }
+    const auto failing_draw = [](std::size_t i) {
+        if (i == 3)
+            throw std::runtime_error("draw failed");
+    };
+    CHECK_THROWS_AS(hopsy::parallel_for(chains, 2, failing_draw), std::runtime_error);
 }
 
 TEST_CASE_METHOD(Fixture, "draw records repeated states after rejection", "[sampling][draw]") {

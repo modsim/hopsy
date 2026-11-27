@@ -132,6 +132,89 @@ PY
 - `summarize` requires at least two matching, distinctly seeded replicates. It writes `summary.json` with ArviZ rank-normalized and folded split R̂ and bulk ESS, keeping the independent cold chains distinct for diagnostics. It checks ESS thresholds of 100 per chain and 50 per half-chain for every free flux. Recorded ESS rates use summed retained-draw timer values. Measure elapsed wall time around a concurrent batch when comparing throughput.
 - The SVGs overlay normalized histograms by method for varying net and exchange fluxes reconstructed in original model coordinates. Fixed flux values are listed in the report. Round trips measure movement along the ladder. Check R̂ and ESS alongside them.
 
+#### Overnight validation
+
+After building the Python bindings and installing the native-target 13CFLUX
+wheel, run this from the repository root on Linux with `taskset`, `lscpu`, and
+`flock` available.
+
+```bash
+cpp/benchmarks/run_nrpt_benchmarks.sh cpp/build/nrpt-overnight
+```
+
+For a short end-to-end check, use a separate directory.
+
+```bash
+cpp/benchmarks/run_nrpt_benchmarks.sh --smoke cpp/build/nrpt-overnight-smoke
+```
+
+The overnight profile runs the two models in sequence, with one independent
+replicate at a time and eight native workers pinned to eight distinct physical
+cores. Numerical libraries are limited to one thread. Each worker advances one
+temperature slot, then the workers synchronize for the usual alternating swaps.
+The launcher uses seeds `42, 136, 271, 314`, initialization weights
+`0, 0.33, 0.67, 0.995`, 2,000 warm-up scans, and the ladders in the smoke
+examples above. Slots with β ≤ 0.5 take 20 rounded coordinate Hit-and-Run
+steps. Slots above the cutoff take one CSmMALA step at scale 0.15. The harder
+model uses `[12]Gluc` with the same explicit caps shown above. The launcher
+copies both inputs into the result directories and removes the external
+schema hint from the harder copy.
+
+The reference NatProt run kept 120,000 cold draws per seed and took about one
+hour with four replicates running concurrently and ten Hit-and-Run steps per
+scan. Eight times that draw count is 960,000 per seed. For the new sequential
+20-to-1 configuration, four 2,000-draw pilots per model on the Ryzen 5950X
+measured mean retained scan times of 18.124 ms for NatProt and 13.991 ms for
+`[12]Gluc`. Multiplying each rate by four seeds and by the draws plus warm-up
+gives these sampling estimates.
+
+| Retained draws per seed per model | NatProt GOX | Capped `[12]Gluc` | Combined sampling |
+|---:|---:|---:|---:|
+| 250,000 (default) | 5 h 04 min | 3 h 55 min | **9 h 00 min** |
+| 960,000 (`--reference-8x`) | 19 h 22 min | 14 h 57 min | **34 h 20 min** |
+
+The default targets the 8–10 h window. Setup, diagnostics and plots add time,
+and elapsed time depends on CPU load and the trajectories. A fixed draw count
+gives each seed the same sample size. On a different machine, use
+`NRPT_NATPROT_DRAWS` and `NRPT_GLUC_DRAWS` to set the default profile's counts
+from a local pilot. The optional `HOPSY_PYTHON` and `HOPSY_BINDINGS` variables
+select another interpreter or binding build.
+
+Monitor both models from another terminal.
+
+```bash
+tail -F cpp/build/nrpt-overnight/run.log
+```
+
+The output includes `configuration.txt` with the Git commit, seeds, settings,
+package versions and input and extension hashes. Each `seed-*` directory is
+published after its draws, replica trace, report, and timing have been written.
+Run the same command with the same directory to resume. Completed seeds are
+reused, and an interrupted seed restarts from its original RNG stream in a new
+attempt directory. The previous attempt's log stays in its hidden
+`.seed-*` directory.
+
+```bash
+cat cpp/build/nrpt-overnight/{natprot-gox,edp-gox-mgox-tpi-12gluc}/summary.md
+```
+
+Each model's `summary.json` has the machine-readable diagnostics in
+`sequential_run`. The equivalent `summary.md` reports generated and retained
+cold draws, per-seed wall times, round trips per seed and per physical replica,
+and round-trip rates. The sampling wall covers warm-up and retained scans
+across the sequential replicates. Total wall adds replicate setup, output,
+and diagnostics. `latest-invocation-wall-seconds.txt` at the run root measures
+the launcher invocation, including setup and orchestration.
+
+ESS and R̂ use the independent retained cold chains. ESS/s divides by sampling
+wall, and the minimum, mean and sum use defined marginal ArviZ bulk ESS values
+across varying fluxes. The sum is descriptive because fluxes can be correlated.
+R̂ is the maximum rank-normalized and folded split R̂ across varying fluxes.
+The summarizer requires at least two distinct seeds. The numbered,
+model-specific SVGs overlay the cold-chain histograms by seed with shared bins
+in original model units. Fixed fluxes appear as vertical lines at their model
+values.
+
 #### NatProt GOX on the Ryzen 9 5950X
 
 Each strategy ran separately with four seeds (42, 136, 271, and 314), starting

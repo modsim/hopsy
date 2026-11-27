@@ -1,9 +1,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
-#include <exception>
 #include <limits>
-#include <thread>
 #include <vector>
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -12,7 +10,8 @@
 #include <hopsy/kernel/gaussian_kernel.h>
 #include <hopsy/kernel/hit_and_run.h>
 #include <hopsy/kernel/uniform_line_kernel.h>
-#include <hopsy/sampling/non_reversible_parallel_tempering.h>
+#include <hopsy/sampling/parallel.h>
+#include <hopsy/sampling/parallel_tempering/non_reversible_parallel_tempering.h>
 
 namespace {
     using State = hopsy::Vector<double>;
@@ -346,22 +345,9 @@ TEST_CASE("NRPT split exploration is reproducible across independent slot worker
     auto serial = make_sampler();
     auto parallel = make_sampler();
     for (int scan = 0; scan < 32; ++scan) {
-        std::array<std::exception_ptr, 4> failures{};
-        {
-            std::array<std::jthread, 4> workers;
-            for (std::size_t slot = 0; slot < workers.size(); ++slot) {
-                workers[slot] = std::jthread([&, slot] {
-                    try {
-                        parallel.explore(slot, slot == 0 ? 5 : 3);
-                    } catch (...) {
-                        failures[slot] = std::current_exception();
-                    }
-                });
-            }
-        }
-        for (const auto &error : failures)
-            if (error)
-                std::rethrow_exception(error);
+        hopsy::parallel_for(parallel.size(), 2, [&](std::size_t slot) {
+            parallel.explore(slot, slot == 0 ? 5 : 3);
+        });
         parallel.communicate();
         serial.scan(3, 5);
         REQUIRE(std::ranges::equal(parallel.replica_indices(), serial.replica_indices()));

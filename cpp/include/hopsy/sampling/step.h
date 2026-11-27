@@ -11,8 +11,8 @@
 namespace hopsy {
     template <typename Kernel, typename State, typename Target, typename Geometry,
               typename Workspace>
-    bool step(Kernel &kernel, State &state, RandomNumberGenerator &rng, const Target &target,
-              const Geometry &geometry, Workspace &workspace) {
+    inline bool step(Kernel &kernel, State &state, RandomNumberGenerator &rng, const Target &target,
+                     const Geometry &geometry, Workspace &workspace) {
         kernel.propose(state, rng, target, geometry, workspace);
 
         if constexpr (Kernel::template always_accept<Target>) {
@@ -45,6 +45,12 @@ namespace hopsy {
     }
 
     namespace detail {
+        template <typename Kernel, typename State>
+        void cancel_transition(Kernel &kernel, State &state, LogDensityCache &cache) {
+            cache.clear_proposal();
+            kernel.reject(state);
+        }
+
         template <typename Kernel, typename State, typename Target, typename Geometry,
                   typename Workspace>
         bool step_with_density_cache(Kernel &kernel, State &state, RandomNumberGenerator &rng,

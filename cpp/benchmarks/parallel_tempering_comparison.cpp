@@ -6,11 +6,10 @@
 #include <exception>
 #include <iomanip>
 #include <iostream>
-#include <latch>
 #include <numeric>
+#include <optional>
 #include <stdexcept>
 #include <string_view>
-#include <thread>
 #include <utility>
 #include <vector>
 #include <hopsy/geometry/linear_polytope.h>
@@ -18,7 +17,8 @@
 #include <hopsy/kernel/gaussian_kernel.h>
 #include <hopsy/kernel/hit_and_run.h>
 #include <hopsy/kernel/uniform_line_kernel.h>
-#include <hopsy/sampling/non_reversible_parallel_tempering.h>
+#include <hopsy/sampling/parallel.h>
+#include <hopsy/sampling/parallel_tempering/non_reversible_parallel_tempering.h>
 #include <hopsy/target/gaussian.h>
 #include "batch_means.h"
 
@@ -54,30 +54,6 @@ namespace {
         return LinearPolytope<double>(A, State::Constant(2 * dimension, radius));
     }
 
-    template <typename Work> void run_workers(const Work &work) {
-        // Release the workers only after all barrier participants exist.
-        std::latch launch(1);
-        std::vector<std::jthread> workers;
-        workers.reserve(chains);
-        try {
-            for (std::size_t i = 0; i < chains; ++i) {
-                workers.emplace_back([&, i](std::stop_token stop) {
-                    launch.wait();
-                    if (!stop.stop_requested())
-                        work(i);
-                });
-            }
-        } catch (...) {
-            for (auto &worker : workers)
-                worker.request_stop();
-            launch.count_down();
-            throw;
-        }
-        launch.count_down();
-        for (auto &worker : workers)
-            worker.join();
-    }
-
     State initial_state(double radius, std::size_t slot) {
         return State::Constant(dimension, 0.8 * radius * (2. * slot / (chains - 1) - 1.));
     }
@@ -95,7 +71,7 @@ namespace {
         std::array<std::exception_ptr, chains> failures{};
         std::barrier ready(chains, [&]() noexcept { start = Clock::now(); });
         std::barrier done(chains, [&]() noexcept { stop = Clock::now(); });
-        run_workers([&](std::size_t id) {
+        hopsy::detail::run_workers(chains, [&](std::size_t id) {
             bool warmed_up = false;
             try {
                 auto &samples = result.traces[id];
@@ -124,48 +100,25 @@ namespace {
     }
 
     template <typename Sampler>
-    double threaded_scans(Sampler &sampler, Samples &samples, Index warmup_scans, Index block) {
-        const Index total_scans = warmup_scans + samples.cols();
-        Index scan = 0;
-        Clock::time_point start, stop;
-        std::array<std::exception_ptr, chains> failures{};
-        std::exception_ptr failure;
-        std::barrier exchange(chains, [&]() noexcept {
-            for (const auto &error : failures) {
-                if (error) {
-                    failure = error;
-                    return;
-                }
-            }
-            try {
+    double timed_scans(Sampler &sampler, Samples &samples, Index warmup_scans, Index block,
+                       std::optional<std::size_t> workers) {
+        const Index scans = warmup_scans + samples.cols();
+        const std::vector<Index> steps(chains, block);
+        auto start = Clock::now();
+        Clock::time_point stop;
+        sampler.run_scans(scans, steps, workers,
+            [&](Index scan) {
                 if (scan >= warmup_scans)
                     samples.col(scan - warmup_scans) = sampler.sampling_state(chains - 1);
-                sampler.communicate();
-                ++scan;
-                if (scan == warmup_scans) {
+            },
+            [&](Index scan) {
+                if (scan + 1 == warmup_scans) {
                     sampler.reset_statistics();
                     start = Clock::now();
                 }
-                if (scan == total_scans)
+                if (scan + 1 == scans)
                     stop = Clock::now();
-            } catch (...) {
-                failure = std::current_exception();
-            }
-        });
-        run_workers([&](std::size_t slot) {
-            for (Index n = 0; n < total_scans; ++n) {
-                try {
-                    sampler.explore(slot, block);
-                } catch (...) {
-                    failures[slot] = std::current_exception();
-                }
-                exchange.arrive_and_wait();
-                if (failure)
-                    break;
-            }
-        });
-        if (failure)
-            std::rethrow_exception(failure);
+            });
         return std::chrono::duration<double>(stop - start).count();
     }
 
@@ -185,21 +138,8 @@ namespace {
         const Index warmup_scans = workload.warmup_steps / block;
         Result result;
         auto &samples = result.traces.emplace_back(dimension, workload.steps / block);
-        if (threaded) {
-            result.seconds = threaded_scans(sampler, samples, warmup_scans, block);
-        } else {
-            for (Index n = 0; n < warmup_scans; ++n)
-                sampler.scan(block, block);
-            sampler.reset_statistics();
-            const auto start = Clock::now();
-            for (Index n = 0; n < samples.cols(); ++n) {
-                for (std::size_t slot = 0; slot < chains; ++slot)
-                    sampler.explore(slot, block);
-                samples.col(n) = sampler.sampling_state(chains - 1);
-                sampler.communicate();
-            }
-            result.seconds = std::chrono::duration<double>(Clock::now() - start).count();
-        }
+        result.seconds = timed_scans(sampler, samples, warmup_scans, block,
+                                     threaded ? std::optional{chains} : std::nullopt);
         const auto rejections = sampler.mean_exchange_rejections();
         const auto trips = sampler.round_trips();
         result.barrier = std::accumulate(rejections.begin(), rejections.end(), 0.);

@@ -95,6 +95,7 @@ by kernel family to limit compiler memory consumption.
 ```python
 accepted = chain.step(rng)
 physical = chain.draw(rng, 1000, thinning=2)
+physical, accepted_log_density, proposed_log_density = chain.draw_traced(rng, 1000, thinning=2)
 sampling = chain.draw_sampling(rng, 1000, thinning=2)
 
 physical_out = np.empty((chain.target_dimension, 1000), order="F")
@@ -111,6 +112,16 @@ Outputs must be writable float64 matrices with compatible dimensions and
 nonoverlapping positive strides. C/F contiguous and ordinary sliced matrices
 work. Direct kernel step-size access is permitted while unbound; use the chain's
 step-size property while bound. Invalid output arguments do not consume the RNG.
+
+`chain.draw_traced` returns the same samples as `draw` and one-dimensional
+arrays of cached accepted and proposed log densities after each thinning block.
+The proposal value describes the final transition in the block. Missing cache
+entries appear as `NaN`. Recording traces requires no extra target evaluations.
+
+For independent parallel sampling, submit `draw` or `draw_traced` calls to
+`concurrent.futures.ThreadPoolExecutor` with a separate chain, kernel and RNG
+per job. With native targets that support concurrent evaluation, the same
+GIL-releasing calls run concurrently. `Executor.map` preserves the input order.
 
 All three Gaussian kernels and the nine Hit-and-Run combinations are available:
 `GaussianRandomWalkKernel`, `DikinWalkKernel`, `CSmMALAKernel`, and
@@ -301,9 +312,9 @@ the GIL, and calls on a busy sampler raise an error. Use `sampling_state(slot)`
 and `target_state(slot)` to inspect detached copies of current states.
 Exchange counts, replica indices, and round trips are snapshots.
 
-`draw_parallel` keeps its native workers for the duration of the draw and
-synchronizes before each exchange. It supports built-in targets and capsule
-targets with private contexts. For the latter, pass `replica_targets=` with
+`draw_parallel` delegates to the C++ scan driver, which keeps its native workers
+for the duration of the draw and synchronizes before each exchange. It supports
+built-in targets and capsule targets with private contexts. For the latter, pass `replica_targets=` with
 one separately created `CapsuleTarget` per replica when binding. Every
 capsule must evaluate the same log density, including its additive constant,
 in the problem's target coordinates. Capsules follow physical replicas

@@ -291,7 +291,14 @@ def reconstruct_fluxes(space, indices, chains):
 
 
 def plot_flux_posteriors(
-    simulator, flux_samples, initial, directory, *, reference_max_beta=0.0
+    simulator,
+    flux_samples,
+    initial,
+    directory,
+    *,
+    reference_max_beta=0.0,
+    replicate_seeds=None,
+    model_tag=None,
 ):
     """Overlay reconstructed marginal densities with shared bins for each flux."""
     from matplotlib import rc_context
@@ -320,37 +327,44 @@ def plot_flux_posteriors(
         "nrpt_parallel_rounded_reference": ("parallel NRPT · rounded hot", "-."),
     }
     handles = {}
-    for kernel, mode in flux_samples:
-        kernel_name, color = kernel_styles[kernel]
-        mode_name, linestyle = mode_styles[mode]
-        if mode.endswith("_rounded_reference"):
-            color = "#0072B2"
-            if reference_max_beta > 0:
-                execution = "parallel" if mode.startswith("nrpt_parallel") else "serial"
-                mode_name = (
-                    f"{execution} NRPT · Hit-and-Run at β ≤ {reference_max_beta:g}"
-                )
-        handles[kernel, mode] = Line2D(
-            [], [], color=color, ls=linestyle, label=f"{kernel_name} · {mode_name}"
-        )
+    if replicate_seeds is not None:
+        if len(flux_samples) != 1:
+            raise ValueError("Replicate overlays require exactly one sampling method")
+        values = next(iter(flux_samples.values()))
+        if len(replicate_seeds) != len(values):
+            raise ValueError("Expected one seed per cold chain")
+        flux_samples = {
+            seed: values[i : i + 1] for i, seed in enumerate(replicate_seeds)
+        }
+        handles = {
+            seed: Line2D([], [], color=f"C{i % 10}", label=f"Seed {seed}")
+            for i, seed in enumerate(replicate_seeds)
+        }
+    else:
+        for kernel, mode in flux_samples:
+            kernel_name, color = kernel_styles[kernel]
+            mode_name, linestyle = mode_styles[mode]
+            if mode.endswith("_rounded_reference"):
+                color = "#0072B2"
+                if reference_max_beta > 0:
+                    execution = (
+                        "parallel" if mode.startswith("nrpt_parallel") else "serial"
+                    )
+                    mode_name = (
+                        f"{execution} NRPT · Hit-and-Run at β ≤ {reference_max_beta:g}"
+                    )
+            handles[kernel, mode] = Line2D(
+                [], [], color=color, ls=linestyle, label=f"{kernel_name} · {mode_name}"
+            )
 
     directory.mkdir(parents=True, exist_ok=True)
     fixed = space.compute_parameters(initial)
     plots = {}
     rows_by_flux = {index: row for row, index in enumerate(flux_indices)}
-    for group, indices in groups.items():
-        varying = [i for i in indices if i in rows_by_flux]
-        info = {
-            "histograms": len(varying),
-            "fixed_fluxes": {
-                names[i]: float(fixed[i]) for i in indices if i not in rows_by_flux
-            },
-        }
-        plots[group] = info
-        if not varying:
-            continue
-        columns = min(4, len(varying))
-        rows = (len(varying) + columns - 1) // columns
+
+    def save_page(title, panels, path):
+        columns = min(4, len(panels))
+        rows = (len(panels) + columns - 1) // columns
         height = 1 + 1.85 * rows
         figure = Figure(figsize=(3.25 * columns + 0.4, height))
         axes = figure.subplots(rows, columns, squeeze=False).ravel()
@@ -362,7 +376,7 @@ def plot_flux_posteriors(
             wspace=0.37,
             hspace=0.66,
         )
-        figure.suptitle(f"{group.capitalize()} flux posteriors", y=1 - 0.12 / height)
+        figure.suptitle(title, y=1 - 0.12 / height)
         figure.legend(
             handles=list(handles.values()),
             loc="upper center",
@@ -371,40 +385,72 @@ def plot_flux_posteriors(
             fontsize=9,
             frameon=False,
         )
-        figure.supxlabel("Flux", y=0.11 / height)
+        figure.supxlabel("Flux (model units)", y=0.11 / height)
         figure.supylabel("Posterior density", x=0.012)
-        for ax, index in zip(axes, varying):
-            row = rows_by_flux[index]
-            lower = min(values[:, row, :].min() for values in flux_samples.values())
-            upper = max(values[:, row, :].max() for values in flux_samples.values())
-            bins = 40
-            # A chain can stay nearly constant along a varying flux. Keep bin
-            # edges distinct even if the observed span is only a few ulps.
-            min_span = bins * np.finfo(float).eps * max(1.0, abs(lower), abs(upper))
-            if upper - lower < min_span:
-                lower -= min_span
-                upper += min_span
-            edges = np.linspace(lower, upper, bins + 1)
-            for style, values in flux_samples.items():
-                handle = handles[style]
-                ax.hist(
-                    values[:, row, :].ravel(),
-                    bins=edges,
-                    density=True,
-                    histtype="step",
-                    color=handle.get_color(),
-                    linestyle=handle.get_linestyle(),
-                    linewidth=1.4,
-                )
+        for ax, index in zip(axes, panels):
+            if index not in rows_by_flux:
+                ax.axvline(fixed[index], color="0.3", linewidth=1.4)
+                ax.set_yticks([])
+                ax.text(0.04, 0.85, "fixed", transform=ax.transAxes, fontsize=8)
+            else:
+                row = rows_by_flux[index]
+                lower = min(values[:, row, :].min() for values in flux_samples.values())
+                upper = max(values[:, row, :].max() for values in flux_samples.values())
+                bins = 40
+                # A chain can stay nearly constant along a varying flux. Keep bin
+                # edges distinct even if the observed span is only a few ulps.
+                min_span = bins * np.finfo(float).eps * max(1.0, abs(lower), abs(upper))
+                if upper - lower < min_span:
+                    lower -= min_span
+                    upper += min_span
+                edges = np.linspace(lower, upper, bins + 1)
+                for style, values in flux_samples.items():
+                    handle = handles[style]
+                    ax.hist(
+                        values[:, row, :].ravel(),
+                        bins=edges,
+                        density=True,
+                        histtype="step",
+                        color=handle.get_color(),
+                        linestyle=handle.get_linestyle(),
+                        linewidth=1.4,
+                    )
+                ax.yaxis.set_major_locator(MaxNLocator(nbins=3))
             ax.set_title(names[index], fontsize=10, parse_math=False)
             ax.xaxis.set_major_locator(MaxNLocator(nbins=4))
-            ax.yaxis.set_major_locator(MaxNLocator(nbins=3))
             ax.tick_params(labelsize=8)
             ax.spines[["top", "right"]].set_visible(False)
-        for ax in axes[len(varying) :]:
+        for ax in axes[len(panels) :]:
             ax.set_visible(False)
-        path = directory / f"{group}_flux_posteriors.svg"
         with rc_context({"svg.fonttype": "none"}):
             figure.savefig(path)
-        info["svg"] = str(path)
+
+    for group, indices in groups.items():
+        varying = [i for i in indices if i in rows_by_flux]
+        info = {
+            "histograms": len(varying),
+            "fixed_fluxes": {
+                names[i]: float(fixed[i]) for i in indices if i not in rows_by_flux
+            },
+        }
+        plots[group] = info
+        title = f"{group.capitalize()} flux posteriors"
+        if replicate_seeds is None:
+            if varying:
+                path = directory / f"{group}_flux_posteriors.svg"
+                save_page(title, varying, path)
+                info["svg"] = str(path)
+            continue
+
+        # Put fixed fluxes on the same pages as varying fluxes. A point mass
+        # is shown as a line because it has no finite density histogram.
+        panels_per_page = 20
+        info["figures"] = []
+        for page, offset in enumerate(range(0, len(indices), panels_per_page), start=1):
+            panels = indices[offset : offset + panels_per_page]
+            path = directory / f"{model_tag}_{group}_flux_posteriors_{page:02}.svg"
+            save_page(f"{model_tag} · {title} · {page}", panels, path)
+            info["figures"].append(
+                {"svg": str(path), "fluxes": [names[i] for i in panels]}
+            )
     return plots

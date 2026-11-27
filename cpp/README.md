@@ -2,6 +2,12 @@
 
 hopsy 2.0 is a header-only C++20 library for constrained Markov chain Monte Carlo. The optional nanobind module exposes the same samplers and a native target capsule interface to Python.
 
+## Sampling execution
+
+[`step.h`](include/hopsy/sampling/step.h) runs one kernel transition. [`draw.h`](include/hopsy/sampling/draw.h) contains the shared thinning and retained-sample loop. [`chain.h`](include/hopsy/sampling/chain.h) binds the kernel, target, state and workspace across calls. Its `draw_observed` method invokes a C++ observer after each retained draw. [`owned_chain.h`](include/hopsy/sampling/owned_chain.h) manages ownership and guards each draw's mutable resources.
+
+[`parallel.h`](include/hopsy/sampling/parallel.h) provides `hopsy::parallel_for` for independent C++ work and the worker and barrier loop used by NRPT. Ordinary Python chains can run their `draw` or `draw_traced` methods in a `ThreadPoolExecutor` with separate chains and RNGs. NRPT keeps one group of native workers through a draw and exchanges replicas after every synchronized local-exploration phase.
+
 ## How non-reversible parallel tempering works
 
 For a bounded, positive-volume feasible region (P), slot β targets a density proportional to `1_P(x) exp(β ℓ(x))`, where ℓ is the entire supplied target log density. The hottest slot at β = 0 is uniform on (P), even where the supplied target gives zero mass. The cold slot at β = 1 targets the requested posterior. Intermediate slots use strictly increasing β. A constant-volume affine coordinate map preserves these semantics.
@@ -16,13 +22,15 @@ Hit-and-Run combines random dense, random coordinate or cycling coordinate direc
 
 | Source | Responsibility |
 |---|---|
-| [non_reversible_parallel_tempering.h](include/hopsy/sampling/non_reversible_parallel_tempering.h) | Replica ownership, local exploration, swaps and trip counters |
-| [temperature_ladder.h](include/hopsy/sampling/temperature_ladder.h) | Ladder validation and warm-up adaptation |
-| [basis_reference.h](include/hopsy/sampling/basis_reference.h), [log_density_cache.h](include/hopsy/target/log_density_cache.h) | Rounded chord directions and cached accepted and proposed densities |
-| [tempering.cpp](bindings/tempering.cpp), [tempering.h](bindings/tempering.h) | Python API, native worker assignment and the per-scan exchange barrier |
+| [non_reversible_parallel_tempering.h](include/hopsy/sampling/parallel_tempering/non_reversible_parallel_tempering.h) | Replica ownership, local exploration, swaps and trip counters |
+| [temperature_ladder.h](include/hopsy/sampling/parallel_tempering/temperature_ladder.h) | Ladder validation and warm-up adaptation |
+| [basis_reference.h](include/hopsy/sampling/parallel_tempering/basis_reference.h) | Rounded Hit-and-Run reference updates |
+| [tempering.cpp](bindings/tempering.cpp), [tempering.h](bindings/tempering.h) | Python API, ownership and GIL guards, and dispatch to the typed core |
 | [benchmark_ecoli_nrpt.py](benchmarks/benchmark_ecoli_nrpt.py), [benchmark_flux_convergence.py](benchmarks/benchmark_flux_convergence.py), [flux_benchmark_common.py](benchmarks/flux_benchmark_common.py) | Single-seed comparisons, replicated convergence diagnostics, and shared model and trace utilities |
 
 See the [complete C++ example](examples/non_reversible_parallel_tempering.cpp) and the [Python, C++ and capsule API guide](bindings/README.md).
+
+C++ callers should include these three NRPT headers from `hopsy/sampling/parallel_tempering/`. They were previously directly under `hopsy/sampling/`.
 
 ### Chain and geometry contracts
 

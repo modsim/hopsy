@@ -3,6 +3,7 @@
 
 import argparse
 import json
+import re
 from functools import partial
 from pathlib import Path
 from time import perf_counter
@@ -33,7 +34,9 @@ TRACE_BATCH_SIZE = 2_000
 
 
 def write_json(path, value):
-    path.write_text(json.dumps(value, indent=2, allow_nan=False) + "\n")
+    pending = path.with_suffix(".json.tmp")
+    pending.write_text(json.dumps(value, indent=2, allow_nan=False) + "\n")
+    pending.replace(path)
 
 
 def draw_traces(sampler, args, mode, steps, dimension):
@@ -110,12 +113,12 @@ def run_replicate(args):
         warmup_seconds = perf_counter() - start
         start = perf_counter()
         samples = chain.draw(rng, args.num_samples)
+        seconds = perf_counter() - start
         save(
             "standalone",
             samples,
-            sampling_report(
-                "standalone", samples, perf_counter() - start, args.num_samples, A, b
-            ),
+            sampling_report("standalone", samples, seconds, args.num_samples, A, b)
+            | {"sampling_wall_seconds": warmup_seconds + seconds},
             warmup_seconds,
         )
         del chain, samples
@@ -149,13 +152,14 @@ def run_replicate(args):
             f"seed {args.seed} {mode} warm-up starts with step counts {steps}",
             flush=True,
         )
-        start = perf_counter()
+        sampling_start = perf_counter()
         sampler.draw_parallel(args.warmup, workers=args.workers, steps_per_slot=steps)
-        warmup_seconds = perf_counter() - start
+        warmup_seconds = perf_counter() - sampling_start
         sampler.reset_statistics()
         samples, ids, densities, seconds = draw_traces(
             sampler, args, mode, steps, initial.size
         )
+        sampling_wall_seconds = perf_counter() - sampling_start
         result = sampling_report(
             mode, samples, seconds, args.num_samples * sum(steps), A, b
         )
@@ -163,6 +167,7 @@ def run_replicate(args):
         round_trips = sampler.round_trips
         result.update(
             workers=args.workers,
+            sampling_wall_seconds=sampling_wall_seconds,
             steps_per_slot=steps,
             exchange_statistics=exchanges,
             global_communication_barrier=sum(sampler.mean_exchange_rejections()),
@@ -297,11 +302,137 @@ def load_reports(replicates):
     return reports
 
 
+def sequential_summary(directories, reports, mode, diagnostics, analysis_seconds):
+    replicates = []
+    for directory, report in zip(directories, reports, strict=True):
+        result = report["results"][mode]
+        trips = result["total_round_trips"]
+        wall = float((directory / "wall-seconds.txt").read_text())
+        replicates.append(
+            {
+                "seed": report["seed"],
+                "wall_seconds": wall,
+                "sampling_wall_seconds": result["sampling_wall_seconds"],
+                "generated_cold_draws": report["warmup"] + result["cold_samples"],
+                "retained_cold_draws": result["cold_samples"],
+                "retained_local_transitions": result["local_transitions"],
+                "round_trips": trips,
+                "round_trips_per_wall_second": trips / wall,
+                "round_trips_by_physical_replica": result["round_trips"],
+            }
+        )
+    sampling_wall = sum(r["sampling_wall_seconds"] for r in replicates)
+    replicate_wall = sum(r["wall_seconds"] for r in replicates)
+    total_wall = replicate_wall + analysis_seconds
+    trips = sum(r["round_trips"] for r in replicates)
+    ess = diagnostics["flux_pooled_bulk_ess"]
+    defined = [value for value in ess.values() if value is not None]
+    total = sum(defined) if defined else None
+    ess_stats = {
+        "minimum": min(defined, default=None),
+        "mean": total / len(defined) if defined else None,
+        "total": total,
+    }
+    return {
+        "replicates": replicates,
+        "sampling_wall_seconds": sampling_wall,
+        "replicate_wall_seconds_total": replicate_wall,
+        "analysis_wall_seconds": analysis_seconds,
+        "total_wall_seconds": total_wall,
+        "generated_cold_draws": sum(r["generated_cold_draws"] for r in replicates),
+        "retained_cold_draws": sum(r["retained_cold_draws"] for r in replicates),
+        "round_trips": trips,
+        "round_trips_per_wall_second": trips / total_wall,
+        "round_trips_per_sampling_second": trips / sampling_wall,
+        "flux_ess_defined": len(defined),
+        "varying_fluxes": len(ess),
+        "flux_ess": ess_stats,
+        "flux_ess_per_sampling_second": {
+            name: value / sampling_wall if value is not None else None
+            for name, value in ess_stats.items()
+        },
+        "max_flux_rhat": diagnostics["flux_rhat_summary"]["max"],
+    }
+
+
+def write_sequential_markdown(path, tag, summary, ess_method, rhat_method):
+    def display(value):
+        if value is None:
+            return "undefined"
+        if isinstance(value, float):
+            return f"{value:,.4g}"
+        return f"{value:,}" if isinstance(value, int) else str(value)
+
+    lines = [
+        f"# {tag} NRPT benchmark",
+        "",
+        "Sampling wall covers warm-up and retained draws. Total wall adds replicate setup,"
+        " output, and diagnostics. Round trips start after warm-up.",
+        "",
+        "| Metric | Value |",
+        "|---|---:|",
+    ]
+    for label, key in (
+        ("Total wall (s)", "total_wall_seconds"),
+        ("Sampling wall (s)", "sampling_wall_seconds"),
+        ("Diagnostics and plots (s)", "analysis_wall_seconds"),
+        ("Generated cold draws, including warm-up", "generated_cold_draws"),
+        ("Retained cold draws", "retained_cold_draws"),
+        ("Round trips", "round_trips"),
+        ("Round trips per total wall second", "round_trips_per_wall_second"),
+        ("Round trips per sampling second", "round_trips_per_sampling_second"),
+        ("Maximum varying-flux R-hat", "max_flux_rhat"),
+    ):
+        lines.append(f"| {label} | {display(summary[key])} |")
+    lines.extend(
+        (
+            "",
+            "| Bulk ESS across varying fluxes | ESS | ESS per sampling second |",
+            "|---|---:|---:|",
+        )
+    )
+    for name in ("minimum", "mean", "total"):
+        value = display(summary["flux_ess"][name])
+        rate = display(summary["flux_ess_per_sampling_second"][name])
+        lines.append(f"| {name.capitalize()} | {value} | {rate} |")
+    lines.extend(
+        (
+            "",
+            f"Defined ESS for {summary['flux_ess_defined']} of {summary['varying_fluxes']} varying fluxes.",
+            "Total ESS sums marginal estimates across fluxes.",
+            f"{ess_method}. {rhat_method}. Both use independent retained cold chains.",
+            "",
+            "| Seed | Wall (s) | Sampling wall (s) | Retained draws | Trips | Trips per wall second | Trips by physical replica |",
+            "|---:|---:|---:|---:|---:|---:|---|",
+        )
+    )
+    for replicate in summary["replicates"]:
+        cells = [
+            display(replicate[key])
+            for key in (
+                "seed",
+                "wall_seconds",
+                "sampling_wall_seconds",
+                "retained_cold_draws",
+                "round_trips",
+                "round_trips_per_wall_second",
+            )
+        ]
+        cells.append(str(replicate["round_trips_by_physical_replica"]))
+        lines.append("| " + " | ".join(cells) + " |")
+    path.write_text("\n".join(lines) + "\n")
+
+
 def aggregate(args):
+    analysis_start = perf_counter()
     import arviz
 
     reports = load_reports(args.replicates)
     reference = reports[0]
+    if args.sequential_model and (
+        len(reference["results"]) != 1 or "standalone" in reference["results"]
+    ):
+        raise ValueError("Sequential benchmark summaries require one NRPT method")
     simulator = x3cflux.create_simulator_from_fml(
         reference["fml"], reference["configuration"]
     )
@@ -406,26 +537,39 @@ def aggregate(args):
         )
     args.output.mkdir(parents=True, exist_ok=True)
     durations = [report.get("elapsed_seconds") for report in reports]
-    write_json(
-        args.output / "summary.json",
-        {
-            "rhat_method": f"ArviZ {arviz.__version__} rank-normalized and folded split R-hat",
-            "ess_method": f"ArviZ {arviz.__version__} bulk ESS",
-            "per_chain_ess_targets": ESS_TARGETS,
-            "replicate_elapsed_seconds_total": (
-                None if None in durations else sum(durations)
-            ),
-            "modes": modes,
-            "replicates": reports,
-            "posterior_plots": plot_flux_posteriors(
-                simulator,
-                plots,
-                first_draw,
-                args.output,
-                reference_max_beta=reference["reference_max_beta"],
-            ),
-        },
+    plots = plot_flux_posteriors(
+        simulator,
+        plots,
+        first_draw,
+        args.output,
+        reference_max_beta=reference["reference_max_beta"],
+        replicate_seeds=[r["seed"] for r in reports] if args.sequential_model else None,
+        model_tag=args.sequential_model,
     )
+    summary = {
+        "rhat_method": f"ArviZ {arviz.__version__} rank-normalized and folded split R-hat",
+        "ess_method": f"ArviZ {arviz.__version__} bulk ESS",
+        "per_chain_ess_targets": ESS_TARGETS,
+        "replicate_elapsed_seconds_total": (
+            None if None in durations else sum(durations)
+        ),
+        "modes": modes,
+        "replicates": reports,
+        "posterior_plots": plots,
+    }
+    if args.sequential_model:
+        mode, diagnostics = next(iter(modes.items()))
+        summary["sequential_run"] = sequential_summary(
+            args.replicates, reports, mode, diagnostics, perf_counter() - analysis_start
+        )
+        write_sequential_markdown(
+            args.output / "summary.md",
+            args.sequential_model,
+            summary["sequential_run"],
+            summary["ess_method"],
+            summary["rhat_method"],
+        )
+    write_json(args.output / "summary.json", summary)
 
 
 def main():
@@ -463,8 +607,19 @@ def main():
     )
     summary.set_defaults(action=aggregate)
     summary.add_argument("--output", type=Path, required=True)
+    summary.add_argument(
+        "--sequential-model",
+        metavar="TAG",
+        help="report sequential wall times and save model-specific replicate overlays",
+    )
     summary.add_argument("replicates", type=Path, nargs="+")
     args = parser.parse_args()
+    if (
+        args.action is aggregate
+        and args.sequential_model
+        and not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9_-]*", args.sequential_model)
+    ):
+        parser.error("--sequential-model must be a filename-safe model tag")
     if args.action is run_replicate:
         validate_model_arguments(parser, args)
         if args.seed < 0:

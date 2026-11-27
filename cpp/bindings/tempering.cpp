@@ -1,31 +1,12 @@
 #include "tempering.h"
-#include <algorithm>
-#include <barrier>
-#include <exception>
-#include <latch>
-#include <limits>
-#include <thread>
-#include <nanobind/stl/tuple.h>
 
 namespace hopsy::bindings {
     namespace {
-        std::vector<Index> draw_steps(Index count, std::size_t slots, Index local_steps,
-                                      Index reference_steps,
-                                      std::optional<std::vector<Index>> steps_per_slot) {
-            if (count < 0)
-                throw std::invalid_argument("Invalid sample count");
-            if (steps_per_slot) {
-                if (steps_per_slot->size() != slots ||
-                    std::any_of(steps_per_slot->begin(), steps_per_slot->end(),
-                                [](Index steps) { return steps < 1; }))
-                    throw std::invalid_argument("Expected one positive step count per slot");
+        std::vector<Index> draw_steps(std::size_t slots, Index local_steps, Index reference_steps,
+                                     std::optional<std::vector<Index>> steps_per_slot) {
+            if (steps_per_slot)
                 return std::move(*steps_per_slot);
-            }
-            if (local_steps < 1 || reference_steps < 1)
-                throw std::invalid_argument("Local and reference exploration require positive steps");
-            std::vector<Index> steps(slots, local_steps);
-            steps.front() = reference_steps;
-            return steps;
+            return detail::tempering_steps(slots, local_steps, reference_steps);
         }
 
         template <auto Method, bool ReleaseGIL = false> auto exclusive_call() {
@@ -62,123 +43,37 @@ namespace hopsy::bindings {
         return methods;
     }
 
-    void TemperingBinding::record_scan(DenseMatrix &samples, Index scan, std::size_t cold,
-                                       Trace *trace) {
-        samples.col(scan) = target_state(cold);
-        communicate();
-        if (trace)
-            record_snapshot(trace->ids.col(scan + 1).data(),
-                            trace->log_densities.col(scan + 1).data());
+    void TemperingBinding::require_parallel_target() const {
+        if (!parallel_ready_)
+            throw std::invalid_argument(
+                "parallel sampling requires a built-in target or one native capsule per replica");
     }
 
-    std::tuple<DenseMatrix, TemperingBinding::ReplicaTrace, DenseMatrix>
+    DenseMatrix TemperingBinding::draw(Index count, Index local_steps, Index reference_steps) {
+        return draw_samples(count, detail::tempering_steps(size(), local_steps, reference_steps),
+                            std::nullopt);
+    }
+
+    std::tuple<DenseMatrix, Matrix<Index>, DenseMatrix>
     TemperingBinding::draw_traced(Index count, Index local_steps, Index reference_steps,
                                   bool parallel, std::size_t workers,
                                   std::optional<std::vector<Index>> steps_per_slot) {
-        const auto slots = ladder().size();
-        const auto steps = draw_steps(count, slots, local_steps, reference_steps,
-                                      std::move(steps_per_slot));
-        if (count == std::numeric_limits<Index>::max())
-            throw std::invalid_argument("Trace requires room for the initial snapshot");
-        Trace trace{ReplicaTrace(slots, count + 1), DenseMatrix(slots, count + 1)};
-        record_snapshot(trace.ids.col(0).data(), trace.log_densities.col(0).data());
-        DenseMatrix samples;
-        if (parallel) {
-            samples = run_parallel_draw(count, steps, &trace, workers);
-        } else {
-            if (workers != 0)
-                throw std::invalid_argument("A worker count requires parallel=True");
-            samples.resize(target_state(slots - 1).size(), count);
-            for (Index scan = 0; scan < count; ++scan) {
-                for (std::size_t slot = 0; slot < slots; ++slot)
-                    explore(slot, steps[slot]);
-                record_scan(samples, scan, slots - 1, &trace);
-            }
-        }
-        return {std::move(samples), std::move(trace.ids), std::move(trace.log_densities)};
+        auto steps = draw_steps(size(), local_steps, reference_steps, std::move(steps_per_slot));
+        if (parallel)
+            require_parallel_target();
+        else if (workers != 0)
+            throw std::invalid_argument("A worker count requires parallel=True");
+        auto result = draw_trace(count, steps, parallel ? std::optional{workers} : std::nullopt);
+        return {std::move(result.samples), std::move(result.replica_ids),
+                std::move(result.log_densities)};
     }
 
     DenseMatrix TemperingBinding::draw_parallel(Index count, Index local_steps,
                                                 Index reference_steps, std::size_t workers,
                                                 std::optional<std::vector<Index>> steps_per_slot) {
-        auto steps = draw_steps(count, ladder().size(), local_steps, reference_steps,
-                                std::move(steps_per_slot));
-        return run_parallel_draw(count, steps, nullptr, workers);
-    }
-
-    DenseMatrix TemperingBinding::run_parallel_draw(Index count, const std::vector<Index> &steps,
-                                                    Trace *trace,
-                                                    std::size_t worker_count) {
-        if (!parallel_ready_)
-            throw std::invalid_argument(
-                "parallel sampling requires a built-in target or one native capsule per replica");
-        const auto slots = steps.size();
-        if (worker_count == 0)
-            worker_count = slots;
-        if (worker_count > slots)
-            throw std::invalid_argument("Workers must not exceed the number of temperature slots");
-        const auto cold = slots - 1;
-        DenseMatrix samples(target_state(cold).size(), count);
-        if (count == 0)
-            return samples;
-
-        Index completed_scans = 0;
-        std::vector<std::exception_ptr> exploration_errors(slots);
-        std::exception_ptr failure;
-        std::barrier finish_scan(static_cast<std::ptrdiff_t>(worker_count), [&]() noexcept {
-            for (const auto &error : exploration_errors) {
-                if (error) {
-                    failure = error;
-                    return;
-                }
-            }
-            try {
-                record_scan(samples, completed_scans, cold, trace);
-                ++completed_scans;
-            } catch (...) {
-                failure = std::current_exception();
-            }
-        });
-
-        // A failed thread launch must release workers without entering a
-        // barrier whose participant count can no longer be reached.
-        std::latch start(1);
-        std::vector<std::jthread> workers;
-        workers.reserve(worker_count);
-        try {
-            for (std::size_t worker = 0; worker < worker_count; ++worker) {
-                workers.emplace_back([&, worker](std::stop_token stop) {
-                    start.wait();
-                    if (stop.stop_requested())
-                        return;
-                    for (Index i = 0; i < count; ++i) {
-                        // Slot assignment is fixed for this draw. On arrival of
-                        // the last worker, finish_scan records and exchanges.
-                        for (std::size_t slot = worker; slot < slots; slot += worker_count) {
-                            try {
-                                explore(slot, steps[slot]);
-                            } catch (...) {
-                                exploration_errors[slot] = std::current_exception();
-                            }
-                        }
-                        finish_scan.arrive_and_wait();
-                        if (failure)
-                            return;
-                    }
-                });
-            }
-        } catch (...) {
-            for (auto &worker : workers)
-                worker.request_stop();
-            start.count_down();
-            throw;
-        }
-        start.count_down();
-        for (auto &worker : workers)
-            worker.join();
-        if (failure)
-            std::rethrow_exception(failure);
-        return samples;
+        auto steps = draw_steps(size(), local_steps, reference_steps, std::move(steps_per_slot));
+        require_parallel_target();
+        return draw_samples(count, steps, workers);
     }
 
     void bind_tempering(nb::module_ &m) {

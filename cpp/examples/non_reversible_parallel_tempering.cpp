@@ -6,7 +6,7 @@
 #include <hopsy/kernel/direction_generator.h>
 #include <hopsy/kernel/hit_and_run.h>
 #include <hopsy/kernel/uniform_line_kernel.h>
-#include <hopsy/sampling/non_reversible_parallel_tempering.h>
+#include <hopsy/sampling/parallel_tempering/non_reversible_parallel_tempering.h>
 
 struct StandardNormal {
     double log_density(const hopsy::Vector<double> &x) const { return -0.5 * x.squaredNorm(); }

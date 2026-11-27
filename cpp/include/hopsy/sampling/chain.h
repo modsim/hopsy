@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <utility>
 #include <hopsy/problem/problem.h>
-#include <hopsy/sampling/step.h>
+#include <hopsy/sampling/draw.h>
 #include <hopsy/kernel/geometry_support.h>
 
 namespace hopsy {
@@ -61,22 +61,7 @@ namespace hopsy {
         BoundChain &operator=(BoundChain &&) = delete;
 
         bool step(RandomNumberGenerator &rng) {
-            // Always-accepted line kernels never prepare a target-dependent
-            // reverse distribution. Keep exception cleanup out of that path.
-            decltype(auto) target = transition_target();
-            using Target = std::remove_cvref_t<decltype(target)>;
-            if constexpr (Kernel::template always_accept<Target>) {
-                return hopsy::step(kernel_, state_, rng, target, problem_.geometry(),
-                                   mutable_workspace());
-            } else {
-                try {
-                    return transition(rng, target, problem_.geometry(), mutable_workspace());
-                } catch (...) {
-                    density_cache_.clear_proposal();
-                    kernel_.reject(state_);
-                    throw;
-                }
-            }
+            return with_step(rng, [](const auto &step) { return step(); });
         }
         const state_type &sampling_state() const noexcept { return state_; }
         std::optional<double> state_log_density() const noexcept { return density_cache_.state(); }
@@ -111,27 +96,27 @@ namespace hopsy {
         template <typename Derived>
         void draw_into(RandomNumberGenerator &rng, Eigen::MatrixBase<Derived> &samples,
                        Index thinning = 1) {
-            draw_into_impl<false>(rng, samples, thinning);
+            draw_into_impl<false>(rng, samples, thinning, detail::ignore_sample);
         }
         template <typename Derived>
         void draw_sampling_into(RandomNumberGenerator &rng, Eigen::MatrixBase<Derived> &samples,
                                 Index thinning = 1) {
-            draw_into_impl<true>(rng, samples, thinning);
+            draw_into_impl<true>(rng, samples, thinning, detail::ignore_sample);
         }
         Matrix<scalar_type> draw(RandomNumberGenerator &rng, Index count, Index thinning = 1) {
-            if (count < 0 || thinning < 1)
-                throw std::invalid_argument("Invalid sample count or thinning");
-            Matrix<scalar_type> result(target_dimension(), count);
-            draw_into(rng, result, thinning);
-            return result;
+            return draw_impl<false>(rng, count, thinning, detail::ignore_sample);
         }
         Matrix<scalar_type> draw_sampling(RandomNumberGenerator &rng, Index count,
                                           Index thinning = 1) {
-            if (count < 0 || thinning < 1)
-                throw std::invalid_argument("Invalid sample count or thinning");
-            Matrix<scalar_type> result(sampling_dimension(), count);
-            draw_sampling_into(rng, result, thinning);
-            return result;
+            return draw_impl<true>(rng, count, thinning, detail::ignore_sample);
+        }
+
+        // Observe each retained draw after thinning. The callback can read the
+        // state and its caches through the const binding.
+        template <typename Observe>
+        Matrix<scalar_type> draw_observed(RandomNumberGenerator &rng, Index count, Index thinning,
+                                           const Observe &observe) {
+            return draw_impl<false>(rng, count, thinning, observe);
         }
 
       private:
@@ -154,41 +139,52 @@ namespace hopsy {
                 return hopsy::step(kernel_, state_, rng, target, geometry, workspace);
             }
         }
-        template <bool Sampling, typename Derived>
-        void draw_into_impl(RandomNumberGenerator &rng, Eigen::MatrixBase<Derived> &samples,
-                            Index thinning) {
-            const Index rows = Sampling ? sampling_dimension() : target_dimension();
-            if (thinning < 1 || samples.rows() != rows)
-                throw std::invalid_argument("Invalid output dimension or thinning");
-            // Resolve the fixed binding once per batch. Cancellation surrounds
-            // the batch rather than rebuilding a single-step call each time.
+        template <typename Run> decltype(auto) with_step(RandomNumberGenerator &rng, const Run &run) {
+            // Resolve the bound target and workspace once per batch.
             decltype(auto) target = transition_target();
             const auto &geometry = problem_.geometry();
             auto &workspace = mutable_workspace();
-            auto draw = [&] {
-                for (Index sample = 0; sample < samples.cols(); ++sample) {
-                    for (Index iteration = 0; iteration < thinning; ++iteration)
-                        transition(rng, target, geometry, workspace);
+            const auto step = [&] { return transition(rng, target, geometry, workspace); };
+            using Target = std::remove_cvref_t<decltype(target)>;
+            if constexpr (Kernel::template always_accept<Target>) {
+                return run(step);
+            } else {
+                try {
+                    return run(step);
+                } catch (...) {
+                    detail::cancel_transition(kernel_, state_, density_cache_);
+                    throw;
+                }
+            }
+        }
+
+        template <bool Sampling, typename Observe>
+        Matrix<scalar_type> draw_impl(RandomNumberGenerator &rng, Index count, Index thinning,
+                                      const Observe &observe) {
+            if (count < 0 || thinning < 1)
+                throw std::invalid_argument("Invalid sample count or thinning");
+            Matrix<scalar_type> samples(Sampling ? sampling_dimension() : target_dimension(), count);
+            draw_into_impl<Sampling>(rng, samples, thinning, observe);
+            return samples;
+        }
+
+        template <bool Sampling, typename Derived, typename Observe>
+        void draw_into_impl(RandomNumberGenerator &rng, Eigen::MatrixBase<Derived> &samples,
+                            Index thinning, const Observe &observe) {
+            const Index rows = Sampling ? sampling_dimension() : target_dimension();
+            if (thinning < 1 || samples.rows() != rows)
+                throw std::invalid_argument("Invalid output dimension or thinning");
+            with_step(rng, [&](const auto &step) {
+                detail::collect_draws(samples.cols(), thinning, step, [&](Index sample) {
                     if constexpr (Sampling || Problem::identity_coordinates)
                         samples.col(sample) = state_;
                     else {
                         auto column = samples.col(sample);
                         problem_.coordinates().to_target(state_, column);
                     }
-                }
-            };
-            using Target = std::remove_cvref_t<decltype(target)>;
-            if constexpr (Kernel::template always_accept<Target>) {
-                draw();
-            } else {
-                try {
-                    draw();
-                } catch (...) {
-                    density_cache_.clear_proposal();
-                    kernel_.reject(state_);
-                    throw;
-                }
-            }
+                    observe(sample, std::as_const(*this));
+                });
+            });
         }
         const Problem &problem_;
         Kernel &kernel_;
@@ -210,17 +206,6 @@ namespace hopsy {
         return BoundChain<P, K, decltype(workspace)>(problem, kernel, state, std::move(workspace),
                                                      std::false_type{});
     }
-    namespace detail {
-        // Owning frontends have already validated and encapsulated state and
-        // geometry. Rebind only the target; do not repeat O(m*n) feasibility
-        // checks on every Python single-step call.
-        template <typename P, typename K, typename W>
-        auto bind_existing_chain(const P &problem, K &kernel, typename K::state_type &state,
-                                 W &workspace) {
-            return BoundChain<P, K, std::reference_wrapper<W>>(
-                problem, kernel, state, std::ref(workspace), std::false_type{});
-        }
-    } // namespace detail
     // Borrowing a temporary problem would leave dangling references.
     template <typename P, typename K, typename... Args>
     auto bind_chain(const P &&, K &, typename K::state_type &, Args &&...) = delete;

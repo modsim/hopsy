@@ -8,7 +8,7 @@
 #include <hopsy/kernel/gaussian_line_kernel.h>
 #include <hopsy/kernel/overrelaxed_line_kernel.h>
 #include <hopsy/sampling/chain.h>
-#include <hopsy/sampling/non_reversible_parallel_tempering.h>
+#include <hopsy/sampling/parallel_tempering/non_reversible_parallel_tempering.h>
 #include <hopsy/target/uniform.h>
 #include <numeric>
 #include <random>

@@ -81,6 +81,47 @@ def test_parallel_native_chains_are_reproducible(name):
         np.testing.assert_array_equal(x, y)
 
 
+@pytest.mark.parametrize("name", ["UniformHitAndRunKernel", "CSmMALAKernel"])
+def test_parallel_traces_match_cache_after_thinning(name):
+    target = core.GaussianTarget(np.zeros(3), np.eye(3))
+    expected = [make(name, seed=i, target=target) for i in range(3)]
+    actual = [make(name, seed=i, target=target) for i in range(3)]
+    count, thinning = 32, 3
+
+    def draw_traced(pair):
+        chain, rng = pair
+        return chain.draw_traced(rng, count, thinning=thinning)
+
+    with ThreadPoolExecutor(2) as pool:
+        traces = list(pool.map(draw_traced, actual))
+
+    for (chain, rng), (samples, accepted, proposed) in zip(expected, traces):
+        for i in range(count):
+            for _ in range(thinning):
+                chain.step(rng)
+            np.testing.assert_array_equal(samples[:, i], chain.target_state)
+            if chain.state_log_density is None:
+                assert np.isnan(accepted[i])
+            else:
+                assert accepted[i] == chain.state_log_density
+            if chain.proposal_log_density is None:
+                assert np.isnan(proposed[i])
+            else:
+                assert proposed[i] == chain.proposal_log_density
+
+
+def test_empty_draw_and_unevaluated_uniform_trace():
+    chain, rng = make("UniformHitAndRunKernel")
+    empty = chain.draw_traced(rng, 0)
+    assert [part.shape for part in empty] == [(3, 0), (0,), (0,)]
+    with pytest.raises(ValueError, match="Invalid sample count or thinning"):
+        chain.draw_traced(rng, 2, thinning=0)
+    expected, expected_rng = make("UniformHitAndRunKernel")
+    samples, accepted, proposed = chain.draw_traced(rng, 8)
+    np.testing.assert_array_equal(samples, expected.draw(expected_rng, 8))
+    assert np.isnan(accepted).all() and np.isnan(proposed).all()
+
+
 @pytest.mark.parametrize("name", NAMES)
 def test_explicit_object_lifetimes_and_detached_state(name):
     initial = np.zeros(3)

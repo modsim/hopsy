@@ -81,6 +81,11 @@ namespace hopsy {
         Matrix<scalar_type> draw(RandomNumberGenerator &rng, Index count, Index thinning = 1) {
             return run(rng, [&] { return binding_->draw(rng, count, thinning); });
         }
+        template <typename Observe>
+        Matrix<scalar_type> draw_observed(RandomNumberGenerator &rng, Index count, Index thinning,
+                                           const Observe &observe) {
+            return run(rng, [&] { return binding_->draw_observed(rng, count, thinning, observe); });
+        }
         Matrix<scalar_type> draw_sampling(RandomNumberGenerator &rng, Index count,
                                           Index thinning = 1) {
             return run(rng, [&] { return binding_->draw_sampling(rng, count, thinning); });

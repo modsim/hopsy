@@ -4,8 +4,8 @@
 #include "common.h"
 #include <atomic>
 #include <tuple>
-#include <hopsy/sampling/basis_reference.h>
-#include <hopsy/sampling/non_reversible_parallel_tempering.h>
+#include <hopsy/sampling/parallel_tempering/basis_reference.h>
+#include <hopsy/sampling/parallel_tempering/non_reversible_parallel_tempering.h>
 
 namespace hopsy::bindings {
     std::vector<std::shared_ptr<TargetMethods>>
@@ -14,13 +14,6 @@ namespace hopsy::bindings {
     // Type erasure stays at the binding boundary. Each exploration batch
     // performs its transitions in the typed native sampler.
     class TemperingBinding {
-        using ReplicaTrace = Matrix<Index>;
-
-        struct Trace {
-            ReplicaTrace ids;
-            DenseMatrix log_densities;
-        };
-
         class Operation {
           public:
             explicit Operation(std::atomic_flag &busy) : busy_(busy) {
@@ -41,11 +34,11 @@ namespace hopsy::bindings {
         virtual ~TemperingBinding() = default;
 
         auto lock() const { return Operation(busy_); }
-        virtual DenseMatrix draw(Index count, Index local_steps, Index reference_steps) = 0;
+        DenseMatrix draw(Index count, Index local_steps, Index reference_steps);
         DenseMatrix draw_parallel(Index count, Index local_steps, Index reference_steps,
                                   std::size_t workers,
                                   std::optional<std::vector<Index>> steps_per_slot);
-        std::tuple<DenseMatrix, ReplicaTrace, DenseMatrix>
+        std::tuple<DenseMatrix, Matrix<Index>, DenseMatrix>
         draw_traced(Index count, Index local_steps, Index reference_steps, bool parallel,
                     std::size_t workers, std::optional<std::vector<Index>> steps_per_slot);
         virtual void scan(Index local_steps, Index reference_steps) = 0;
@@ -64,10 +57,12 @@ namespace hopsy::bindings {
         virtual void reset_statistics() = 0;
 
       private:
-        virtual void record_snapshot(Index *ids, double *log_densities) const = 0;
-        void record_scan(DenseMatrix &samples, Index scan, std::size_t cold, Trace *trace);
-        DenseMatrix run_parallel_draw(Index count, const std::vector<Index> &steps_per_slot,
-                                      Trace *trace, std::size_t workers);
+        virtual std::size_t size() const noexcept = 0;
+        virtual DenseMatrix draw_samples(Index count, std::span<const Index> steps,
+                                         std::optional<std::size_t> workers) = 0;
+        virtual TemperingTrace<double> draw_trace(Index count, std::span<const Index> steps,
+                                                  std::optional<std::size_t> workers) = 0;
+        void require_parallel_target() const;
         nb::object problem_owner_; // Retains the geometry, target and coordinate map.
         const bool parallel_ready_;
         mutable std::atomic_flag busy_{};
@@ -85,9 +80,6 @@ namespace hopsy::bindings {
               sampler_(std::move(problem), std::move(ladder), std::move(replicas),
                        std::move(exchange_rng), std::move(replica_problems), std::move(reference)) {}
 
-        DenseMatrix draw(Index count, Index local, Index reference) override {
-            return sampler_.draw(count, local, reference);
-        }
         void scan(Index local, Index reference) override { sampler_.scan(local, reference); }
         std::size_t explore(std::size_t slot, Index steps) override {
             return sampler_.explore(slot, steps);
@@ -125,12 +117,14 @@ namespace hopsy::bindings {
         void reset_statistics() override { sampler_.reset_statistics(); }
 
       private:
-        void record_snapshot(Index *ids, double *log_densities) const override {
-            const auto current = sampler_.replica_indices();
-            for (std::size_t slot = 0; slot < current.size(); ++slot) {
-                ids[slot] = static_cast<Index>(current[slot]);
-                log_densities[slot] = sampler_.state_log_density(slot);
-            }
+        std::size_t size() const noexcept override { return sampler_.size(); }
+        DenseMatrix draw_samples(Index count, std::span<const Index> steps,
+                                 std::optional<std::size_t> workers) override {
+            return sampler_.draw(count, steps, workers);
+        }
+        TemperingTrace<double> draw_trace(Index count, std::span<const Index> steps,
+                                          std::optional<std::size_t> workers) override {
+            return sampler_.draw_traced(count, steps, workers);
         }
 
         NonReversibleParallelTempering<Problem, Kernel, Reference> sampler_;
